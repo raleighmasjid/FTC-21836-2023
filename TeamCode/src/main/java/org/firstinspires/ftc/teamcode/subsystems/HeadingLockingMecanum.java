@@ -19,15 +19,15 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
             TRANSLATION_SETTLING_TIME = 0.3;
 
     public static LowPassGains derivFilterGains = new LowPassGains(
-            0.8,
+            0.85,
             50
     );
 
     public static PIDGains pidGains = new PIDGains(
-            0.02,
-            0.005,
-            0.0015,
-            0.3
+            0.0,
+            0.0,
+            0.0,
+            0.0
     );
 
     private boolean correctHeading = true;

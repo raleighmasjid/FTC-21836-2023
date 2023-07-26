@@ -18,9 +18,6 @@ public class SimpleServoPivot {
 
     private boolean activated = false;
 
-    /**
-     * Initialize {@link SimpleServoPivot}
-     */
     public SimpleServoPivot(SimpleServo[] servos, double ANGLE_A, double ANGLE_B) {
         this.servos = servos;
         updateAngles(ANGLE_A, ANGLE_B);

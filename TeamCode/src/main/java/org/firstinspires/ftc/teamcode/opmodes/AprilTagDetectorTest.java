@@ -26,18 +26,18 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.AprilTagCamera;
+import org.firstinspires.ftc.teamcode.subsystems.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(group = "21836 Backup")
-public class AprilTagCameraTest extends LinearOpMode {
+public class AprilTagDetectorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         telemetry.setMsTransmissionInterval(50);
 
-        AprilTagCamera camera = new AprilTagCamera(
+        AprilTagDetector camera = new AprilTagDetector(
                 hardwareMap,
                 new MultipleTelemetry(telemetry),
                 new int[]{1, 2, 3},

@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @Config
-public class AprilTagCamera {
+public class AprilTagDetector {
 
     public static double
             TAG_SIZE = 0.166,
@@ -23,7 +23,7 @@ public class AprilTagCamera {
             CAMERA_CX = 402.145,
             CAMERA_CY = 221.506;
 
-    public AprilTagDetection detectedTag = null;
+    private AprilTagDetection detectedTag = null;
 
     private final OpenCvCamera camera;
 
@@ -45,7 +45,7 @@ public class AprilTagCamera {
      * @param tagIdsToLookFor integer IDs of April Tags to look for
      * @param cameraRotation  physical orientation of camera
      */
-    public AprilTagCamera(HardwareMap hardwareMap, MultipleTelemetry myTelemetry, int[] tagIdsToLookFor, OpenCvCameraRotation cameraRotation) {
+    public AprilTagDetector(HardwareMap hardwareMap, MultipleTelemetry myTelemetry, int[] tagIdsToLookFor, OpenCvCameraRotation cameraRotation) {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"),
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
@@ -126,5 +126,9 @@ public class AprilTagCamera {
      */
     private void printDetectedTag() {
         myTelemetry.addLine(String.format("\nDetected tag ID=%d", detectedTag.id));
+    }
+
+    public AprilTagDetection getDetectedTag() {
+        return detectedTag;
     }
 }
