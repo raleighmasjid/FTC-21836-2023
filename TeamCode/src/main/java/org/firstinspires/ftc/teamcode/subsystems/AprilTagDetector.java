@@ -39,6 +39,8 @@ public class AprilTagDetector {
 
     private final int[] tagIdsToLookFor;
 
+    private boolean tagVisible = false;
+
     /**
      * @param hardwareMap     {@link HardwareMap} passed in from the opmode
      * @param myTelemetry     {@link MultipleTelemetry} telemetry to print output to
@@ -67,24 +69,35 @@ public class AprilTagDetector {
     }
 
     /**
-     * To be run in a "while (!isStarted() && !isStopRequested())" loop at the end of the init sequence
+     * Prints tag visibility status to telemetry and calls {@link #printLastDetection()} <p>
+     * telemetry.update() should be called after this method
      */
-    public void initLoop() {
-        if (checkIfTagDetected(pipeline.getLatestDetections())) {
-            myTelemetry.addLine("Tag of interest is in sight!");
-            printDetectedTag();
-        } else printNoTagVisible();
+    public void run() {
+        tagVisible = checkIfTagDetected(pipeline.getLatestDetections());
+        myTelemetry.addLine("A tag of interest is " + (tagVisible ? "" : "not ") + "visible");
+        printLastDetection();
     }
 
     /**
-     * To be run once after the opmode is started (after init)
+     * Closes the camera and calls {@link #printLastDetection()} <p>
+     * telemetry.update() should be called after this method
      */
-    public void printOutput() {
+    public void stop() {
         camera.stopStreaming();
         camera.closeCameraDevice();
+        printLastDetection();
+    }
 
-        if (detectedTag != null) printDetectedTag();
-        else myTelemetry.addLine("No tag was detected during the init loop :(");
+    /**
+     * Prints last {@link #detectedTag} to telemetry <p>
+     * telemetry.update() should be called after this method
+     */
+    public void printLastDetection() {
+        myTelemetry.addLine("A tag has" + (
+                detectedTag == null ?
+                        "never been detected" :
+                        "been detected: " + detectedTag.id
+        ));
     }
 
     /**
@@ -104,27 +117,11 @@ public class AprilTagDetector {
         return false;
     }
 
-    /**
-     * Prints telemetry if no tag is visible at the moment <p>
-     * However, if a tag was previously detected, it's id will be printed
-     */
-    private void printNoTagVisible() {
-        myTelemetry.addLine("No tag visible");
-        if (detectedTag == null) myTelemetry.addLine("(A tag has never been detected)");
-        else {
-            myTelemetry.addLine("\nBut a tag WAS detected:");
-            printDetectedTag();
-        }
-    }
-
-    /**
-     * Prints formatted id of the most recent {@link #detectedTag}
-     */
-    private void printDetectedTag() {
-        myTelemetry.addLine(String.format("\nDetected tag ID=%d", detectedTag.id));
-    }
-
     public AprilTagDetection getDetectedTag() {
         return detectedTag;
+    }
+
+    public boolean tagIsVisible() {
+        return tagVisible;
     }
 }

@@ -46,13 +46,13 @@ public class AprilTagDetectorTest extends LinearOpMode {
         );
 
         while (!isStarted() && !isStopRequested()) {
-            camera.initLoop();
+            camera.run();
             myTelemetry.update();
         }
 
         //START IS HERE//
 
-        camera.printOutput();
+        camera.stop();
         myTelemetry.update();
     }
 }
