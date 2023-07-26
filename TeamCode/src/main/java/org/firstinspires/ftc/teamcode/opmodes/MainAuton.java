@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import java.util.List;
 
-@TeleOp(group = "21836 Teleop")
-public class SampleTeleOp extends LinearOpMode {
+@Autonomous(group = "21836 Autonomous", preselectTeleOp = "MainTeleOp")
+public class MainAuton extends LinearOpMode {
 
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
@@ -17,7 +16,7 @@ public class SampleTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        myTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        myTelemetry = new MultipleTelemetry(telemetry);
 
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
