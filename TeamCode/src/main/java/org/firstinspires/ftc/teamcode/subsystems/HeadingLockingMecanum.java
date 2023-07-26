@@ -15,12 +15,12 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
 
     public static double
             kStatic = 0.0,
-            TURN_SETTLING_TIME = 0.3,
-            TRANSLATION_SETTLING_TIME = 0.3;
+            TURN_SETTLING_TIME = 0.0,
+            TRANSLATION_SETTLING_TIME = 0.0;
 
     public static LowPassGains derivFilterGains = new LowPassGains(
-            0.85,
-            50
+            0.5,
+            10
     );
 
     public static PIDGains pidGains = new PIDGains(
