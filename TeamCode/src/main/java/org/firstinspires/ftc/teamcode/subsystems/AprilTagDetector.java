@@ -74,8 +74,6 @@ public class AprilTagDetector {
             myTelemetry.addLine("Tag of interest is in sight!");
             printDetectedTag();
         } else printNoTagVisible();
-
-        myTelemetry.update();
     }
 
     /**
@@ -87,8 +85,6 @@ public class AprilTagDetector {
 
         if (detectedTag != null) printDetectedTag();
         else myTelemetry.addLine("No tag was detected during the init loop :(");
-
-        myTelemetry.update();
     }
 
     /**
