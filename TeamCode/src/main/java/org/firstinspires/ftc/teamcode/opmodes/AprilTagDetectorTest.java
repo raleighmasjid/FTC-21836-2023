@@ -47,6 +47,8 @@ public class AprilTagDetectorTest extends LinearOpMode {
 
         while (!isStarted() && !isStopRequested()) {
             camera.run();
+            camera.printTagIsVisible();
+            camera.printDetectedTag();
             myTelemetry.update();
         }
 

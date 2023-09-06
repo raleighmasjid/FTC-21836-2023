@@ -69,30 +69,49 @@ public class AprilTagDetector {
     }
 
     /**
-     * Prints tag visibility status to telemetry and calls {@link #printLastDetection()} <p>
-     * telemetry.update() should be called after this method
+     * Gets detections from pipeline<p>
+     * Use {@link #getTagIsVisible()} ()} and {@link #getDetectedTag()}
      */
     public void run() {
-        tagVisible = checkIfTagDetected(pipeline.getLatestDetections());
-        myTelemetry.addLine("A tag of interest is " + (tagVisible ? "" : "not ") + "visible");
-        printLastDetection();
+        ArrayList<AprilTagDetection> detections = pipeline.getLatestDetections();
+        if (detections.size() == 0) {
+            tagVisible = false;
+            return;
+        }
+        for (AprilTagDetection detection : detections) {
+            for (int tagId : tagIdsToLookFor) {
+                if (detection.id == tagId) {
+                    detectedTag = detection;
+                    tagVisible = true;
+                    return;
+                }
+            }
+        }
+        tagVisible = false;
+    }
+
+    public boolean getTagIsVisible() {
+        return tagVisible;
+    }
+
+    public AprilTagDetection getDetectedTag() {
+        return detectedTag;
     }
 
     /**
-     * Closes the camera and calls {@link #printLastDetection()} <p>
+     * Prints tag visibility to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void stop() {
-        camera.stopStreaming();
-        camera.closeCameraDevice();
-        printLastDetection();
+    public void printTagIsVisible() {
+        myTelemetry.addLine("A tag of interest is " + (getTagIsVisible() ? "" : "not ") + "visible");
     }
 
     /**
      * Prints last {@link #detectedTag} to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void printLastDetection() {
+    public void printDetectedTag() {
+        AprilTagDetection detectedTag = getDetectedTag();
         myTelemetry.addLine("A tag has" + (
                 detectedTag == null ?
                         "never been detected" :
@@ -101,27 +120,10 @@ public class AprilTagDetector {
     }
 
     /**
-     * @param detections {@link AprilTagDetection} ArrayList grabbed from an {@link AprilTagDetectionPipeline}
-     * @return Whether or not a {@link #detectedTag}'s id is one of the {@link #tagIdsToLookFor}
+     * Closes the camera
      */
-    private boolean checkIfTagDetected(ArrayList<AprilTagDetection> detections) {
-        if (detections.size() == 0) return false;
-        for (AprilTagDetection detection : detections) {
-            for (int tagId : tagIdsToLookFor) {
-                if (detection.id == tagId) {
-                    detectedTag = detection;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public AprilTagDetection getDetectedTag() {
-        return detectedTag;
-    }
-
-    public boolean tagIsVisible() {
-        return tagVisible;
+    public void stop() {
+        camera.stopStreaming();
+        camera.closeCameraDevice();
     }
 }
