@@ -38,7 +38,7 @@ public class Main {
         printLine();
 
         boolean solve = false;
-        while (!backdrop.rowFull(10)) {
+        while (backdrop.rowNotFull(10)) {
             if (!solve) {
                 int x = input.nextInt();
                 int y = input.nextInt();

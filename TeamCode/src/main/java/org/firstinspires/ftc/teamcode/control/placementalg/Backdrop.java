@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -21,7 +23,7 @@ public class Backdrop {
     static {
         PERFECT_BACKDROP = new Backdrop();
         PERFECT_BACKDROP.calculate();
-        while (!PERFECT_BACKDROP.rowFull(10)) {
+        while (PERFECT_BACKDROP.rowNotFull(10)) {
             Pixel pToPlace = PERFECT_BACKDROP.pixelsToPlace.get(0);
             if (pToPlace.color == Pixel.Color.ANY)
                 pToPlace = new Pixel(pToPlace, Pixel.Color.COLORED);
@@ -115,7 +117,7 @@ public class Backdrop {
 
     private void scanForMosaics() {
         for (Pixel[] row : slots) for (Pixel pixel : row) pixel.mosaic = null;
-        for (int y = 0; y < slots.length && !rowEmpty(y); y++) {
+        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) {
             for (int x = 0; x < slots[x].length; x++) {
 
                 Pixel pixel = get(x, y);
@@ -260,12 +262,12 @@ public class Backdrop {
 
     private void invalidateMosaic(Pixel mosaic) {
         Pixel invMosaic = new Pixel(mosaic, Pixel.Color.INVALID);
-        for (int y = 0; y < slots.length && !rowEmpty(y); y++) for (Pixel pixel : slots[y]) {
+        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
             if (pixel.mosaic == mosaic && (pixel.isColored() || pixel.isEmpty()))
                 pixel.mosaic = invMosaic;
         }
 
-        for (int y = 0; y < slots.length && !rowEmpty(y); y++) for (Pixel pixel : slots[y]) {
+        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
             if (pixel.isColored() && touchingAdjacentMosaic(pixel, false)) pixel.mosaic = invMosaic;
         }
     }
@@ -345,7 +347,7 @@ public class Backdrop {
 
     private int getHighestPixelY() {
         int highestY = 0;
-        for (int y = 0; y < slots.length && !rowEmpty(y); y++) for (Pixel p : slots[y]) {
+        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel p : slots[y]) {
             if (!p.isEmpty() && p.color != Pixel.Color.INVALID) highestY = p.y;
         }
         return highestY;
@@ -393,14 +395,14 @@ public class Backdrop {
         return allTrue(pMosaicsBlocked);
     }
 
-    private boolean rowEmpty(int y) {
-        for (Pixel pixel : slots[y]) if (!pixel.isEmpty() && pixel.color != Pixel.Color.INVALID) return false;
-        return true;
+    private boolean rowNotEmpty(int y) {
+        for (Pixel pixel : slots[y]) if (!pixel.isEmpty() && pixel.color != Pixel.Color.INVALID) return true;
+        return false;
     }
 
-    public boolean rowFull(int y) {
-        for (Pixel pixel : slots[y]) if (pixel.isEmpty()) return false;
-        return true;
+    public boolean rowNotFull(int y) {
+        for (Pixel pixel : slots[y]) if (pixel.isEmpty()) return true;
+        return false;
     }
 
     public void printPixelsToPlace() {

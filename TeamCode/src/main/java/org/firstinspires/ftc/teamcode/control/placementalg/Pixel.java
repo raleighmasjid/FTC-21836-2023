@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,10 +25,8 @@ public class Pixel implements Comparable<Pixel> {
         YELLOW;
 
         private static final String RESET = "\u001B[0m";
-        private static final String G = "\u001B[32m";
-        private static final String Y = "\u001B[33m";
-        private static final String P = "\u001B[35m";
 
+        @NonNull
         public String toString() {
             switch (this) {
                 case WHITE:
@@ -36,11 +36,11 @@ public class Pixel implements Comparable<Pixel> {
                 case COLORED:
                     return "C" + RESET;
                 case PURPLE:
-                    return P + "P" + RESET;
+                    return "\u001B[35m" + "P" + RESET;
                 case YELLOW:
-                    return Y + "Y" + RESET;
+                    return "\u001B[33m" + "Y" + RESET;
                 case GREEN:
-                    return G + "G" + RESET;
+                    return "\u001B[32m" + "G" + RESET;
                 case INVALID:
                     return " ";
                 case EMPTY:
@@ -113,6 +113,7 @@ public class Pixel implements Comparable<Pixel> {
         return mosaic != null && mosaic.color != Color.INVALID;
     }
 
+    @NonNull
     public String toString() {
         double decPlaces = 100000;
         return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
