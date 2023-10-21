@@ -9,6 +9,7 @@ public class Main {
         Backdrop backdrop = new Backdrop();
         boolean alwaysPlaceColored = true;
         boolean printPerIteration = true;
+        backdrop.printRectangular = false;
 
         String[] colors = {
                 "  _ _ _ _ _ _",

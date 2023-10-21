@@ -7,6 +7,7 @@ public class Backdrop {
     private final static int rows = 11;
     private final static int columns = 7;
     public boolean noColor = false;
+    public boolean printRectangular = true;
 
     private final Pixel[][] slots = new Pixel[rows][columns];
     public final ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
@@ -203,7 +204,8 @@ public class Backdrop {
                 Pixel pixel = get(x, y);
                 String color = pixel.color.toString();
                 if (pixel.inMosaic()) color = color.toLowerCase();
-                backdrop.append(color).append(x == columns - 1 ? "" : spacer);
+                if (!color.equals(" ") || printRectangular) backdrop.append(color);
+                backdrop.append(x == columns - 1 ? "" : spacer);
             }
             backdrop.append('\n');
         }
