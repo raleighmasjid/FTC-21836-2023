@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Pixel implements Comparable<Pixel> {
 
     public int compareTo(Pixel cPixel) {
@@ -67,6 +70,15 @@ public class Pixel implements Comparable<Pixel> {
                     return Color.EMPTY;
             }
         }
+
+        public static Color getRemainingColor(Color c1, Color c2) {
+            if (c1 == Color.EMPTY || c2 == Color.EMPTY) return Color.COLORED;
+            if (c1 == c2) return c1;
+            ArrayList<Color> colors = new ArrayList<>(Arrays.asList(GREEN, PURPLE, YELLOW));
+            colors.remove(c1);
+            colors.remove(c2);
+            return colors.get(0);
+        }
     }
 
     public final int x, y;
@@ -99,26 +111,6 @@ public class Pixel implements Comparable<Pixel> {
 
     public boolean inMosaic() {
         return mosaic != null && mosaic.color != Color.INVALID;
-    }
-
-    public static Color getRemainingColor(Pixel p1, Pixel p2) {
-        if (p1.color == Color.EMPTY || p2.color == Color.EMPTY) return Color.COLORED;
-        if (p1.color == Color.GREEN) {
-            if (p2.color == Color.YELLOW) return Color.PURPLE;
-            else if (p2.color == Color.PURPLE) return Color.YELLOW;
-            else if (p2.color == Color.GREEN) return Color.GREEN;
-            else return Color.INVALID;
-        } else if (p1.color == Pixel.Color.YELLOW) {
-            if (p2.color == Color.GREEN) return Color.PURPLE;
-            else if (p2.color == Color.PURPLE) return Color.GREEN;
-            else if (p2.color == Pixel.Color.YELLOW) return Color.YELLOW;
-            else return Color.INVALID;
-        } else if (p1.color == Color.PURPLE) {
-            if (p2.color == Color.GREEN) return Color.YELLOW;
-            else if (p2.color == Color.YELLOW) return Color.GREEN;
-            else if (p2.color == Color.PURPLE) return Color.PURPLE;
-            else return Color.INVALID;
-        } else return Color.INVALID;
     }
 
     public String toString() {

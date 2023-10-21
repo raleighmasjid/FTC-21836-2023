@@ -158,13 +158,13 @@ public class Backdrop {
                     ) {
                         if (pMosaic[1].isColored() && pMosaic[2].isEmpty()) {
                             Pixel b = pMosaic[2];
-                            pixelsToPlace.add(new Pixel(b, Pixel.getRemainingColor(pixel, pMosaic[1])));
+                            pixelsToPlace.add(new Pixel(b, Pixel.Color.getRemainingColor(pixel.color, pMosaic[1].color)));
                             b = new Pixel(b);
                             b.scoreValue += 11;
                             colorsToGetSPixels.add(b);
                         } else if (pMosaic[2].isColored() && pMosaic[1].isEmpty()) {
                             Pixel b = pMosaic[1];
-                            pixelsToPlace.add(new Pixel(b, Pixel.getRemainingColor(pixel, pMosaic[2])));
+                            pixelsToPlace.add(new Pixel(b, Pixel.Color.getRemainingColor(pixel.color, pMosaic[2].color)));
                             b = new Pixel(b);
                             b.scoreValue += 11;
                             colorsToGetSPixels.add(b);
