@@ -39,8 +39,8 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
 
     private final PIDController headingController = new PIDController();
 
-    public HeadingLockingMecanum(HardwareMap hw, double motorCPR, double motorRPM) {
-        super(hw, motorCPR, motorRPM);
+    public HeadingLockingMecanum(HardwareMap hw, double motorCPR, double motorRPM, HeadingLocalizer headingLocalizer) {
+        super(hw, motorCPR, motorRPM, headingLocalizer);
     }
 
     @Override
