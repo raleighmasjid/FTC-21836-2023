@@ -4,12 +4,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +13,7 @@ import java.util.Collections;
 
 public class MecanumDrivetrain {
 
-    private final IMU imu;
+    private final HeadingLocalizer headingLocalizer;
 
     private final MecanumDrive mecanumDrivetrain;
 
@@ -34,7 +30,7 @@ public class MecanumDrivetrain {
         return new MotorEx(hw, name, motorCPR, motorRPM);
     }
 
-    public MecanumDrivetrain(HardwareMap hw, double motorCPR, double motorRPM) {
+    public MecanumDrivetrain(HardwareMap hw, double motorCPR, double motorRPM, HeadingLocalizer headingLocalizer) {
         this.hw = hw;
         this.motorCPR = motorCPR;
         this.motorRPM = motorRPM;
@@ -58,15 +54,7 @@ public class MecanumDrivetrain {
         // Initialize the FTCLib drive-base
         mecanumDrivetrain = new MecanumDrive(false, motors[0], motors[1], motors[2], motors[3]);
 
-        imu = hw.get(IMU.class, "imu");
-        imu.resetDeviceConfigurationForOpMode();
-        imu.resetYaw();
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-        )));
-
-        resetPosition();
+        this.headingLocalizer = headingLocalizer;
     }
 
     public static double normalizeAngle(double angle) {
@@ -78,7 +66,7 @@ public class MecanumDrivetrain {
     }
 
     public void readIMU() {
-        latestIMUReading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        latestIMUReading = headingLocalizer.getHeading();
     }
 
     /**
@@ -94,25 +82,9 @@ public class MecanumDrivetrain {
         return normalizeAngle(latestIMUReading - headingOffset);
     }
 
-    public int getMotorPos(int motorIndex) {
-        return motors[motorIndex].encoder.getPosition();
-    }
-
-    public double getY() {
-        return (getMotorPos(0) + getMotorPos(1) + getMotorPos(2) + getMotorPos(3)) * 0.25;
-    }
-
-    public double getX() {
-        return (getMotorPos(0) - getMotorPos(1) - getMotorPos(2) + getMotorPos(3)) * 0.25;
-    }
-
-    public void resetPosition() {
-        for (MotorEx motor : motors) motor.encoder.reset();
-    }
-
     public void run(double xCommand, double yCommand, double turnCommand) {
         // normalize inputs
-        double max = Collections.max(Arrays.asList(xCommand, yCommand, turnCommand, 1.0));
+        double max = Collections.max(Arrays.asList(Math.abs(xCommand), Math.abs(yCommand), Math.abs(turnCommand), 1.0));
         xCommand /= max;
         yCommand /= max;
         turnCommand /= max;
