@@ -1,6 +1,13 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_BOTTOM_HEIGHT;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_HEIGHT;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_WIDTH;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_X;
+
 import androidx.annotation.NonNull;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,6 +127,18 @@ public class Pixel implements Comparable<Pixel> {
 
     public boolean inMosaic() {
         return mosaic != null && mosaic.color != Color.INVALID;
+    }
+
+    public Pose2d toPose2d(double topY) {
+        return new Pose2d(
+                SCORING_X,
+                topY - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
+                Math.toRadians(0)
+        );
+    }
+
+    public double toScoringHeight() {
+        return PIXEL_BOTTOM_HEIGHT + (y * PIXEL_HEIGHT);
     }
 
     @NonNull
