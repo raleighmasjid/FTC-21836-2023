@@ -80,7 +80,7 @@ public class Backdrop {
                 get(6, y),
                 get(6, y + 1),
         };
-        for (Pixel p : shouldBeColored) if (!(p.isEmpty() || p.isColored())) return false;
+        for (Pixel p : shouldBeColored) if (!(p.isEmpty() || p.color.isColored())) return false;
 
         Pixel[] shouldBeWhite = {
                 get(5, y - 1),
@@ -121,7 +121,7 @@ public class Backdrop {
             for (int x = 0; x < slots[x].length; x++) {
 
                 Pixel pixel = get(x, y);
-                if (pixel.mosaic != null || !pixel.isColored() || (pixel.isColored() && touchingAdjacentMosaic(pixel, false)))
+                if (pixel.mosaic != null || !pixel.color.isColored() || touchingAdjacentMosaic(pixel, false))
                     continue;
 
                 Pixel[][] possibleMosaics = getPossibleMosaics(pixel);
@@ -131,7 +131,7 @@ public class Backdrop {
                 for (Pixel[] pMosaic : possibleMosaics) {
                     boolean sameColor = pMosaic[0].color == pMosaic[1].color && pMosaic[1].color == pMosaic[2].color;
                     boolean diffColors = pMosaic[0].color != pMosaic[1].color && pMosaic[1].color != pMosaic[2].color && pMosaic[0].color != pMosaic[2].color;
-                    boolean allColored = pMosaic[1].isColored() && pMosaic[2].isColored();
+                    boolean allColored = pMosaic[1].color.isColored() && pMosaic[2].color.isColored();
                     isMosaic = sameColor || (diffColors && allColored);
                     if (isMosaic) {
                         pixels = pMosaic;
@@ -152,16 +152,16 @@ public class Backdrop {
                 }
 
                 for (Pixel[] pMosaic : possibleMosaics) {
-                    for (Pixel a : pMosaic) if (a.isColored() || a.isEmpty()) a.mosaic = pixel;
+                    for (Pixel a : pMosaic) if (a.color.isColored() || a.isEmpty()) a.mosaic = pixel;
 
                     if (
                             !touchingAdjacentMosaic(pMosaic[0], false) &&
                                     !touchingAdjacentMosaic(pMosaic[1], false) &&
                                     !touchingAdjacentMosaic(pMosaic[2], false)
                     ) {
-                        if (pMosaic[1].isColored() && pMosaic[2].isEmpty()) {
+                        if (pMosaic[1].color.isColored() && pMosaic[2].isEmpty()) {
                             oneRemainingCase(pixel, pMosaic[2], pMosaic[1]);
-                        } else if (pMosaic[2].isColored() && pMosaic[1].isEmpty()) {
+                        } else if (pMosaic[2].color.isColored() && pMosaic[1].isEmpty()) {
                             oneRemainingCase(pixel, pMosaic[1], pMosaic[2]);
                         } else if (pMosaic[1].isEmpty() && pMosaic[2].isEmpty()) {
                             pixelsToPlace.add(new Pixel(pMosaic[1], Pixel.Color.COLORED));
@@ -226,7 +226,7 @@ public class Backdrop {
     private void updateScoreValues() {
         for (Pixel pixel : pixelsToPlace) {
             if (!noColor) {
-                if (pixel.isColored()) pixel.scoreValue += 11;
+                if (pixel.color.isColored()) pixel.scoreValue += 11;
                 if (pixel.color == Pixel.Color.COLORED) pixel.scoreValue += 22/3.0;
                 if (pixel.color == Pixel.Color.WHITE) pixel.scoreValue += 11/9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
@@ -263,12 +263,12 @@ public class Backdrop {
     private void invalidateMosaic(Pixel mosaic) {
         Pixel invMosaic = new Pixel(mosaic, Pixel.Color.INVALID);
         for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
-            if (pixel.mosaic == mosaic && (pixel.isColored() || pixel.isEmpty()))
+            if (pixel.mosaic == mosaic && (pixel.color.isColored() || pixel.isEmpty()))
                 pixel.mosaic = invMosaic;
         }
 
         for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
-            if (pixel.isColored() && touchingAdjacentMosaic(pixel, false)) pixel.mosaic = invMosaic;
+            if (pixel.color.isColored() && touchingAdjacentMosaic(pixel, false)) pixel.mosaic = invMosaic;
         }
     }
 
@@ -279,7 +279,7 @@ public class Backdrop {
     private ArrayList<Pixel> getAdjacentMosaics(Pixel pixel, boolean includeEmpties) {
         ArrayList<Pixel> adjacentMosaics = new ArrayList<>();
         for (Pixel neighbor : getNeighbors(pixel, includeEmpties)) {
-            if ((neighbor.isColored() || neighbor.isEmpty()) && neighbor.mosaic != pixel.mosaic) {
+            if ((neighbor.color.isColored() || neighbor.isEmpty()) && neighbor.mosaic != pixel.mosaic) {
                 adjacentMosaics.add(neighbor);
             }
         }

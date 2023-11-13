@@ -79,6 +79,19 @@ public class Pixel implements Comparable<Pixel> {
             colors.remove(c2);
             return colors.get(0);
         }
+
+        public boolean matches(Color other) {
+            if (this == Color.INVALID || other == Color.INVALID) return false;
+            return this == Color.ANY ||
+                    other == Color.ANY ||
+                    this == other ||
+                    isColored() && other == Color.COLORED ||
+                    this == Color.COLORED && other.isColored();
+        }
+
+        public boolean isColored() {
+            return this == Color.PURPLE || this == Color.YELLOW || this == Color.GREEN;
+        }
     }
 
     public final int x, y;
@@ -99,10 +112,6 @@ public class Pixel implements Comparable<Pixel> {
 
     public Pixel(Pixel p) {
         this(p, p.color);
-    }
-
-    public boolean isColored() {
-        return color == Color.PURPLE || color == Color.YELLOW || color == Color.GREEN;
     }
 
     public boolean isEmpty() {
