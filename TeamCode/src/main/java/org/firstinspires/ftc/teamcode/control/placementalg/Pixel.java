@@ -99,6 +99,10 @@ public class Pixel implements Comparable<Pixel> {
         public boolean isColored() {
             return this == Color.PURPLE || this == Color.YELLOW || this == Color.GREEN;
         }
+
+        public boolean isEmpty() {
+            return this == Color.EMPTY;
+        }
     }
 
     public final int x, y;
@@ -119,10 +123,6 @@ public class Pixel implements Comparable<Pixel> {
 
     public Pixel(Pixel p) {
         this(p, p.color);
-    }
-
-    public boolean isEmpty() {
-        return color == Color.EMPTY;
     }
 
     public boolean inMosaic() {
