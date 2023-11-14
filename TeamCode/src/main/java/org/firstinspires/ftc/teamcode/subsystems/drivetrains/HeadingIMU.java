@@ -6,9 +6,13 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class HeadingIMU implements HeadingLocalizer {
+public class HeadingIMU extends Thread implements HeadingLocalizer {
 
     private final IMU imu;
+
+    private double heading;
+
+    private boolean run = false;
 
     public HeadingIMU(HardwareMap hw, String name, RevHubOrientationOnRobot imuOrientation) {
         imu = hw.get(IMU.class, name);
@@ -18,7 +22,24 @@ public class HeadingIMU implements HeadingLocalizer {
     }
 
     @Override
+    public void start() {
+        run = true;
+        super.start();
+    }
+
+    @Override
+    public void run() {
+        while (run) heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    @Override
     public double getHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        return heading;
+    }
+
+    @Override
+    public void interrupt() {
+        run = false;
+        super.interrupt();
     }
 }
