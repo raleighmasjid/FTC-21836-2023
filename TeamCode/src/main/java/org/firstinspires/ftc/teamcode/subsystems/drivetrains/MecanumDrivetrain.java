@@ -58,8 +58,6 @@ public class MecanumDrivetrain {
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         ));
-
-        resetPosition();
     }
 
     public void readIMU() {
@@ -77,10 +75,6 @@ public class MecanumDrivetrain {
 
     public double getHeading() {
         return AngleUnit.normalizeDegrees(latestIMUReading - headingOffset);
-    }
-
-    public void resetPosition() {
-        for (MotorEx motor : motors) motor.encoder.reset();
     }
 
     public void run(double xCommand, double yCommand, double turnCommand) {
