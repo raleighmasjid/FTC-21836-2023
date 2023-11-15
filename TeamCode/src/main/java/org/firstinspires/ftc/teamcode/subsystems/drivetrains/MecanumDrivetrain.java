@@ -27,12 +27,10 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -66,9 +64,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     private final DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private final List<DcMotorEx> motors;
 
-    private final IMU imu;
-
-    public final HeadingIMU imuEx;
+    public final HeadingIMU imu;
     private double headingOffset, latestIMUReading;
     protected final VoltageSensor batteryVoltageSensor;
 
@@ -90,12 +86,8 @@ public class MecanumDrivetrain extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                LOGO_FACING_DIR, USB_FACING_DIR));
-        imu.initialize(parameters);
 
-        imuEx = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
 
         leftFront = hardwareMap.get(DcMotorEx.class, "left front");
         leftBack = hardwareMap.get(DcMotorEx.class, "left back");
@@ -288,12 +280,12 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        return imu.getHeading();
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+        return imu.getAngularVelo();
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
@@ -316,7 +308,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     public void readIMU() {
-        latestIMUReading = imuEx.getHeading();
+        latestIMUReading = imu.getHeading();
     }
 
     /**
