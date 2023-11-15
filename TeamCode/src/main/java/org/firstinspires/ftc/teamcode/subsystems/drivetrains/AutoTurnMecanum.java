@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.State;
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
+import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 
@@ -37,7 +38,8 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     private final ElapsedTime turnSettlingTimer = new ElapsedTime();
     private final ElapsedTime translationSettlingTimer = new ElapsedTime();
 
-    private final PIDController headingController = new PIDController();
+    private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(derivFilterGains);
+    private final PIDController headingController = new PIDController(kDFilter);
 
     public AutoTurnMecanum(HardwareMap hardwareMap) {
         super(hardwareMap);
@@ -46,7 +48,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     @Override
     public void readIMU() {
         headingController.setGains(pidGains);
-        headingController.derivFilter.setGains(derivFilterGains);
+        kDFilter.setGains(derivFilterGains);
         super.readIMU();
     }
 
