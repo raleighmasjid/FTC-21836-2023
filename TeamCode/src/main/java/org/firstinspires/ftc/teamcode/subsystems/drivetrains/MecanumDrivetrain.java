@@ -8,6 +8,8 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -63,14 +65,6 @@ public class MecanumDrivetrain {
         resetPosition();
     }
 
-    public static double normalizeAngle(double angle) {
-        angle %= 360.0;
-        if (angle <= -180.0) return angle + 360.0;
-        if (angle > 180.0) return angle - 360.0;
-        if (angle == -0.0) return 0.0;
-        return angle;
-    }
-
     public void readIMU() {
         latestIMUReading = headingLocalizer.getHeading();
     }
@@ -81,11 +75,11 @@ public class MecanumDrivetrain {
      * @param angle Angle of the robot in degrees, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        headingOffset = latestIMUReading - normalizeAngle(angle);
+        headingOffset = latestIMUReading - AngleUnit.normalizeDegrees(angle);
     }
 
     public double getHeading() {
-        return normalizeAngle(latestIMUReading - headingOffset);
+        return AngleUnit.normalizeDegrees(latestIMUReading - headingOffset);
     }
 
     public void resetPosition() {
