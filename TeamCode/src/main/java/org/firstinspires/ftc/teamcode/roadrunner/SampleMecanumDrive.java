@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -9,6 +12,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -32,9 +36,11 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.HeadingIMU;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -51,26 +57,27 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
-    private TrajectorySequenceRunner trajectorySequenceRunner;
+    private final TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(DriveConstants.MAX_ACCEL);
 
-    private TrajectoryFollower follower;
+    private final DcMotorEx leftFront, leftBack, rightBack, rightFront;
+    private final List<DcMotorEx> motors;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
-    private List<DcMotorEx> motors;
+    private final IMU imu;
 
-    private IMU imu;
-    private VoltageSensor batteryVoltageSensor;
+    public final HeadingIMU imuEx;
+    private double headingOffset, latestIMUReading;
+    private final VoltageSensor batteryVoltageSensor;
 
-    private List<Integer> lastEncPositions = new ArrayList<>();
-    private List<Integer> lastEncVels = new ArrayList<>();
+    private final List<Integer> lastEncPositions = new ArrayList<>();
+    private final List<Integer> lastEncVels = new ArrayList<>();
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
 
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
+        TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
@@ -84,15 +91,17 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: adjust the names of the following hardware devices to match your configuration
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
+                LOGO_FACING_DIR, USB_FACING_DIR));
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        imuEx = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        leftFront = hardwareMap.get(DcMotorEx.class, "left front");
+        leftBack = hardwareMap.get(DcMotorEx.class, "left back");
+        rightBack = hardwareMap.get(DcMotorEx.class, "right back");
+        rightFront = hardwareMap.get(DcMotorEx.class, "right front");
+
+        motors = Arrays.asList(leftFront, leftBack, rightBack, rightFront);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -271,8 +280,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
+        leftBack.setPower(v1);
+        rightBack.setPower(v2);
         rightFront.setPower(v3);
     }
 
@@ -295,5 +304,55 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public static double normalizeAngle(double angle) {
+        angle %= 360.0;
+        if (angle <= -180.0) return angle + 360.0;
+        if (angle > 180.0) return angle - 360.0;
+        if (angle == -0.0) return 0.0;
+        return angle;
+    }
+
+    public void readIMU() {
+        latestIMUReading = imuEx.getHeading();
+    }
+
+    /**
+     * Set internal heading of the robot to correct field-centric direction
+     *
+     * @param angle Angle of the robot in degrees, 0 facing forward and increases counter-clockwise
+     */
+    public void setCurrentHeading(double angle) {
+        headingOffset = latestIMUReading - normalizeAngle(angle);
+    }
+
+    public double getHeading() {
+        return normalizeAngle(latestIMUReading - headingOffset);
+    }
+
+    /**
+     * Field-centric driving using (threaded) {@link HeadingIMU}
+     *
+     * @param xCommand strafing input
+     * @param yCommand forward input
+     * @param turnCommand turning input
+     */
+    public void run(double xCommand, double yCommand, double turnCommand) {
+        // normalize inputs
+        double max = Collections.max(Arrays.asList(Math.abs(xCommand), Math.abs(yCommand), Math.abs(turnCommand), 1.0));
+        xCommand /= max;
+        yCommand /= max;
+        turnCommand /= max;
+
+        Vector2d output = new Vector2d(xCommand, yCommand).rotated(-getHeading());
+
+        setWeightedDrivePower(
+                new Pose2d(
+                        output.getX(),
+                        output.getY(),
+                        turnCommand
+                )
+        );
     }
 }
