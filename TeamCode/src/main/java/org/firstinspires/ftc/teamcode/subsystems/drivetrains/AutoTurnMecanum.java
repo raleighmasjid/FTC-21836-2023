@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 
 @Config
-public class HeadingLockingMecanum extends MecanumDrivetrain {
+public class AutoTurnMecanum extends MecanumDrivetrain {
 
     public static double
             kStatic = 0.0,
@@ -30,7 +30,7 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
             0.0
     );
 
-    private boolean correctHeading = true;
+    private boolean useAutoTurn = true;
 
     private double lastXCommand = 0.0, lastYCommand = 0.0, targetHeading;
 
@@ -39,8 +39,8 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
 
     private final PIDController headingController = new PIDController();
 
-    public HeadingLockingMecanum(HardwareMap hw, double motorCPR, double motorRPM, HeadingLocalizer headingLocalizer) {
-        super(hw, motorCPR, motorRPM, headingLocalizer);
+    public AutoTurnMecanum(HardwareMap hardwareMap) {
+        super(hardwareMap);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
         double scalar = 12.0 / batteryVoltageSensor.getVoltage();
         boolean useManualInput = turnCommand != 0.0;
 
-        if (useManualInput || !correctHeading) {
+        if (useManualInput || !useAutoTurn) {
             turnCommand *= scalar;
             turnSettlingTimer.reset();
         }
@@ -64,7 +64,7 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
         boolean yStopped = lastYCommand != 0 && yCommand == 0;
         if (xStopped || yStopped) translationSettlingTimer.reset();
 
-        if (correctHeading) {
+        if (useAutoTurn) {
             if (useManualInput || turnSettlingTimer.seconds() <= TURN_SETTLING_TIME) {
                 setTargetHeading(getHeading());
             } else if (translationSettlingTimer.seconds() > TRANSLATION_SETTLING_TIME) {
@@ -90,11 +90,11 @@ public class HeadingLockingMecanum extends MecanumDrivetrain {
     }
 
     public void toggleHeadingCorrection() {
-        correctHeading = !correctHeading;
+        useAutoTurn = !useAutoTurn;
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Heading correction is", correctHeading ? "active" : "disabled");
+        telemetry.addData("Auto turn is", useAutoTurn ? "active" : "inactive");
     }
 
     @Override
