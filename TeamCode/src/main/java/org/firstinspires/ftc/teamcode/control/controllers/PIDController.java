@@ -3,7 +3,8 @@ package org.firstinspires.ftc.teamcode.control.controllers;
 import org.firstinspires.ftc.teamcode.control.Differentiator;
 import org.firstinspires.ftc.teamcode.control.Integrator;
 import org.firstinspires.ftc.teamcode.control.State;
-import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
+import org.firstinspires.ftc.teamcode.control.filters.Filter;
+import org.firstinspires.ftc.teamcode.control.filters.NoFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 
 public class PIDController implements FeedbackController {
@@ -11,20 +12,19 @@ public class PIDController implements FeedbackController {
     private PIDGains gains = new PIDGains();
     private State target = new State();
 
-    public final FIRLowPassFilter derivFilter;
-    private final Differentiator differentiator;
+    public final Filter derivFilter;
+    private final Differentiator differentiator = new Differentiator();
     private final Integrator integrator = new Integrator();
 
     private double error, lastError, errorIntegral, errorDerivative;
     private boolean calculateError = true;
 
     public PIDController() {
-        this(new FIRLowPassFilter());
+        this(new NoFilter());
     }
 
-    public PIDController(FIRLowPassFilter derivFilter) {
+    public PIDController(Filter derivFilter) {
         this.derivFilter = derivFilter;
-        differentiator = new Differentiator(derivFilter);
     }
 
     public void setGains(PIDGains gains) {
@@ -42,7 +42,7 @@ public class PIDController implements FeedbackController {
 
         if (Math.signum(error) != Math.signum(lastError)) reset();
         errorIntegral = integrator.getIntegral(error);
-        errorDerivative = differentiator.getDerivative(error);
+        errorDerivative = derivFilter.calculate(differentiator.getDerivative(error));
 
         double output = (gains.kP * error) + (gains.kI * errorIntegral) + (gains.kD * errorDerivative);
 
