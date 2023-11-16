@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasure
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_HEIGHT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_WIDTH;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_X;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_Y_BLUE_HIGHEST;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_Y_RED_HIGHEST;
 
 import androidx.annotation.NonNull;
 
@@ -129,10 +131,10 @@ public class Pixel implements Comparable<Pixel> {
         return mosaic != null && mosaic.color != Color.INVALID;
     }
 
-    public Pose2d toPose2d(double topY) {
+    public Pose2d toPose2d(boolean isRed) {
         return new Pose2d(
                 SCORING_X,
-                topY - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
+                (isRed ? SCORING_Y_RED_HIGHEST : SCORING_Y_BLUE_HIGHEST) - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
                 Math.toRadians(0)
         );
     }
