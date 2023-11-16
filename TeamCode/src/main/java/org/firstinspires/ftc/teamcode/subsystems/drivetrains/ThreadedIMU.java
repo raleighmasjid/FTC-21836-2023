@@ -12,7 +12,7 @@ public class ThreadedIMU extends Thread {
 
     private double heading, angularVelo;
 
-    private boolean run = false;
+    private boolean run = true;
 
     public ThreadedIMU(HardwareMap hw, String name, RevHubOrientationOnRobot imuOrientation) {
         imu = hw.get(IMU.class, name);
@@ -23,7 +23,6 @@ public class ThreadedIMU extends Thread {
 
     @Override
     public void start() {
-        run = true;
         super.start();
     }
 
@@ -46,6 +45,5 @@ public class ThreadedIMU extends Thread {
     @Override
     public void interrupt() {
         run = false;
-        super.interrupt();
     }
 }
