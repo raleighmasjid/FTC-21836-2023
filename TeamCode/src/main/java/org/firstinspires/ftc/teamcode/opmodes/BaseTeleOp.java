@@ -5,14 +5,12 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 
 import java.util.List;
 
-@TeleOp(group = "21836 TeleOp")
-public class MainTeleOp extends LinearOpMode {
+public abstract class BaseTeleOp extends LinearOpMode {
 
     // Declare objects:
     MultipleTelemetry myTelemetry;
