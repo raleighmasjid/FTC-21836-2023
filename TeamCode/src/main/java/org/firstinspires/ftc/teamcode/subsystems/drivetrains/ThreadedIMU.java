@@ -5,26 +5,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.control.Differentiator;
 
 public class ThreadedIMU extends Thread {
 
     private final IMU imu;
 
-    private double heading;
+    private double heading, angularVelo;
 
     private boolean run = false;
-
-    private final Differentiator veloCalc;
-    private double angularVelo;
 
     public ThreadedIMU(HardwareMap hw, String name, RevHubOrientationOnRobot imuOrientation) {
         imu = hw.get(IMU.class, name);
         imu.resetDeviceConfigurationForOpMode();
         imu.resetYaw();
         imu.initialize(new IMU.Parameters(imuOrientation));
-
-        veloCalc = new Differentiator();
     }
 
     @Override
@@ -37,7 +31,7 @@ public class ThreadedIMU extends Thread {
     public void run() {
         while (run) {
             heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-            angularVelo = veloCalc.getDerivative(heading);
+            angularVelo = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
         }
     }
 
