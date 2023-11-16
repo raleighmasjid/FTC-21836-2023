@@ -295,15 +295,15 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return (Double) imu.getAngularVelo();
+        return imu.getAngularVelo();
     }
 
     public final ThreadedIMU imu;
 
-    private double headingOffset, latestIMUReading;
+    private double headingOffset, heading;
 
     public void readIMU() {
-        latestIMUReading = imu.getHeading();
+        heading = Math.toDegrees(imu.getHeading());
     }
 
     /**
@@ -312,11 +312,11 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param angle Angle of the robot in degrees, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        headingOffset = latestIMUReading - AngleUnit.normalizeDegrees(angle);
+        headingOffset = heading - AngleUnit.normalizeDegrees(angle);
     }
 
     public double getHeading() {
-        return AngleUnit.normalizeDegrees(latestIMUReading - headingOffset);
+        return AngleUnit.normalizeDegrees(heading - headingOffset);
     }
 
     /**

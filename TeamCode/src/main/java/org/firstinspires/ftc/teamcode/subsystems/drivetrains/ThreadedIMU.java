@@ -30,7 +30,7 @@ public class ThreadedIMU extends Thread {
     @Override
     public void run() {
         while (run) {
-            heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             angularVelo = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
         }
     }
