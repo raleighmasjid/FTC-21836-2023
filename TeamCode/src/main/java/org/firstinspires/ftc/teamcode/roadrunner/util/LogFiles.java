@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.util.WebHandlerManager;
 import org.firstinspires.ftc.ftccommon.external.WebHandlerRegistrar;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.roadrunner.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
 
