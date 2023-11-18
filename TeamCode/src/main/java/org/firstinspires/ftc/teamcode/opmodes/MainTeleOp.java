@@ -12,12 +12,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
 import java.util.List;
 
-public abstract class BaseTeleOp extends LinearOpMode {
+@TeleOp(group = "21836 TeleOp")
+public class MainTeleOp extends LinearOpMode {
 
     // Declare objects:
     MultipleTelemetry myTelemetry;
@@ -25,7 +27,8 @@ public abstract class BaseTeleOp extends LinearOpMode {
     AutoTurnMecanum drivetrain;
     GamepadEx Gamepad1, Gamepad2;
 
-    public void runOpMode(boolean red) throws InterruptedException {
+    @Override
+    public void runOpMode() throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
         myTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -58,9 +61,9 @@ public abstract class BaseTeleOp extends LinearOpMode {
 
             // Reset current heading as per these keybinds:
             if (Gamepad1.wasJustPressed(DPAD_UP)) drivetrain.setCurrentHeading(0);
-            else if (Gamepad1.wasJustPressed(DPAD_LEFT)) drivetrain.setCurrentHeading(PI/2);
-            else if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
-            else if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
+            if (Gamepad1.wasJustPressed(DPAD_LEFT)) drivetrain.setCurrentHeading(PI/2);
+            if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
+            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
 
             if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0) lockSlowMode = false;
             // Field-centric drive dt with control stick inputs:
