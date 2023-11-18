@@ -9,6 +9,7 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -62,7 +63,8 @@ public abstract class BaseTeleOp extends LinearOpMode {
             drivetrain.run(
                     Gamepad1.getLeftX(),
                     Gamepad1.getLeftY(),
-                    Gamepad1.getRightX()
+                    Gamepad1.getRightX(),
+                    Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
             );
 
             // Push telemetry data to multiple outputs (set earlier):

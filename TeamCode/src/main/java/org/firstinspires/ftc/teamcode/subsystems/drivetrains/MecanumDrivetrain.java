@@ -307,6 +307,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     public final ThreadedIMU imu;
 
     private double headingOffset;
+    public static double SLOW_FACTOR = 0.3;
 
     /**
      * Set internal heading of the robot to correct field-centric direction
@@ -328,7 +329,7 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param yCommand forward input
      * @param turnCommand turning input
      */
-    public void run(double xCommand, double yCommand, double turnCommand) {
+    public void run(double xCommand, double yCommand, double turnCommand, double slowCommand) {
         // normalize inputs
         double max = Collections.max(Arrays.asList(abs(xCommand), abs(yCommand), abs(turnCommand), 1.0));
         xCommand /= max;
@@ -343,10 +344,11 @@ public class MecanumDrivetrain extends MecanumDrive {
         yCommand = x * sin(theta) + y * cos(theta);
 
         // run motors
+        double slowScalar = 1 - (1 - SLOW_FACTOR) * slowCommand;
         setWeightedDrivePower(new Pose2d(
-                yCommand,
-                -xCommand,
-                -turnCommand
+                yCommand * slowScalar,
+                -xCommand * slowScalar,
+                -turnCommand * slowScalar
         ));
     }
 

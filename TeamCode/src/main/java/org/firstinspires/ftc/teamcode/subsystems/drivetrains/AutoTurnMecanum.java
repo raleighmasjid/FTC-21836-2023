@@ -55,7 +55,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     }
 
     @Override
-    public void run(double xCommand, double yCommand, double turnCommand) {
+    public void run(double xCommand, double yCommand, double turnCommand, double slowCommand) {
         double scalar = 12.0 / batteryVoltageSensor.getVoltage();
         boolean useManualInput = turnCommand != 0.0;
 
@@ -80,7 +80,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
 
         lastXCommand = xCommand;
         lastYCommand = yCommand;
-        super.run(xCommand * scalar, yCommand * scalar, turnCommand);
+        super.run(xCommand * scalar, yCommand * scalar, turnCommand, slowCommand);
     }
 
 
