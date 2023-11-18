@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -336,12 +339,15 @@ public class MecanumDrivetrain extends MecanumDrive {
         yCommand /= max;
         turnCommand /= max;
 
-        Vector2d output = new Vector2d(xCommand, yCommand).rotated(-getHeading());
+        double rotatedX = xCommand * cos(-getHeading()) - yCommand * sin(-getHeading());
+        double rotatedY = xCommand * sin(-getHeading()) + yCommand * cos(-getHeading());
 
         setWeightedDrivePower(
                 new Pose2d(
-                        output.getX(),
-                        output.getY(),
+//                        rotatedX,
+//                        rotatedY,
+                        xCommand,
+                        yCommand,
                         turnCommand
                 )
         );
