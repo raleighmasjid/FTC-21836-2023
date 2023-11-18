@@ -62,27 +62,27 @@ public class Pixel implements Comparable<Pixel> {
         public static Color fromString(String color) {
             switch (color.toUpperCase()) {
                 case "W":
-                    return Color.WHITE;
+                    return WHITE;
                 case "A":
-                    return Color.ANY;
+                    return ANY;
                 case "C":
-                    return Color.COLORED;
+                    return COLORED;
                 case "P":
-                    return Color.PURPLE;
+                    return PURPLE;
                 case "Y":
-                    return Color.YELLOW;
+                    return YELLOW;
                 case "G":
-                    return Color.GREEN;
+                    return GREEN;
                 case " ":
                     return INVALID;
                 case "_":
                 default:
-                    return Color.EMPTY;
+                    return EMPTY;
             }
         }
 
         public static Color getRemainingColor(Color c1, Color c2) {
-            if (c1 == Color.EMPTY || c2 == Color.EMPTY) return Color.COLORED;
+            if (c1 == EMPTY || c2 == EMPTY) return COLORED;
             if (c1 == c2) return c1;
             ArrayList<Color> colors = new ArrayList<>(Arrays.asList(GREEN, PURPLE, YELLOW));
             colors.remove(c1);
@@ -92,19 +92,19 @@ public class Pixel implements Comparable<Pixel> {
 
         public boolean matches(Color other) {
             if (this == INVALID || other == INVALID) return false;
-            return this == Color.ANY ||
-                    other == Color.ANY ||
+            return this == ANY ||
+                    other == ANY ||
                     this == other ||
-                    isColored() && other == Color.COLORED ||
-                    this == Color.COLORED && other.isColored();
+                    isColored() && other == COLORED ||
+                    this == COLORED && other.isColored();
         }
 
         public boolean isColored() {
-            return this == Color.PURPLE || this == Color.YELLOW || this == Color.GREEN;
+            return this == PURPLE || this == YELLOW || this == GREEN;
         }
 
         public boolean isEmpty() {
-            return this == Color.EMPTY;
+            return this == EMPTY;
         }
     }
 
