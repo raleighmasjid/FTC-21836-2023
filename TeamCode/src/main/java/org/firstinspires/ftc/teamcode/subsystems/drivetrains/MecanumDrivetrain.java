@@ -346,9 +346,9 @@ public class MecanumDrivetrain extends MecanumDrive {
                 new Pose2d(
 //                        rotatedX,
 //                        rotatedY,
-                        xCommand,
                         yCommand,
-                        turnCommand
+                        -xCommand,
+                        -turnCommand
                 )
         );
     }
