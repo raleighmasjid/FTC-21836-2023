@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -47,11 +53,11 @@ public abstract class BaseTeleOp extends LinearOpMode {
             Gamepad2.readButtons();
             drivetrain.readIMU();
 
-            // Reset current heading as per these keybinds:
-            if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) drivetrain.setCurrentHeading(0);
-            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) drivetrain.setCurrentHeading(90);
-            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) drivetrain.setCurrentHeading(180);
-            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) drivetrain.setCurrentHeading(270);
+            // Reset current heading as per these keybindings:
+            if (Gamepad1.wasJustPressed(DPAD_UP)) drivetrain.setCurrentHeading(0);
+            else if (Gamepad1.wasJustPressed(DPAD_LEFT)) drivetrain.setCurrentHeading(PI/2);
+            else if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
+            else if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
 
             // Field-centric drive dt with control stick inputs:
             drivetrain.run(

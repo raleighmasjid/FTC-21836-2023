@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
-
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.toDegrees;
 
 import androidx.annotation.NonNull;
 
@@ -16,7 +17,6 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -315,14 +314,14 @@ public class MecanumDrivetrain extends MecanumDrive {
     /**
      * Set internal heading of the robot to correct field-centric direction
      *
-     * @param angle Angle of the robot in degrees, 0 facing forward and increases counter-clockwise
+     * @param angle Angle of the robot in radians, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        headingOffset = heading - AngleUnit.normalizeDegrees(angle);
+        headingOffset = normalizeRadians(imu.getHeading() - angle);
     }
 
     public double getHeading() {
-        return AngleUnit.normalizeDegrees(heading - headingOffset);
+        return normalizeRadians(imu.getHeading() - headingOffset);
     }
 
     /**
@@ -340,11 +339,11 @@ public class MecanumDrivetrain extends MecanumDrive {
         turnCommand /= max;
 
         // counter-rotate x and y inputs by current heading
-        double theta = Math.toRadians(-getHeading());
         double rotatedX = xCommand * cos(theta) - yCommand * sin(theta);
         double rotatedY = xCommand * sin(theta) + yCommand * cos(theta);
         xCommand = rotatedX;
         yCommand = rotatedY;
+        double theta = -getHeading();
 
         // run motors
         setWeightedDrivePower(new Pose2d(
@@ -355,6 +354,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Drivetrain current heading", getHeading());
+        telemetry.addData("Current heading (radians)", getHeading());
+        telemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
     }
 }
