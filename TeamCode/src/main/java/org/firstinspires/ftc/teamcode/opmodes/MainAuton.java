@@ -33,11 +33,14 @@ public class MainAuton extends LinearOpMode {
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         boolean right = true;
-        while (!Gamepad1.isDown(RIGHT_STICK_BUTTON)) {
+        while (!(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
             if (Gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
             if (Gamepad1.wasJustPressed(B)) red = true;
             if (Gamepad1.wasJustPressed(X)) red = false;
+            myTelemetry.addLine((red ? "Red" : "Blue") + "alliance");
+            myTelemetry.addLine(right ? "Right" : "Left");
+            myTelemetry.update();
         }
 
         waitForStart();
