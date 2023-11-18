@@ -68,7 +68,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
                     Gamepad1.getLeftX(),
                     Gamepad1.getLeftY(),
                     Gamepad1.getRightX(),
-                    lockSlowMode ? 1 : Gamepad1.getTrigger(RIGHT_TRIGGER)
+                    (lockSlowMode ? 1 : 0) + Gamepad1.getTrigger(RIGHT_TRIGGER)
             );
 
             // Push telemetry data to multiple outputs (set earlier):

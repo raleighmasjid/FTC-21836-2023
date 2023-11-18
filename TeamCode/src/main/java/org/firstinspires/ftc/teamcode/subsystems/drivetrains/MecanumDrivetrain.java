@@ -344,7 +344,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         yCommand = x * sin(theta) + y * cos(theta);
 
         // run motors
-        double slowScalar = 1 - (1 - SLOW_FACTOR) * slowCommand;
+        double slowScalar = Math.max(1 - (1 - SLOW_FACTOR) * slowCommand, 0);
         setWeightedDrivePower(new Pose2d(
                 yCommand * slowScalar,
                 -xCommand * slowScalar,
