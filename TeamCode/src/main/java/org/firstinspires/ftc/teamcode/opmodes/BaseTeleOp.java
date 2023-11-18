@@ -10,7 +10,6 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -57,12 +56,13 @@ public abstract class BaseTeleOp extends LinearOpMode {
             Gamepad2.readButtons();
             drivetrain.updateGains();
 
-            // Reset current heading as per these keybindings:
+            // Reset current heading as per these keybinds:
             if (Gamepad1.wasJustPressed(DPAD_UP)) drivetrain.setCurrentHeading(0);
             else if (Gamepad1.wasJustPressed(DPAD_LEFT)) drivetrain.setCurrentHeading(PI/2);
             else if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
             else if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
 
+            if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0) lockSlowMode = false;
             // Field-centric drive dt with control stick inputs:
             drivetrain.run(
                     Gamepad1.getLeftX(),
