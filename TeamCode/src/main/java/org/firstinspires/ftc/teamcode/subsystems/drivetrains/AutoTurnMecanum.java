@@ -49,11 +49,9 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
         super(hardwareMap);
     }
 
-    @Override
-    public void readIMU() {
+    public void updateGains() {
         headingController.setGains(pidGains);
         kDFilter.setGains(derivFilterGains);
-        super.readIMU();
     }
 
     @Override

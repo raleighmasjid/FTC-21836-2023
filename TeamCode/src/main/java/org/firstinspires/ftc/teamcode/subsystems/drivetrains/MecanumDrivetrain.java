@@ -305,11 +305,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     public final ThreadedIMU imu;
 
-    private double headingOffset, heading;
-
-    public void readIMU() {
-        heading = Math.toDegrees(imu.getHeading());
-    }
+    private double headingOffset;
 
     /**
      * Set internal heading of the robot to correct field-centric direction

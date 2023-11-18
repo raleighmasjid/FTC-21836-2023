@@ -51,7 +51,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
             // Read sensors + gamepads:
             Gamepad1.readButtons();
             Gamepad2.readButtons();
-            drivetrain.readIMU();
+            drivetrain.updateGains();
 
             // Reset current heading as per these keybindings:
             if (Gamepad1.wasJustPressed(DPAD_UP)) drivetrain.setCurrentHeading(0);
