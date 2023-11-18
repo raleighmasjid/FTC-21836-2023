@@ -37,7 +37,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
 
     private boolean useAutoTurn = true;
 
-    private double lastXCommand = 0.0, lastYCommand = 0.0, targetHeading;
+    private double lastXCommand, lastYCommand, targetHeading;
 
     private final ElapsedTime turnSettlingTimer = new ElapsedTime();
     private final ElapsedTime translationSettlingTimer = new ElapsedTime();

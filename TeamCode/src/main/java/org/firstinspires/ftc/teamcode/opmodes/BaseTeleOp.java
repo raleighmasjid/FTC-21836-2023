@@ -9,11 +9,10 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
     // Declare objects:
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
-    MecanumDrivetrain drivetrain;
+    AutoTurnMecanum drivetrain;
     GamepadEx Gamepad1, Gamepad2;
 
     @Override
@@ -36,7 +35,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
-        drivetrain = new MecanumDrivetrain(hardwareMap);
+        drivetrain = new AutoTurnMecanum(hardwareMap);
 
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);

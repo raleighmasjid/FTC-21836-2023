@@ -335,11 +335,11 @@ public class MecanumDrivetrain extends MecanumDrive {
         turnCommand /= max;
 
         // counter-rotate x and y inputs by current heading
-        double rotatedX = xCommand * cos(theta) - yCommand * sin(theta);
-        double rotatedY = xCommand * sin(theta) + yCommand * cos(theta);
-        xCommand = rotatedX;
-        yCommand = rotatedY;
         double theta = -getHeading();
+        double x = xCommand;
+        double y = yCommand;
+        xCommand = x * cos(theta) - y * sin(theta);
+        yCommand = x * sin(theta) + y * cos(theta);
 
         // run motors
         setWeightedDrivePower(new Pose2d(
