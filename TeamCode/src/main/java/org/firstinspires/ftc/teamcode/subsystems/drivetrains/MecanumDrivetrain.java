@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
+import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
@@ -230,12 +231,12 @@ public class MecanumDrivetrain extends MecanumDrive {
     public void setWeightedDrivePower(Pose2d drivePower) {
         Pose2d vel = drivePower;
 
-        if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
-                + Math.abs(drivePower.getHeading()) > 1) {
+        if (abs(drivePower.getX()) + abs(drivePower.getY())
+                + abs(drivePower.getHeading()) > 1) {
             // re-normalize the powers according to the weights
-            double denom = VX_WEIGHT * Math.abs(drivePower.getX())
-                    + VY_WEIGHT * Math.abs(drivePower.getY())
-                    + OMEGA_WEIGHT * Math.abs(drivePower.getHeading());
+            double denom = VX_WEIGHT * abs(drivePower.getX())
+                    + VY_WEIGHT * abs(drivePower.getY())
+                    + OMEGA_WEIGHT * abs(drivePower.getHeading());
 
             vel = new Pose2d(
                     VX_WEIGHT * drivePower.getX(),
@@ -329,7 +330,7 @@ public class MecanumDrivetrain extends MecanumDrive {
      */
     public void run(double xCommand, double yCommand, double turnCommand) {
         // normalize inputs
-        double max = Collections.max(Arrays.asList(Math.abs(xCommand), Math.abs(yCommand), Math.abs(turnCommand), 1.0));
+        double max = Collections.max(Arrays.asList(abs(xCommand), abs(yCommand), abs(turnCommand), 1.0));
         xCommand /= max;
         yCommand /= max;
         turnCommand /= max;
