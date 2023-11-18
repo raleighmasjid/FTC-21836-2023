@@ -15,8 +15,7 @@ public abstract class BaseAuton extends LinearOpMode {
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(boolean red, boolean right) throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
         myTelemetry = new MultipleTelemetry(telemetry);

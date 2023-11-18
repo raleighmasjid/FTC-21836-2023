@@ -25,7 +25,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
     AutoTurnMecanum drivetrain;
     GamepadEx Gamepad1, Gamepad2;
 
-    public void runOpMode(boolean isRed) throws InterruptedException {
+    public void runOpMode(boolean red) throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
         myTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
