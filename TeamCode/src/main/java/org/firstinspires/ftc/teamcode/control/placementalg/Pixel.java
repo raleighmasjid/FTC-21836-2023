@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_BOTTOM_HEIGHT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_HEIGHT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_WIDTH;
@@ -73,7 +74,7 @@ public class Pixel implements Comparable<Pixel> {
                 case "G":
                     return Color.GREEN;
                 case " ":
-                    return Color.INVALID;
+                    return INVALID;
                 case "_":
                 default:
                     return Color.EMPTY;
@@ -90,7 +91,7 @@ public class Pixel implements Comparable<Pixel> {
         }
 
         public boolean matches(Color other) {
-            if (this == Color.INVALID || other == Color.INVALID) return false;
+            if (this == INVALID || other == INVALID) return false;
             return this == Color.ANY ||
                     other == Color.ANY ||
                     this == other ||
@@ -128,7 +129,7 @@ public class Pixel implements Comparable<Pixel> {
     }
 
     public boolean inMosaic() {
-        return mosaic != null && mosaic.color != Color.INVALID;
+        return mosaic != null && mosaic.color != INVALID;
     }
 
     public Pose2d toPose2d(boolean isRed) {

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -25,8 +27,8 @@ public class Backdrop {
         PERFECT_BACKDROP.calculate();
         while (PERFECT_BACKDROP.rowNotFull(10)) {
             Pixel pToPlace = PERFECT_BACKDROP.pixelsToPlace.get(0);
-            if (pToPlace.color == Pixel.Color.ANY)
-                pToPlace = new Pixel(pToPlace, Pixel.Color.COLORED);
+            if (pToPlace.color == ANY)
+                pToPlace = new Pixel(pToPlace, COLORED);
             PERFECT_BACKDROP.add(pToPlace);
             PERFECT_BACKDROP.calculate();
         }
@@ -34,19 +36,14 @@ public class Backdrop {
 
     public Backdrop() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
-            slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? Pixel.Color.INVALID : Pixel.Color.EMPTY);
+            slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
         }
         setLineGoal = getSetLineGoal();
         setLineSPixels = getSupportPixels(setLineGoal);
     }
 
     public void add(Pixel pixel) {
-        Pixel.Color[] colors = {
-                Pixel.Color.PURPLE,
-                Pixel.Color.GREEN,
-                Pixel.Color.YELLOW,
-                Pixel.Color.WHITE,
-        };
+        Pixel.Color[] colors = {PURPLE, GREEN, YELLOW, WHITE};
         switch (pixel.color) {
             case ANY:
                 add(new Pixel(pixel, colors[(int) Math.floor(Math.random() * 4)]));
@@ -57,12 +54,12 @@ public class Backdrop {
             default:
                 int x = pixel.x;
                 int y = pixel.y;
-                if (coordsInRange(x, y) && get(x, y).color != Pixel.Color.INVALID) slots[y][x] = pixel;
+                if (coordsInRange(x, y) && get(x, y).color != INVALID) slots[y][x] = pixel;
         }
     }
 
     public Pixel get(int x, int y) {
-        return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, Pixel.Color.INVALID);
+        return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, INVALID);
     }
 
     private static boolean coordsInRange(int x, int y) {
@@ -86,7 +83,7 @@ public class Backdrop {
                 get(5, y - 1),
                 get(6, y - 1),
         };
-        for (Pixel p : shouldBeWhite) if (!(p.color.isEmpty() || p.color == Pixel.Color.WHITE)) return false;
+        for (Pixel p : shouldBeWhite) if (!(p.color.isEmpty() || p.color == WHITE)) return false;
 
         return true;
     }
@@ -147,7 +144,7 @@ public class Backdrop {
                             break;
                         }
                     }
-                    if (pixels[0].mosaic.color != Pixel.Color.INVALID) numOfMosaics++;
+                    if (pixels[0].mosaic.color != INVALID) numOfMosaics++;
                     continue;
                 }
 
@@ -164,8 +161,8 @@ public class Backdrop {
                         } else if (pMosaic[2].color.isColored() && pMosaic[1].color.isEmpty()) {
                             oneRemainingCase(pixel, pMosaic[1], pMosaic[2]);
                         } else if (pMosaic[1].color.isEmpty() && pMosaic[2].color.isEmpty()) {
-                            pixelsToPlace.add(new Pixel(pMosaic[1], Pixel.Color.COLORED));
-                            pixelsToPlace.add(new Pixel(pMosaic[2], Pixel.Color.COLORED));
+                            pixelsToPlace.add(new Pixel(pMosaic[1], COLORED));
+                            pixelsToPlace.add(new Pixel(pMosaic[2], COLORED));
                             Pixel p1 = new Pixel(pMosaic[1]);
                             Pixel p2 = new Pixel(pMosaic[2]);
                             p1.scoreValue += 22/3.0;
@@ -191,7 +188,7 @@ public class Backdrop {
 
     private void oneRemainingCase(Pixel pixel, Pixel x1, Pixel x2) {
         Pixel b = x1;
-        pixelsToPlace.add(new Pixel(b, Pixel.Color.getRemainingColor(pixel.color, x2.color)));
+        pixelsToPlace.add(new Pixel(b, getRemainingColor(pixel.color, x2.color)));
         b = new Pixel(b);
         b.scoreValue += 11;
         colorsToGetSPixels.add(b);
@@ -227,8 +224,8 @@ public class Backdrop {
         for (Pixel pixel : pixelsToPlace) {
             if (!noColor) {
                 if (pixel.color.isColored()) pixel.scoreValue += 11;
-                if (pixel.color == Pixel.Color.COLORED) pixel.scoreValue += 22/3.0;
-                if (pixel.color == Pixel.Color.WHITE) pixel.scoreValue += 11/9.0;
+                if (pixel.color == COLORED) pixel.scoreValue += 22/3.0;
+                if (pixel.color == WHITE) pixel.scoreValue += 11/9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
                     if (inArray(pixel, mosaicSPixels)) {
@@ -261,7 +258,7 @@ public class Backdrop {
     }
 
     private void invalidateMosaic(Pixel mosaic) {
-        Pixel invMosaic = new Pixel(mosaic, Pixel.Color.INVALID);
+        Pixel invMosaic = new Pixel(mosaic, INVALID);
         for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
             if (pixel.mosaic == mosaic && (pixel.color.isColored() || pixel.color.isEmpty()))
                 pixel.mosaic = invMosaic;
@@ -334,7 +331,7 @@ public class Backdrop {
 
         for (int x = 0; x < columns; x++) {
             Pixel pixel = get(x, setY);
-            if (pixel.color == Pixel.Color.INVALID) continue;
+            if (pixel.color == INVALID) continue;
             ArrayList<Pixel> sPixels = getSupportPixels(pixel);
             if (sPixels.size() < leastSPixels) {
                 leastSPixels = sPixels.size();
@@ -348,7 +345,7 @@ public class Backdrop {
     private int getHighestPixelY() {
         int highestY = 0;
         for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel p : slots[y]) {
-            if (!p.color.isEmpty() && p.color != Pixel.Color.INVALID) highestY = p.y;
+            if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
         }
         return highestY;
     }
@@ -367,7 +364,7 @@ public class Backdrop {
         for (int y = 0; y < slots.length; y++) {
             for (int x = 0; x < slots[x].length; x++) {
                 Pixel pixel = get(x, y);
-                if (pixel.color.isEmpty() && pixel.color != Pixel.Color.INVALID && !inArray(pixel, pixelsToPlace) && isSupported(pixel)) {
+                if (pixel.color.isEmpty() && pixel.color != INVALID && !inArray(pixel, pixelsToPlace) && isSupported(pixel)) {
                     pixelsToPlace.add(getSafeColor(pixel));
                     return;
                 }
@@ -376,7 +373,7 @@ public class Backdrop {
     }
 
     private Pixel getSafeColor(Pixel pixel) {
-        return new Pixel(pixel, touchingAdjacentMosaic(pixel, false) || noSpaceForMosaics(pixel) ? Pixel.Color.WHITE : Pixel.Color.ANY);
+        return new Pixel(pixel, touchingAdjacentMosaic(pixel, false) || noSpaceForMosaics(pixel) ? WHITE : ANY);
     }
 
     private static boolean allTrue(boolean... booleans) {
@@ -396,7 +393,7 @@ public class Backdrop {
     }
 
     private boolean rowNotEmpty(int y) {
-        for (Pixel pixel : slots[y]) if (!pixel.color.isEmpty() && pixel.color != Pixel.Color.INVALID) return true;
+        for (Pixel pixel : slots[y]) if (!pixel.color.isEmpty() && pixel.color != INVALID) return true;
         return false;
     }
 
@@ -424,7 +421,7 @@ public class Backdrop {
         scanForMosaics();
         scanForSetLinePixels();
         scanForEmptySpot();
-        for (int i = 0; i < 7 && !colorInArray(Pixel.Color.ANY, pixelsToPlace); i++) scanForEmptySpot();
+        for (int i = 0; i < 7 && !colorInArray(ANY, pixelsToPlace); i++) scanForEmptySpot();
 
         removeDuplicates(pixelsToPlace);
         removeOverridingPixels(pixelsToPlace);

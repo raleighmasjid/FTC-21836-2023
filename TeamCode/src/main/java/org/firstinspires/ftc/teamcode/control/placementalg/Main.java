@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
+
 import java.util.Scanner;
 
 public class Main {
@@ -49,7 +51,7 @@ public class Main {
             }
             if (solve) {
                 Pixel pToPlace = backdrop.pixelsToPlace.get(0);
-                if (alwaysPlaceColored && pToPlace.color == Pixel.Color.ANY) pToPlace = new Pixel(pToPlace, Pixel.Color.COLORED);
+                if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
                 backdrop.add(pToPlace);
             }
             backdrop.calculate();
