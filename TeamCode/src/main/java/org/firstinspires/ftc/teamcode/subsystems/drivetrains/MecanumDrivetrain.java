@@ -339,18 +339,19 @@ public class MecanumDrivetrain extends MecanumDrive {
         yCommand /= max;
         turnCommand /= max;
 
-        double rotatedX = xCommand * cos(-getHeading()) - yCommand * sin(-getHeading());
-        double rotatedY = xCommand * sin(-getHeading()) + yCommand * cos(-getHeading());
+        // counter-rotate x and y inputs by current heading
+        double theta = Math.toRadians(-getHeading());
+        double rotatedX = xCommand * cos(theta) - yCommand * sin(theta);
+        double rotatedY = xCommand * sin(theta) + yCommand * cos(theta);
+        xCommand = rotatedX;
+        yCommand = rotatedY;
 
-        setWeightedDrivePower(
-                new Pose2d(
-//                        rotatedX,
-//                        rotatedY,
-                        yCommand,
-                        -xCommand,
-                        -turnCommand
-                )
-        );
+        // run motors
+        setWeightedDrivePower(new Pose2d(
+                yCommand,
+                -xCommand,
+                -turnCommand
+        ));
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {

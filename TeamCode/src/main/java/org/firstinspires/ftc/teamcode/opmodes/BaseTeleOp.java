@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -46,6 +47,12 @@ public abstract class BaseTeleOp extends LinearOpMode {
             Gamepad2.readButtons();
             drivetrain.readIMU();
 
+            // Reset current heading as per these keybinds:
+            if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) drivetrain.setCurrentHeading(0);
+            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) drivetrain.setCurrentHeading(90);
+            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) drivetrain.setCurrentHeading(180);
+            else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) drivetrain.setCurrentHeading(270);
+
             // Field-centric drive dt with control stick inputs:
             drivetrain.run(
                     Gamepad1.getLeftX(),
@@ -54,6 +61,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
             );
 
             // Push telemetry data to multiple outputs (set earlier):
+            drivetrain.printNumericalTelemetry(myTelemetry);
             myTelemetry.update();
         }
         drivetrain.imu.interrupt();
