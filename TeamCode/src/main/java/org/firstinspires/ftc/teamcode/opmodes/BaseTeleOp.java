@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -25,8 +26,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
     AutoTurnMecanum drivetrain;
     GamepadEx Gamepad1, Gamepad2;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(boolean isRed) throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
         myTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -40,8 +40,12 @@ public abstract class BaseTeleOp extends LinearOpMode {
 
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
+        boolean lockSlowMode = false;
 
-        waitForStart();
+//        waitForStart();
+        while (!isStarted() && !isStopRequested()) {
+            if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0.5) lockSlowMode = true;
+        }
         drivetrain.imu.start();
 
         // Control loop:
@@ -64,7 +68,7 @@ public abstract class BaseTeleOp extends LinearOpMode {
                     Gamepad1.getLeftX(),
                     Gamepad1.getLeftY(),
                     Gamepad1.getRightX(),
-                    Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                    lockSlowMode ? 1 : Gamepad1.getTrigger(RIGHT_TRIGGER)
             );
 
             // Push telemetry data to multiple outputs (set earlier):

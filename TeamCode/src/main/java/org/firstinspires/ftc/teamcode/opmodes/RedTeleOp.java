@@ -7,6 +7,6 @@ public class RedTeleOp extends BaseTeleOp {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        super.runOpMode();
+        super.runOpMode(true);
     }
 }
