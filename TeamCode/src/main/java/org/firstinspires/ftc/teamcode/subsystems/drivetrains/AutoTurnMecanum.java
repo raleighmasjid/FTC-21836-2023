@@ -99,12 +99,12 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
         setTargetHeading(angle);
     }
 
-    public void toggleHeadingCorrection() {
+    public void toggleAutoTurn() {
         useAutoTurn = !useAutoTurn;
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Heading correction is", useAutoTurn ? "active" : "inactive");
+        telemetry.addData("Auto turn is", useAutoTurn ? "active" : "inactive");
     }
 
     @Override
