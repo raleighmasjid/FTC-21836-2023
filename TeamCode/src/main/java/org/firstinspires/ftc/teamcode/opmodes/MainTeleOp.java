@@ -36,12 +36,15 @@ public class MainTeleOp extends LinearOpMode {
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
+        // Initialize drivetrain:
         drivetrain = new AutoTurnMecanum(hardwareMap);
 
+        // Initialize gamepads
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
-        boolean lockSlowMode = false;
 
+        // Get gamepad 1 button input and save "lockSlowMode" and "red" booleans for teleop configuration:
+        boolean lockSlowMode = false;
         while (opModeInInit()) {
             Gamepad1.readButtons();
             if (Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = !lockSlowMode;
