@@ -12,7 +12,7 @@ public class PIDController implements FeedbackController {
     private PIDGains gains = new PIDGains();
     private State target = new State();
 
-    public final Filter derivFilter;
+    private final Filter derivFilter;
     private final Differentiator differentiator = new Differentiator();
     private final Integrator integrator = new Integrator();
 
