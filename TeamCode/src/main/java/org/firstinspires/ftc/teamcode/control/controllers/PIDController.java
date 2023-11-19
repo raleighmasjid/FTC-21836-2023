@@ -16,7 +16,9 @@ public class PIDController implements FeedbackController {
     private final Differentiator differentiator = new Differentiator();
     private final Integrator integrator = new Integrator();
 
-    private double error, errorIntegral, errorDerivative;
+    private State error;
+    private double errorIntegral;
+    private double errorDerivative;
 
     public PIDController() {
         this(new NoFilter());
@@ -34,16 +36,16 @@ public class PIDController implements FeedbackController {
      * @param measurement Only the X attribute of the {@link State} parameter is used as feedback
      */
     public double calculate(State measurement) {
-        double lastError = error;
-        error = target.x - measurement.x;
+        State lastError = error;
+        error = target.minus(measurement);
 
-        if (Math.signum(error) != Math.signum(lastError)) reset();
-        errorIntegral = integrator.getIntegral(error);
-        errorDerivative = derivFilter.calculate(differentiator.getDerivative(error));
+        if (Math.signum(error.x) != Math.signum(lastError.x)) reset();
+        errorIntegral = integrator.getIntegral(error.x);
+        errorDerivative = derivFilter.calculate(differentiator.getDerivative(error.x));
 
-        double output = (gains.kP * error) + (gains.kI * errorIntegral) + (gains.kD * errorDerivative);
+        double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * errorDerivative);
 
-        stopIntegration(Math.abs(output) >= gains.maxOutputWithIntegral && Math.signum(output) == Math.signum(error));
+        stopIntegration(Math.abs(output) >= gains.maxOutputWithIntegral && Math.signum(output) == Math.signum(error.x));
 
         return output;
     }
