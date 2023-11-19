@@ -56,11 +56,11 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
 
     @Override
     public void run(double xCommand, double yCommand, double turnCommand, double slowCommand) {
-        double scalar = 12.0 / batteryVoltageSensor.getVoltage();
+        double voltageScalar = 12.0 / batteryVoltageSensor.getVoltage();
         boolean useManualInput = turnCommand != 0.0;
 
         if (useManualInput || !useAutoTurn) {
-            turnCommand *= scalar;
+            turnCommand *= voltageScalar;
             turnSettlingTimer.reset();
         }
 
@@ -74,13 +74,13 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
             } else if (translationSettlingTimer.seconds() > TRANSLATION_SETTLING_TIME) {
                 headingController.setError(-normalizeRadians(targetHeading - getHeading()));
                 double pidOutput = headingController.calculate(new State(getHeading()));
-                turnCommand = pidOutput + (Math.signum(pidOutput) * kStatic * scalar);
+                turnCommand = pidOutput + (Math.signum(pidOutput) * kStatic * voltageScalar);
             }
         }
 
         lastXCommand = xCommand;
         lastYCommand = yCommand;
-        super.run(xCommand * scalar, yCommand * scalar, turnCommand, slowCommand);
+        super.run(xCommand, yCommand, turnCommand / voltageScalar, slowCommand);
     }
 
 

@@ -44,7 +44,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /*
@@ -330,25 +329,21 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param turnCommand turning input
      */
     public void run(double xCommand, double yCommand, double turnCommand, double slowCommand) {
-        // normalize inputs
-        double max = Collections.max(Arrays.asList(abs(xCommand), abs(yCommand), abs(turnCommand), 1.0));
-        xCommand /= max;
-        yCommand /= max;
-        turnCommand /= max;
 
-        // counter-rotate x and y inputs by current heading
-        double theta = -getHeading();
+        // counter-rotate translation vector by current heading
         double x = xCommand;
         double y = yCommand;
+        double theta = -getHeading();
         xCommand = x * cos(theta) - y * sin(theta);
         yCommand = x * sin(theta) + y * cos(theta);
 
         // run motors
         double slowScalar = Math.max(1 - (1 - SLOW_FACTOR) * slowCommand, 0);
+        double voltageScalar = 12.0 / batteryVoltageSensor.getVoltage();
         setWeightedDrivePower(new Pose2d(
-                yCommand * slowScalar,
-                -xCommand * slowScalar,
-                -turnCommand * slowScalar
+                yCommand * slowScalar * voltageScalar,
+                -xCommand * slowScalar * voltageScalar,
+                -turnCommand * slowScalar * voltageScalar
         ));
     }
 
