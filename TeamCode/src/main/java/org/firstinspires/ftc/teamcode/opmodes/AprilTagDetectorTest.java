@@ -45,7 +45,7 @@ public class AprilTagDetectorTest extends LinearOpMode {
                 OpenCvCameraRotation.SIDEWAYS_RIGHT
         );
 
-        while (!isStarted() && !isStopRequested()) {
+        while (opModeInInit()) {
             camera.run();
             camera.printTagIsVisible();
             camera.printDetectedTag();
