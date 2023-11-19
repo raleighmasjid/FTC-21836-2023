@@ -32,6 +32,7 @@ public class MainAuton extends LinearOpMode {
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
+        Gamepad1 = new GamepadEx(gamepad1);
         boolean right = true;
         while (!(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
