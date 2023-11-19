@@ -44,6 +44,7 @@ public class MainTeleOp extends LinearOpMode {
 
 //        waitForStart();
         while (!isStarted() && !isStopRequested()) {
+            Gamepad1.readButtons();
             if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0.5) lockSlowMode = true;
             if (Gamepad1.wasJustPressed(B)) red = true;
             if (Gamepad1.wasJustPressed(X)) red = false;
