@@ -34,13 +34,13 @@ public class MainAuton extends LinearOpMode {
 
         Gamepad1 = new GamepadEx(gamepad1);
         boolean right = true;
-        while (!((Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER)) || isStarted() || isStopRequested())) {
+        while (opModeInInit() && !(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
             Gamepad1.readButtons();
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
             if (Gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
             if (Gamepad1.wasJustPressed(B)) red = true;
             if (Gamepad1.wasJustPressed(X)) red = false;
-            myTelemetry.addLine("Selected " + (red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
+            myTelemetry.addLine((red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT") + " position");
             myTelemetry.addLine("Press both shoulder buttons to confirm!");
             myTelemetry.update();
         }

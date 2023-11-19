@@ -42,13 +42,13 @@ public class MainTeleOp extends LinearOpMode {
         Gamepad2 = new GamepadEx(gamepad2);
         boolean lockSlowMode = false;
 
-        while (!isStarted() && !isStopRequested()) {
+        while (opModeInInit()) {
             Gamepad1.readButtons();
             if (Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = !lockSlowMode;
             if (Gamepad1.wasJustPressed(B)) red = true;
             if (Gamepad1.wasJustPressed(X)) red = false;
-            myTelemetry.addLine("Slow mode " + (lockSlowMode ? "ON" : "OFF"));
-            myTelemetry.addLine("Selected " + (red ? "RED" : "BLUE"));
+            myTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + " mode");
+            myTelemetry.addLine((red ? "RED" : "BLUE") + " alliance");
             myTelemetry.update();
         }
         drivetrain.imu.start();
