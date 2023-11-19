@@ -10,7 +10,7 @@ public class FeedforwardController implements Controller {
     private State target;
 
     public FeedforwardController() {
-        this(new FeedforwardGains(0.0, 0.0, 0.0));
+        this(new FeedforwardGains());
     }
 
     public FeedforwardController(FeedforwardGains gains) {
