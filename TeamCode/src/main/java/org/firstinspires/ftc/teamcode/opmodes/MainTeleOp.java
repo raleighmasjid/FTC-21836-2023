@@ -42,13 +42,13 @@ public class MainTeleOp extends LinearOpMode {
         Gamepad2 = new GamepadEx(gamepad2);
         boolean lockSlowMode = false;
 
-//        waitForStart();
         while (!isStarted() && !isStopRequested()) {
             Gamepad1.readButtons();
-            if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0.5) lockSlowMode = true;
+            if (Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = !lockSlowMode;
             if (Gamepad1.wasJustPressed(B)) red = true;
             if (Gamepad1.wasJustPressed(X)) red = false;
-            myTelemetry.addLine((red ? "Red" : "Blue") + "alliance");
+            myTelemetry.addLine("Slow mode " + (lockSlowMode ? "ON" : "OFF"));
+            myTelemetry.addLine("Selected " + (red ? "RED" : "BLUE"));
             myTelemetry.update();
         }
         drivetrain.imu.start();
@@ -68,7 +68,7 @@ public class MainTeleOp extends LinearOpMode {
             if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
 
-            if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0) lockSlowMode = false;
+            if (lockSlowMode && Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = false;
             // Field-centric drive dt with control stick inputs:
             drivetrain.run(
                     Gamepad1.getLeftX(),
