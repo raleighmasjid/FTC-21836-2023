@@ -19,7 +19,7 @@ public class MainAuton extends LinearOpMode {
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
     GamepadEx Gamepad1;
-    public static boolean red = true;
+    static boolean red = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
