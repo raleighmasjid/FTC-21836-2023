@@ -293,6 +293,10 @@ public class MecanumDrivetrain extends MecanumDrive {
         return new ProfileAccelerationConstraint(maxAccel);
     }
 
+    public void breakFollowing() {
+        trajectorySequenceRunner.breakFollowing();
+    }
+
     @Override
     public double getRawExternalHeading() {
         return imu.getHeading();
