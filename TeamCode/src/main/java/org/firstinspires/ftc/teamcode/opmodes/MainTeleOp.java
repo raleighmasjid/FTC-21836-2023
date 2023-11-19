@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.*;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.red;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -47,6 +45,10 @@ public class MainTeleOp extends LinearOpMode {
 //        waitForStart();
         while (!isStarted() && !isStopRequested()) {
             if (Gamepad1.getTrigger(RIGHT_TRIGGER) > 0.5) lockSlowMode = true;
+            if (Gamepad1.wasJustPressed(B)) red = true;
+            if (Gamepad1.wasJustPressed(X)) red = false;
+            myTelemetry.addLine((red ? "Red" : "Blue") + "alliance");
+            myTelemetry.update();
         }
         drivetrain.imu.start();
 
