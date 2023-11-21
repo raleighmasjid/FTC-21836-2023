@@ -135,10 +135,6 @@ public class Pixel implements Comparable<Pixel> {
         );
     }
 
-    public double toScoringHeight() {
-        return PIXEL_BOTTOM_HEIGHT + (y * PIXEL_HEIGHT);
-    }
-
     @NonNull
     public String toString() {
         double decPlaces = 100000;
