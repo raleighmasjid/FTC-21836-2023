@@ -12,7 +12,7 @@ import com.arcrobotics.ftclib.hardware.SimpleServo;
  */
 public class SimpleServoPivot {
 
-    public static SimpleServo getReversed(SimpleServo servo) {
+    public static SimpleServo getReversedServo(SimpleServo servo) {
         servo.setInverted(true);
         return servo;
     }
