@@ -1,12 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_BOTTOM_HEIGHT;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_HEIGHT;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.PIXEL_WIDTH;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_X;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_Y_BLUE_HIGHEST;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.SCORING_Y_RED_HIGHEST;
+import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.*;
 
 import androidx.annotation.NonNull;
 
