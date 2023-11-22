@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 
 import com.arcrobotics.ftclib.hardware.SimpleServo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
  * Servo(s) with two set positions <p>
@@ -15,6 +16,14 @@ public class SimpleServoPivot {
     public static SimpleServo getReversedServo(SimpleServo servo) {
         servo.setInverted(true);
         return servo;
+    }
+
+    public static SimpleServo getAxonMini(HardwareMap hardwareMap, String name) {
+        return new SimpleServo(hardwareMap, name, 0, 355);
+    }
+
+    public static SimpleServo getGoBildaServo(HardwareMap hardwareMap, String name) {
+        return new SimpleServo(hardwareMap, name, 0, 300);
     }
 
     private final SimpleServo[] servos;
