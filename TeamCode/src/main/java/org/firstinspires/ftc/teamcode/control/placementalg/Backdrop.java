@@ -1,45 +1,29 @@
 package org.firstinspires.ftc.teamcode.control.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.GREEN;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.INVALID;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.PURPLE;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.WHITE;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.YELLOW;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Backdrop {
-    private final static int rows = 11;
-    private final static int columns = 7;
-    public boolean noColor = false;
+    final static int ROWS = 11;
+    final static int COLUMNS = 7;
     public boolean printRectangular = true;
 
-    private final Pixel[][] slots = new Pixel[rows][columns];
-    public final ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
-    private final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
-    private ArrayList<Pixel> setLineSPixels;
-    private Pixel setLineGoal;
+    final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
     public int numOfMosaics = 0;
-    public static final Backdrop PERFECT_BACKDROP;
-
-    static {
-        PERFECT_BACKDROP = new Backdrop();
-        PERFECT_BACKDROP.calculate();
-        while (PERFECT_BACKDROP.rowNotFull(10)) {
-            Pixel pToPlace = PERFECT_BACKDROP.pixelsToPlace.get(0);
-            if (pToPlace.color == ANY)
-                pToPlace = new Pixel(pToPlace, COLORED);
-            PERFECT_BACKDROP.add(pToPlace);
-            PERFECT_BACKDROP.calculate();
-        }
-    }
 
     public Backdrop() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
             slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
         }
-        setLineGoal = getSetLineGoal();
-        setLineSPixels = getSupportPixels(setLineGoal);
     }
 
     public void add(Pixel pixel) {
@@ -63,213 +47,34 @@ public class Backdrop {
     }
 
     private static boolean coordsInRange(int x, int y) {
-        return x >= 0 && x < columns && y >= 0 && y < rows;
-    }
-
-    private boolean preferUpMosaic(Pixel pixel) {
-        int x = pixel.x;
-        int y = pixel.y;
-        if (!(x == 3 && (y == 3 || y == 9))) return false;
-        if (y == 9) return preferUpMosaic(new Pixel(x, 3, pixel.color));
-
-        Pixel[] shouldBeColored = {
-                get(5, y),
-                get(6, y),
-                get(6, y + 1),
-        };
-        for (Pixel p : shouldBeColored) if (!(p.color.isEmpty() || p.color.isColored())) return false;
-
-        Pixel[] shouldBeWhite = {
-                get(5, y - 1),
-                get(6, y - 1),
-        };
-        for (Pixel p : shouldBeWhite) if (!(p.color.isEmpty() || p.color == WHITE)) return false;
-
-        return true;
-    }
-
-    private Pixel[][] getPossibleMosaics(Pixel pixel) {
-        int x = pixel.x;
-        int y = pixel.y;
-        Pixel[] up = {
-                pixel,
-                get(x, y + 1),
-                get(x - 1 + 2 * (y % 2), y + 1)
-        };
-        Pixel[] right = {
-                pixel,
-                get(x + 1, y),
-                get(x + (y % 2), y + 1)
-        };
-        Pixel[] left = {
-                pixel,
-                get(x - 1, y),
-                get(x + (y % 2) - 1, y + 1)
-        };
-        if (x == 1) return new Pixel[][]{up, left, right};
-        if (x == 6 || preferUpMosaic(pixel)) return new Pixel[][]{up, right, left};
-        if (x == 5 || x == 3) return new Pixel[][]{right, left, up};
-        return new Pixel[][]{left, right, up};
-    }
-
-    private void scanForMosaics() {
-        for (Pixel[] row : slots) for (Pixel pixel : row) pixel.mosaic = null;
-        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) {
-            for (int x = 0; x < slots[x].length; x++) {
-
-                Pixel pixel = get(x, y);
-                if (pixel.mosaic != null || !pixel.color.isColored() || touchingAdjacentMosaic(pixel, false))
-                    continue;
-
-                Pixel[][] possibleMosaics = getPossibleMosaics(pixel);
-                Pixel[] pixels = {};
-
-                boolean isMosaic = false;
-                for (Pixel[] pMosaic : possibleMosaics) {
-                    boolean sameColor = pMosaic[0].color == pMosaic[1].color && pMosaic[1].color == pMosaic[2].color;
-                    boolean diffColors = pMosaic[0].color != pMosaic[1].color && pMosaic[1].color != pMosaic[2].color && pMosaic[0].color != pMosaic[2].color;
-                    boolean allColored = pMosaic[1].color.isColored() && pMosaic[2].color.isColored();
-                    isMosaic = sameColor || (diffColors && allColored);
-                    if (isMosaic) {
-                        pixels = pMosaic;
-                        break;
-                    }
-                }
-
-                if (isMosaic) {
-                    for (Pixel p : pixels) p.mosaic = pixel;
-                    for (Pixel p : pixels) {
-                        if (touchingAdjacentMosaic(p, false)) {
-                            invalidateMosaic(p.mosaic);
-                            break;
-                        }
-                    }
-                    if (pixels[0].mosaic.color != INVALID) numOfMosaics++;
-                    continue;
-                }
-
-                for (Pixel[] pMosaic : possibleMosaics) {
-                    for (Pixel a : pMosaic) if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
-
-                    if (
-                            !touchingAdjacentMosaic(pMosaic[0], false) &&
-                                    !touchingAdjacentMosaic(pMosaic[1], false) &&
-                                    !touchingAdjacentMosaic(pMosaic[2], false)
-                    ) {
-                        if (pMosaic[1].color.isColored() && pMosaic[2].color.isEmpty()) {
-                            oneRemainingCase(pixel, pMosaic[2], pMosaic[1]);
-                        } else if (pMosaic[2].color.isColored() && pMosaic[1].color.isEmpty()) {
-                            oneRemainingCase(pixel, pMosaic[1], pMosaic[2]);
-                        } else if (pMosaic[1].color.isEmpty() && pMosaic[2].color.isEmpty()) {
-                            pixelsToPlace.add(new Pixel(pMosaic[1], COLORED));
-                            pixelsToPlace.add(new Pixel(pMosaic[2], COLORED));
-                            Pixel p1 = new Pixel(pMosaic[1]);
-                            Pixel p2 = new Pixel(pMosaic[2]);
-                            p1.scoreValue += 22/3.0;
-                            p2.scoreValue += 22/3.0;
-                            colorsToGetSPixels.add(p1);
-                            colorsToGetSPixels.add(p2);
-                        }
-                        if (pMosaic[1].color.isEmpty() || pMosaic[2].color.isEmpty()) {
-                            invalidateMosaic(pixel);
-                            break;
-                        }
-                    }
-                    invalidateMosaic(pixel);
-
-                }
-            }
-        }
-        for (Pixel p : colorsToGetSPixels) pixelsToPlace.addAll(getSupportPixels(p));
-        removeDuplicates(pixelsToPlace);
-        removeUnsupportedPixels(pixelsToPlace);
-        removeOverridingPixels(pixelsToPlace);
-    }
-
-    private void oneRemainingCase(Pixel pixel, Pixel x1, Pixel x2) {
-        Pixel b = x1;
-        pixelsToPlace.add(new Pixel(b, getRemainingColor(pixel.color, x2.color)));
-        b = new Pixel(b);
-        b.scoreValue += 11;
-        colorsToGetSPixels.add(b);
+        return x >= 0 && x < COLUMNS && y >= 0 && y < ROWS;
     }
 
     @NonNull
     public String toString() {
         String spacer = " ";
         StringBuilder backdrop = new StringBuilder();
-        for (int y = rows - 1; y >= 0; y--) {
+        for (int y = ROWS - 1; y >= 0; y--) {
             backdrop.append(y).append(spacer).append(y >= 10 ? "" : spacer);
-            for (int x = 0; x < columns; x++) {
+            for (int x = 0; x < COLUMNS; x++) {
                 Pixel pixel = get(x, y);
                 String color = pixel.color.toString();
                 if (pixel.inMosaic()) color = color.toLowerCase();
                 if (!color.equals(" ") || printRectangular) backdrop.append(color);
-                backdrop.append(x == columns - 1 ? "" : spacer);
+                backdrop.append(x == COLUMNS - 1 ? "" : spacer);
             }
             backdrop.append('\n');
         }
         backdrop.append(spacer).append(spacer).append(spacer);
-        for (int x = 0; x < columns; x++) backdrop.append(x).append(x == columns - 1 ? "" : spacer);
+        for (int x = 0; x < COLUMNS; x++) backdrop.append(x).append(x == COLUMNS - 1 ? "" : spacer);
         return backdrop.toString();
     }
 
     public void print() {
         System.out.println(this);
-        System.out.println();
-        printPixelsToPlace();
     }
 
-    private void updateScoreValues() {
-        for (Pixel pixel : pixelsToPlace) {
-            if (!noColor) {
-                if (pixel.color.isColored()) pixel.scoreValue += 11;
-                if (pixel.color == COLORED) pixel.scoreValue += 22/3.0;
-                if (pixel.color == WHITE) pixel.scoreValue += 11/9.0;
-                for (Pixel mosaicPixel : colorsToGetSPixels) {
-                    ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
-                    if (inArray(pixel, mosaicSPixels)) {
-                        pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
-                    }
-                }
-            }
-
-            if (inArray(pixel, setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
-        }
-        Collections.sort(pixelsToPlace);
-    }
-
-    private void removeUnsupportedPixels(ArrayList<Pixel> pixels) {
-        ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
-        pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (isSupported(pixel)) pixels.add(pixel);
-    }
-
-    private void removeDuplicates(ArrayList<Pixel> pixels) {
-        ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
-        pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (!inArray(pixel, pixels)) pixels.add(pixel);
-    }
-
-    private void removeOverridingPixels(ArrayList<Pixel> pixels) {
-        ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
-        pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (get(pixel.x, pixel.y).color.isEmpty()) pixels.add(pixel);
-    }
-
-    private void invalidateMosaic(Pixel mosaic) {
-        Pixel invMosaic = new Pixel(mosaic, INVALID);
-        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
-            if (pixel.mosaic == mosaic && (pixel.color.isColored() || pixel.color.isEmpty()))
-                pixel.mosaic = invMosaic;
-        }
-
-        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel pixel : slots[y]) {
-            if (pixel.color.isColored() && touchingAdjacentMosaic(pixel, false)) pixel.mosaic = invMosaic;
-        }
-    }
-
-    private boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
+    boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
         return getAdjacentMosaics(pixel, includeEmpties).size() > 0;
     }
 
@@ -302,47 +107,11 @@ public class Backdrop {
         return neighbors;
     }
 
-    private boolean isSupported(Pixel pixel) {
+    boolean isSupported(Pixel pixel) {
         return !get(pixel.x, pixel.y - 1).color.isEmpty() && !get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color.isEmpty();
     }
 
-    public ArrayList<Pixel> getSupportPixels(Pixel pixel) {
-        ArrayList<Pixel> sPixels = new ArrayList<>();
-        if (pixel.color.isEmpty()) {
-            sPixels.add(getSafeColor(pixel));
-            Pixel s1 = get(pixel.x, pixel.y - 1);
-            Pixel s2 = get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1);
-            sPixels.addAll(getSupportPixels(s1));
-            sPixels.addAll(getSupportPixels(s2));
-        }
-        removeDuplicates(sPixels);
-        removeOverridingPixels(sPixels);
-        return sPixels;
-    }
-
-    private Pixel getSetLineGoal() {
-        int highestY = getHighestPixelY();
-        int setY = highestY >= 5 ? 8 :
-                highestY >= 2 ? 5 :
-                        2;
-
-        int leastSPixels = 100;
-        Pixel bestSetPixel = get(6, 8);
-
-        for (int x = 0; x < columns; x++) {
-            Pixel pixel = get(x, setY);
-            if (pixel.color == INVALID) continue;
-            ArrayList<Pixel> sPixels = getSupportPixels(pixel);
-            if (sPixels.size() < leastSPixels) {
-                leastSPixels = sPixels.size();
-                bestSetPixel = pixel;
-            }
-        }
-
-        return bestSetPixel;
-    }
-
-    private int getHighestPixelY() {
+    int getHighestPixelY() {
         int highestY = 0;
         for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel p : slots[y]) {
             if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
@@ -350,49 +119,17 @@ public class Backdrop {
         return highestY;
     }
 
-    private boolean inArray(Pixel pixel, Iterable<Pixel> array) {
+    static boolean inArray(Pixel pixel, Iterable<Pixel> array) {
         for (Pixel p1 : array) if (pixel.x == p1.x && pixel.y == p1.y) return true;
         return false;
     }
 
-    private boolean colorInArray(Pixel.Color color, Iterable<Pixel> array) {
-        for (Pixel p1 : array) if (color == p1.color) return true;
-        return false;
-    }
-
-    private void scanForEmptySpot() {
-        for (int y = 0; y < slots.length; y++) {
-            for (int x = 0; x < slots[x].length; x++) {
-                Pixel pixel = get(x, y);
-                if (pixel.color.isEmpty() && pixel.color != INVALID && !inArray(pixel, pixelsToPlace) && isSupported(pixel)) {
-                    pixelsToPlace.add(getSafeColor(pixel));
-                    return;
-                }
-            }
-        }
-    }
-
-    private Pixel getSafeColor(Pixel pixel) {
-        return new Pixel(pixel, touchingAdjacentMosaic(pixel, false) || noSpaceForMosaics(pixel) ? WHITE : ANY);
-    }
-
-    private static boolean allTrue(boolean... booleans) {
+    static boolean allTrue(boolean... booleans) {
         for(boolean b : booleans) if(!b) return false;
         return true;
     }
 
-    private boolean noSpaceForMosaics(Pixel pixel) {
-        Pixel[][] pMosaics = getPossibleMosaics(pixel);
-        boolean[] pMosaicsBlocked = new boolean[pMosaics.length];
-        for (int i = 0; i < pMosaics.length; i++) {
-            if (!pMosaics[i][1].color.isEmpty() || !pMosaics[i][2].color.isEmpty() || touchingAdjacentMosaic(pMosaics[i][1], true) || touchingAdjacentMosaic(pMosaics[i][2], true)) {
-                pMosaicsBlocked[i] = true;
-            }
-        }
-        return allTrue(pMosaicsBlocked);
-    }
-
-    private boolean rowNotEmpty(int y) {
+    boolean rowNotEmpty(int y) {
         for (Pixel pixel : slots[y]) if (!pixel.color.isEmpty() && pixel.color != INVALID) return true;
         return false;
     }
@@ -400,34 +137,6 @@ public class Backdrop {
     public boolean rowNotFull(int y) {
         for (Pixel pixel : slots[y]) if (pixel.color.isEmpty()) return true;
         return false;
-    }
-
-    public void printPixelsToPlace() {
-        for (Pixel pixel : pixelsToPlace) pixel.print();
-    }
-
-    private void scanForSetLinePixels() {
-        setLineGoal = getSetLineGoal();
-        setLineSPixels = getSupportPixels(setLineGoal);
-        if (setLineGoal.y <= 8) pixelsToPlace.addAll(setLineSPixels);
-        removeUnsupportedPixels(pixelsToPlace);
-    }
-
-    public void calculate() {
-        pixelsToPlace.clear();
-        colorsToGetSPixels.clear();
-        numOfMosaics = 0;
-
-        scanForMosaics();
-        scanForSetLinePixels();
-        scanForEmptySpot();
-        for (int i = 0; i < 7 && !colorInArray(ANY, pixelsToPlace); i++) scanForEmptySpot();
-
-        removeDuplicates(pixelsToPlace);
-        removeOverridingPixels(pixelsToPlace);
-        removeUnsupportedPixels(pixelsToPlace);
-
-        updateScoreValues();
     }
 
 }

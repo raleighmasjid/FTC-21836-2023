@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.control.placementalg;
 
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
+        PlacementCalculator calculator = new PlacementCalculator();
         Backdrop backdrop = new Backdrop();
         boolean alwaysPlaceColored = true;
         boolean printPerIteration = true;
@@ -35,11 +37,13 @@ public class Main {
                 backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
             }
         }
-        backdrop.calculate();
+        ArrayList<Pixel> pixelsToPlace = calculator.calculate(backdrop);
         backdrop.print();
         printLine();
+        calculator.printPixelsToPlace();
+        printLine();
 
-        boolean solve = false;
+        boolean solve = true;
         while (backdrop.rowNotFull(10)) {
             if (!solve) {
                 int x = input.nextInt();
@@ -50,21 +54,25 @@ public class Main {
                 backdrop.add(new Pixel(x, y, Pixel.Color.fromString(color)));
             }
             if (solve) {
-                Pixel pToPlace = backdrop.pixelsToPlace.get(0);
+                Pixel pToPlace = pixelsToPlace.get(0);
                 if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
                 backdrop.add(pToPlace);
             }
-            backdrop.calculate();
+            pixelsToPlace = calculator.calculate(backdrop);
             if (!solve || printPerIteration) {
                 printLine();
                 printLine();
                 backdrop.print();
+                printLine();
+                calculator.printPixelsToPlace();
             }
         }
         if (solve && !printPerIteration) {
             printLine();
             printLine();
             backdrop.print();
+            printLine();
+            calculator.printPixelsToPlace();
         }
         System.out.println(backdrop.numOfMosaics + " total mosaics");
     }
