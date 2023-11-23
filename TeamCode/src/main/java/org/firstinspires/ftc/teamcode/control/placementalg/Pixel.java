@@ -90,12 +90,13 @@ public class Pixel implements Comparable<Pixel> {
         }
 
         public boolean matches(Color other) {
-            if (this == INVALID || other == INVALID) return false;
-            return this == ANY ||
+            return (this != INVALID && other != INVALID) && (
+                    this == ANY ||
                     other == ANY ||
                     this == other ||
                     isColored() && other == COLORED ||
-                    this == COLORED && other.isColored();
+                    this == COLORED && other.isColored()
+            );
         }
 
         public boolean isColored() {
