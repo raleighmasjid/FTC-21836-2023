@@ -1,8 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.*;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.red;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -12,7 +19,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 import java.util.List;
 
@@ -22,7 +29,6 @@ public class MainTeleOp extends LinearOpMode {
     // Declare objects:
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
-    AutoTurnMecanum drivetrain;
     GamepadEx Gamepad1, Gamepad2;
 
     @Override
@@ -36,8 +42,8 @@ public class MainTeleOp extends LinearOpMode {
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
-        // Initialize drivetrain:
-        drivetrain = new AutoTurnMecanum(hardwareMap);
+        // Initialize robot:
+        if (robot == null) robot = new Robot(hardwareMap);
 
         // Initialize gamepads
         Gamepad1 = new GamepadEx(gamepad1);
@@ -54,7 +60,7 @@ public class MainTeleOp extends LinearOpMode {
             myTelemetry.addLine((red ? "RED" : "BLUE") + " alliance");
             myTelemetry.update();
         }
-        drivetrain.imu.start();
+        robot.start();
 
         // Control loop:
         while (opModeIsActive()) {
@@ -63,27 +69,33 @@ public class MainTeleOp extends LinearOpMode {
             // Read sensors + gamepads:
             Gamepad1.readButtons();
             Gamepad2.readButtons();
-            drivetrain.updateGains();
+            robot.drivetrain.updateGains();
 
             // Reset current heading as per these keybinds:
-            if (Gamepad1.wasJustPressed(DPAD_UP)) drivetrain.setCurrentHeading(0);
-            if (Gamepad1.wasJustPressed(DPAD_LEFT)) drivetrain.setCurrentHeading(PI/2);
-            if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
-            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
+            if (Gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
+            if (Gamepad1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
+            if (Gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
+            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
 
             if (lockSlowMode && Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = false;
             // Field-centric drive dt with control stick inputs:
-            drivetrain.run(
+            robot.drivetrain.run(
                     Gamepad1.getLeftX(),
                     Gamepad1.getLeftY(),
                     Gamepad1.getRightX(),
                     (lockSlowMode ? 1 : 0) + Gamepad1.getTrigger(RIGHT_TRIGGER)
             );
+            robot.intake.run();
+            robot.deposit.run();
+            robot.lift.run(Gamepad1.getRightY());
 
             // Push telemetry data to multiple outputs (set earlier):
-            drivetrain.printNumericalTelemetry(myTelemetry);
+            robot.printTelemetry(myTelemetry);
+            myTelemetry.addLine();
+            myTelemetry.addLine();
+            robot.printNumericalTelemetry(myTelemetry);
             myTelemetry.update();
         }
-        drivetrain.imu.interrupt();
+        robot.interrupt();
     }
 }

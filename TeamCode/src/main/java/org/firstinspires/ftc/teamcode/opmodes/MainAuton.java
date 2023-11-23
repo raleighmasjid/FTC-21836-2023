@@ -9,6 +9,9 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
+
 import java.util.List;
 
 @Config
@@ -19,6 +22,8 @@ public class MainAuton extends LinearOpMode {
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
     GamepadEx Gamepad1;
+    static Robot robot = null;
+    static Backdrop backdrop = new Backdrop();
     static boolean red = true;
 
     @Override

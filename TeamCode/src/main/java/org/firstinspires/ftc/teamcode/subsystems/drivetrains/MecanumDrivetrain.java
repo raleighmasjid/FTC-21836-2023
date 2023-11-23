@@ -193,6 +193,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
+        setCurrentHeading(getPoseEstimate().getHeading());
     }
 
     public void waitForIdle() {
