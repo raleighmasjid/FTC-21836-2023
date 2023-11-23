@@ -22,11 +22,6 @@ public class ThreadedIMU extends Thread {
     }
 
     @Override
-    public void start() {
-        super.start();
-    }
-
-    @Override
     public void run() {
         while (run) {
             heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);

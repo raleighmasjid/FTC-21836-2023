@@ -39,7 +39,7 @@ public class Pixel implements Comparable<Pixel> {
                 case ANY:
                     return "A";
                 case COLORED:
-                    return "C" + RESET;
+                    return "C";
                 case PURPLE:
                     return "\u001B[35m" + "P" + RESET;
                 case YELLOW:

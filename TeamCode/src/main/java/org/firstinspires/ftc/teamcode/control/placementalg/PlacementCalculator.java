@@ -110,7 +110,8 @@ public class PlacementCalculator {
                 }
 
                 for (Pixel[] pMosaic : possibleMosaics) {
-                    for (Pixel a : pMosaic) if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
+                    for (Pixel a : pMosaic)
+                        if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
 
                     if (
                             !backdrop.touchingAdjacentMosaic(pMosaic[0], false) &&
@@ -126,8 +127,8 @@ public class PlacementCalculator {
                             pixelsToPlace.add(new Pixel(pMosaic[2], COLORED));
                             Pixel p1 = new Pixel(pMosaic[1]);
                             Pixel p2 = new Pixel(pMosaic[2]);
-                            p1.scoreValue += 22/3.0;
-                            p2.scoreValue += 22/3.0;
+                            p1.scoreValue += 22 / 3.0;
+                            p2.scoreValue += 22 / 3.0;
                             colorsToGetSPixels.add(p1);
                             colorsToGetSPixels.add(p2);
                         }
@@ -170,19 +171,23 @@ public class PlacementCalculator {
     private void removeOverridingPixels(ArrayList<Pixel> pixels) {
         ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
         pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (backdrop.get(pixel.x, pixel.y).color.isEmpty()) pixels.add(pixel);
+        for (Pixel pixel : pixelsCopy)
+            if (backdrop.get(pixel.x, pixel.y).color.isEmpty()) pixels.add(pixel);
     }
 
     private void invalidateMosaic(Pixel mosaic) {
         Pixel invMosaic = new Pixel(mosaic, INVALID);
-        for (int y = 0; y < ROWS && backdrop.rowNotEmpty(y); y++) for (Pixel pixel : backdrop.slots[y]) {
-            if (pixel.mosaic == mosaic && (pixel.color.isColored() || pixel.color.isEmpty()))
-                pixel.mosaic = invMosaic;
-        }
+        for (int y = 0; y < ROWS && backdrop.rowNotEmpty(y); y++)
+            for (Pixel pixel : backdrop.slots[y]) {
+                if (pixel.mosaic == mosaic && (pixel.color.isColored() || pixel.color.isEmpty()))
+                    pixel.mosaic = invMosaic;
+            }
 
-        for (int y = 0; y < ROWS && backdrop.rowNotEmpty(y); y++) for (Pixel pixel : backdrop.slots[y]) {
-            if (pixel.color.isColored() && backdrop.touchingAdjacentMosaic(pixel, false)) pixel.mosaic = invMosaic;
-        }
+        for (int y = 0; y < ROWS && backdrop.rowNotEmpty(y); y++)
+            for (Pixel pixel : backdrop.slots[y]) {
+                if (pixel.color.isColored() && backdrop.touchingAdjacentMosaic(pixel, false))
+                    pixel.mosaic = invMosaic;
+            }
     }
 
     private ArrayList<Pixel> getSupportPixels(Pixel pixel) {
@@ -259,8 +264,8 @@ public class PlacementCalculator {
         for (Pixel pixel : pixelsToPlace) {
             if (!noColor) {
                 if (pixel.color.isColored()) pixel.scoreValue += 11;
-                if (pixel.color == COLORED) pixel.scoreValue += 22/3.0;
-                if (pixel.color == WHITE) pixel.scoreValue += 11/9.0;
+                if (pixel.color == COLORED) pixel.scoreValue += 22 / 3.0;
+                if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
                     if (inArray(pixel, mosaicSPixels)) {
@@ -269,7 +274,8 @@ public class PlacementCalculator {
                 }
             }
 
-            if (inArray(pixel, setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
+            if (inArray(pixel, setLineSPixels))
+                pixel.scoreValue += 10 / (double) setLineSPixels.size();
         }
         Collections.sort(pixelsToPlace);
     }
