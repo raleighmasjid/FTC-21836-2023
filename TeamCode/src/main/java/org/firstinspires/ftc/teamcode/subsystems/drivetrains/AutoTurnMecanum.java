@@ -72,10 +72,8 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
             if (useManualInput || turnSettlingTimer.seconds() <= TURN_SETTLING_TIME) {
                 setTargetHeading(getHeading());
             } else if (translationSettlingTimer.seconds() > TRANSLATION_SETTLING_TIME) {
-
-                headingController.setTarget(new State(-normalizeRadians(targetHeading - getHeading()) + getHeading()));
-
-                double pidOutput = headingController.calculate(new State(getHeading()));
+                headingController.setTarget(new State(normalizeRadians(targetHeading - getHeading()) + getHeading()));
+                double pidOutput = -headingController.calculate(new State(getHeading()));
                 turnCommand = pidOutput + (Math.signum(pidOutput) * kStatic * voltageScalar);
             }
         }
