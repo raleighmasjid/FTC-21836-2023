@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasure
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class Pixel implements Comparable<Pixel> {
         return (int) (diff * 1000000000);
     }
 
+    @Config
     public enum Color {
         INVALID,
         EMPTY,
@@ -28,6 +30,8 @@ public class Pixel implements Comparable<Pixel> {
         PURPLE,
         GREEN,
         YELLOW;
+
+        public static float TEST_VAR = 0;
 
         private static final String RESET = "\u001B[0m";
 
