@@ -8,7 +8,7 @@ import java.util.Collections;
 
 public class PlacementCalculator {
     private Backdrop backdrop;
-    public final ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
+    private final ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
     private final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private ArrayList<Pixel> setLineSPixels;
     public boolean noColor = false;
@@ -185,7 +185,7 @@ public class PlacementCalculator {
         }
     }
 
-    public ArrayList<Pixel> getSupportPixels(Pixel pixel) {
+    private ArrayList<Pixel> getSupportPixels(Pixel pixel) {
         ArrayList<Pixel> sPixels = new ArrayList<>();
         if (pixel.color.isEmpty()) {
             sPixels.add(getSafeColor(pixel));
@@ -219,10 +219,6 @@ public class PlacementCalculator {
         }
 
         return bestSetPixel;
-    }
-
-    public void printPixelsToPlace() {
-        for (Pixel pixel : pixelsToPlace) pixel.print();
     }
 
     private void scanForSetLinePixels() {
@@ -300,5 +296,9 @@ public class PlacementCalculator {
 
         sortPixelsToPlace();
         return pixelsToPlace;
+    }
+
+    public void printPixelsToPlace() {
+        for (Pixel pixel : pixelsToPlace) pixel.print();
     }
 }
