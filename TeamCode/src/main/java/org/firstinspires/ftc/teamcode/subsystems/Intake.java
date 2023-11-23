@@ -20,11 +20,11 @@ import org.firstinspires.ftc.teamcode.control.placementalg.Pixel;
 public class Intake {
 
     public static double
-            PIVOT_OFFSET = 0,
-            LATCH_OPEN = 0,
-            LATCH_CLOSED = 30,
+            ANGLE_PIVOT_OFFSET = 0,
+            ANGLE_LATCH_OPEN = 0,
+            ANGLE_LATCH_CLOSED = 30,
             kV = 1,
-            PIVOTING_TIME = 1,
+            TIME_PIVOTING = 1,
             COLOR_SENSOR_GAIN = 1;
 
     private final MotorEx motor;
@@ -40,7 +40,7 @@ public class Intake {
     private IntakeState currentState = HAS_0;
     private final ElapsedTime timer = new ElapsedTime();
     private final Pixel[] pixels = new Pixel[2];
-    public boolean waitingForDepositLock = false;
+    public boolean justDroppedPixels = false;
 
     enum IntakeState {
         HAS_0,
@@ -58,8 +58,8 @@ public class Intake {
                         getAxonMini(hardwareMap, "intake right"),
                         getReversedServo(getAxonMini(hardwareMap, "intake left"))
                 },
-                PIVOT_OFFSET,
-                PIVOT_OFFSET + 180
+                ANGLE_PIVOT_OFFSET,
+                ANGLE_PIVOT_OFFSET + 180
         );
 
         latch = new SimpleServoPivot(
@@ -67,8 +67,8 @@ public class Intake {
                         getGoBildaServo(hardwareMap, "latch right"),
                         getReversedServo(getGoBildaServo(hardwareMap, "latch left"))
                 },
-                LATCH_OPEN,
-                LATCH_CLOSED
+                ANGLE_LATCH_OPEN,
+                ANGLE_LATCH_CLOSED
         );
 
         motor = new MotorEx(hardwareMap, "intake", RPM_1620);
@@ -85,28 +85,25 @@ public class Intake {
         motor.set(output * kV * (12.0 / batteryVoltageSensor.getVoltage()));
     }
 
-    public boolean transferDone() {
-        return Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
-    }
-
     public void run() {
 
         switch (currentState) {
             case HAS_0:
+                if (justDroppedPixels) justDroppedPixels = false;
                 bottomHSV = bottomSensor.getHSV();
-                // set transferred = false when pixel detected
                 break;
             case HAS_1:
                 topHSV = topSensor.getHSV();
                 break;
             case PIVOTING:
-                if (timer.seconds() >= PIVOTING_TIME) {
+                if (timer.seconds() >= TIME_PIVOTING) {
                     currentState = TRANSFERRING;
                     latch.setActivated(false);
                 }
                 break;
             case TRANSFERRING:
-                if (transferDone()) {
+                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
+                if (justDroppedPixels) {
                     currentState = HAS_0;
                     pivot.setActivated(false);
                 }

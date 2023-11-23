@@ -6,18 +6,21 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReve
 
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Deposit {
 
     public static double
-            CLAW_OPEN = 8,
-            CLAW_CLOSED = 0,
-            HOOK_OFFSET = 0,
-            PIVOT_OFFSET = 0;
+            ANGLE_CLAW_OPEN = 8,
+            ANGLE_CLAW_CLOSED = 0,
+            ANGLE_OFFSET_HOOK = 0,
+            ANGLE_OFFSET_PIVOT = 0,
+            TIME_DROP_TO_RETRACT = 0.25;
 
     private final SimpleServoPivot pivot, hook, claw;
 
-    private boolean floorScoring = false;
+    private final ElapsedTime timer = new ElapsedTime();
+    private boolean floorScoring = false, retracted = true;
     private int pixelsLocked = 0;
 
     public Deposit(HardwareMap hardwareMap) {
@@ -26,29 +29,21 @@ public class Deposit {
                         getAxonMini(hardwareMap, "deposit left"),
                         getReversedServo(getAxonMini(hardwareMap, "deposit right")),
                 },
-                PIVOT_OFFSET,
-                PIVOT_OFFSET + 120
+                ANGLE_OFFSET_PIVOT,
+                ANGLE_OFFSET_PIVOT + 120
         );
 
         hook = new SimpleServoPivot(
                 new SimpleServo[]{getGoBildaServo(hardwareMap, "pixel hook")},
-                HOOK_OFFSET,
-                HOOK_OFFSET + 180
+                ANGLE_OFFSET_HOOK,
+                ANGLE_OFFSET_HOOK + 180
         );
 
         claw = new SimpleServoPivot(
                 new SimpleServo[]{getGoBildaServo(hardwareMap, "pixel claw")},
-                CLAW_OPEN,
-                CLAW_CLOSED
+                ANGLE_CLAW_OPEN,
+                ANGLE_CLAW_CLOSED
         );
-    }
-
-    public void setFloorScoring(boolean floorScoring) {
-        this.floorScoring = floorScoring;
-    }
-
-    public void extend() {
-        pivot.setActivated(true);
     }
 
     public void lockPixels() {
@@ -65,23 +60,47 @@ public class Deposit {
 
     public void dropSecondPixel() {
         pixelsLocked = 0;
+        retracted = false;
+        timer.reset();
     }
 
-    public boolean noPixels() {
-        return pixelsLocked == 0;
+    public boolean droppedBothPixels() {
+        return !retracted && timer.seconds() >= TIME_DROP_TO_RETRACT;
+    }
+
+    public void toggleFloorScoring() {
+        setFloorScoring(!floorScoring);
+    }
+
+    public void setFloorScoring(boolean floorScoring) {
+        this.floorScoring = floorScoring;
+    }
+
+    public void extend() {
+        pivot.setActivated(true);
     }
 
     public void retract() {
         pivot.setActivated(false);
+        retracted = true;
+    }
+
+    public void toggle() {
+        if (pivot.getActivated()) retract(); else extend();
     }
 
     public void run() {
-        pivot.updateAngles(PIVOT_OFFSET, PIVOT_OFFSET + (floorScoring ? 170.5 : 120));
-        claw.updateAngles(CLAW_OPEN, CLAW_CLOSED);
+        if (droppedBothPixels()) retract();
+
+        pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + (floorScoring ? 170.5 : 120));
+        claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
+        hook.updateAngles(ANGLE_OFFSET_HOOK, ANGLE_OFFSET_HOOK + 180);
+
         claw.setActivated(pixelsLocked >= 1);
         hook.setActivated(pixelsLocked == 2);
+
         pivot.run();
-        hook.run();
         claw.run();
+        hook.run();
     }
 }
