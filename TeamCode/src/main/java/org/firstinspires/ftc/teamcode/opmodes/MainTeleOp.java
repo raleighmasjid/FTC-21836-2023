@@ -42,7 +42,7 @@ public class MainTeleOp extends LinearOpMode {
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
-        // Initialize robot:
+        // Initialize robot if not already initialized:
         if (robot == null) robot = new Robot(hardwareMap);
 
         // Initialize gamepads
@@ -69,7 +69,7 @@ public class MainTeleOp extends LinearOpMode {
             // Read sensors + gamepads:
             Gamepad1.readButtons();
             Gamepad2.readButtons();
-            robot.drivetrain.updateGains();
+            robot.readSensors();
 
             // Reset current heading as per these keybinds:
             if (Gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);

@@ -21,6 +21,11 @@ public class Robot {
         lift = new Lift(hardwareMap);
     }
 
+    public void readSensors() {
+        drivetrain.updateGains();
+        lift.readSensors();
+    }
+
     public void start() {
         drivetrain.imu.start();
         intake.start();
