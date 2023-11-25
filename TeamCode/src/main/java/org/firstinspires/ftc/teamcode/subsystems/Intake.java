@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.fromHSV;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
@@ -24,6 +27,7 @@ public class Intake {
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 30,
             kV = 1,
+            TIME_REVERSING = 1,
             TIME_PIVOTING = 1,
             COLOR_SENSOR_GAIN = 1;
 
@@ -39,12 +43,13 @@ public class Intake {
 
     private IntakeState currentState = HAS_0;
     private final ElapsedTime timer = new ElapsedTime();
-    private final Pixel[] pixels = new Pixel[2];
-    public boolean justDroppedPixels = false;
+    private final Pixel.Color[] colors = new Pixel.Color[2];
+    private boolean justDroppedPixels = false;
 
     enum IntakeState {
         HAS_0,
         HAS_1,
+        REVERSING,
         PIVOTING,
         TRANSFERRING,
     }
@@ -72,6 +77,7 @@ public class Intake {
         );
 
         motor = new MotorEx(hardwareMap, "intake", RPM_1620);
+        motor.setZeroPowerBehavior(FLOAT);
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         timer.reset();
     }
@@ -87,13 +93,31 @@ public class Intake {
 
     public void run() {
 
+        if (justDroppedPixels) justDroppedPixels = false;
+
         switch (currentState) {
             case HAS_0:
-                if (justDroppedPixels) justDroppedPixels = false;
                 bottomHSV = bottomSensor.getHSV();
-                break;
+                /* {
+                    currentState = HAS_1;
+                    colors[0] = fromHSV(bottomHSV);
+                }
+                break; */
             case HAS_1:
                 topHSV = topSensor.getHSV();
+                /* {
+                    currentState = REVERSING;
+                    timer.reset();
+                    colors[1] = fromHSV(topHSV);
+                    latch.setActivated(true);
+                } */
+                break;
+            case REVERSING:
+                runMotor(-1);
+                if (timer.seconds() >= TIME_REVERSING) {
+                    currentState = PIVOTING;
+                    pivot.setActivated(true);
+                }
                 break;
             case PIVOTING:
                 if (timer.seconds() >= TIME_PIVOTING) {
@@ -102,7 +126,7 @@ public class Intake {
                 }
                 break;
             case TRANSFERRING:
-                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
+                justDroppedPixels = fromHSV(topSensor.getHSV()) == EMPTY;
                 if (justDroppedPixels) {
                     currentState = HAS_0;
                     pivot.setActivated(false);
@@ -119,8 +143,16 @@ public class Intake {
         topSensor.interrupt();
     }
 
-    public Pixel[] getPixels() {
-        return pixels;
+    public Pixel.Color[] getColors() {
+        return colors;
+    }
+
+    public boolean justDroppedPixels() {
+        return justDroppedPixels;
+    }
+
+    public IntakeState getCurrentState() {
+        return currentState;
     }
 
     private void printHSV(MultipleTelemetry telemetry, float[] hsv, String title) {
