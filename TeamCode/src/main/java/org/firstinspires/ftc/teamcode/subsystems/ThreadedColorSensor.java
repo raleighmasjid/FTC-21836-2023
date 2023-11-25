@@ -16,9 +16,7 @@ public class ThreadedColorSensor extends Thread {
 
     public ThreadedColorSensor(HardwareMap hardwareMap, String name, float gain) {
         sensor = hardwareMap.get(NormalizedColorSensor.class, name);
-        if (sensor instanceof SwitchableLight) {
-            ((SwitchableLight) sensor).enableLight(true);
-        }
+        if (sensor instanceof SwitchableLight) ((SwitchableLight) sensor).enableLight(true);
         sensor.setGain(gain);
     }
 
@@ -33,5 +31,13 @@ public class ThreadedColorSensor extends Thread {
     public float[] getHSV() {
         Color.colorToHSV(rgba.toColor(), hsv);
         return hsv;
+    }
+
+    public float[] getRGB() {
+        return new float[]{
+                rgba.red * 255,
+                rgba.green * 255,
+                rgba.blue * 255
+        };
     }
 }
