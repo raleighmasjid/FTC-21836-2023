@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import java.util.List;
 
 @Config
-@Autonomous(group = "21836 Autonomous", preselectTeleOp = "MainTeleOp")
+@Autonomous(group = "21836 Main", preselectTeleOp = "MainTeleOp")
 public class MainAuton extends LinearOpMode {
 
     // Declare objects:

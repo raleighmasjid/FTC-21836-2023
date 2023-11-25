@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 import java.util.List;
 
-@TeleOp(group = "21836 TeleOp")
+@TeleOp(group = "21836 Main")
 public class MainTeleOp extends LinearOpMode {
 
     // Declare objects:
