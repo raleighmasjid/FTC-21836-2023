@@ -12,7 +12,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBi
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -59,21 +58,17 @@ public class Intake {
         topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
 
         pivot = new SimpleServoPivot(
-                new SimpleServo[]{
-                        getAxonMini(hardwareMap, "intake right"),
-                        getReversedServo(getAxonMini(hardwareMap, "intake left"))
-                },
                 ANGLE_PIVOT_OFFSET,
-                ANGLE_PIVOT_OFFSET + 180
+                ANGLE_PIVOT_OFFSET + 180,
+                getAxonMini(hardwareMap, "intake right"),
+                getReversedServo(getAxonMini(hardwareMap, "intake left"))
         );
 
         latch = new SimpleServoPivot(
-                new SimpleServo[]{
-                        getGoBildaServo(hardwareMap, "latch right"),
-                        getReversedServo(getGoBildaServo(hardwareMap, "latch left"))
-                },
                 ANGLE_LATCH_OPEN,
-                ANGLE_LATCH_CLOSED
+                ANGLE_LATCH_CLOSED,
+                getGoBildaServo(hardwareMap, "latch right"),
+                getReversedServo(getGoBildaServo(hardwareMap, "latch left"))
         );
 
         motor = new MotorEx(hardwareMap, "intake", RPM_1620);

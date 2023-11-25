@@ -32,7 +32,7 @@ public class SimpleServoPivot {
 
     private boolean activated = false;
 
-    public SimpleServoPivot(SimpleServo[] servos, double ANGLE_A, double ANGLE_B) {
+    public SimpleServoPivot(double ANGLE_A, double ANGLE_B, SimpleServo... servos) {
         this.servos = servos;
         updateAngles(ANGLE_A, ANGLE_B);
     }

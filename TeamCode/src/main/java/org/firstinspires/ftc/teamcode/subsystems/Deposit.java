@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxon
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
 
-import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -25,24 +24,22 @@ public class Deposit {
 
     public Deposit(HardwareMap hardwareMap) {
         pivot = new SimpleServoPivot(
-                new SimpleServo[]{
-                        getAxonMini(hardwareMap, "deposit left"),
-                        getReversedServo(getAxonMini(hardwareMap, "deposit right")),
-                },
                 ANGLE_OFFSET_PIVOT,
-                ANGLE_OFFSET_PIVOT + 120
+                ANGLE_OFFSET_PIVOT + 120,
+                getAxonMini(hardwareMap, "deposit left"),
+                getReversedServo(getAxonMini(hardwareMap, "deposit right"))
         );
 
         hook = new SimpleServoPivot(
-                new SimpleServo[]{getGoBildaServo(hardwareMap, "pixel hook")},
                 ANGLE_OFFSET_HOOK,
-                ANGLE_OFFSET_HOOK + 180
+                ANGLE_OFFSET_HOOK + 180,
+                getGoBildaServo(hardwareMap, "pixel hook")
         );
 
         claw = new SimpleServoPivot(
-                new SimpleServo[]{getGoBildaServo(hardwareMap, "pixel claw")},
                 ANGLE_CLAW_OPEN,
-                ANGLE_CLAW_CLOSED
+                ANGLE_CLAW_CLOSED,
+                getGoBildaServo(hardwareMap, "pixel claw")
         );
     }
 
