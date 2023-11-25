@@ -7,8 +7,8 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.red;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -78,13 +78,13 @@ public class TestDrivetrain extends LinearOpMode {
             if (Gamepad1.wasJustPressed(DPAD_DOWN)) drivetrain.setCurrentHeading(PI);
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) drivetrain.setCurrentHeading(-PI/2);
 
-            if (lockSlowMode && Gamepad1.wasJustPressed(RIGHT_BUMPER)) lockSlowMode = false;
+            if (lockSlowMode && Gamepad1.isDown(RIGHT_BUMPER)) lockSlowMode = false;
             // Field-centric drive dt with control stick inputs:
-            drivetrain.run(
+            robot.drivetrain.run(
                     Gamepad1.getLeftX(),
                     Gamepad1.getLeftY(),
                     Gamepad1.getRightX(),
-                    (lockSlowMode ? 1 : 0) + Gamepad1.getTrigger(RIGHT_TRIGGER)
+                    lockSlowMode || Gamepad1.isDown(RIGHT_BUMPER) ? 1 : 0
             );
 
             // Push telemetry data to multiple outputs (set earlier):
