@@ -82,11 +82,7 @@ public class Intake {
         topSensor.start();
     }
 
-    public void runMotor(double output) {
-        motor.set(output * kV * (12.0 / batteryVoltageSensor.getVoltage()));
-    }
-
-    public void run() {
+    public void run(double motorPower) {
 
         if (justDroppedPixels) justDroppedPixels = false;
 
@@ -108,7 +104,7 @@ public class Intake {
                 } */
                 break;
             case REVERSING:
-                runMotor(-1);
+                motorPower--;
                 if (timer.seconds() >= TIME_REVERSING) {
                     currentState = PIVOTING;
                     pivot.setActivated(true);
@@ -128,6 +124,8 @@ public class Intake {
                 }
                 break;
         }
+
+        motor.set(motorPower * kV * (12.0 / batteryVoltageSensor.getVoltage()));
 
         pivot.run();
         latch.run();
