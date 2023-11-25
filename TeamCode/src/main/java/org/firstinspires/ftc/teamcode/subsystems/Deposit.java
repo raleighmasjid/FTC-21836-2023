@@ -20,7 +20,7 @@ public class Deposit {
     private final SimpleServoPivot pivot, hook, claw;
 
     private final ElapsedTime timer = new ElapsedTime();
-    private boolean floorScoring = false, retracted = true;
+    private boolean retracted = true;
     private int pixelsLocked = 0;
 
     public Deposit(HardwareMap hardwareMap) {
@@ -64,18 +64,6 @@ public class Deposit {
         timer.reset();
     }
 
-    public boolean droppedBothPixels() {
-        return !retracted && timer.seconds() >= TIME_DROP_TO_RETRACT;
-    }
-
-    public void toggleFloorScoring() {
-        setFloorScoring(!floorScoring);
-    }
-
-    public void setFloorScoring(boolean floorScoring) {
-        this.floorScoring = floorScoring;
-    }
-
     public void extend() {
         pivot.setActivated(true);
     }
@@ -89,10 +77,14 @@ public class Deposit {
         if (pivot.getActivated()) retract(); else extend();
     }
 
+    public boolean droppedBothPixels() {
+        return !retracted && timer.seconds() >= TIME_DROP_TO_RETRACT;
+    }
+
     public void run() {
         if (droppedBothPixels()) retract();
 
-        pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + (floorScoring ? 170.5 : 120));
+        pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
         hook.updateAngles(ANGLE_OFFSET_HOOK, ANGLE_OFFSET_HOOK + 180);
 
