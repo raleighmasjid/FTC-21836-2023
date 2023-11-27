@@ -18,11 +18,11 @@ public class Robot {
     }
 
     public void start() {
-        drivetrain.imu.start();
+        drivetrain.start();
     }
 
     public void interrupt() {
-        drivetrain.imu.interrupt();
+        drivetrain.interrupt();
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {

@@ -75,6 +75,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     public MecanumDrivetrain(HardwareMap hardwareMap) {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
+        this.hardwareMap = hardwareMap;
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
@@ -88,8 +89,6 @@ public class MecanumDrivetrain extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-
-        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
 
         leftFront = hardwareMap.get(DcMotorEx.class, "left front");
         leftBack = hardwareMap.get(DcMotorEx.class, "left back");
@@ -308,10 +307,20 @@ public class MecanumDrivetrain extends MecanumDrive {
         return imu.getAngularVelo();
     }
 
-    public final ThreadedIMU imu;
+    private final HardwareMap hardwareMap;
+    private ThreadedIMU imu;
 
     private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
+
+    public void start() {
+        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        imu.start();
+    }
+
+    public void interrupt() {
+        imu.interrupt();
+    }
 
     /**
      * Set internal heading of the robot to correct field-centric direction
