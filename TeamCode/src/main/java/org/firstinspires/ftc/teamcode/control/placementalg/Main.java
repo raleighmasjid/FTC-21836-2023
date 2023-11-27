@@ -9,7 +9,6 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
-        PlacementCalculator calculator = new PlacementCalculator();
         Backdrop backdrop = new Backdrop();
         boolean alwaysPlaceColored = true;
         boolean printPerIteration = true;
@@ -37,10 +36,10 @@ public class Main {
                 backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
             }
         }
-        ArrayList<Pixel> pixelsToPlace = calculator.calculate(backdrop);
+        ArrayList<Pixel> pixelsToPlace = PlacementCalculator.calculate(backdrop);
         backdrop.print();
         printLine();
-        calculator.printPixelsToPlace();
+        for (Pixel pixel : pixelsToPlace) pixel.print();
         printLine();
 
         boolean solve = true;
@@ -58,13 +57,13 @@ public class Main {
                 if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
                 backdrop.add(pToPlace);
             }
-            pixelsToPlace = calculator.calculate(backdrop);
+            pixelsToPlace = PlacementCalculator.calculate(backdrop);
             if (!solve || printPerIteration) {
                 printLine();
                 printLine();
                 backdrop.print();
                 printLine();
-                calculator.printPixelsToPlace();
+                for (Pixel pixel : pixelsToPlace) pixel.print();
             }
         }
         if (solve && !printPerIteration) {
@@ -72,7 +71,7 @@ public class Main {
             printLine();
             backdrop.print();
             printLine();
-            calculator.printPixelsToPlace();
+            for (Pixel pixel : pixelsToPlace) pixel.print();
         }
         System.out.println(backdrop.numOfMosaics + " total mosaics");
     }

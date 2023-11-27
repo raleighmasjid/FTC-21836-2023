@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.control.placementalg.PlacementCalculator;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
 public class Robot {
@@ -12,7 +11,6 @@ public class Robot {
     public Intake intake;
     public Deposit deposit;
     public Lift lift;
-    private PlacementCalculator calculator;
 
     public Robot(HardwareMap hardwareMap) {
         drivetrain = new AutoTurnMecanum(hardwareMap);
