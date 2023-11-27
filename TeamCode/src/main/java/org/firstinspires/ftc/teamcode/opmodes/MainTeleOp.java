@@ -7,8 +7,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.red;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static java.lang.Math.PI;
@@ -86,9 +84,6 @@ public class MainTeleOp extends LinearOpMode {
                     Gamepad1.getRightX(),
                     lockSlowMode || Gamepad1.isDown(RIGHT_BUMPER) ? 1 : 0
             );
-            robot.intake.run(Gamepad1.getTrigger(RIGHT_TRIGGER) - Gamepad1.getTrigger(LEFT_TRIGGER));
-            robot.deposit.run();
-            robot.lift.run(Gamepad1.getRightY());
 
             // Push telemetry data to multiple outputs (set earlier):
             robot.printTelemetry(myTelemetry);
