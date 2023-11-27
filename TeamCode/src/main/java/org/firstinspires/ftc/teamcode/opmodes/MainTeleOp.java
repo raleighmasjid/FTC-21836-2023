@@ -87,9 +87,6 @@ public class MainTeleOp extends LinearOpMode {
 
             // Push telemetry data to multiple outputs (set earlier):
             robot.printTelemetry(myTelemetry);
-            myTelemetry.addLine();
-            myTelemetry.addLine();
-            robot.printNumericalTelemetry(myTelemetry);
             myTelemetry.update();
         }
         robot.interrupt();
