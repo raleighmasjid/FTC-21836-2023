@@ -13,7 +13,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.control.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Config
@@ -24,7 +23,6 @@ public class MainAuton extends LinearOpMode {
     static GamepadEx Gamepad1, Gamepad2;
     static MultipleTelemetry Telemetry;
     static Robot robot = null;
-    static Backdrop backdrop = new Backdrop();
 
     @Override
     public void runOpMode() throws InterruptedException {

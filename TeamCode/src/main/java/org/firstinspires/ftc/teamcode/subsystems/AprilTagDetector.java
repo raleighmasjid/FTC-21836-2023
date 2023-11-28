@@ -35,9 +35,7 @@ public class AprilTagDetector {
             CAMERA_CY
     );
 
-    private final MultipleTelemetry myTelemetry;
-
-    private final int[] tagIdsToLookFor;
+    private int[] tagIdsToLookFor;
 
     private boolean tagVisible = false;
 
@@ -64,7 +62,10 @@ public class AprilTagDetector {
 
             }
         });
-        this.myTelemetry = myTelemetry;
+        setTagIdsToLookFor(tagIdsToLookFor);
+    }
+
+    public void setTagIdsToLookFor(int[] tagIdsToLookFor) {
         this.tagIdsToLookFor = tagIdsToLookFor;
     }
 
@@ -102,17 +103,17 @@ public class AprilTagDetector {
      * Prints tag visibility to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void printTagIsVisible() {
-        myTelemetry.addLine("A tag of interest is " + (getTagIsVisible() ? "" : "not ") + "visible");
+    public void printTagIsVisible(MultipleTelemetry telemetry) {
+        telemetry.addLine("A tag of interest is " + (getTagIsVisible() ? "" : "not ") + "visible");
     }
 
     /**
      * Prints last {@link #detectedTag} to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void printDetectedTag() {
+    public void printDetectedTag(MultipleTelemetry telemetry) {
         AprilTagDetection detectedTag = getDetectedTag();
-        myTelemetry.addLine("A tag has" + (
+        telemetry.addLine("A tag has" + (
                 detectedTag == null ?
                         "never been detected" :
                         "been detected: " + detectedTag.id
