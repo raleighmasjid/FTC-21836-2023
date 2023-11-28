@@ -77,14 +77,14 @@ public class Lift {
     }
 
     public void upOneRow() {
-        setTarget(targetRow + 1);
+        setTargetRow(targetRow + 1);
     }
 
     public void downOneRow() {
-        setTarget(targetRow - 1);
+        setTargetRow(targetRow - 1);
     }
 
-    public void setTarget(int targetRow) {
+    public void setTargetRow(int targetRow) {
         this.targetRow = max(min(targetRow, 10), -1);
         targetState = new State(this.targetRow < 0 ? 0 : BOTTOM_ROW_HEIGHT + (this.targetRow * PIXEL_HEIGHT));
         controller.setTarget(targetState);
