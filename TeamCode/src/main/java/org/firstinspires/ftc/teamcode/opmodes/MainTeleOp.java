@@ -41,10 +41,10 @@ public class MainTeleOp extends LinearOpMode {
         while (opModeInInit()) {
             Gamepad1.readButtons();
             if (Gamepad1.wasJustPressed(RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
-            if (Gamepad1.wasJustPressed(B)) robot.red = true;
-            if (Gamepad1.wasJustPressed(X)) robot.red = false;
+            if (Gamepad1.wasJustPressed(B)) robot.isRed = true;
+            if (Gamepad1.wasJustPressed(X)) robot.isRed = false;
             Telemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            Telemetry.addLine((robot.red ? "RED" : "BLUE") + " alliance");
+            Telemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
             Telemetry.update();
         }
         robot.start();

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Robot {
 
-    public boolean red = true;
+    public boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
 

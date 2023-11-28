@@ -39,18 +39,18 @@ public class MainAuton extends LinearOpMode {
         Gamepad1 = new GamepadEx(super.gamepad1);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
-        boolean right = true;
+        boolean isRight = true;
         while (opModeInInit() && !(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
             Gamepad1.readButtons();
-            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
-            if (Gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
-            if (Gamepad1.wasJustPressed(B)) robot.red = true;
-            if (Gamepad1.wasJustPressed(X)) robot.red = false;
-            Telemetry.addLine("Selected " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
+            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) isRight = true;
+            if (Gamepad1.wasJustPressed(DPAD_LEFT)) isRight = false;
+            if (Gamepad1.wasJustPressed(B)) robot.isRed = true;
+            if (Gamepad1.wasJustPressed(X)) robot.isRed = false;
+            Telemetry.addLine("Selected " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
             Telemetry.addLine("Press both shoulder buttons to confirm!");
             Telemetry.update();
         }
-        Telemetry.addLine("Confirmed " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
+        Telemetry.addLine("Confirmed " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
         Telemetry.update();
 
         waitForStart();
