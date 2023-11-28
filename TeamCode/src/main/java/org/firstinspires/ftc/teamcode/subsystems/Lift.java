@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.*;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -39,8 +40,8 @@ public class Lift {
 
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
-    private State currentState = new State(), targetState = new State();
-    private String targetPosName = "Retracted";
+    private State currentState = new State();
+    private int row = -1;
     private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
     private final PIDController controller = new PIDController(kDFilter);
 
@@ -71,14 +72,25 @@ public class Lift {
         controller.setGains(pidGains);
     }
 
-    public void setTarget(int pixelY) {
-        pixelY = min(pixelY, 10);
-        boolean retracted = pixelY < 0;
+    private double rowToInches() {
+        return row < 0 ? 0 : BOTTOM_ROW_HEIGHT + (row * PIXEL_HEIGHT);
+    }
 
-        targetState = new State(retracted ? 0 : BOTTOM_ROW_HEIGHT + (pixelY * PIXEL_HEIGHT));
-        targetPosName = retracted ? "Retracted" : "Row " + pixelY;
+    private String rowName() {
+        return row < 0 ? "Retracted" : "Row " + row;
+    }
 
-        controller.setTarget(targetState);
+    public void increaseRow() {
+        setTarget(row + 1);
+    }
+
+    public void decreaseRow() {
+        setTarget(row - 1);
+    }
+
+    public void setTarget(int row) {
+        this.row = max(min(row, 10), -1);
+        controller.setTarget(new State(rowToInches()));
     }
 
     public void run() {
@@ -100,19 +112,19 @@ public class Lift {
     }
 
     public void reset() {
-        targetPosName = "Retracted";
+        row = -1;
         currentState = new State();
         controller.reset();
         for (MotorEx motor : motors) motor.encoder.reset();
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Named lift position", targetPosName);
+        telemetry.addData("Named lift position", rowName());
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
         telemetry.addData("Current position (in)", currentState.x);
-        telemetry.addData("Target position (in)", targetState.x);
+        telemetry.addData("Target position (in)", rowToInches());
         telemetry.addLine();
         telemetry.addData("Lift error derivative (in/s)", controller.getErrorDerivative());
 
