@@ -72,10 +72,6 @@ public class Lift {
         controller.setGains(pidGains);
     }
 
-    private String rowName() {
-        return targetRow < 0 ? "Retracted" : "Row " + targetRow;
-    }
-
     public void upOneRow() {
         setTargetRow(targetRow + 1);
     }
@@ -117,7 +113,7 @@ public class Lift {
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Named target position", rowName());
+        telemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
