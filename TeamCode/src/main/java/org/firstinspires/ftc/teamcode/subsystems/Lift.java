@@ -40,7 +40,7 @@ public class Lift {
 
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
-    private State currentState = new State();
+    private State currentState = new State(), targetState = new State();
     private int row = -1;
     private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
     private final PIDController controller = new PIDController(kDFilter);
@@ -72,10 +72,6 @@ public class Lift {
         controller.setGains(pidGains);
     }
 
-    private double rowToInches() {
-        return row < 0 ? 0 : BOTTOM_ROW_HEIGHT + (row * PIXEL_HEIGHT);
-    }
-
     private String rowName() {
         return row < 0 ? "Retracted" : "Row " + row;
     }
@@ -90,7 +86,8 @@ public class Lift {
 
     public void setTarget(int row) {
         this.row = max(min(row, 10), -1);
-        controller.setTarget(new State(rowToInches()));
+        targetState = new State(this.row < 0 ? 0 : BOTTOM_ROW_HEIGHT + (this.row * PIXEL_HEIGHT));
+        controller.setTarget(targetState);
     }
 
     public void run() {
@@ -114,6 +111,7 @@ public class Lift {
     public void reset() {
         row = -1;
         currentState = new State();
+        targetState = new State();
         controller.reset();
         for (MotorEx motor : motors) motor.encoder.reset();
     }
@@ -124,7 +122,7 @@ public class Lift {
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
         telemetry.addData("Current position (in)", currentState.x);
-        telemetry.addData("Target position (in)", rowToInches());
+        telemetry.addData("Target position (in)", targetState.x);
         telemetry.addLine();
         telemetry.addData("Lift error derivative (in/s)", controller.getErrorDerivative());
 
