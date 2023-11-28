@@ -21,7 +21,7 @@ public class MainAuton extends LinearOpMode {
     // Declare objects:
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
-    GamepadEx Gamepad1;
+    GamepadEx gamepad1;
     static Robot robot = null;
     static Backdrop backdrop = new Backdrop();
     static boolean red = true;
@@ -38,16 +38,16 @@ public class MainAuton extends LinearOpMode {
         for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         // Initialize gamepad (ONLY FOR INIT, DON'T CALL DURING WHILE LOOP)
-        Gamepad1 = new GamepadEx(gamepad1);
+        gamepad1 = new GamepadEx(super.gamepad1);
 
         // Get gamepad 1 button input and save "right" and "red" booleans for autonomous configuration:
         boolean right = true;
-        while (opModeInInit() && !(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
-            Gamepad1.readButtons();
-            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
-            if (Gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
-            if (Gamepad1.wasJustPressed(B)) red = true;
-            if (Gamepad1.wasJustPressed(X)) red = false;
+        while (opModeInInit() && !(gamepad1.isDown(RIGHT_BUMPER) && gamepad1.isDown(LEFT_BUMPER))) {
+            gamepad1.readButtons();
+            if (gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
+            if (gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
+            if (gamepad1.wasJustPressed(B)) red = true;
+            if (gamepad1.wasJustPressed(X)) red = false;
             myTelemetry.addLine("Selected " + (red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
             myTelemetry.addLine("Press both shoulder buttons to confirm!");
             myTelemetry.update();

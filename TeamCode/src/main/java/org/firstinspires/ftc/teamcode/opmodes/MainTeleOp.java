@@ -28,7 +28,7 @@ public class MainTeleOp extends LinearOpMode {
     // Declare objects:
     MultipleTelemetry myTelemetry;
     List<LynxModule> hubs;
-    GamepadEx Gamepad1, Gamepad2;
+    GamepadEx gamepad1, gamepad2;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -45,16 +45,15 @@ public class MainTeleOp extends LinearOpMode {
         if (robot == null) robot = new Robot(hardwareMap);
 
         // Initialize gamepads
-        Gamepad1 = new GamepadEx(gamepad1);
-        Gamepad2 = new GamepadEx(gamepad2);
+        gamepad1 = new GamepadEx(super.gamepad1);
+        gamepad2 = new GamepadEx(super.gamepad2);
 
-        // Get gamepad 1 button input and save "lockSlowMode" and "red" booleans for teleop configuration:
-        boolean lockSlowMode = false;
+        // Get gamepad 1 button input and locks slow mode and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
-            Gamepad1.readButtons();
-            if (Gamepad1.wasJustPressed(B)) red = true;
-            if (Gamepad1.wasJustPressed(X)) red = false;
+            gamepad1.readButtons();
             if (gamepad1.wasJustPressed(RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
+            if (gamepad1.wasJustPressed(B)) red = true;
+            if (gamepad1.wasJustPressed(X)) red = false;
             myTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
             myTelemetry.addLine((red ? "RED" : "BLUE") + " alliance");
             myTelemetry.update();
@@ -66,21 +65,21 @@ public class MainTeleOp extends LinearOpMode {
             // Manually clear old sensor data from the last loop:
             for (LynxModule hub : hubs) hub.clearBulkCache();
             // Read sensors + gamepads:
-            Gamepad1.readButtons();
-            Gamepad2.readButtons();
+            gamepad1.readButtons();
+            gamepad2.readButtons();
             robot.readSensors();
 
             // Reset current heading as per these keybinds:
-            if (Gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
-            if (Gamepad1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
-            if (Gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
-            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
+            if (gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
+            if (gamepad1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
+            if (gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
+            if (gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
 
             // Field-centric drive dt with control stick inputs:
             robot.drivetrain.run(
-                    Gamepad1.getLeftX(),
-                    Gamepad1.getLeftY(),
-                    Gamepad1.getRightX(),
+                    gamepad1.getLeftX(),
+                    gamepad1.getLeftY(),
+                    gamepad1.getRightX(),
                     gamepad1.isDown(RIGHT_BUMPER)
             );
 
