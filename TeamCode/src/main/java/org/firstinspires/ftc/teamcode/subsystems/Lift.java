@@ -41,7 +41,7 @@ public class Lift {
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
     private State currentState = new State(), targetState = new State();
-    private int row = -1;
+    private int targetRow = -1;
     private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
     private final PIDController controller = new PIDController(kDFilter);
 
@@ -73,20 +73,20 @@ public class Lift {
     }
 
     private String rowName() {
-        return row < 0 ? "Retracted" : "Row " + row;
+        return targetRow < 0 ? "Retracted" : "Row " + targetRow;
     }
 
-    public void increaseRow() {
-        setTarget(row + 1);
+    public void upOneRow() {
+        setTarget(targetRow + 1);
     }
 
-    public void decreaseRow() {
-        setTarget(row - 1);
+    public void downOneRow() {
+        setTarget(targetRow - 1);
     }
 
-    public void setTarget(int row) {
-        this.row = max(min(row, 10), -1);
-        targetState = new State(this.row < 0 ? 0 : BOTTOM_ROW_HEIGHT + (this.row * PIXEL_HEIGHT));
+    public void setTarget(int targetRow) {
+        this.targetRow = max(min(targetRow, 10), -1);
+        targetState = new State(this.targetRow < 0 ? 0 : BOTTOM_ROW_HEIGHT + (this.targetRow * PIXEL_HEIGHT));
         controller.setTarget(targetState);
     }
 
@@ -109,7 +109,7 @@ public class Lift {
     }
 
     public void reset() {
-        row = -1;
+        targetRow = -1;
         currentState = new State();
         targetState = new State();
         controller.reset();
@@ -117,7 +117,7 @@ public class Lift {
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Named lift position", rowName());
+        telemetry.addData("Named target position", rowName());
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {

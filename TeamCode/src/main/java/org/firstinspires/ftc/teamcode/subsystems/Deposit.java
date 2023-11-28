@@ -14,7 +14,7 @@ public class Deposit {
             ANGLE_CLAW_CLOSED = 0,
             ANGLE_OFFSET_HOOK = 0,
             ANGLE_OFFSET_PIVOT = 0,
-            TIME_DROP_TO_RETRACT = 0.25;
+            TIME_DROP = 0.25;
 
     private final SimpleServoPivot pivot, hook, claw;
 
@@ -75,7 +75,7 @@ public class Deposit {
     }
 
     public boolean droppedBothPixels() {
-        return !retracted && timer.seconds() >= TIME_DROP_TO_RETRACT;
+        return !retracted && timer.seconds() >= TIME_DROP;
     }
 
     public void run() {
