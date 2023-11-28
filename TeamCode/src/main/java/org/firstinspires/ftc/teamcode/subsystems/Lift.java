@@ -4,6 +4,8 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.*;
 
+import static java.lang.Math.min;
+
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -70,13 +72,12 @@ public class Lift {
     }
 
     public void setTarget(int pixelY) {
-        if (pixelY < 0) {
-            targetState = new State(0);
-            targetPosName = "Retracted";
-        } else {
-            targetState = new State(BOTTOM_ROW_HEIGHT + (pixelY * PIXEL_HEIGHT));
-            targetPosName = "Row " + pixelY;
-        }
+        pixelY = min(pixelY, 10);
+        boolean retracted = pixelY < 0;
+
+        targetState = new State(retracted ? 0 : BOTTOM_ROW_HEIGHT + (pixelY * PIXEL_HEIGHT));
+        targetPosName = retracted ? "Retracted" : "Row " + pixelY;
+
         controller.setTarget(targetState);
     }
 
