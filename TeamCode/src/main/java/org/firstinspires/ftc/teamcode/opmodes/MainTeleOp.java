@@ -7,27 +7,22 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.red;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
-
-import java.util.List;
 
 @TeleOp(group = "21836 Main")
 public class MainTeleOp extends LinearOpMode {
 
     // Declare objects:
     MultipleTelemetry myTelemetry;
-    List<LynxModule> hubs;
     GamepadEx gamepad1, gamepad2;
 
     @Override
@@ -35,11 +30,6 @@ public class MainTeleOp extends LinearOpMode {
 
         // Initialize multiple telemetry outputs:
         myTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        // Initialize internal hub representations:
-        // Switch hubs to manually reset sensor inputs when we tell it to:
-        hubs = hardwareMap.getAll(LynxModule.class);
-        for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         // Initialize robot if not already initialized:
         if (robot == null) robot = new Robot(hardwareMap);
@@ -52,22 +42,20 @@ public class MainTeleOp extends LinearOpMode {
         while (opModeInInit()) {
             gamepad1.readButtons();
             if (gamepad1.wasJustPressed(RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
-            if (gamepad1.wasJustPressed(B)) red = true;
-            if (gamepad1.wasJustPressed(X)) red = false;
+            if (gamepad1.wasJustPressed(B)) robot.red = true;
+            if (gamepad1.wasJustPressed(X)) robot.red = false;
             myTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            myTelemetry.addLine((red ? "RED" : "BLUE") + " alliance");
+            myTelemetry.addLine((robot.red ? "RED" : "BLUE") + " alliance");
             myTelemetry.update();
         }
         robot.start();
 
         // Control loop:
         while (opModeIsActive()) {
-            // Manually clear old sensor data from the last loop:
-            for (LynxModule hub : hubs) hub.clearBulkCache();
             // Read sensors + gamepads:
+            robot.readSensors();
             gamepad1.readButtons();
             gamepad2.readButtons();
-            robot.readSensors();
 
             // Reset current heading as per these keybinds:
             if (gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
@@ -75,12 +63,12 @@ public class MainTeleOp extends LinearOpMode {
             if (gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
             if (gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
 
-            // Field-centric drive dt with control stick inputs:
+            // Field-centric driving with control stick inputs:
             robot.drivetrain.run(
                     gamepad1.getLeftX(),
                     gamepad1.getLeftY(),
                     gamepad1.getRightX(),
-                    gamepad1.isDown(RIGHT_BUMPER)
+                    gamepad1.isDown(RIGHT_BUMPER) // drives slower when bumper held
             );
 
             // Push telemetry data to multiple outputs (set earlier):
