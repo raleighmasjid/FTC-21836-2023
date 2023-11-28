@@ -14,17 +14,17 @@ public class Robot {
 
     public final AutoTurnMecanum drivetrain;
 
-    private final List<LynxModule> hubs;
+    private final List<LynxModule> revHubs;
 
     public Robot(HardwareMap hardwareMap) {
-        hubs = hardwareMap.getAll(LynxModule.class);
-        for (LynxModule hub : hubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        revHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : revHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         drivetrain = new AutoTurnMecanum(hardwareMap);
     }
 
     public void readSensors() {
-        for (LynxModule hub : hubs) hub.clearBulkCache();
+        for (LynxModule hub : revHubs) hub.clearBulkCache();
 
         drivetrain.updateGains();
     }
