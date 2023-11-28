@@ -312,6 +312,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
+    private boolean slowModeLocked = false;
 
     public void start() {
         imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
@@ -341,7 +342,7 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param yCommand forward input
      * @param turnCommand turning input
      */
-    public void run(double xCommand, double yCommand, double turnCommand, double slowCommand) {
+    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
 
         // counter-rotate translation vector by current heading
         double x = xCommand;
@@ -350,14 +351,28 @@ public class MecanumDrivetrain extends MecanumDrive {
         xCommand = x * cos(theta) - y * sin(theta);
         yCommand = x * sin(theta) + y * cos(theta);
 
+        if (useSlowMode) slowModeLocked = false;
+        if (useSlowMode || slowModeLocked) {
+            yCommand *= SLOW_FACTOR;
+            xCommand *= SLOW_FACTOR;
+            turnCommand *= SLOW_FACTOR;
+        }
+
         // run motors
-        double slowScalar = Math.max(1 - (1 - SLOW_FACTOR) * slowCommand, 0);
         double voltageScalar = 12.0 / batteryVoltageSensor.getVoltage();
         setWeightedDrivePower(new Pose2d(
-                yCommand * slowScalar * voltageScalar,
-                -xCommand * slowScalar * voltageScalar,
-                -turnCommand * slowScalar * voltageScalar
+                yCommand * voltageScalar,
+                -xCommand * voltageScalar,
+                -turnCommand * voltageScalar
         ));
+    }
+
+    public void toggleSlowModeLock() {
+        slowModeLocked = !slowModeLocked;
+    }
+
+    public boolean isSlowModeLocked() {
+        return slowModeLocked;
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
