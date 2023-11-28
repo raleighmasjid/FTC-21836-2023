@@ -4,7 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.fromHSV;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
@@ -25,14 +25,12 @@ public class Intake {
             ANGLE_PIVOT_OFFSET = 0,
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 30,
-            kV = 1,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 1,
             COLOR_SENSOR_GAIN = 1;
 
     private final HardwareMap hardwareMap;
     private final MotorEx motor;
-    private final VoltageSensor batteryVoltageSensor;
 
     private ThreadedColorSensor bottomSensor, topSensor;
     private float[]
@@ -41,14 +39,16 @@ public class Intake {
 
     private final SimpleServoPivot pivot, latch;
 
-    private IntakeState currentState = HAS_0;
+    private IntakeState currentState = HAS_0_PIXELS;
     private final ElapsedTime timer = new ElapsedTime();
-    private final Pixel.Color[] colors = new Pixel.Color[2];
+    private final Pixel.Color[] colors = new Pixel.Color[]{
+            EMPTY, EMPTY
+    };
     private boolean justDroppedPixels = false;
 
     enum IntakeState {
-        HAS_0,
-        HAS_1,
+        HAS_0_PIXELS,
+        HAS_1_PIXELS,
         REVERSING,
         PIVOTING,
         TRANSFERRING,
@@ -73,16 +73,12 @@ public class Intake {
 
         motor = new MotorEx(hardwareMap, "intake", RPM_1620);
         motor.setZeroPowerBehavior(FLOAT);
-        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         timer.reset();
     }
 
     public void start() {
         bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
         topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
-
-        bottomSensor.start();
-        topSensor.start();
     }
 
     public void run(double motorPower) {
@@ -90,16 +86,16 @@ public class Intake {
         if (justDroppedPixels) justDroppedPixels = false;
 
         switch (currentState) {
-            case HAS_0:
+            case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
-                /* {
+                /* if (fromHSV(bottomHSV) != EMPTY) {
                     currentState = HAS_1;
                     colors[0] = fromHSV(bottomHSV);
                 }
                 break; */
-            case HAS_1:
+            case HAS_1_PIXELS:
                 topHSV = topSensor.getHSV();
-                /* {
+                /* if (fromHSV(topHSV) != EMPTY) {
                     currentState = REVERSING;
                     timer.reset();
                     colors[1] = fromHSV(topHSV);
@@ -122,13 +118,13 @@ public class Intake {
             case TRANSFERRING:
                 justDroppedPixels = fromHSV(topSensor.getHSV()) == EMPTY;
                 if (justDroppedPixels) {
-                    currentState = HAS_0;
+                    currentState = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 }
                 break;
         }
 
-        motor.set(motorPower * kV * (12.0 / batteryVoltageSensor.getVoltage()));
+        motor.set(motorPower);
 
         pivot.run();
         latch.run();

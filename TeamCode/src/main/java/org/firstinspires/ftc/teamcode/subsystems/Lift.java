@@ -50,11 +50,6 @@ public class Lift {
         return new MotorEx(hardwareMap, name, RPM_1150);
     }
 
-    public static MotorEx getReversedMotor(MotorEx motor) {
-        motor.setInverted(true);
-        return motor;
-    }
-
     public Lift(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -79,7 +74,7 @@ public class Lift {
             targetState = new State(0);
             positionName = "Retracted";
         } else {
-            targetState = new State(PIXEL_BOTTOM_HEIGHT + (pixelY * PIXEL_HEIGHT));
+            targetState = new State(BOTTOM_ROW_HEIGHT + (pixelY * PIXEL_HEIGHT));
             positionName = "Row " + pixelY;
         }
         controller.setTarget(targetState);
