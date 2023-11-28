@@ -18,6 +18,8 @@ public class ThreadedColorSensor extends Thread {
         sensor = hardwareMap.get(NormalizedColorSensor.class, name);
         if (sensor instanceof SwitchableLight) ((SwitchableLight) sensor).enableLight(true);
         sensor.setGain(gain);
+
+        start();
     }
 
     public void run() {

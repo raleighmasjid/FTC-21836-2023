@@ -315,7 +315,6 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     public void start() {
         imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
-        imu.start();
     }
 
     public void interrupt() {

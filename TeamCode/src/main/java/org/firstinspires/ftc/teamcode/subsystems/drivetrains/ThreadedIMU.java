@@ -19,6 +19,8 @@ public class ThreadedIMU extends Thread {
         imu.resetDeviceConfigurationForOpMode();
         imu.resetYaw();
         imu.initialize(new IMU.Parameters(imuOrientation));
+
+        start();
     }
 
     @Override
