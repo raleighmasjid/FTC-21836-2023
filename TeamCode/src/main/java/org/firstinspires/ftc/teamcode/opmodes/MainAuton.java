@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 public class MainAuton extends LinearOpMode {
 
     // Declare objects:
-    MultipleTelemetry myTelemetry;
-    GamepadEx gamepad1;
+    static GamepadEx Gamepad1, Gamepad2;
+    static MultipleTelemetry Telemetry;
     static Robot robot = null;
     static Backdrop backdrop = new Backdrop();
 
@@ -30,25 +30,28 @@ public class MainAuton extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
-        myTelemetry = new MultipleTelemetry(telemetry);
+        Telemetry = new MultipleTelemetry(telemetry);
 
-        // Initialize gamepad (ONLY FOR INIT, DON'T CALL DURING WHILE LOOP)
-        gamepad1 = new GamepadEx(super.gamepad1);
+        // Initialize robot if not already initialized:
+        robot = new Robot(hardwareMap);
+
+        // Initialize gamepad:
+        Gamepad1 = new GamepadEx(super.gamepad1);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         boolean right = true;
-        while (opModeInInit() && !(gamepad1.isDown(RIGHT_BUMPER) && gamepad1.isDown(LEFT_BUMPER))) {
-            gamepad1.readButtons();
-            if (gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
-            if (gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
-            if (gamepad1.wasJustPressed(B)) robot.red = true;
-            if (gamepad1.wasJustPressed(X)) robot.red = false;
-            myTelemetry.addLine("Selected " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
-            myTelemetry.addLine("Press both shoulder buttons to confirm!");
-            myTelemetry.update();
+        while (opModeInInit() && !(Gamepad1.isDown(RIGHT_BUMPER) && Gamepad1.isDown(LEFT_BUMPER))) {
+            Gamepad1.readButtons();
+            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) right = true;
+            if (Gamepad1.wasJustPressed(DPAD_LEFT)) right = false;
+            if (Gamepad1.wasJustPressed(B)) robot.red = true;
+            if (Gamepad1.wasJustPressed(X)) robot.red = false;
+            Telemetry.addLine("Selected " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
+            Telemetry.addLine("Press both shoulder buttons to confirm!");
+            Telemetry.update();
         }
-        myTelemetry.addLine("Confirmed " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
-        myTelemetry.update();
+        Telemetry.addLine("Confirmed " + (robot.red ? "RED" : "BLUE") + " " + (right ? "RIGHT" : "LEFT"));
+        Telemetry.update();
 
         waitForStart();
 
@@ -58,7 +61,7 @@ public class MainAuton extends LinearOpMode {
             robot.readSensors();
 
             // Push telemetry data
-            myTelemetry.update();
+            Telemetry.update();
         }
     }
 }
