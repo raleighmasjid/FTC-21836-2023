@@ -38,7 +38,7 @@ public class Lift {
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
     private State currentState = new State(), targetState = new State();
-    private String positionName = "Retracted";
+    private String targetPosName = "Retracted";
     private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
     private final PIDController controller = new PIDController(kDFilter);
 
@@ -72,10 +72,10 @@ public class Lift {
     public void setTarget(int pixelY) {
         if (pixelY < 0) {
             targetState = new State(0);
-            positionName = "Retracted";
+            targetPosName = "Retracted";
         } else {
             targetState = new State(BOTTOM_ROW_HEIGHT + (pixelY * PIXEL_HEIGHT));
-            positionName = "Row " + pixelY;
+            targetPosName = "Row " + pixelY;
         }
         controller.setTarget(targetState);
     }
@@ -99,14 +99,14 @@ public class Lift {
     }
 
     public void reset() {
-        positionName = "Retracted";
+        targetPosName = "Retracted";
         currentState = new State();
         controller.reset();
         for (MotorEx motor : motors) motor.encoder.reset();
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Named lift position", positionName);
+        telemetry.addData("Named lift position", targetPosName);
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {
