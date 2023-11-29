@@ -86,6 +86,10 @@ public class Lift {
         controller.setTarget(targetState);
     }
 
+    public int getTargetRow() {
+        return targetRow;
+    }
+
     public void run() {
         run(controller.calculate(currentState), false);
     }
