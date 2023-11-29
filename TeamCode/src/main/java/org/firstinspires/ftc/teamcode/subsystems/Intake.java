@@ -120,7 +120,7 @@ public class Intake {
                 }
                 break;
             case TRANSFERRING:
-                justDroppedPixels = fromHSV(topSensor.getHSV()) == EMPTY;
+                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
                 if (justDroppedPixels) {
                     currentState = HAS_0_PIXELS;
                     pivot.setActivated(false);
