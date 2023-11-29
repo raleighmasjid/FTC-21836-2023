@@ -81,7 +81,11 @@ public class Intake {
         topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
     }
 
-    public void run(double motorPower) {
+    public void setMotorPower(double motorPower) {
+        motor.set(motorPower);
+    }
+
+    public void run () {
 
         if (justDroppedPixels) justDroppedPixels = false;
 
@@ -103,7 +107,7 @@ public class Intake {
                 } */
                 break;
             case REVERSING:
-                motorPower--;
+                setMotorPower(-1);
                 if (timer.seconds() >= TIME_REVERSING) {
                     currentState = PIVOTING;
                     pivot.setActivated(true);
@@ -123,8 +127,6 @@ public class Intake {
                 }
                 break;
         }
-
-        motor.set(motorPower);
 
         pivot.run();
         latch.run();
