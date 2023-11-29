@@ -13,6 +13,9 @@ public class Robot {
     public boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
+    public final Lift lift;
+    public final Intake intake;
+    public final Deposit deposit;
 
     private final List<LynxModule> revHubs;
 
@@ -21,12 +24,27 @@ public class Robot {
         for (LynxModule hub : revHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         drivetrain = new AutoTurnMecanum(hardwareMap);
+        lift = new Lift(hardwareMap);
+        intake = new Intake(hardwareMap);
+        deposit = new Deposit(hardwareMap);
     }
 
     public void readSensors() {
         for (LynxModule hub : revHubs) hub.clearBulkCache();
 
         drivetrain.updateGains();
+    }
+
+    public void run() {
+
+        if (lift.getTargetRow() > -1) deposit.extend();
+        else deposit.retract();
+
+        if (intake.justDroppedPixels()) deposit.lockPixels();
+
+        lift.run();
+        intake.run();
+        deposit.run();
     }
 
     public void start() {
