@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0_PIXELS;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_1_PIXEL;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
@@ -127,11 +126,11 @@ public class Intake {
         switch (currentState) {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
-                if (Pixel.Color.fromHSV(bottomHSV) != EMPTY) {
+                /* if (Pixel.Color.fromHSV(bottomHSV) != EMPTY) {
                     currentState = HAS_1_PIXEL;
                     colors[0] = Pixel.Color.fromHSV(bottomHSV);
-                    intakingHeight = IntakingHeight.get(Math.max(intakingHeight.ordinal() - 1, 0));
-                }
+                    intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
+                } */
                 break;
             case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
@@ -140,7 +139,7 @@ public class Intake {
                     timer.reset();
                     colors[1] = fromHSV(topHSV);
                     latch.setActivated(true);
-                    intakingHeight = IntakingHeight.get(Math.max(intakingHeight.ordinal() - 1, 0));
+                    intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
                 } */
                 break;
             case REVERSING:
