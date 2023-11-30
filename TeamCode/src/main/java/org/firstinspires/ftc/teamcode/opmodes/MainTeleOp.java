@@ -8,12 +8,18 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad2;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Telemetry;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FIVE_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FOUR_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.THREE_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.TWO_STACK;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -68,8 +74,15 @@ public class MainTeleOp extends LinearOpMode {
             robot.intake.setMotorPower(Gamepad1.getTrigger(RIGHT_TRIGGER) - Gamepad1.getTrigger(LEFT_TRIGGER));
 
             if (Gamepad1.wasJustPressed(A)) robot.deposit.dropPixel();
+
             if (Gamepad2.wasJustPressed(DPAD_DOWN)) robot.lift.decrementRow();
             if (Gamepad2.wasJustPressed(DPAD_UP)) robot.lift.incrementRow();
+
+            if (Gamepad2.wasJustPressed(Y)) robot.intake.setIntakingHeight(FIVE_STACK);
+            if (Gamepad2.wasJustPressed(X)) robot.intake.setIntakingHeight(FOUR_STACK);
+            if (Gamepad2.wasJustPressed(B)) robot.intake.setIntakingHeight(THREE_STACK);
+            if (Gamepad2.wasJustPressed(A)) robot.intake.setIntakingHeight(TWO_STACK);
+            if (Gamepad2.wasJustPressed(RIGHT_BUMPER)) robot.intake.setIntakingHeight(FLOOR);
 
             // Field-centric driving with control stick inputs:
             robot.drivetrain.run(

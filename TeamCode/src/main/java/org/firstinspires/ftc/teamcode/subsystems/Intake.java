@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.fromHSV;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0_PIXELS;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_1_PIXEL;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
+import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
@@ -14,7 +15,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReve
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.placementalg.Pixel;
@@ -40,19 +40,54 @@ public class Intake {
     private final SimpleServoPivot pivot, latch;
 
     private IntakeState currentState = HAS_0_PIXELS;
+    private IntakingHeight intakingHeight = FLOOR;
     private final ElapsedTime timer = new ElapsedTime();
-    private final Pixel.Color[] colors = new Pixel.Color[]{
-            EMPTY, EMPTY
-    };
+    private final Pixel.Color[] colors = {EMPTY, EMPTY};
     private boolean justDroppedPixels = false;
 
     enum IntakeState {
         HAS_0_PIXELS,
-        HAS_1_PIXELS,
+        HAS_1_PIXEL,
         REVERSING,
         PIVOTING,
         TRANSFERRING,
     }
+
+    public enum IntakingHeight {
+        FLOOR,
+        TWO_STACK,
+        THREE_STACK,
+        FOUR_STACK,
+        FIVE_STACK;
+
+        public final double deltaX, deltaTheta, deltaY;
+
+        private static final IntakingHeight[] values = values();
+        public static IntakingHeight get(int ordinal) {
+            return values[ordinal];
+        }
+
+        IntakingHeight() {
+            if (ordinal() == 0) {
+                deltaY = 0;
+                deltaTheta = 0;
+                deltaX = 0;
+                return;
+            }
+
+            double r = 9.5019488189;
+            double theta0 = -0.496183876745;
+            double y0 = -4.523622;
+            double x0 = 8.35606811024;
+
+            deltaY = ordinal() * 0.5 - 0.139370079;
+
+            double theta1 = Math.asin((y0 + deltaY) / r);
+            deltaTheta = Math.toDegrees(theta1 - theta0);
+            deltaX = r * Math.cos(theta1) - x0;
+        }
+    }
+
 
     public Intake(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -92,18 +127,20 @@ public class Intake {
         switch (currentState) {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
-                /* if (fromHSV(bottomHSV) != EMPTY) {
-                    currentState = HAS_1;
-                    colors[0] = fromHSV(bottomHSV);
+                if (Pixel.Color.fromHSV(bottomHSV) != EMPTY) {
+                    currentState = HAS_1_PIXEL;
+                    colors[0] = Pixel.Color.fromHSV(bottomHSV);
+                    intakingHeight = IntakingHeight.get(Math.max(intakingHeight.ordinal() - 1, 0));
                 }
-                break; */
-            case HAS_1_PIXELS:
+                break;
+            case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
                 /* if (fromHSV(topHSV) != EMPTY) {
                     currentState = REVERSING;
                     timer.reset();
                     colors[1] = fromHSV(topHSV);
                     latch.setActivated(true);
+                    intakingHeight = IntakingHeight.get(Math.max(intakingHeight.ordinal() - 1, 0));
                 } */
                 break;
             case REVERSING:
@@ -128,6 +165,9 @@ public class Intake {
                 break;
         }
 
+        pivot.updateAngles(ANGLE_PIVOT_OFFSET + intakingHeight.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
+        latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
+
         pivot.run();
         latch.run();
     }
@@ -147,6 +187,14 @@ public class Intake {
 
     public IntakeState getCurrentState() {
         return currentState;
+    }
+
+    public void setIntakingHeight(IntakingHeight intakingHeight) {
+        this.intakingHeight = intakingHeight;
+    }
+
+    public double getStackXOffset() {
+        return intakingHeight.deltaX;
     }
 
     private void printHSV(MultipleTelemetry telemetry, float[] hsv, String title) {

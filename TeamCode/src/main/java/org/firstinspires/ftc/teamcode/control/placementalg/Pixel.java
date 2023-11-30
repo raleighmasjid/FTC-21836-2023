@@ -81,7 +81,7 @@ public class Pixel implements Comparable<Pixel> {
         }
 
         public static Color fromHSV(float[] hsv) {
-            return WHITE;
+            return EMPTY;
         }
 
         public static Color getRemainingColor(Color c1, Color c2) {
