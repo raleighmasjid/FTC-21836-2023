@@ -58,7 +58,11 @@ public class MainAuton extends LinearOpMode {
             // Manually clear old sensor data from the last loop:
             robot.readSensors();
 
+            robot.drivetrain.update();
+            robot.run();
+
             // Push telemetry data
+            robot.printTelemetry(Telemetry);
             Telemetry.update();
         }
     }

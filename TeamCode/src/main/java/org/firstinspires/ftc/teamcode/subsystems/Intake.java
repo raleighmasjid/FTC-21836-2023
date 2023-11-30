@@ -130,8 +130,8 @@ public class Intake {
                     currentState = HAS_1_PIXEL;
                     colors[0] = Pixel.Color.fromHSV(bottomHSV);
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
-                } */
-                break;
+                }
+                break; */
             case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
                 /* if (fromHSV(topHSV) != EMPTY) {
