@@ -126,18 +126,18 @@ public class Intake {
         switch (currentState) {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
-                /* if (Pixel.Color.fromHSV(bottomHSV) != EMPTY) {
+                colors[0] = Pixel.Color.fromHSV(bottomHSV);
+                /* if (colors[0] != EMPTY) {
                     currentState = HAS_1_PIXEL;
-                    colors[0] = Pixel.Color.fromHSV(bottomHSV);
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
                 }
                 break; */
             case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
-                /* if (fromHSV(topHSV) != EMPTY) {
+                colors[1] = Pixel.Color.fromHSV(topHSV);
+                /* if (colors[1] != EMPTY) {
                     currentState = REVERSING;
                     timer.reset();
-                    colors[1] = fromHSV(topHSV);
                     latch.setActivated(true);
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
                 } */
@@ -201,6 +201,11 @@ public class Intake {
         telemetry.addData("Hue", hsv[0]);
         telemetry.addData("Saturation", hsv[1]);
         telemetry.addData("Value", hsv[2]);
+    }
+
+    public void printTelemetry(MultipleTelemetry telemetry) {
+        telemetry.addData("Bottom color", colors[0]);
+        telemetry.addData("Top color", colors[1]);
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {

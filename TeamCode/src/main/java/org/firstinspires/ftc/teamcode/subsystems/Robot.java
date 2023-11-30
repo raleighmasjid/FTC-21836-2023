@@ -57,6 +57,8 @@ public class Robot {
         telemetry.addLine();
         lift.printTelemetry(telemetry);
         telemetry.addLine();
+        intake.printTelemetry(telemetry);
+        telemetry.addLine();
         telemetry.addLine();
         drivetrain.printNumericalTelemetry(telemetry);
         telemetry.addLine();
