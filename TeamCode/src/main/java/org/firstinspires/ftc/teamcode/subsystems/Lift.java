@@ -80,6 +80,10 @@ public class Lift {
         setTargetRow(targetRow - 1);
     }
 
+    public void retract() {
+        setTargetRow(-1);
+    }
+
     public void setTargetRow(int targetRow) {
         this.targetRow = max(min(targetRow, 10), -1);
         targetState = new State(this.targetRow < 0 ? 0 : BOTTOM_ROW_HEIGHT + (this.targetRow * PIXEL_HEIGHT));

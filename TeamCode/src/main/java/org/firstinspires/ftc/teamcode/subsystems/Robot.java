@@ -31,13 +31,15 @@ public class Robot {
 
     public void readSensors() {
         for (LynxModule hub : revHubs) hub.clearBulkCache();
+
+        lift.readSensors();
     }
 
     public void run() {
 
         if (intake.justDroppedPixels()) deposit.lockPixels();
         if (lift.getTargetRow() > -1) deposit.extend();
-        if (deposit.droppedBothPixels()) lift.setTargetRow(-1);
+        if (deposit.droppedBothPixels()) lift.retract();
 
         lift.run();
         intake.run();
@@ -46,10 +48,12 @@ public class Robot {
 
     public void start() {
         drivetrain.start();
+        intake.start();
     }
 
     public void interrupt() {
         drivetrain.interrupt();
+        intake.interrupt();
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {

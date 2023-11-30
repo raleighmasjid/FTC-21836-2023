@@ -68,5 +68,6 @@ public class PIDController implements FeedbackController {
 
     public void reset() {
         integrator.reset();
+        derivFilter.reset();
     }
 }
