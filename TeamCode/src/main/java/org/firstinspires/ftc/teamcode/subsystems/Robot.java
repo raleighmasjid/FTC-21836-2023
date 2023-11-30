@@ -58,7 +58,13 @@ public class Robot {
     public void printTelemetry(MultipleTelemetry telemetry) {
         drivetrain.printTelemetry(telemetry);
         telemetry.addLine();
+        lift.printTelemetry(telemetry);
+        telemetry.addLine();
         telemetry.addLine();
         drivetrain.printNumericalTelemetry(telemetry);
+        telemetry.addLine();
+        lift.printNumericalTelemetry(telemetry);
+        telemetry.addLine();
+        intake.printNumericalTelemetry(telemetry);
     }
 }

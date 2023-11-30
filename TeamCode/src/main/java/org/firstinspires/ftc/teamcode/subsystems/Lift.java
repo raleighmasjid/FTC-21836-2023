@@ -72,11 +72,11 @@ public class Lift {
         controller.setGains(pidGains);
     }
 
-    public void upOneRow() {
+    public void incrementRow() {
         setTargetRow(targetRow + 1);
     }
 
-    public void downOneRow() {
+    public void decrementRow() {
         setTargetRow(targetRow - 1);
     }
 

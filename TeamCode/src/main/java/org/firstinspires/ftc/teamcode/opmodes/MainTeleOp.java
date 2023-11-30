@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
@@ -7,6 +8,8 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
@@ -62,6 +65,12 @@ public class MainTeleOp extends LinearOpMode {
             if (Gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
             if (Gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
 
+            robot.intake.setMotorPower(Gamepad1.getTrigger(RIGHT_TRIGGER) - Gamepad1.getTrigger(LEFT_TRIGGER));
+
+            if (Gamepad1.wasJustPressed(A)) robot.deposit.dropPixel();
+            if (Gamepad2.wasJustPressed(DPAD_DOWN)) robot.lift.decrementRow();
+            if (Gamepad2.wasJustPressed(DPAD_UP)) robot.lift.incrementRow();
+
             // Field-centric driving with control stick inputs:
             robot.drivetrain.run(
                     Gamepad1.getLeftX(),
@@ -69,6 +78,7 @@ public class MainTeleOp extends LinearOpMode {
                     Gamepad1.getRightX(),
                     Gamepad1.isDown(RIGHT_BUMPER) // drives slower when bumper held
             );
+            robot.run();
 
             // Push telemetry data to multiple outputs (set earlier):
             robot.printTelemetry(Telemetry);
