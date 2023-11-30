@@ -49,13 +49,11 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
         super(hardwareMap);
     }
 
-    public void updateGains() {
-        headingController.setGains(pidGains);
-        kDFilter.setGains(derivFilterGains);
-    }
-
     @Override
     public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
+        headingController.setGains(pidGains);
+        kDFilter.setGains(derivFilterGains);
+
         double voltageScalar = 12.0 / batteryVoltageSensor.getVoltage();
         boolean useManualInput = turnCommand != 0.0;
 
