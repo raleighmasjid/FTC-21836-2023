@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.placementalg.Pixel;
 
-public class Intake {
+public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 0,

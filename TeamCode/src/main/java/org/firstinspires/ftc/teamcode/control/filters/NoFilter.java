@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.filters;
 
-public class NoFilter implements Filter {
+public final class NoFilter implements Filter {
 
     private double lastValue;
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Finite impulse response low-pass filter
  */
-public class FIRLowPassFilter implements Filter {
+public final class FIRLowPassFilter implements Filter {
     private LowPassGains gains;
     private final ArrayList<Double> values = new ArrayList<>();
 

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.control.placementalg;
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
-public class ScoringMeasurements {
+public final class ScoringMeasurements {
     public static double
             PIXEL_WIDTH = 3,
             PIXEL_HEIGHT = 2.59945,

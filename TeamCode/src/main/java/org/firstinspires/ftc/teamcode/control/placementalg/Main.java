@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Main {
+public final class Main {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);

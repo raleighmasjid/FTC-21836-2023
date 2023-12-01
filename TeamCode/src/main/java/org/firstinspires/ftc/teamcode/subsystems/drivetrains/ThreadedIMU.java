@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class ThreadedIMU extends Thread {
+public final class ThreadedIMU extends Thread {
 
     private final IMU imu;
 

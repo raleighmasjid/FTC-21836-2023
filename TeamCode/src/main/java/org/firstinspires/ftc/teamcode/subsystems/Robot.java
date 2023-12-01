@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
 import java.util.List;
 
-public class Robot {
+public final class Robot {
 
     public boolean isRed = true;
 

@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 
-public class Backdrop {
+public final class Backdrop {
     final static int ROWS = 11;
     final static int COLUMNS = 7;
     public boolean printRectangular = true;

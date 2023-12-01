@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 
-public class Lift {
+public final class Lift {
 
     public static PIDGains pidGains = new PIDGains(
             0,

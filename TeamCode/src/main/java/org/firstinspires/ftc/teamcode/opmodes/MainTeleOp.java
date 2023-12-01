@@ -31,7 +31,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @TeleOp(group = "21836 Main")
-public class MainTeleOp extends LinearOpMode {
+public final class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {

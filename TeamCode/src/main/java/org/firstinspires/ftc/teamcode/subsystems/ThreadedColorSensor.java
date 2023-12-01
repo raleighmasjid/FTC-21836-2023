@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
-public class ThreadedColorSensor extends Thread {
+public final class ThreadedColorSensor extends Thread {
 
     private final NormalizedColorSensor sensor;
     private NormalizedRGBA rgba = new NormalizedRGBA();

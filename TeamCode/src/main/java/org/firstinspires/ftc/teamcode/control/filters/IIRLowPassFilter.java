@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 /**
  * Infinite impulse response low-pass filter
  */
-public class IIRLowPassFilter implements Filter {
+public final class IIRLowPassFilter implements Filter {
     private LowPassGains gains;
     private double estimate = Double.NaN;
 

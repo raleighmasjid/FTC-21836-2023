@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Config
 @Autonomous(group = "21836 Main", preselectTeleOp = "MainTeleOp")
-public class MainAuton extends LinearOpMode {
+public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
     static GamepadEx Gamepad1, Gamepad2;

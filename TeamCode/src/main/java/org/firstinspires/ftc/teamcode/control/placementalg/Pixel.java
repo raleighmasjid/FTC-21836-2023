@@ -11,7 +11,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Pixel implements Comparable<Pixel> {
+public final class Pixel implements Comparable<Pixel> {
 
     public int compareTo(Pixel cPixel) {
         double diff = cPixel.scoreValue - scoreValue;

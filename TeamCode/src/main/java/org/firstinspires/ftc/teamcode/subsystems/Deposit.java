@@ -7,7 +7,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReve
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class Deposit {
+public final class Deposit {
 
     public static double
             ANGLE_CLAW_OPEN = 8,
