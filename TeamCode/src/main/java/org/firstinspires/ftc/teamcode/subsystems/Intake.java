@@ -49,7 +49,6 @@ public class Intake {
     enum IntakeState {
         HAS_0_PIXELS,
         HAS_1_PIXEL,
-        REVERSING,
         PIVOTING,
         TRANSFERRING,
     }
@@ -138,21 +137,17 @@ public class Intake {
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 /* if (colors[1] != EMPTY) {
-                    currentState = REVERSING;
+                    currentState = PIVOTING;
                     timer.reset();
                     latch.setActivated(true);
+                    pivot.setActivated(true);
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
                 } */
                 break;
-            case REVERSING:
-                setMotorPower(-1);
-                if (timer.seconds() >= TIME_REVERSING) {
-                    currentState = PIVOTING;
-                    pivot.setActivated(true);
-                }
-                break;
             case PIVOTING:
+                if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
                 if (timer.seconds() >= TIME_PIVOTING) {
+                    setMotorPower(0);
                     currentState = TRANSFERRING;
                     latch.setActivated(false);
                 }
