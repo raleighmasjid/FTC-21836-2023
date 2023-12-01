@@ -31,8 +31,6 @@ public final class Robot {
 
     public void readSensors() {
         for (LynxModule hub : revHubs) hub.clearBulkCache();
-
-        lift.readSensors();
     }
 
     public void run() {

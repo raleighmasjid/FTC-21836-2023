@@ -45,7 +45,6 @@ public final class Lift {
 
     // Battery voltage sensor and variable to track its readings:
     private final VoltageSensor batteryVoltageSensor;
-    private double batteryVoltage;
 
     public Lift(HardwareMap hardwareMap) {
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -56,13 +55,6 @@ public final class Lift {
         motors[1].setInverted(true);
         motors[1].encoder.setDirection(REVERSE);
         reset();
-    }
-
-    public void readSensors() {
-        batteryVoltage = batteryVoltageSensor.getVoltage();
-        currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
-        kDFilter.setGains(filterGains);
-        controller.setGains(pidGains);
     }
 
     public void incrementRow() {
@@ -88,17 +80,13 @@ public final class Lift {
     }
 
     public void run() {
-        run(controller.calculate(currentState), false);
-    }
 
-    public void run(double output) {
-        run(output, true);
-    }
+        currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
-    private void run(double output, boolean voltageCompensate) {
-        double scalar = 12.0 / batteryVoltage;
-        if (voltageCompensate) output *= scalar;
-        for (MotorEx motor : motors) motor.set(output + kG() * scalar);
+        kDFilter.setGains(filterGains);
+        controller.setGains(pidGains);
+
+        for (MotorEx motor : motors) motor.set(controller.calculate(currentState) + kG() * (12.0 / batteryVoltageSensor.getVoltage()));
     }
 
     private double kG() {
