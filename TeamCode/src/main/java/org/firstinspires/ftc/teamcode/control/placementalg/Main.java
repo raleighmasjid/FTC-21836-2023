@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public final class Main {
+final class Main {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
@@ -43,7 +43,7 @@ public final class Main {
         printLine();
 
         boolean solve = true;
-        while (backdrop.rowNotFull(10)) {
+        while (backdrop.notFull()) {
             if (!solve) {
                 int x = input.nextInt();
                 int y = input.nextInt();
@@ -76,7 +76,7 @@ public final class Main {
         System.out.println(backdrop.numOfMosaics + " total mosaics");
     }
 
-    public static void printLine() {
+    private static void printLine() {
         System.out.println();
     }
 }

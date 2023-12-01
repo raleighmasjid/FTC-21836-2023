@@ -19,7 +19,7 @@ public final class PlacementCalculator {
     static {
         PERFECT_BACKDROP = new Backdrop();
         calculate(PERFECT_BACKDROP);
-        while (PERFECT_BACKDROP.rowNotFull(10)) {
+        while (PERFECT_BACKDROP.notFull()) {
             Pixel pToPlace = pixelsToPlace.get(0);
             if (pToPlace.color == ANY)
                 pToPlace = new Pixel(pToPlace, COLORED);

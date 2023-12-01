@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public final class Backdrop {
     final static int ROWS = 11;
     final static int COLUMNS = 7;
-    public boolean printRectangular = true;
+    public boolean printRectangular = false;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
@@ -70,7 +70,7 @@ public final class Backdrop {
         return backdrop.toString();
     }
 
-    public void print() {
+    void print() {
         System.out.println(this);
     }
 
@@ -134,8 +134,8 @@ public final class Backdrop {
         return false;
     }
 
-    public boolean rowNotFull(int y) {
-        for (Pixel pixel : slots[y]) if (pixel.color.isEmpty()) return true;
+    public boolean notFull() {
+        for (Pixel pixel : slots[10]) if (pixel.color.isEmpty()) return true;
         return false;
     }
 

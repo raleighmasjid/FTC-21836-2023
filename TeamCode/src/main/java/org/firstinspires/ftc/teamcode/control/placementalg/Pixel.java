@@ -112,27 +112,27 @@ public final class Pixel implements Comparable<Pixel> {
         }
     }
 
-    public final int x, y;
-    public Pixel mosaic = null;
+    final int x, y;
+    Pixel mosaic = null;
     public final Color color;
-    public double scoreValue = 0;
+    double scoreValue = 0;
 
-    public Pixel(int x, int y, Color color) {
+    Pixel(int x, int y, Color color) {
         this.x = x;
         this.y = y;
         this.color = color;
     }
 
-    public Pixel(Pixel p, Color color) {
+    Pixel(Pixel p, Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
 
-    public Pixel(Pixel p) {
+    Pixel(Pixel p) {
         this(p, p.color);
     }
 
-    public boolean inMosaic() {
+    boolean inMosaic() {
         return mosaic != null && mosaic.color != INVALID;
     }
 
@@ -150,7 +150,7 @@ public final class Pixel implements Comparable<Pixel> {
         return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
     }
 
-    public void print() {
+    void print() {
         System.out.println(this);
     }
 }
