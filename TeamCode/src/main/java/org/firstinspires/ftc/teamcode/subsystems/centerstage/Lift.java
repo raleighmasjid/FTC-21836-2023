@@ -71,7 +71,7 @@ public final class Lift {
 
     public void setTargetRow(int targetRow) {
         this.targetRow = max(min(targetRow, 10), -1);
-        targetState = new State(this.targetRow < 0 ? 0 : (this.targetRow * PIXEL_HEIGHT + BOTTOM_ROW_HEIGHT));
+        targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * PIXEL_HEIGHT + BOTTOM_ROW_HEIGHT));
         controller.setTarget(targetState);
     }
 
