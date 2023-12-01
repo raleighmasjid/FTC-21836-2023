@@ -38,7 +38,7 @@ public final class Robot {
     public void run() {
 
         if (intake.justDroppedPixels()) deposit.lockPixels();
-        if (lift.getTargetRow() > -1) deposit.extend();
+        if (!deposit.isExtended() && lift.getTargetRow() > -1) deposit.extend();
         if (deposit.droppedBothPixels()) lift.retract();
 
         lift.run();

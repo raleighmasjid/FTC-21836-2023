@@ -72,6 +72,10 @@ public final class Deposit {
         retracted = true;
     }
 
+    public boolean isExtended() {
+        return pivot.getActivated();
+    }
+
     public void toggle() {
         if (pivot.getActivated()) retract(); else extend();
     }
