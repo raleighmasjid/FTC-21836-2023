@@ -4,12 +4,14 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0_PIXELS;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
+import static java.lang.Math.asin;
+import static java.lang.Math.cos;
+import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -81,9 +83,9 @@ public class Intake {
 
             deltaY = ordinal() * 0.5 - 0.139370079;
 
-            double theta1 = Math.asin((y0 + deltaY) / r);
-            deltaTheta = Math.toDegrees(theta1 - theta0);
-            deltaX = r * Math.cos(theta1) - x0;
+            double theta1 = asin((y0 + deltaY) / r);
+            deltaTheta = toDegrees(theta1 - theta0);
+            deltaX = r * cos(theta1) - x0;
         }
     }
 
