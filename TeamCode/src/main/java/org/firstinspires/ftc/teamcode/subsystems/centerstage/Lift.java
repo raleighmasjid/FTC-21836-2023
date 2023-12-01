@@ -36,8 +36,6 @@ public final class Lift {
             kG = 0,
             INCHES_PER_TICK = 1;
 
-    private final HardwareMap hardwareMap;
-
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
     private State currentState = new State(), targetState = new State();
@@ -49,16 +47,11 @@ public final class Lift {
     private final VoltageSensor batteryVoltageSensor;
     private double batteryVoltage;
 
-    private MotorEx getLiftMotor(String name) {
-        return new MotorEx(hardwareMap, name, RPM_1150);
-    }
-
     public Lift(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         this.motors = new MotorEx[]{
-                getLiftMotor("lift right"),
-                getLiftMotor("lift left")
+                new MotorEx(hardwareMap, "lift right", RPM_1150),
+                new MotorEx(hardwareMap, "lift left", RPM_1150)
         };
         motors[1].setInverted(true);
         motors[1].encoder.setDirection(REVERSE);
