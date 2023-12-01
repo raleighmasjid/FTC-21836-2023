@@ -18,7 +18,7 @@ public class SimpleServoPivot {
         return servo;
     }
 
-    public static SimpleServo getAxonMini(HardwareMap hardwareMap, String name) {
+    public static SimpleServo getAxonServo(HardwareMap hardwareMap, String name) {
         return new SimpleServo(hardwareMap, name, 0, 355);
     }
 

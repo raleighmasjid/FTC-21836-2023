@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EM
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
-import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
+import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
 import static java.lang.Math.asin;
@@ -97,8 +97,8 @@ public final class Intake {
         pivot = new SimpleServoPivot(
                 ANGLE_PIVOT_OFFSET,
                 ANGLE_PIVOT_OFFSET + 180,
-                getAxonMini(hardwareMap, "intake right"),
-                getReversedServo(getAxonMini(hardwareMap, "intake left"))
+                getAxonServo(hardwareMap, "intake right"),
+                getReversedServo(getAxonServo(hardwareMap, "intake left"))
         );
 
         latch = new SimpleServoPivot(

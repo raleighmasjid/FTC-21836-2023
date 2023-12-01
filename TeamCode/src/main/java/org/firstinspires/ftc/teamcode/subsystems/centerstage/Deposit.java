@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
-import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
+import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
 
@@ -28,8 +28,8 @@ public final class Deposit {
         pivot = new SimpleServoPivot(
                 ANGLE_OFFSET_PIVOT,
                 ANGLE_OFFSET_PIVOT + 120,
-                getAxonMini(hardwareMap, "deposit left"),
-                getReversedServo(getAxonMini(hardwareMap, "deposit right"))
+                getAxonServo(hardwareMap, "deposit left"),
+                getReversedServo(getAxonServo(hardwareMap, "deposit right"))
         );
 
         hook = new SimpleServoPivot(
