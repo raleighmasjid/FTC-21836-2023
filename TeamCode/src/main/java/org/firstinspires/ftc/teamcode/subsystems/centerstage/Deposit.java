@@ -76,10 +76,6 @@ public final class Deposit {
         return pivot.getActivated();
     }
 
-    public void toggle() {
-        if (pivot.getActivated()) retract(); else extend();
-    }
-
     public boolean droppedBothPixels() {
         return !retracted && timer.seconds() >= TIME_DROP;
     }
