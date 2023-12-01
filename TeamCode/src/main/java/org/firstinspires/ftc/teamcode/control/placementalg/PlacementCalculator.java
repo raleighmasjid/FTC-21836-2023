@@ -145,7 +145,7 @@ public final class PlacementCalculator {
         }
         for (Pixel p : colorsToGetSPixels) pixelsToPlace.addAll(getSupportPixels(p));
         removeDuplicates(pixelsToPlace);
-        removeUnsupportedPixels(pixelsToPlace);
+        removeUnsupportedPixelsToPlace();
         removeOverridingPixels(pixelsToPlace);
     }
 
@@ -157,10 +157,10 @@ public final class PlacementCalculator {
         colorsToGetSPixels.add(b);
     }
 
-    private static void removeUnsupportedPixels(ArrayList<Pixel> pixels) {
-        ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
-        pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (backdrop.isSupported(pixel)) pixels.add(pixel);
+    private static void removeUnsupportedPixelsToPlace() {
+        ArrayList<Pixel> pixelsToPlaceCopy = new ArrayList<>(pixelsToPlace);
+        pixelsToPlace.clear();
+        for (Pixel pixel : pixelsToPlaceCopy) if (backdrop.isSupported(pixel)) pixelsToPlace.add(pixel);
     }
 
     private static void removeDuplicates(ArrayList<Pixel> pixels) {
@@ -231,7 +231,7 @@ public final class PlacementCalculator {
         Pixel setLineGoal = getSetLineGoal();
         setLineSPixels = getSupportPixels(setLineGoal);
         if (setLineGoal.y <= 8) pixelsToPlace.addAll(setLineSPixels);
-        removeUnsupportedPixels(pixelsToPlace);
+        removeUnsupportedPixelsToPlace();
     }
 
     private static void scanForEmptySpot() {
@@ -299,7 +299,7 @@ public final class PlacementCalculator {
 
         removeDuplicates(pixelsToPlace);
         removeOverridingPixels(pixelsToPlace);
-        removeUnsupportedPixels(pixelsToPlace);
+        removeUnsupportedPixelsToPlace();
 
         sortPixelsToPlace();
         return pixelsToPlace;
