@@ -28,11 +28,11 @@ public final class PlacementCalculator {
         }
     }
 
-    private static boolean preferUpMosaic(Pixel pixel) {
+    private static boolean isSpecialCenterCase(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
         if (!(x == 3 && (y == 3 || y == 9))) return false;
-        if (y == 9) return preferUpMosaic(new Pixel(x, 3, pixel.color));
+        if (y == 9) return isSpecialCenterCase(new Pixel(x, 3, pixel.color));
 
         Pixel[] shouldBeColored = {
                 backdrop.get(5, y),
@@ -69,7 +69,7 @@ public final class PlacementCalculator {
                 backdrop.get(x + (y % 2) - 1, y + 1)
         };
         if (x == 1) return new Pixel[][]{up, left, right};
-        if (x == 6 || preferUpMosaic(pixel)) return new Pixel[][]{up, right, left};
+        if (x == 6 || isSpecialCenterCase(pixel)) return new Pixel[][]{up, right, left};
         if (x == 5 || x == 3) return new Pixel[][]{right, left, up};
         return new Pixel[][]{left, right, up};
     }
