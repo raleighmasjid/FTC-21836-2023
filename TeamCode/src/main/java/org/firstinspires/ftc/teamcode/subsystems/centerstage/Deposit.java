@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
@@ -6,6 +6,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReve
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot;
 
 public final class Deposit {
 

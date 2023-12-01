@@ -15,11 +15,11 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Telemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FIVE_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.THREE_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.TWO_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FIVE_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FOUR_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.THREE_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.TWO_STACK;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -28,7 +28,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 @TeleOp(group = "21836 Main")
 public final class MainTeleOp extends LinearOpMode {

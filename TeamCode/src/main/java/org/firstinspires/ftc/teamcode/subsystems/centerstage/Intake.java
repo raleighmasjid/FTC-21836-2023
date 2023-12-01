@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.HAS_0_PIXELS;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakeState.TRANSFERRING;
-import static org.firstinspires.ftc.teamcode.subsystems.Intake.IntakingHeight.FLOOR;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.HAS_0_PIXELS;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.TRANSFERRING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getAxonMini;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot.getReversedServo;
@@ -19,6 +19,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.subsystems.SimpleServoPivot;
+import org.firstinspires.ftc.teamcode.subsystems.ThreadedColorSensor;
 
 public final class Intake {
 
