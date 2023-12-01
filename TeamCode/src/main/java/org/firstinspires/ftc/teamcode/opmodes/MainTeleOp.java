@@ -1,25 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FIVE_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.THREE_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.TWO_STACK;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.*;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.*;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.*;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -67,9 +51,9 @@ public final class MainTeleOp extends LinearOpMode {
 
             // Reset current heading as per these keybinds:
             if (gamepadEx1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
-            if (gamepadEx1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
+            if (gamepadEx1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI / 2);
             if (gamepadEx1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
-            if (gamepadEx1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
+            if (gamepadEx1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI / 2);
 
             robot.intake.setMotorPower(gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER));
 

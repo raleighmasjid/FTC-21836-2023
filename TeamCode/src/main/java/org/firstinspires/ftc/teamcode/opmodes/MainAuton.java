@@ -1,11 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -20,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
-    static GamepadEx gamepadEx1, gamepadEx2;
+    static GamepadEx gamepadEx1 = null, gamepadEx2;
     static MultipleTelemetry mTelemetry;
     static Robot robot = null;
 
