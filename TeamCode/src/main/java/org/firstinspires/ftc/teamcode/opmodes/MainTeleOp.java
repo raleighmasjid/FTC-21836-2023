@@ -11,9 +11,9 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad1;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Gamepad2;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Telemetry;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
@@ -37,24 +37,24 @@ public final class MainTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
-        Telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot if not already initialized:
         if (robot == null) robot = new Robot(hardwareMap);
 
         // Initialize gamepads:
-        if (Gamepad1 == null) Gamepad1 = new GamepadEx(super.gamepad1);
-        Gamepad2 = new GamepadEx(super.gamepad2);
+        if (gamepadEx1 == null) gamepadEx1 = new GamepadEx(super.gamepad1);
+        gamepadEx2 = new GamepadEx(super.gamepad2);
 
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
-            Gamepad1.readButtons();
-            if (Gamepad1.wasJustPressed(RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
-            if (Gamepad1.wasJustPressed(B)) robot.isRed = true;
-            if (Gamepad1.wasJustPressed(X)) robot.isRed = false;
-            Telemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            Telemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
-            Telemetry.update();
+            gamepadEx1.readButtons();
+            if (gamepadEx1.wasJustPressed(RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
+            if (gamepadEx1.wasJustPressed(B)) robot.isRed = true;
+            if (gamepadEx1.wasJustPressed(X)) robot.isRed = false;
+            mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
+            mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
+            mTelemetry.update();
         }
         robot.start();
 
@@ -62,40 +62,40 @@ public final class MainTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             // Read sensors + gamepads:
             robot.readSensors();
-            Gamepad1.readButtons();
-            Gamepad2.readButtons();
+            gamepadEx1.readButtons();
+            gamepadEx2.readButtons();
 
             // Reset current heading as per these keybinds:
-            if (Gamepad1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
-            if (Gamepad1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
-            if (Gamepad1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
-            if (Gamepad1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
+            if (gamepadEx1.wasJustPressed(DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
+            if (gamepadEx1.wasJustPressed(DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI/2);
+            if (gamepadEx1.wasJustPressed(DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
+            if (gamepadEx1.wasJustPressed(DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI/2);
 
-            robot.intake.setMotorPower(Gamepad1.getTrigger(RIGHT_TRIGGER) - Gamepad1.getTrigger(LEFT_TRIGGER));
+            robot.intake.setMotorPower(gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER));
 
-            if (Gamepad1.wasJustPressed(A)) robot.deposit.dropPixel();
+            if (gamepadEx1.wasJustPressed(A)) robot.deposit.dropPixel();
 
-            if (Gamepad2.wasJustPressed(DPAD_DOWN)) robot.lift.decrementRow();
-            if (Gamepad2.wasJustPressed(DPAD_UP)) robot.lift.incrementRow();
+            if (gamepadEx2.wasJustPressed(DPAD_DOWN)) robot.lift.decrementRow();
+            if (gamepadEx2.wasJustPressed(DPAD_UP)) robot.lift.incrementRow();
 
-            if (Gamepad2.wasJustPressed(Y)) robot.intake.setIntakingHeight(FIVE_STACK);
-            if (Gamepad2.wasJustPressed(X)) robot.intake.setIntakingHeight(FOUR_STACK);
-            if (Gamepad2.wasJustPressed(B)) robot.intake.setIntakingHeight(THREE_STACK);
-            if (Gamepad2.wasJustPressed(A)) robot.intake.setIntakingHeight(TWO_STACK);
-            if (Gamepad2.wasJustPressed(RIGHT_BUMPER)) robot.intake.setIntakingHeight(FLOOR);
+            if (gamepadEx2.wasJustPressed(Y)) robot.intake.setIntakingHeight(FIVE_STACK);
+            if (gamepadEx2.wasJustPressed(X)) robot.intake.setIntakingHeight(FOUR_STACK);
+            if (gamepadEx2.wasJustPressed(B)) robot.intake.setIntakingHeight(THREE_STACK);
+            if (gamepadEx2.wasJustPressed(A)) robot.intake.setIntakingHeight(TWO_STACK);
+            if (gamepadEx2.wasJustPressed(RIGHT_BUMPER)) robot.intake.setIntakingHeight(FLOOR);
 
             // Field-centric driving with control stick inputs:
             robot.drivetrain.run(
-                    Gamepad1.getLeftX(),
-                    Gamepad1.getLeftY(),
-                    Gamepad1.getRightX(),
-                    Gamepad1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
+                    gamepadEx1.getLeftX(),
+                    gamepadEx1.getLeftY(),
+                    gamepadEx1.getRightX(),
+                    gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
             );
             robot.run();
 
             // Push telemetry data to multiple outputs (set earlier):
-            robot.printTelemetry(Telemetry);
-            Telemetry.update();
+            robot.printTelemetry(mTelemetry);
+            mTelemetry.update();
         }
         robot.interrupt();
     }
