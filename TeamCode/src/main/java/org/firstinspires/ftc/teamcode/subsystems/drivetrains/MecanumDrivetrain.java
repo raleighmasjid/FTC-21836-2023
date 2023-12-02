@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACI
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USE_VELO_PID;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -280,7 +281,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         if (!USE_VELO_PID) {
-            double scalar = 12.0 / batteryVoltageSensor.getVoltage();
+            double scalar = maxVoltage / batteryVoltageSensor.getVoltage();
 
             v *= scalar;
             v1 *= scalar;
@@ -371,7 +372,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         }
 
         // run motors
-        double voltageScalar = 12.0 / batteryVoltageSensor.getVoltage();
+        double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
         setWeightedDrivePower(new Pose2d(
                 yCommand * voltageScalar,
                 -xCommand * voltageScalar,

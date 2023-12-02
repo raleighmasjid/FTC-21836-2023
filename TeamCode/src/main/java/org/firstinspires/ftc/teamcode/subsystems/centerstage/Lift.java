@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.*;
 
 import static java.lang.Math.max;
@@ -86,7 +87,7 @@ public final class Lift {
         kDFilter.setGains(filterGains);
         controller.setGains(pidGains);
 
-        for (MotorEx motor : motors) motor.set(controller.calculate(currentState) + kG() * (12.0 / batteryVoltageSensor.getVoltage()));
+        for (MotorEx motor : motors) motor.set(controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage()));
     }
 
     private double kG() {

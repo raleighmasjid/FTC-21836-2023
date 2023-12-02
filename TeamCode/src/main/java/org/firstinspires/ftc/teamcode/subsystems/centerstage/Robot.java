@@ -10,6 +10,8 @@ import java.util.List;
 
 public final class Robot {
 
+    public static double maxVoltage = 13;
+
     public boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
