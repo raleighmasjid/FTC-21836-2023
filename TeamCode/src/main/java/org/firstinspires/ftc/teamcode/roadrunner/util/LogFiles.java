@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.roadrunner.SampleTankDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +50,7 @@ public final class LogFiles {
 
         public double ticksPerRev = DriveConstants.TICKS_PER_REV;
         public double maxRpm = DriveConstants.MAX_RPM;
-        public boolean runUsingEncoder = DriveConstants.RUN_USING_ENCODER;
+        public boolean runUsingEncoder = DriveConstants.USE_VELO_PID;
         public double motorP = DriveConstants.MOTOR_VELO_PID.p;
         public double motorI = DriveConstants.MOTOR_VELO_PID.i;
         public double motorD = DriveConstants.MOTOR_VELO_PID.d;
