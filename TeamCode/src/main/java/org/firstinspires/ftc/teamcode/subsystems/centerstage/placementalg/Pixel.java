@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.*;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.*;
-
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.PIXEL_WIDTH;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_X;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_Y_BLUE_HIGHEST;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_Y_RED_HIGHEST;
 import static java.lang.Math.toRadians;
 
 import androidx.annotation.NonNull;
@@ -54,6 +56,10 @@ public final class Pixel implements Comparable<Pixel> {
                 (isRed ? SCORING_Y_RED_HIGHEST : SCORING_Y_BLUE_HIGHEST) - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
                 toRadians(0)
         );
+    }
+
+    public int getY() {
+        return y;
     }
 
     @NonNull
