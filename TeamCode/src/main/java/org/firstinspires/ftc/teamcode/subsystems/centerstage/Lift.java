@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
-import static org.firstinspires.ftc.teamcode.control.placementalg.ScoringMeasurements.*;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;

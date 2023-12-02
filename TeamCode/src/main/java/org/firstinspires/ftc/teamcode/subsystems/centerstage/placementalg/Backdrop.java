@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.control.placementalg;
+package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.GREEN;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.PURPLE;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.WHITE;
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.INVALID;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.PURPLE;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.WHITE;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.YELLOW;
 
 import androidx.annotation.NonNull;
 
@@ -27,7 +27,7 @@ public final class Backdrop {
     }
 
     public void add(Pixel pixel) {
-        Pixel.Color[] colors = {PURPLE, GREEN, YELLOW, WHITE};
+        PixelColor[] colors = {PURPLE, GREEN, YELLOW, WHITE};
         switch (pixel.color) {
             case ANY:
                 add(new Pixel(pixel, colors[(int) Math.floor(Math.random() * 4)]));

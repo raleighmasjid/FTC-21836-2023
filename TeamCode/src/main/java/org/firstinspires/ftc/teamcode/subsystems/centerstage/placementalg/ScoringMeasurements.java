@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.control.placementalg;
+package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import com.acmerobotics.dashboard.config.Config;
 

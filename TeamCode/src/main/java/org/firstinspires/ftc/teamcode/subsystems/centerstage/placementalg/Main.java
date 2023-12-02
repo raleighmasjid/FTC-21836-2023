@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.control.placementalg;
+package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.placementalg.Pixel.Color.*;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -33,7 +33,7 @@ final class Main {
             String[] rowList = colors[y].split(" ");
             for (int x = 0; x < rowList.length; x++) {
                 if (y % 2 == 0 && x == 0) continue;
-                backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
+                backdrop.add(new Pixel(x, 10 - y, PixelColor.fromString(rowList[x])));
             }
         }
         ArrayList<Pixel> pixelsToPlace = PlacementCalculator.calculate(backdrop);
@@ -50,7 +50,7 @@ final class Main {
                 input.nextLine();
                 String color = input.nextLine();
                 if (color.equalsIgnoreCase("solve")) solve = true;
-                backdrop.add(new Pixel(x, y, Pixel.Color.fromString(color)));
+                backdrop.add(new Pixel(x, y, PixelColor.fromString(color)));
             }
             if (solve) {
                 Pixel pToPlace = pixelsToPlace.get(0);
