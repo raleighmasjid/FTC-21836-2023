@@ -129,7 +129,7 @@ public final class Intake {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
-                /* if (colors[0] != EMPTY) {
+                /* if (!colors[0].isEmpty()) {
                     currentState = HAS_1_PIXEL;
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
                 }
@@ -137,7 +137,7 @@ public final class Intake {
             case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
-                /* if (colors[1] != EMPTY) {
+                /* if (!colors[1].isEmpty()) {
                     currentState = PIVOTING;
                     timer.reset();
                     latch.setActivated(true);
