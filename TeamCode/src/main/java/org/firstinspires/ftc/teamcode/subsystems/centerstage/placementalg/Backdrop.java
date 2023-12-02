@@ -7,6 +7,9 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.random;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -18,9 +21,9 @@ public final class Backdrop {
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
-    public int numOfMosaics = 0;
+    int mosaicCount = 0;
 
-    public Backdrop() {
+    {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
             slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
         }
@@ -30,10 +33,10 @@ public final class Backdrop {
         Pixel.Color[] colors = {PURPLE, GREEN, YELLOW, WHITE};
         switch (pixel.color) {
             case ANY:
-                add(new Pixel(pixel, colors[(int) Math.floor(Math.random() * 4)]));
+                add(new Pixel(pixel, colors[(int) floor(random() * 4)]));
                 break;
             case COLORED:
-                add(new Pixel(pixel, colors[(int) Math.floor(Math.random() * 3)]));
+                add(new Pixel(pixel, colors[(int) floor(random() * 3)]));
                 break;
             default:
                 int x = pixel.x;
