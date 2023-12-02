@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PixelColor;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 
@@ -44,7 +44,7 @@ public final class Intake {
     private IntakeState currentState = HAS_0_PIXELS;
     private IntakingHeight intakingHeight = FLOOR;
     private final ElapsedTime timer = new ElapsedTime();
-    private final PixelColor[] colors = {EMPTY, EMPTY};
+    private final Pixel.Color[] colors = {EMPTY, EMPTY};
     private boolean justDroppedPixels = false;
 
     enum IntakeState {
@@ -128,7 +128,7 @@ public final class Intake {
         switch (currentState) {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
-                colors[0] = PixelColor.fromHSV(bottomHSV);
+                colors[0] = Pixel.Color.fromHSV(bottomHSV);
                 /* if (colors[0] != EMPTY) {
                     currentState = HAS_1_PIXEL;
                     intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
@@ -136,7 +136,7 @@ public final class Intake {
                 break; */
             case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
-                colors[1] = PixelColor.fromHSV(topHSV);
+                colors[1] = Pixel.Color.fromHSV(topHSV);
                 /* if (colors[1] != EMPTY) {
                     currentState = PIVOTING;
                     timer.reset();
@@ -154,7 +154,7 @@ public final class Intake {
                 }
                 break;
             case TRANSFERRING:
-                justDroppedPixels = PixelColor.fromHSV(topSensor.getHSV()) == EMPTY;
+                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
                 if (justDroppedPixels) {
                     currentState = HAS_0_PIXELS;
                     pivot.setActivated(false);
@@ -174,7 +174,7 @@ public final class Intake {
         topSensor.interrupt();
     }
 
-    public PixelColor[] getColors() {
+    public Pixel.Color[] getColors() {
         return colors;
     }
 
