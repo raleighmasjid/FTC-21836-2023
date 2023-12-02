@@ -51,6 +51,10 @@ constructor(
         )
     }
 
+    /**
+     * Returns the sum of all the derivatives of this State.
+     * Only to be used to get a control output.
+     */
     fun sum(): Double {
         return x + v + a + j
     }
