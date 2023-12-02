@@ -22,10 +22,10 @@ final class Main {
                 "  _ _ _ _ _ _",
                 "_ _ _ _ _ _ _",
                 "  _ _ _ _ _ _",
-                "W _ _ _ _ _ _",
-                "  W _ _ _ _ _",
-                "W W _ _ _ _ _",
-                "  W W _ _ _ _",
+                "_ _ _ _ _ _ _",
+                "  _ _ _ _ _ _",
+                "_ _ _ _ _ _ _",
+                "  _ _ _ _ _ _",
         };
 
         for (int y = 0; y < colors.length; y++) {
@@ -42,7 +42,7 @@ final class Main {
         for (Pixel pixel : pixelsToPlace) pixel.print();
         printLine();
 
-        boolean solve = true;
+        boolean solve = false;
         while (backdrop.notFull()) {
             if (!solve) {
                 int x = input.nextInt();
@@ -73,7 +73,7 @@ final class Main {
             printLine();
             for (Pixel pixel : pixelsToPlace) pixel.print();
         }
-        System.out.println(backdrop.numOfMosaics + " total mosaics");
+        System.out.println(backdrop.mosaicCount + " total mosaics");
     }
 
     private static void printLine() {

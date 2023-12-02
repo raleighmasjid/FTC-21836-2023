@@ -109,7 +109,7 @@ public final class PlacementCalculator {
                             break;
                         }
                     }
-                    if (pixels[0].mosaic.color != INVALID) backdrop.numOfMosaics++;
+                    if (pixels[0].mosaic.color != INVALID) backdrop.mosaicCount++;
                     continue;
                 }
 
@@ -290,7 +290,7 @@ public final class PlacementCalculator {
 
     public static ArrayList<Pixel> calculate(Backdrop backdrop) {
         PlacementCalculator.backdrop = backdrop;
-        backdrop.numOfMosaics = 0;
+        backdrop.mosaicCount = 0;
         pixelsToPlace.clear();
         colorsToGetSPixels.clear();
 

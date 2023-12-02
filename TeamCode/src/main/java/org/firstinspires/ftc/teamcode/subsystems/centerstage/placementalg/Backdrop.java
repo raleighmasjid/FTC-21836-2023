@@ -75,6 +75,9 @@ public final class Backdrop {
 
     void print() {
         System.out.println(this);
+        System.out.println();
+        System.out.println("Auton score: " + getPixelCount() * 5);
+        System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
 
     boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
@@ -142,4 +145,18 @@ public final class Backdrop {
         return false;
     }
 
+    public int getPixelCount() {
+        int pixelCount = 0;
+        for (Pixel[] row : slots) for (Pixel pixel : row) if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
+        return pixelCount;
+    }
+
+    private int getSetLinesReached() {
+        int highestY = getHighestPixelY();
+        int setLinesReached = 0;
+        if (highestY >= 3) setLinesReached++;
+        if (highestY >= 5) setLinesReached++;
+        if (highestY >= 8) setLinesReached++;
+        return setLinesReached;
+    }
 }
