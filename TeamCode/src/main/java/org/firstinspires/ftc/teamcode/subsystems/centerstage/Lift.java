@@ -75,8 +75,8 @@ public final class Lift {
         controller.setTarget(targetState);
     }
 
-    public int getTargetRow() {
-        return targetRow;
+    public boolean isExtended() {
+        return targetRow > -1;
     }
 
     public void run() {
