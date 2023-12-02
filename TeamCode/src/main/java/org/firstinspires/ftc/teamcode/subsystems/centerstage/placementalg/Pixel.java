@@ -85,8 +85,8 @@ public final class Pixel implements Comparable<Pixel> {
                 ),
                 maxWhite = new HSV(
                         1,
-                        1,
-                        1
+                        0.5F,
+                        0.5F
                 ),
                 minPurple = new HSV(
                         0,
@@ -95,8 +95,8 @@ public final class Pixel implements Comparable<Pixel> {
                 ),
                 maxPurple = new HSV(
                         1,
-                        1,
-                        1
+                        0.5F,
+                        0.5F
                 ),
                 minYellow = new HSV(
                         0,
@@ -105,8 +105,8 @@ public final class Pixel implements Comparable<Pixel> {
                 ),
                 maxYellow = new HSV(
                         1,
-                        1,
-                        1
+                        0.5F,
+                        0.5F
                 ),
                 minGreen = new HSV(
                         0,
@@ -115,8 +115,8 @@ public final class Pixel implements Comparable<Pixel> {
                 ),
                 maxGreen = new HSV(
                         1,
-                        1,
-                        1
+                        0.5F,
+                        0.5F
                 );
 
         private static final String RESET = "\u001B[0m";
