@@ -77,7 +77,47 @@ public final class Pixel implements Comparable<Pixel> {
         GREEN,
         YELLOW;
 
-        public static float TEST_VAR = 0;
+        public static HSV
+                minWhite = new HSV(
+                        0,
+                        0,
+                        0
+                ),
+                maxWhite = new HSV(
+                        1,
+                        1,
+                        1
+                ),
+                minPurple = new HSV(
+                        0,
+                        0,
+                        0
+                ),
+                maxPurple = new HSV(
+                        1,
+                        1,
+                        1
+                ),
+                minYellow = new HSV(
+                        0,
+                        0,
+                        0
+                ),
+                maxYellow = new HSV(
+                        1,
+                        1,
+                        1
+                ),
+                minGreen = new HSV(
+                        0,
+                        0,
+                        0
+                ),
+                maxGreen = new HSV(
+                        1,
+                        1,
+                        1
+                );
 
         private static final String RESET = "\u001B[0m";
 
@@ -127,7 +167,11 @@ public final class Pixel implements Comparable<Pixel> {
         }
 
         public static Color fromHSV(HSV hsv) {
-            return EMPTY;
+            return hsv.inRange(minPurple, maxPurple) ? PURPLE :
+                    hsv.inRange(minGreen, maxGreen) ? GREEN :
+                    hsv.inRange(minYellow, maxYellow) ? YELLOW :
+                    hsv.inRange(minWhite, maxWhite) ? WHITE :
+                    EMPTY;
         }
 
         static Color getRemainingColor(Color c1, Color c2) {
