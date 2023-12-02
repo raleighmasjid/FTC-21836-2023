@@ -26,7 +26,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.subsystems.AprilTagDetector;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(group = "21836 Backup")

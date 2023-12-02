@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.utilities;
 
 
 import com.arcrobotics.ftclib.hardware.SimpleServo;
