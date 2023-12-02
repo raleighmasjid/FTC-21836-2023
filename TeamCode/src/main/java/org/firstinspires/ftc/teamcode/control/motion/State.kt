@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.control
+package org.firstinspires.ftc.teamcode.control.motion
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FullStateGains

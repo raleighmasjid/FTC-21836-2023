@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.control.controllers;
 
-import org.firstinspires.ftc.teamcode.control.Differentiator;
-import org.firstinspires.ftc.teamcode.control.Integrator;
-import org.firstinspires.ftc.teamcode.control.State;
+import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
+import org.firstinspires.ftc.teamcode.control.motion.Integrator;
+import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.filters.Filter;
 import org.firstinspires.ftc.teamcode.control.filters.NoFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;

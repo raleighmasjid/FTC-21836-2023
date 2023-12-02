@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.controllers;
 
-import org.firstinspires.ftc.teamcode.control.State;
+import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FullStateGains;
 
 public class FullStateController implements FeedbackController {
