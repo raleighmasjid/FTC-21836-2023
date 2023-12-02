@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -80,7 +82,7 @@ public final class Pixel implements Comparable<Pixel> {
             }
         }
 
-        public static Color fromHSV(float[] hsv) {
+        public static Color fromHSV(HSV hsv) {
             return EMPTY;
         }
 

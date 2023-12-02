@@ -18,6 +18,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.firstinspires.ftc.teamcode.control.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
@@ -36,9 +37,7 @@ public final class Intake {
     private final MotorEx motor;
 
     private ThreadedColorSensor bottomSensor, topSensor;
-    private float[]
-            bottomHSV = new float[3],
-            topHSV = new float[3];
+    private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
     private final SimpleServoPivot pivot, latch;
 
@@ -195,16 +194,16 @@ public final class Intake {
         return intakingHeight.deltaX;
     }
 
-    private void printHSV(MultipleTelemetry telemetry, float[] hsv, String title) {
+    private void printHSV(MultipleTelemetry telemetry, HSV color, String title) {
         telemetry.addLine(title + ":");
-        telemetry.addData("Hue", hsv[0]);
-        telemetry.addData("Saturation", hsv[1]);
-        telemetry.addData("Value", hsv[2]);
+        telemetry.addData("Hue", color.hue);
+        telemetry.addData("Saturation", color.saturation);
+        telemetry.addData("Value", color.value);
     }
 
     public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Bottom color", colors[0]);
-        telemetry.addData("Top color", colors[1]);
+        telemetry.addData("Bottom color", colors[0].toString());
+        telemetry.addData("Top color", colors[1].toString());
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {

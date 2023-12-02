@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.RGB;
+
 public final class ThreadedColorSensor extends Thread {
 
     private final NormalizedColorSensor sensor;
@@ -30,16 +33,20 @@ public final class ThreadedColorSensor extends Thread {
         run = false;
     }
 
-    public float[] getHSV() {
+    public HSV getHSV() {
         Color.colorToHSV(rgba.toColor(), hsv);
-        return hsv;
+        return new HSV(
+                hsv[0],
+                hsv[1],
+                hsv[2]
+        );
     }
 
-    public float[] getRGB() {
-        return new float[]{
+    public RGB getRGB() {
+        return new RGB(
                 rgba.red * 255,
                 rgba.green * 255,
                 rgba.blue * 255
-        };
+        );
     }
 }
