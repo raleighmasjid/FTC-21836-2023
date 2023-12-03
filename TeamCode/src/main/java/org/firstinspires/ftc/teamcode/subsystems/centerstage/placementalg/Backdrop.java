@@ -41,7 +41,7 @@ public final class Backdrop {
             default:
                 int x = pixel.x;
                 int y = pixel.y;
-                if (coordsInRange(x, y) && get(x, y).color != INVALID) slots[y][x] = pixel;
+                if (coordsInRange(x, y) && !(y % 2 == 0 && x == 0)) slots[y][x] = pixel;
         }
     }
 
@@ -152,11 +152,6 @@ public final class Backdrop {
     }
 
     private int getSetLinesReached() {
-        int highestY = getHighestPixelY();
-        int setLinesReached = 0;
-        if (highestY >= 3) setLinesReached++;
-        if (highestY >= 5) setLinesReached++;
-        if (highestY >= 8) setLinesReached++;
-        return setLinesReached;
+        return (getHighestPixelY() + 1) / 3 ;
     }
 }
