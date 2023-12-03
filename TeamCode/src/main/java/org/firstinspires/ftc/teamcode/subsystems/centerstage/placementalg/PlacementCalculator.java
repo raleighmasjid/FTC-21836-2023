@@ -71,7 +71,7 @@ public final class PlacementCalculator {
                 backdrop.get(x - 1, y),
                 backdrop.get(x + (y % 2) - 1, y + 1)
         };
-        if (x == 1) return new Pixel[][]{up, left, right};
+        if (x == 1) return new Pixel[][]{left, up, right};
         if (x == 6 || isSpecialCenterCase(pixel)) return new Pixel[][]{up, right, left};
         if (x == 5 || x == 3) return new Pixel[][]{right, left, up};
         return new Pixel[][]{left, right, up};
