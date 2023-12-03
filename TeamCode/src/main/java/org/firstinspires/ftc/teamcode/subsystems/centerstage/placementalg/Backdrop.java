@@ -57,7 +57,7 @@ public final class Backdrop {
                 Pixel pixel = get(x, y);
                 String color = pixel.color.toString();
                 if (pixel.inMosaic()) color = color.toLowerCase();
-                if (!color.equals(" ") || printRectangular) backdrop.append(color);
+                if (pixel.color != INVALID || printRectangular) backdrop.append(color);
                 backdrop.append(x == COLUMNS - 1 ? "" : spacer);
             }
             backdrop.append('\n');
