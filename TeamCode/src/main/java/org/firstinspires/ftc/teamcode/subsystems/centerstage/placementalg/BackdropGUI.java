@@ -60,9 +60,20 @@ public final class BackdropGUI {
     public void toTelemetry(MultipleTelemetry mTelemetry) {
         String[] rows = backdrop.toString().split("\n");
 
+        if (!showSelection) {
+            String row = rows[10 - selectedPixel.y];
+            int xIndex = selectedPixel.x + (selectedPixel.y % 2 == 0 ? 3 : 4);
+            rows[10 - selectedPixel.y] = row.substring(0, xIndex) + " " + row.substring(xIndex + (selectedPixel.color.isColored() ? 6 : 1));
+        }
+
         for (String row : rows) mTelemetry.addLine(row);
         mTelemetry.addLine();
         for (Pixel pixel : pixelsToPlace) mTelemetry.addLine(pixel.toString());
+
+        if (timer.seconds() >= 0.5) {
+            showSelection = !showSelection;
+            timer.reset();
+        }
     }
 
     public void print() {
