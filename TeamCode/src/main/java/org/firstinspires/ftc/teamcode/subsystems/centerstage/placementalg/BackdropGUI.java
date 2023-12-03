@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.COLUMNS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.ROWS;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.SPACER;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.calculate;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 
 @Config
 public final class BackdropGUI {
+
+    public static double flashingTime = 0.5;
 
     private final Backdrop backdrop = new Backdrop();
     private ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
@@ -41,7 +45,7 @@ public final class BackdropGUI {
 
     public void incrementX() {
         int newX = selectedPixel.x + 1;
-        selectedPixel = backdrop.get((newX >= COLUMNS) ? 0 : (selectedPixel.y % 2 == 0 ? 1 : 0), selectedPixel.y);
+        selectedPixel = backdrop.get((newX >= COLUMNS) ? (selectedPixel.y % 2 == 0 ? 1 : 0) : newX, selectedPixel.y);
     }
 
     public void decrementX() {
@@ -59,38 +63,38 @@ public final class BackdropGUI {
     }
 
     public void toTelemetry(MultipleTelemetry mTelemetry) {
-        String[] rows = backdrop.toString().split("\n");
 
-        if (!showSelection) {
-            String row = rows[10 - selectedPixel.y];
-            int xIndex = selectedPixel.x + (selectedPixel.y % 2 == 0 ? 3 : 4);
-            rows[10 - selectedPixel.y] = row.substring(0, xIndex) + " " + row.substring(xIndex + (selectedPixel.color.isColored() ? 6 : 1));
-        }
+        Pixel saved = selectedPixel;
+        if (!showSelection) backdrop.add(new Pixel(selectedPixel, SPACER));
+
+        String[] rows = backdrop.toString().split("\n");
 
         for (String row : rows) mTelemetry.addLine(row);
         mTelemetry.addLine();
         for (Pixel pixel : pixelsToPlace) mTelemetry.addLine(pixel.toString());
 
-        if (timer.seconds() >= 0.5) {
+        if (!showSelection) backdrop.add(saved);
+
+        if (timer.seconds() >= flashingTime) {
             showSelection = !showSelection;
             timer.reset();
         }
     }
 
     public void print() {
-        String[] rows = backdrop.toString().split("\n");
 
-        if (!showSelection) {
-            String row = rows[10 - selectedPixel.y];
-            int xIndex = selectedPixel.x + (selectedPixel.y % 2 == 0 ? 3 : 4);
-            rows[10 - selectedPixel.y] = row.substring(0, xIndex) + " " + row.substring(xIndex + (selectedPixel.color.isColored() ? 6 : 1));
-        }
+        Pixel saved = selectedPixel;
+        if (!showSelection) backdrop.add(new Pixel(selectedPixel, SPACER));
+
+        String[] rows = backdrop.toString().split("\n");
 
         for (String row : rows) System.out.println(row);
         System.out.println();
         for (Pixel pixel : pixelsToPlace) System.out.println(pixel.toString());
 
-        if (timer.seconds() >= 0.5) {
+        if (!showSelection) backdrop.add(saved);
+
+        if (timer.seconds() >= flashingTime) {
             showSelection = !showSelection;
             timer.reset();
         }
