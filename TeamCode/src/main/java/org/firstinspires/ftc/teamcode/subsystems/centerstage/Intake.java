@@ -16,6 +16,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.max;
 import static java.lang.Math.toDegrees;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 
+@Config
 public final class Intake {
 
     public static double

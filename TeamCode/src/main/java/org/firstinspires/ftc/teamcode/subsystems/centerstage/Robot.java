@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
 import java.util.List;
 
+@Config
 public final class Robot {
 
     public static double maxVoltage = 13;

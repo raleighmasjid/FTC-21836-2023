@@ -4,11 +4,13 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPiv
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
+@Config
 public final class Deposit {
 
     public static double

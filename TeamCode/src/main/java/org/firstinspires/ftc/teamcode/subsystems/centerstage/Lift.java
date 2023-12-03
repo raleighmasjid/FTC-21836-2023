@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 
+@Config
 public final class Lift {
 
     public static PIDGains pidGains = new PIDGains(

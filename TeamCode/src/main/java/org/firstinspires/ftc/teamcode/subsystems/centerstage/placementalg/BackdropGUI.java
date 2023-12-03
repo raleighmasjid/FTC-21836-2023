@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
+@Config
 public final class BackdropGUI {
 
     private final Backdrop backdrop = new Backdrop();
