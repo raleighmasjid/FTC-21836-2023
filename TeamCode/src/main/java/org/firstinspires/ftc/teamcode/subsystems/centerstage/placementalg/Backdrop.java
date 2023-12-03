@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.PURPLE;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
-
-import static java.lang.Math.floor;
 import static java.lang.Math.random;
+import static java.lang.Math.round;
 
 import androidx.annotation.NonNull;
 
@@ -30,13 +25,12 @@ public final class Backdrop {
     }
 
     public void add(Pixel pixel) {
-        Pixel.Color[] colors = {PURPLE, GREEN, YELLOW, WHITE};
         switch (pixel.color) {
             case ANY:
-                add(new Pixel(pixel, colors[(int) floor(random() * 4)]));
+                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3) + 1)));
                 break;
             case COLORED:
-                add(new Pixel(pixel, colors[(int) floor(random() * 3)]));
+                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 2) + 2)));
                 break;
             default:
                 int x = pixel.x;
