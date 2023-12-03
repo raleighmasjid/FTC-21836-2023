@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.COLUMNS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.ROWS;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.HIGHLIGHTED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.calculate;
+import static java.lang.System.out;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -17,17 +20,23 @@ public final class BackdropGUI {
     public static double flashingTime = 0.5;
 
     private final Backdrop backdrop = new Backdrop();
-    private ArrayList<Pixel> pixelsToPlace = new ArrayList<>();
+    private ArrayList<Pixel> pixelsToPlace = calculate(backdrop);
 
-    private Pixel selectedPixel = backdrop.get(1, 0);
+    private Pixel selectedPixel;
     private boolean showSelection = true;
     private final ElapsedTime timer = new ElapsedTime();
 
     public BackdropGUI() {
         backdrop.printRectangular = false;
+
+        for (int i = 0; i < 15; i++) {
+            backdrop.add(pixelsToPlace.get(0));
+            pixelsToPlace = calculate(backdrop);
+        }
+        selectedPixel = backdrop.get(1, 0);
     }
 
-    public void incrementY() {
+    public void up() {
         int newY = selectedPixel.y + 1;
         selectedPixel = backdrop.get(selectedPixel.x, (newY >= ROWS) ? 0 : newY);
         if (selectedPixel.x == 0 && selectedPixel.y % 2 == 0) {
@@ -35,7 +44,7 @@ public final class BackdropGUI {
         }
     }
 
-    public void decrementY() {
+    public void down() {
         int newY = selectedPixel.y - 1;
         selectedPixel = backdrop.get(selectedPixel.x, (newY < 0) ? ROWS - 1 : newY);
         if (selectedPixel.x == 0 && selectedPixel.y % 2 == 0) {
@@ -43,17 +52,17 @@ public final class BackdropGUI {
         }
     }
 
-    public void incrementX() {
+    public void right() {
         int newX = selectedPixel.x + 1;
         selectedPixel = backdrop.get((newX >= COLUMNS) ? (selectedPixel.y % 2 == 0 ? 1 : 0) : newX, selectedPixel.y);
     }
 
-    public void decrementX() {
+    public void left() {
         int newX = selectedPixel.x - 1;
         selectedPixel = backdrop.get((newX < (selectedPixel.y % 2 == 0 ? 1 : 0)) ? COLUMNS - 1 : newX, selectedPixel.y);
     }
 
-    public void changeTo(Pixel.Color color) {
+    public void update(Pixel.Color color) {
         backdrop.add(new Pixel(selectedPixel, color));
         selectedPixel = backdrop.get(selectedPixel.x, selectedPixel.y);
         pixelsToPlace = calculate(backdrop);
@@ -79,14 +88,17 @@ public final class BackdropGUI {
 
     public void print() {
 
+        Pixel toFill = new Pixel(pixelsToPlace.get(0), EMPTY);
+        backdrop.add(new Pixel(toFill, HIGHLIGHTED));
+
         Pixel saved = selectedPixel;
-        if (!showSelection) backdrop.add(new Pixel(selectedPixel, INVALID));
+        if (!showSelection) backdrop.add(new Pixel(saved, INVALID));
 
         String[] rows = backdrop.toString().split("\n");
-
-        for (String row : rows) System.out.println(row);
-        System.out.println();
-        for (Pixel pixel : pixelsToPlace) System.out.println(pixel.toString());
+        for (String row : rows) out.println(row);
+        out.println();
+        out.println(HIGHLIGHTED + " " + pixelsToPlace.get(0).color.name());
+        for (Pixel pixel : pixelsToPlace) out.println(pixel.toString());
 
         if (!showSelection) backdrop.add(saved);
 
@@ -94,5 +106,7 @@ public final class BackdropGUI {
             showSelection = !showSelection;
             timer.reset();
         }
+
+        backdrop.add(toFill);
     }
 }

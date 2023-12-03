@@ -19,15 +19,15 @@ final class GUITesting {
 
             String key = input.nextLine();
 
-            if (Objects.equals(key, "e")) backdropGUI.incrementY();
-            else if (Objects.equals(key, "f")) backdropGUI.incrementX();
-            else if (Objects.equals(key, "s")) backdropGUI.decrementX();
-            else if (Objects.equals(key, "d")) backdropGUI.decrementY();
-            else if (Objects.equals(key, "z")) backdropGUI.changeTo(EMPTY);
-            else if (Objects.equals(key, "x")) backdropGUI.changeTo(WHITE);
-            else if (Objects.equals(key, "c")) backdropGUI.changeTo(PURPLE);
-            else if (Objects.equals(key, "v")) backdropGUI.changeTo(YELLOW);
-            else if (Objects.equals(key, "b")) backdropGUI.changeTo(GREEN);
+            if (Objects.equals(key, "e")) backdropGUI.up();
+            else if (Objects.equals(key, "f")) backdropGUI.right();
+            else if (Objects.equals(key, "s")) backdropGUI.left();
+            else if (Objects.equals(key, "d")) backdropGUI.down();
+            else if (Objects.equals(key, "z")) backdropGUI.update(EMPTY);
+            else if (Objects.equals(key, "x")) backdropGUI.update(WHITE);
+            else if (Objects.equals(key, "c")) backdropGUI.update(PURPLE);
+            else if (Objects.equals(key, "v")) backdropGUI.update(YELLOW);
+            else if (Objects.equals(key, "b")) backdropGUI.update(GREEN);
 
             backdropGUI.print();
         }

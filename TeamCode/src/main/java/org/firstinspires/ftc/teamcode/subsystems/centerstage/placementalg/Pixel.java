@@ -81,7 +81,8 @@ public final class Pixel implements Comparable<Pixel> {
         GREEN,
         ANY,
         COLORED,
-        INVALID;
+        INVALID,
+        HIGHLIGHTED;
 
         public static HSV
                 minWhite = new HSV(
@@ -148,6 +149,8 @@ public final class Pixel implements Comparable<Pixel> {
                     return "\u001B[32m" + "G" + RESET;
                 case INVALID:
                     return " ";
+                case HIGHLIGHTED:
+                    return "□";
                 case EMPTY:
                 default:
                     return "_";
@@ -158,6 +161,7 @@ public final class Pixel implements Comparable<Pixel> {
             switch (color.toUpperCase()) {
                 case "W":
                     return WHITE;
+                case "#":
                 case "A":
                     return ANY;
                 case "C":
