@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.COLUMNS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.ROWS;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.SPACER;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.calculate;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -53,19 +53,15 @@ public final class BackdropGUI {
         selectedPixel = backdrop.get((newX < (selectedPixel.y % 2 == 0 ? 1 : 0)) ? COLUMNS - 1 : newX, selectedPixel.y);
     }
 
-    public void flipColor() {
-        int newColorInd = selectedPixel.color.ordinal() + 1;
-        if (newColorInd > 4) newColorInd = 0;
-
-        backdrop.add(new Pixel(selectedPixel, Pixel.Color.get(newColorInd)));
+    public void changeTo(Pixel.Color color) {
+        backdrop.add(new Pixel(selectedPixel, color));
         selectedPixel = backdrop.get(selectedPixel.x, selectedPixel.y);
         pixelsToPlace = calculate(backdrop);
     }
 
     public void toTelemetry(MultipleTelemetry mTelemetry) {
-
         Pixel saved = selectedPixel;
-        if (!showSelection) backdrop.add(new Pixel(selectedPixel, SPACER));
+        if (!showSelection) backdrop.add(new Pixel(selectedPixel, INVALID));
 
         String[] rows = backdrop.toString().split("\n");
 
@@ -84,7 +80,7 @@ public final class BackdropGUI {
     public void print() {
 
         Pixel saved = selectedPixel;
-        if (!showSelection) backdrop.add(new Pixel(selectedPixel, SPACER));
+        if (!showSelection) backdrop.add(new Pixel(selectedPixel, INVALID));
 
         String[] rows = backdrop.toString().split("\n");
 

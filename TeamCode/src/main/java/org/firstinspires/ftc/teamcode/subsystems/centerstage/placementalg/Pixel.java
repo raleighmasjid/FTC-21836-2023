@@ -81,8 +81,7 @@ public final class Pixel implements Comparable<Pixel> {
         GREEN,
         ANY,
         COLORED,
-        INVALID,
-        SPACER;
+        INVALID;
 
         public static HSV
                 minWhite = new HSV(
@@ -147,7 +146,6 @@ public final class Pixel implements Comparable<Pixel> {
                     return "\u001B[33m" + "Y" + RESET;
                 case GREEN:
                     return "\u001B[32m" + "G" + RESET;
-                case SPACER:
                 case INVALID:
                     return " ";
                 case EMPTY:
