@@ -17,13 +17,13 @@ import java.util.ArrayList;
 public final class Backdrop {
     final static int ROWS = 11;
     final static int COLUMNS = 7;
-    public boolean printRectangular = false;
+    public boolean printRectangular = true;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
     int mosaicCount = 0;
 
-    {
+    Backdrop() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
             slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
         }
@@ -145,7 +145,7 @@ public final class Backdrop {
         return false;
     }
 
-    public int getPixelCount() {
+    int getPixelCount() {
         int pixelCount = 0;
         for (Pixel[] row : slots) for (Pixel pixel : row) if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
         return pixelCount;

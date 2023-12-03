@@ -74,14 +74,14 @@ public final class Pixel implements Comparable<Pixel> {
 
     @Config
     public enum Color {
-        INVALID,
         EMPTY,
-        ANY,
-        COLORED,
         WHITE,
         PURPLE,
+        YELLOW,
         GREEN,
-        YELLOW;
+        ANY,
+        COLORED,
+        INVALID;
 
         public static HSV
                 minWhite = new HSV(
@@ -126,6 +126,10 @@ public final class Pixel implements Comparable<Pixel> {
                 );
 
         private static final String RESET = "\u001B[0m";
+        private static final Color[] values = values();
+        public static Color get(int ordinal) {
+            return values[ordinal];
+        }
 
         @NonNull
         public String toString() {

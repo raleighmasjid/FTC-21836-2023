@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import java.util.ArrayList;
 import java.util.Scanner;
 
-final class Main {
+final class AlgorithmTesting {
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
