@@ -5,14 +5,13 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
-import static java.lang.Thread.sleep;
 
 import java.util.Objects;
 import java.util.Scanner;
 
 final class GUITesting {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         BackdropGUI backdropGUI = new BackdropGUI();
         Scanner input = new Scanner(System.in);
 
@@ -31,8 +30,6 @@ final class GUITesting {
             else if (Objects.equals(key, "b")) backdropGUI.changeTo(GREEN);
 
             backdropGUI.print();
-
-            sleep(250);
         }
     }
 }
