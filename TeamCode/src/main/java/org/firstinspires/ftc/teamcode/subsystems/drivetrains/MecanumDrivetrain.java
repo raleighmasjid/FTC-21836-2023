@@ -12,6 +12,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
+import static java.util.Collections.max;
 
 import androidx.annotation.NonNull;
 
@@ -280,10 +281,13 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftBack.setPower(v1);
-        rightBack.setPower(v2);
-        rightFront.setPower(v3);
+
+        double max = max(Arrays.asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0));
+
+        leftFront.setPower(v / max);
+        leftBack.setPower(v1 / max);
+        rightBack.setPower(v2 / max);
+        rightFront.setPower(v3 / max);
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
