@@ -280,15 +280,6 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        if (!USE_VELO_PID) {
-            double scalar = maxVoltage / batteryVoltageSensor.getVoltage();
-
-            v *= scalar;
-            v1 *= scalar;
-            v2 *= scalar;
-            v3 *= scalar;
-        }
-
         leftFront.setPower(v);
         leftBack.setPower(v1);
         rightBack.setPower(v2);
