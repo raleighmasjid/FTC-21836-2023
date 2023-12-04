@@ -12,6 +12,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
+import static java.util.Arrays.asList;
 import static java.util.Collections.max;
 
 import androidx.annotation.NonNull;
@@ -50,7 +51,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedIMU;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -102,7 +102,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         rightBack = hardwareMap.get(DcMotorEx.class, "right back");
         rightFront = hardwareMap.get(DcMotorEx.class, "right front");
 
-        motors = Arrays.asList(leftFront, leftBack, rightBack, rightFront);
+        motors = asList(leftFront, leftBack, rightBack, rightFront);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -282,7 +282,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
 
-        double max = max(Arrays.asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0));
+        double max = max(asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0));
 
         leftFront.setPower(v / max);
         leftBack.setPower(v1 / max);
@@ -291,7 +291,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
-        return new MinVelocityConstraint(Arrays.asList(
+        return new MinVelocityConstraint(asList(
                 new AngularVelocityConstraint(maxAngularVel),
                 new MecanumVelocityConstraint(maxVel, trackWidth)
         ));
