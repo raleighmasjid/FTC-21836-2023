@@ -33,7 +33,7 @@ public class FeedforwardController implements Controller {
     }
 
     public double calculate() {
-        return calculate(12.0);
+        return calculate(maxVoltage);
     }
 
     /**

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.roadrunner.opmode;
 
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -72,7 +74,7 @@ public class MaxVelocityTuner extends LinearOpMode {
 
         telemetry.addData("Max Velocity", maxVelocity);
         telemetry.addData("Max Recommended Velocity", maxVelocity * 0.8);
-        telemetry.addData("Voltage Compensated kF", effectiveKf * batteryVoltageSensor.getVoltage() / 12);
+        telemetry.addData("Voltage Compensated kF", effectiveKf * batteryVoltageSensor.getVoltage() / maxVoltage);
         telemetry.update();
 
         while (!isStopRequested() && opModeIsActive()) idle();
