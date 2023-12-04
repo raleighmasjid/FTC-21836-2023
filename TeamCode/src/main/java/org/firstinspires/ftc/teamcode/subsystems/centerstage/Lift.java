@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -19,6 +18,8 @@ import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 
 @Config
 public final class Lift {
@@ -74,7 +75,7 @@ public final class Lift {
 
     public void setTargetRow(int targetRow) {
         this.targetRow = max(min(targetRow, 10), -1);
-        targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * PIXEL_HEIGHT + BOTTOM_ROW_HEIGHT));
+        targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.PIXEL_HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
         controller.setTarget(targetState);
     }
 

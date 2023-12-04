@@ -7,11 +7,20 @@ import static java.lang.Math.round;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import java.util.ArrayList;
 
+@Config
 public final class Backdrop {
-    final static int ROWS = 11;
-    final static int COLUMNS = 7;
+
+    public static double
+            BOTTOM_ROW_HEIGHT = 7.25,
+            BACKDROP_X = 47,
+            BACKDROP_Y_MAX_BLUE = 45,
+            BACKDROP_Y_MAX_RED = -25;
+
+    final static int ROWS = 11, COLUMNS = 7;
     public boolean printRectangular = true;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];

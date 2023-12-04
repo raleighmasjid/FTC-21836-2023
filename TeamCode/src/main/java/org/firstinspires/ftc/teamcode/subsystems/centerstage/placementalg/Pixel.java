@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.PIXEL_WIDTH;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_X;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_Y_BLUE_HIGHEST;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.ScoringMeasurements.SCORING_Y_RED_HIGHEST;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_X;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_Y_MAX_BLUE;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_Y_MAX_RED;
 import static java.lang.Math.toRadians;
 
 import androidx.annotation.NonNull;
@@ -17,12 +16,17 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@Config
 public final class Pixel implements Comparable<Pixel> {
 
-    public int compareTo(Pixel cPixel) {
-        double diff = cPixel.scoreValue - scoreValue;
-        if (diff == 0) diff = y - cPixel.y;
-        if (diff == 0) diff = x - cPixel.x;
+    public static double
+            PIXEL_WIDTH = 3,
+            PIXEL_HEIGHT = 2.59945;
+
+    public int compareTo(Pixel other) {
+        double diff = other.scoreValue - scoreValue;
+        if (diff == 0) diff = y - other.y;
+        if (diff == 0) diff = x - other.x;
         return (int) (diff * 1000000000);
     }
 
@@ -52,8 +56,8 @@ public final class Pixel implements Comparable<Pixel> {
 
     public Pose2d toPose2d(boolean isRed) {
         return new Pose2d(
-                SCORING_X,
-                (isRed ? SCORING_Y_RED_HIGHEST : SCORING_Y_BLUE_HIGHEST) - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
+                BACKDROP_X,
+                (isRed ? BACKDROP_Y_MAX_RED : BACKDROP_Y_MAX_BLUE) - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
                 toRadians(0)
         );
     }
