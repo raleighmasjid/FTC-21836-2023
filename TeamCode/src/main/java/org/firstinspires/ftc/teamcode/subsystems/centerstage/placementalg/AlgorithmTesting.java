@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.*;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.COLORED;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -20,12 +21,12 @@ final class AlgorithmTesting {
                 "  _ _ _ _ _ _",
                 "_ _ _ _ _ _ _",
                 "  _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                "  _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                "  _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                "  _ _ _ _ _ _",
+                "W W G _ _ _ _",
+                "  p W W _ _ _",
+                "g y W g _ _ _",
+                "  W W y p _ _",
+                "g p W W W _ _",
+                "  y W P Y W _",
         };
 
         for (int y = 0; y < colors.length; y++) {
