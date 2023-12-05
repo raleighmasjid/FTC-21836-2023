@@ -122,7 +122,7 @@ public final class Backdrop {
 
     int getHighestPixelY() {
         int highestY = 0;
-        for (int y = 0; y < slots.length && rowNotEmpty(y); y++) for (Pixel p : slots[y]) {
+        for (Pixel[] row : slots) for (Pixel p : row) {
             if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
         }
         return highestY;
@@ -136,11 +136,6 @@ public final class Backdrop {
     static boolean allTrue(boolean... booleans) {
         for(boolean b : booleans) if(!b) return false;
         return true;
-    }
-
-    boolean rowNotEmpty(int y) {
-        for (Pixel pixel : slots[y]) if (!pixel.color.isEmpty() && pixel.color != INVALID) return true;
-        return false;
     }
 
     public boolean notFull() {

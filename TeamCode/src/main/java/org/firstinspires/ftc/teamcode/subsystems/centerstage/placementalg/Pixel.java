@@ -140,11 +140,9 @@ public final class Pixel implements Comparable<Pixel> {
         public String toString() {
             switch (this) {
                 case WHITE:
-                    return "W";
                 case ANY:
-                    return "A";
                 case COLORED:
-                    return "C";
+                    return "" + name().charAt(0);
                 case PURPLE:
                     return "\u001B[35m" + "P" + RESET;
                 case YELLOW:
@@ -154,7 +152,7 @@ public final class Pixel implements Comparable<Pixel> {
                 case INVALID:
                     return " ";
                 case HIGHLIGHTED:
-                    return "□";
+                    return "#";
                 case EMPTY:
                 default:
                     return "_";
