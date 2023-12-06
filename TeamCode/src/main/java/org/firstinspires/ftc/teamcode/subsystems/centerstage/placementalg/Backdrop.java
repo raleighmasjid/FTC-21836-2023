@@ -52,6 +52,10 @@ public final class Backdrop {
         return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, INVALID);
     }
 
+    Pixel get(Pixel pixel) {
+        return get(pixel.x, pixel.y);
+    }
+
     private static boolean coordsInRange(int x, int y) {
         return x >= 0 && x < COLUMNS && y >= 0 && y < ROWS;
     }
@@ -83,21 +87,7 @@ public final class Backdrop {
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
 
-    boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
-        return getAdjacentMosaics(pixel, includeEmpties).size() > 0;
-    }
-
-    private ArrayList<Pixel> getAdjacentMosaics(Pixel pixel, boolean includeEmpties) {
-        ArrayList<Pixel> adjacentMosaics = new ArrayList<>();
-        for (Pixel neighbor : getNeighbors(pixel, includeEmpties)) {
-            if ((neighbor.color.isColored() || neighbor.color.isEmpty()) && neighbor.mosaic != pixel.mosaic) {
-                adjacentMosaics.add(neighbor);
-            }
-        }
-        return adjacentMosaics;
-    }
-
-    private ArrayList<Pixel> getNeighbors(Pixel pixel, boolean includeEmpties) {
+    ArrayList<Pixel> getNeighbors(Pixel pixel, boolean includeEmpties) {
         ArrayList<Pixel> neighbors = new ArrayList<>();
         int x = pixel.x;
         int y = pixel.y;
@@ -114,6 +104,10 @@ public final class Backdrop {
                 neighbors.add(n);
         }
         return neighbors;
+    }
+
+    boolean touches(Pixel p1, Pixel p2) {
+        return inArray(p1, getNeighbors(p2, true));
     }
 
     boolean isSupported(Pixel pixel) {
@@ -143,7 +137,7 @@ public final class Backdrop {
         return false;
     }
 
-    int getPixelCount() {
+    private int getPixelCount() {
         int pixelCount = 0;
         for (Pixel[] row : slots) for (Pixel pixel : row) if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
         return pixelCount;
