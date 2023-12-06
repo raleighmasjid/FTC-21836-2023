@@ -7,10 +7,10 @@ data class HSV @JvmOverloads constructor(
 ) {
     fun inRange(min:HSV, max:HSV): Boolean {
 
-        val hueRange = min.hue..max.hue
-        val saturationRange = min.saturation..max.saturation
-        val valueRange = min.value..max.value
+        val hueInRange = (min.hue <= hue) && (hue <= max.hue)
+        val saturationInRange = (min.saturation <= saturation) && (saturation <= max.saturation)
+        val valueInRange = (min.value <= value) && (value <= max.value)
 
-        return (hue in hueRange) and (saturation in saturationRange) and (value in valueRange)
+        return hueInRange && saturationInRange && valueInRange
     }
 }
