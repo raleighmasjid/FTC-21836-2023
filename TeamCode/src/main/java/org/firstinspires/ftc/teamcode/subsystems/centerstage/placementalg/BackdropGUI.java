@@ -69,13 +69,17 @@ public final class BackdropGUI {
     }
 
     public void toTelemetry(MultipleTelemetry mTelemetry) {
+
+        Pixel toFill = new Pixel(pixelsToPlace.get(0), EMPTY);
+        backdrop.add(new Pixel(toFill, HIGHLIGHTED));
+
         Pixel saved = selectedPixel;
-        if (!showSelection) backdrop.add(new Pixel(selectedPixel, INVALID));
+        if (!showSelection) backdrop.add(new Pixel(saved, INVALID));
 
         String[] rows = backdrop.toString().split("\n");
-
         for (String row : rows) mTelemetry.addLine(row);
         mTelemetry.addLine();
+        mTelemetry.addLine(HIGHLIGHTED + " " + pixelsToPlace.get(0).color.name());
         for (Pixel pixel : pixelsToPlace) mTelemetry.addLine(pixel.toString());
 
         if (!showSelection) backdrop.add(saved);
@@ -84,6 +88,8 @@ public final class BackdropGUI {
             showSelection = !showSelection;
             timer.reset();
         }
+
+        backdrop.add(toFill);
     }
 
     public void print() {

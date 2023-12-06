@@ -191,7 +191,7 @@ public final class Intake {
         return currentState;
     }
 
-    public void setIntakingHeight(IntakingHeight intakingHeight) {
+    public void setHeight(IntakingHeight intakingHeight) {
         this.intakingHeight = intakingHeight;
     }
 
