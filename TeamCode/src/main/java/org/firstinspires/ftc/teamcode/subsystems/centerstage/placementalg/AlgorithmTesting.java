@@ -74,7 +74,7 @@ final class AlgorithmTesting {
             printLine();
             for (Pixel pixel : pixelsToPlace) pixel.print();
         }
-        System.out.println(backdrop.mosaicCount + " total mosaics");
+        System.out.println(backdrop.mosaicCount + " mosaics");
     }
 
     private static void printLine() {
