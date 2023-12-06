@@ -5,6 +5,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -18,6 +19,10 @@ public final class MainAuton extends LinearOpMode {
     static GamepadEx gamepadEx1 = null, gamepadEx2;
     static MultipleTelemetry mTelemetry;
     static Robot robot = null;
+
+    static boolean pressed(int gamepad, GamepadKeys.Button button) {
+        return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,10 +40,10 @@ public final class MainAuton extends LinearOpMode {
         boolean isRight = true;
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
-            if (gamepadEx1.wasJustPressed(DPAD_RIGHT)) isRight = true;
-            if (gamepadEx1.wasJustPressed(DPAD_LEFT)) isRight = false;
-            if (gamepadEx1.wasJustPressed(B)) robot.isRed = true;
-            if (gamepadEx1.wasJustPressed(X)) robot.isRed = false;
+            if (pressed(1, DPAD_RIGHT))     isRight = true;
+            if (pressed(1, DPAD_LEFT))      isRight = false;
+            if (pressed(1, B))              robot.isRed = true;
+            if (pressed(1, X))              robot.isRed = false;
             mTelemetry.addLine("Selected " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
             mTelemetry.update();

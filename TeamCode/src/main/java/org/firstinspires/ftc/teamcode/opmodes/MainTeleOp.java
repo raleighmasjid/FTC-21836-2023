@@ -15,6 +15,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.pressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
@@ -31,7 +32,6 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -59,9 +59,9 @@ public final class MainTeleOp extends LinearOpMode {
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (pressed(1, RIGHT_BUMPER)) robot.drivetrain.toggleSlowModeLock();
-            if (pressed(1, B)) robot.isRed = true;
-            if (pressed(1, X)) robot.isRed = false;
+            if (pressed(1, RIGHT_BUMPER))   robot.drivetrain.toggleSlowModeLock();
+            if (pressed(1, B))              robot.isRed = true;
+            if (pressed(1, X))              robot.isRed = false;
             mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
             mTelemetry.update();
@@ -128,9 +128,5 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.update();
         }
         robot.interrupt();
-    }
-
-    private static boolean pressed(int gamepad, GamepadKeys.Button button) {
-        return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
 }
