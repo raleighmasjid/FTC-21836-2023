@@ -40,10 +40,10 @@ public final class MainAuton extends LinearOpMode {
         boolean isRight = true;
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, DPAD_RIGHT))     isRight = true;
-            if (keyPressed(1, DPAD_LEFT))      isRight = false;
-            if (keyPressed(1, B))              robot.isRed = true;
-            if (keyPressed(1, X))              robot.isRed = false;
+            if (keyPressed(1, DPAD_RIGHT))  isRight = true;
+            if (keyPressed(1, DPAD_LEFT))   isRight = false;
+            if (keyPressed(1, B))           robot.isRed = true;
+            if (keyPressed(1, X))           robot.isRed = false;
             mTelemetry.addLine("Selected " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
             mTelemetry.update();
