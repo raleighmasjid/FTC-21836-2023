@@ -115,12 +115,10 @@ public final class PlacementCalculator {
                 continue;
             }
 
-//            pMosaics:
+            pMosaics:
             for (Pixel[] pMosaic : possibleMosaics) {
-                for (Pixel a : pMosaic) {
-                    if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
-//                    if (a.color == WHITE) continue pMosaics;
-                }
+                for (Pixel a : pMosaic) if (a.color == WHITE) continue pMosaics;
+                for (Pixel a : pMosaic) if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
 
                 if (
                         !touchingAdjacentMosaic(pMosaic[0], false) &&
@@ -340,10 +338,8 @@ public final class PlacementCalculator {
         scanForMosaics();
         scanForSetLinePixels();
         int i = 0;
-        do {
-            scanForEmptySpot();
-            i++;
-        } while (i < 8 && !willPlaceColored());
+        do scanForEmptySpot();
+        while (++i < 8 && !willPlaceColored());
 
         removeDuplicates(pixelsToPlace);
         removeOverridingPixels(pixelsToPlace);
