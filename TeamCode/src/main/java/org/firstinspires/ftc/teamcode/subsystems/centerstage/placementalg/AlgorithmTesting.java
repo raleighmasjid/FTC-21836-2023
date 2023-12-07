@@ -43,10 +43,6 @@ final class AlgorithmTesting {
         for (Pixel pixel : pixelsToPlace) pixel.print();
         printLine();
 
-        backdrop.get(2, 6).mosaic.print();
-        backdrop.get(3, 6).mosaic.print();
-        backdrop.get(3, 5).mosaic.print();
-
 
         boolean solve = false;
         while (backdrop.notFull()) {
