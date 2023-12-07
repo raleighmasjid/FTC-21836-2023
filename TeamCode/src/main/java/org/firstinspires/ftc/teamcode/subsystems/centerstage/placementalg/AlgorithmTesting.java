@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.COLORED;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -40,39 +43,38 @@ final class AlgorithmTesting {
         for (Pixel pixel : pixelsToPlace) pixel.print();
         printLine();
 
-
-//        boolean solve = false;
-//        while (backdrop.notFull()) {
-//            if (!solve) {
-//                int x = input.nextInt();
-//                int y = input.nextInt();
-//                input.nextLine();
-//                String color = input.nextLine();
-//                if (color.equalsIgnoreCase("solve")) solve = true;
-//                backdrop.add(new Pixel(x, y, Pixel.Color.fromString(color)));
-//            }
-//            if (solve) {
-//                Pixel pToPlace = pixelsToPlace.get(0);
-//                if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
-//                backdrop.add(pToPlace);
-//            }
-//            pixelsToPlace = PlacementCalculator.calculate(backdrop);
-//            if (!solve || printPerIteration) {
-//                printLine();
-//                printLine();
-//                backdrop.print();
-//                printLine();
-//                for (Pixel pixel : pixelsToPlace) pixel.print();
-//            }
-//        }
-//        if (solve && !printPerIteration) {
-//            printLine();
-//            printLine();
-//            backdrop.print();
-//            printLine();
-//            for (Pixel pixel : pixelsToPlace) pixel.print();
-//        }
-//        System.out.println(backdrop.mosaicCount + " mosaics");
+        boolean solve = false;
+        while (backdrop.notFull()) {
+            if (!solve) {
+                int x = input.nextInt();
+                int y = input.nextInt();
+                input.nextLine();
+                String color = input.nextLine();
+                if (color.equalsIgnoreCase("solve")) solve = true;
+                backdrop.add(new Pixel(x, y, Pixel.Color.fromString(color)));
+            }
+            if (solve) {
+                Pixel pToPlace = pixelsToPlace.get(0);
+                if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
+                backdrop.add(pToPlace);
+            }
+            pixelsToPlace = PlacementCalculator.calculate(backdrop);
+            if (!solve || printPerIteration) {
+                printLine();
+                printLine();
+                backdrop.print();
+                printLine();
+                for (Pixel pixel : pixelsToPlace) pixel.print();
+            }
+        }
+        if (solve && !printPerIteration) {
+            printLine();
+            printLine();
+            backdrop.print();
+            printLine();
+            for (Pixel pixel : pixelsToPlace) pixel.print();
+        }
+        System.out.println(backdrop.mosaicCount + " mosaics");
     }
 
     private static void printLine() {

@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @Config
@@ -89,10 +88,10 @@ public final class Backdrop {
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
 
-    ArrayList<Pixel> getNeighbors(Pixel pixel) {
+    Pixel[] getNeighbors(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
-        Pixel[] ns = {
+        return new Pixel[]{
                 get(x + 1, y),
                 get(x - 1, y),
                 get(x, y + 1),
@@ -100,11 +99,10 @@ public final class Backdrop {
                 get(x - 1 + 2 * (y % 2), y + 1),
                 get(x - 1 + 2 * (y % 2), y - 1),
         };
-        return new ArrayList<>(Arrays.asList(ns));
     }
 
     boolean touching(Pixel p1, Pixel p2) {
-        return inArray(get(p1), getNeighbors(get(p2)));
+        return inArray(get(p1), Arrays.asList(getNeighbors(get(p2))));
     }
 
     boolean isSupported(Pixel pixel) {

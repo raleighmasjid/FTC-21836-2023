@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.getRemainingColor;
-import static java.lang.System.out;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -170,11 +169,11 @@ public final class PlacementCalculator {
 
     private static boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
         for (Pixel neighbor : backdrop.getNeighbors(pixel)) {
-            if (neighbor.mosaic != pixel.mosaic && neighbor.mosaic != null) {
+            if (neighbor.mosaic != pixel.mosaic) {
 
                 if (neighbor.color.isColored()) return true;
 
-                if (includeEmpties && neighbor.color.isEmpty()) {
+                if (includeEmpties && neighbor.color.isEmpty() && neighbor.mosaic != null) {
 
                     Pixel[][] pMosaics = getPossibleMosaics(backdrop.get(neighbor.mosaic));
                     ArrayList<Pixel[]> activePMosaics = new ArrayList<>();
@@ -195,7 +194,7 @@ public final class PlacementCalculator {
                         }
                     }
 
-                    return allTrue(pMosaicsTouchingPixel);
+                    if (allTrue(pMosaicsTouchingPixel)) return true;
 
                 }
             }
@@ -293,10 +292,6 @@ public final class PlacementCalculator {
     }
 
     private static Pixel getSafeColor(Pixel pixel) {
-        if (pixel == backdrop.get(4, 4)) {
-            out.println(touchingAdjacentMosaic(pixel, true));
-            out.println(noSpaceForMosaics(pixel));
-        }
         return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) ? WHITE : ANY);
     }
 
