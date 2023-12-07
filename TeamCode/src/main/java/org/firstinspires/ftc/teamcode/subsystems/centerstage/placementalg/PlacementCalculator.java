@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.getRemainingColor;
+import static java.lang.System.out;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,11 +116,11 @@ public final class PlacementCalculator {
                 continue;
             }
 
-            pMosaics:
+//            pMosaics:
             for (Pixel[] pMosaic : possibleMosaics) {
                 for (Pixel a : pMosaic) {
                     if (a.color.isColored() || a.color.isEmpty()) a.mosaic = pixel;
-                    if (a.color == WHITE) continue pMosaics;
+//                    if (a.color == WHITE) continue pMosaics;
                 }
 
                 if (
@@ -292,6 +293,10 @@ public final class PlacementCalculator {
     }
 
     private static Pixel getSafeColor(Pixel pixel) {
+        if (pixel == backdrop.get(4, 4)) {
+            out.println(touchingAdjacentMosaic(pixel, true));
+            out.println(noSpaceForMosaics(pixel));
+        }
         return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) ? WHITE : ANY);
     }
 
