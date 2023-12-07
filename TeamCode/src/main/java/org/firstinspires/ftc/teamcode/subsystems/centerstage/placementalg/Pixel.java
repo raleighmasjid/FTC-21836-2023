@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_X;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_Y_MAX_BLUE;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.BACKDROP_Y_MAX_RED;
 import static java.lang.Math.toRadians;
 
 import androidx.annotation.NonNull;
@@ -20,8 +17,8 @@ import java.util.Arrays;
 public final class Pixel implements Comparable<Pixel> {
 
     public static double
-            PIXEL_WIDTH = 3,
-            PIXEL_HEIGHT = 2.59945;
+            WIDTH = 3,
+            HEIGHT = 2.59945;
 
     public int compareTo(Pixel other) {
         double diff = other.scoreValue - scoreValue;
@@ -56,8 +53,8 @@ public final class Pixel implements Comparable<Pixel> {
 
     public Pose2d toPose2d(boolean isRed) {
         return new Pose2d(
-                BACKDROP_X,
-                (isRed ? BACKDROP_Y_MAX_RED : BACKDROP_Y_MAX_BLUE) - (x * PIXEL_WIDTH) + (y % 2 == 0 ? 0.5 * PIXEL_WIDTH : 0),
+                Backdrop.X,
+                (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
                 toRadians(0)
         );
     }

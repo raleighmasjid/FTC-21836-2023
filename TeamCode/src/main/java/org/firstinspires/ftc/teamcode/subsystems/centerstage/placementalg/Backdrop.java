@@ -10,15 +10,16 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Config
 public final class Backdrop {
 
     public static double
             BOTTOM_ROW_HEIGHT = 7.25,
-            BACKDROP_X = 47,
-            BACKDROP_Y_MAX_BLUE = 45,
-            BACKDROP_Y_MAX_RED = -25;
+            X = 47,
+            Y_MAX_BLUE = 45,
+            Y_MAX_RED = -25;
 
     final static int ROWS = 11, COLUMNS = 7;
     public boolean printRectangular = true;
@@ -28,9 +29,10 @@ public final class Backdrop {
     int mosaicCount = 0;
 
     Backdrop() {
-        for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
-            slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
-        }
+        for (int y = 0; y < slots.length; y++)
+            for (int x = 0; x < slots[y].length; x++) {
+                slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
+            }
     }
 
     public void add(Pixel pixel) {
@@ -87,8 +89,7 @@ public final class Backdrop {
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
 
-    ArrayList<Pixel> getNeighbors(Pixel pixel, boolean includeEmpties) {
-        ArrayList<Pixel> neighbors = new ArrayList<>();
+    ArrayList<Pixel> getNeighbors(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
         Pixel[] ns = {
@@ -99,15 +100,11 @@ public final class Backdrop {
                 get(x - 1 + 2 * (y % 2), y + 1),
                 get(x - 1 + 2 * (y % 2), y - 1),
         };
-        for (Pixel n : ns) {
-            if (includeEmpties || !n.color.isEmpty())
-                neighbors.add(n);
-        }
-        return neighbors;
+        return new ArrayList<>(Arrays.asList(ns));
     }
 
-    boolean touches(Pixel p1, Pixel p2) {
-        return inArray(p1, getNeighbors(p2, true));
+    boolean touching(Pixel p1, Pixel p2) {
+        return inArray(get(p1), getNeighbors(get(p2)));
     }
 
     boolean isSupported(Pixel pixel) {
@@ -116,9 +113,10 @@ public final class Backdrop {
 
     int getHighestPixelY() {
         int highestY = 0;
-        for (Pixel[] row : slots) for (Pixel p : row) {
-            if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
-        }
+        for (Pixel[] row : slots)
+            for (Pixel p : row) {
+                if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
+            }
         return highestY;
     }
 
@@ -128,7 +126,7 @@ public final class Backdrop {
     }
 
     static boolean allTrue(boolean... booleans) {
-        for(boolean b : booleans) if(!b) return false;
+        for (boolean b : booleans) if (!b) return false;
         return true;
     }
 
@@ -139,11 +137,15 @@ public final class Backdrop {
 
     private int getPixelCount() {
         int pixelCount = 0;
-        for (Pixel[] row : slots) for (Pixel pixel : row) if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
+        for (Pixel[] row : slots) {
+            for (Pixel pixel : row) {
+                if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
+            }
+        }
         return pixelCount;
     }
 
     private int getSetLinesReached() {
-        return (getHighestPixelY() + 1) / 3 ;
+        return (getHighestPixelY() + 1) / 3;
     }
 }

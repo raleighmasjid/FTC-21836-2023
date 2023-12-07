@@ -16,21 +16,21 @@ final class AlgorithmTesting {
         backdrop.printRectangular = false;
 
         String[] colors = {
-                "  _ _ _ _ _ _",
+                " _ _ _ _ _ _ ",
                 "_ _ _ _ _ _ _",
-                "  _ _ _ _ _ _",
+                " _ _ _ _ _ _ ",
                 "_ _ _ _ _ _ _",
-                "  _ _ _ _ _ _",
+                " _ _ _ _ _ _ ",
                 "W W G _ _ _ _",
-                "  p W W _ _ _",
+                " p W W _ _ _ ",
                 "g y W g _ _ _",
-                "  W W y p _ _",
+                " W W y p _ _ ",
                 "g p W W W _ _",
-                "  y W P Y W _",
+                " y W P Y W _ ",
         };
 
         for (int y = 0; y < colors.length; y++) {
-            if (y % 2 == 0) colors[y] = "." + colors[y].substring(1, 13);
+            if (y % 2 == 0) colors[y] = ". " + colors[y].substring(1, 13);
             String[] rowList = colors[y].split(" ");
             for (int x = 0; x < rowList.length; x++) {
                 if (y % 2 == 0 && x == 0) continue;
@@ -42,6 +42,11 @@ final class AlgorithmTesting {
         printLine();
         for (Pixel pixel : pixelsToPlace) pixel.print();
         printLine();
+
+        backdrop.get(2, 6).mosaic.print();
+        backdrop.get(3, 6).mosaic.print();
+        backdrop.get(3, 5).mosaic.print();
+
 
         boolean solve = false;
         while (backdrop.notFull()) {
