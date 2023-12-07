@@ -65,13 +65,9 @@ public final class Deposit {
         timer.reset();
     }
 
-    public void extend() {
-        pivot.setActivated(true);
-    }
-
-    public void retract() {
-        pivot.setActivated(false);
-        retracted = true;
+    public void setExtended(boolean extended) {
+        pivot.setActivated(extended);
+        if (!extended) retracted = true;
     }
 
     public boolean isExtended() {
@@ -83,7 +79,7 @@ public final class Deposit {
     }
 
     public void run() {
-        if (droppedBothPixels()) retract();
+        if (droppedBothPixels()) setExtended(false);
 
         pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
