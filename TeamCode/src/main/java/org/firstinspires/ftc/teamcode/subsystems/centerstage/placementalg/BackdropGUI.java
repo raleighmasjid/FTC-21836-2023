@@ -20,7 +20,7 @@ public final class BackdropGUI {
     public static double flashingTime = 0.5;
 
     private final Backdrop backdrop = new Backdrop();
-    private ArrayList<Pixel> pixelsToPlace = calculate(backdrop);
+    public ArrayList<Pixel> pixelsToPlace = calculate(backdrop);
 
     private Pixel selectedPixel;
     private boolean showSelection = true;

@@ -8,6 +8,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
@@ -111,6 +112,10 @@ public final class MainTeleOp extends LinearOpMode {
                 if (keyPressed(2, A))              robot.intake.setHeight(TWO_STACK);
                 if (keyPressed(2, RIGHT_BUMPER))   robot.intake.setHeight(FLOOR);
 
+            }
+
+            if (keyPressed(2, RIGHT_STICK_BUTTON) && gui.pixelsToPlace.size() > 0) {
+                robot.lift.setTargetRow(gui.pixelsToPlace.get(0).getY());
             }
 
             // Field-centric driving with control stick inputs:
