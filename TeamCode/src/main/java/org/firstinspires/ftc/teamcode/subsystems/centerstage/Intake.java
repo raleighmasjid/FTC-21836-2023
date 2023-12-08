@@ -66,16 +66,15 @@ public final class Intake {
         FOUR_STACK,
         FIVE_STACK;
 
-        public final double deltaX, deltaTheta, deltaY;
+        private final double deltaX, deltaTheta;
 
         private static final IntakingHeight[] values = values();
-        public static IntakingHeight get(int ordinal) {
+        static IntakingHeight get(int ordinal) {
             return values[ordinal];
         }
 
         IntakingHeight() {
             if (ordinal() == 0) {
-                deltaY = 0;
                 deltaTheta = 0;
                 deltaX = 0;
                 return;
@@ -86,7 +85,7 @@ public final class Intake {
             double y0 = -4.523622;
             double x0 = 8.35606811024;
 
-            deltaY = ordinal() * 0.5 - 0.139370079;
+            double deltaY = ordinal() * 0.5 - 0.1;
 
             double theta1 = asin((y0 + deltaY) / r);
             deltaTheta = toDegrees(theta1 - theta0);
@@ -95,7 +94,7 @@ public final class Intake {
     }
 
 
-    public Intake(HardwareMap hardwareMap) {
+    Intake(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
         pivot = new SimpleServoPivot(
@@ -126,7 +125,7 @@ public final class Intake {
         motor.set(motorPower);
     }
 
-    public void run () {
+    void run () {
 
         if (justDroppedPixels) justDroppedPixels = false;
 
@@ -135,8 +134,9 @@ public final class Intake {
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
                 if (!colors[0].isEmpty()) {
+                    topSensor.setLight(true);
                     currentState = HAS_1_PIXEL;
-                    intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
+                    decrementHeight();
                 }
                 break;
             case HAS_1_PIXEL:
@@ -144,7 +144,7 @@ public final class Intake {
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 if (!colors[1].isEmpty()) {
                     currentState = PIVOTING;
-                    intakingHeight = IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0));
+                    decrementHeight();
                     timer.reset();
                     latch.setActivated(true);
                     pivot.setActivated(true);
@@ -174,21 +174,20 @@ public final class Intake {
         latch.run();
     }
 
-    public void interrupt() {
-        bottomSensor.interrupt();
-        topSensor.interrupt();
-    }
-
-    public Pixel.Color[] getColors() {
+    Pixel.Color[] getColors() {
         return colors;
     }
 
-    public boolean justDroppedPixels() {
+    int pixelCount() {
+        return (colors[0].isEmpty() ? 0 : 1) + (colors[1].isEmpty() ? 0 : 1);
+    }
+
+    boolean justDroppedPixels() {
         return justDroppedPixels;
     }
 
-    public IntakeState getCurrentState() {
-        return currentState;
+    private void decrementHeight() {
+        setHeight(IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0)));
     }
 
     public void setHeight(IntakingHeight intakingHeight) {
@@ -206,12 +205,12 @@ public final class Intake {
         telemetry.addData("Value", color.value);
     }
 
-    public void printTelemetry(MultipleTelemetry telemetry) {
+    void printTelemetry(MultipleTelemetry telemetry) {
         telemetry.addData("Bottom color", colors[0].toString());
         telemetry.addData("Top color", colors[1].toString());
     }
 
-    public void printNumericalTelemetry(MultipleTelemetry telemetry) {
+    void printNumericalTelemetry(MultipleTelemetry telemetry) {
         printHSV(telemetry, bottomHSV, "Bottom HSV");
         telemetry.addLine();
         printHSV(telemetry, topHSV, "Top HSV");

@@ -26,7 +26,7 @@ public final class Deposit {
     private boolean retracted = true;
     private int pixelsLocked = 0;
 
-    public Deposit(HardwareMap hardwareMap) {
+    Deposit(HardwareMap hardwareMap) {
         pivot = new SimpleServoPivot(
                 ANGLE_OFFSET_PIVOT,
                 ANGLE_OFFSET_PIVOT + 120,
@@ -47,7 +47,7 @@ public final class Deposit {
         );
     }
 
-    public void lockPixels() {
+    void lockPixels() {
         pixelsLocked = 2;
     }
 
@@ -55,30 +55,30 @@ public final class Deposit {
         if (pixelsLocked == 2) dropFirstPixel(); else dropSecondPixel();
     }
 
-    public void dropFirstPixel() {
+    void dropFirstPixel() {
         pixelsLocked = 1;
     }
 
-    public void dropSecondPixel() {
+    void dropSecondPixel() {
         pixelsLocked = 0;
         retracted = false;
         timer.reset();
     }
 
-    public void setExtended(boolean extended) {
+    void setExtended(boolean extended) {
         pivot.setActivated(extended);
         if (!extended) retracted = true;
     }
 
-    public boolean isExtended() {
+    boolean isExtended() {
         return pivot.getActivated();
     }
 
-    public boolean droppedBothPixels() {
+    boolean droppedBothPixels() {
         return !retracted && timer.seconds() >= TIME_DROP;
     }
 
-    public void run() {
+    void run() {
         if (droppedBothPixels()) setExtended(false);
 
         pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + 120);
