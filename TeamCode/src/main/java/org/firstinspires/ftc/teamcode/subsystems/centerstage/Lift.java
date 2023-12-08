@@ -50,7 +50,7 @@ public final class Lift {
     // Battery voltage sensor and variable to track its readings:
     private final VoltageSensor batteryVoltageSensor;
 
-    public Lift(HardwareMap hardwareMap) {
+    Lift(HardwareMap hardwareMap) {
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         this.motors = new MotorEx[]{
                 new MotorEx(hardwareMap, "lift right", RPM_1150),
@@ -69,7 +69,7 @@ public final class Lift {
         setTargetRow(targetRow - 1);
     }
 
-    public void retract() {
+    void retract() {
         setTargetRow(-1);
     }
 
@@ -79,11 +79,11 @@ public final class Lift {
         controller.setTarget(targetState);
     }
 
-    public boolean isExtended() {
+    boolean isExtended() {
         return targetRow > -1;
     }
 
-    public void run() {
+    void run() {
 
         currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
@@ -97,7 +97,7 @@ public final class Lift {
         return currentState.x > 0.15 ? kG : 0;
     }
 
-    public void reset() {
+    void reset() {
         targetRow = -1;
         currentState = new State();
         targetState = new State();
@@ -105,11 +105,11 @@ public final class Lift {
         for (MotorEx motor : motors) motor.encoder.reset();
     }
 
-    public void printTelemetry(MultipleTelemetry telemetry) {
+    void printTelemetry(MultipleTelemetry telemetry) {
         telemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
     }
 
-    public void printNumericalTelemetry(MultipleTelemetry telemetry) {
+    void printNumericalTelemetry(MultipleTelemetry telemetry) {
         telemetry.addData("Current position (in)", currentState.x);
         telemetry.addData("Target position (in)", targetState.x);
         telemetry.addLine();
