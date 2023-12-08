@@ -116,9 +116,14 @@ public final class Intake {
         timer.reset();
     }
 
-    public void start() {
-        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
-        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
+    void start() {
+        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN).setLight(true);
+        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN).setLight(false);
+    }
+
+    void interrupt() {
+        bottomSensor.interrupt();
+        topSensor.interrupt();
     }
 
     public void setMotorPower(double motorPower) {
@@ -159,10 +164,11 @@ public final class Intake {
                 }
                 break;
             case TRANSFERRING:
-                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty();
+                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty();
                 if (justDroppedPixels) {
                     currentState = HAS_0_PIXELS;
                     pivot.setActivated(false);
+                    topSensor.setLight(false);
                 }
                 break;
         }
