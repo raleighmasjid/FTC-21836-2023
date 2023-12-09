@@ -9,7 +9,7 @@ public class FeedforwardController implements Controller {
 
     private FeedforwardGains gains;
 
-    private State target;
+    private State target = new State();
 
     public FeedforwardController() {
         this(new FeedforwardGains());

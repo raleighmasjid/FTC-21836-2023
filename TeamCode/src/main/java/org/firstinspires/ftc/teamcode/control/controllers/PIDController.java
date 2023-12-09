@@ -16,7 +16,7 @@ public class PIDController implements FeedbackController {
     private final Differentiator differentiator = new Differentiator();
     private final Integrator integrator = new Integrator();
 
-    private State error;
+    private State error = new State();
     private double errorIntegral;
     private double errorDerivative;
 

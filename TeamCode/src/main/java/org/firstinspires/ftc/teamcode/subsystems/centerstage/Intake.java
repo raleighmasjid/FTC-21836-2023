@@ -39,10 +39,9 @@ public final class Intake {
             TIME_PIVOTING = 1,
             COLOR_SENSOR_GAIN = 1;
 
-    private final HardwareMap hardwareMap;
     private final MotorEx motor;
 
-    private ThreadedColorSensor bottomSensor, topSensor;
+    private final ThreadedColorSensor bottomSensor, topSensor;
     private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
     private final SimpleServoPivot pivot, latch;
@@ -96,7 +95,6 @@ public final class Intake {
 
 
     Intake(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
 
         pivot = new SimpleServoPivot(
                 ANGLE_PIVOT_OFFSET,
