@@ -30,11 +30,11 @@ public final class MainAuton extends LinearOpMode {
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(telemetry);
 
-        // Initialize robot if not already initialized:
+        // Initialize robot:
         robot = new Robot(hardwareMap);
 
         // Initialize gamepad:
-        gamepadEx1 = new GamepadEx(super.gamepad1);
+        gamepadEx1 = new GamepadEx(gamepad1);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         boolean isRight = true;

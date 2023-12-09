@@ -49,11 +49,6 @@ public final class Robot {
         deposit.run();
     }
 
-    public void start() {
-        drivetrain.start();
-        intake.start();
-    }
-
     public void interrupt() {
         drivetrain.interrupt();
         intake.interrupt();

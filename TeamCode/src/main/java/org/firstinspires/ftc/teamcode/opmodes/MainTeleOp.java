@@ -48,12 +48,12 @@ public final class MainTeleOp extends LinearOpMode {
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        // Initialize robot if not already initialized:
-        if (robot == null) robot = new Robot(hardwareMap);
+        // Initialize robot:
+        robot = new Robot(hardwareMap);
 
         // Initialize gamepads:
-        if (gamepadEx1 == null) gamepadEx1 = new GamepadEx(super.gamepad1);
-        gamepadEx2 = new GamepadEx(super.gamepad2);
+        gamepadEx1 = new GamepadEx(gamepad1);
+        gamepadEx2 = new GamepadEx(gamepad2);
 
         BackdropGUI gui = new BackdropGUI();
 
@@ -67,7 +67,6 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
             mTelemetry.update();
         }
-        robot.start();
 
         // Control loop:
         while (opModeIsActive()) {

@@ -114,12 +114,11 @@ public final class Intake {
 
         motor = new MotorEx(hardwareMap, "intake", RPM_1620);
         motor.setZeroPowerBehavior(FLOAT);
-        timer.reset();
-    }
 
-    void start() {
         bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
         topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
+
+        timer.reset();
     }
 
     void interrupt() {

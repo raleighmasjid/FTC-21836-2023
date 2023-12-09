@@ -33,7 +33,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -82,7 +81,6 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     public MecanumDrivetrain(HardwareMap hardwareMap) {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
-        this.hardwareMap = hardwareMap;
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
@@ -91,9 +89,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
+        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
 
         // TODO: adjust the names of the following hardware devices to match your configuration
 
@@ -315,16 +311,11 @@ public class MecanumDrivetrain extends MecanumDrive {
         return imu.getAngularVelo();
     }
 
-    private final HardwareMap hardwareMap;
-    private ThreadedIMU imu;
+    private final ThreadedIMU imu;
 
     private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
     private boolean slowModeLocked = false;
-
-    public void start() {
-        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
-    }
 
     public void interrupt() {
         imu.interrupt();
