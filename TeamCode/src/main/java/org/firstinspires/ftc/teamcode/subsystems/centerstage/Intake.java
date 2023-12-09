@@ -32,6 +32,7 @@ public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 0,
+            ANGLE_PIVOT_CLEARANCE = 3,
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 30,
             TIME_REVERSING = 1,
@@ -171,7 +172,7 @@ public final class Intake {
                 break;
         }
 
-        pivot.updateAngles(ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
+        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_PIVOT_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
         latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
 
         pivot.run();
