@@ -20,13 +20,8 @@ public final class ThreadedColorSensor extends Thread {
     public ThreadedColorSensor(HardwareMap hardwareMap, String name, float gain) {
         sensor = hardwareMap.get(NormalizedColorSensor.class, name);
         sensor.setGain(gain);
-        setLight(true);
+        if (sensor instanceof SwitchableLight) ((SwitchableLight) sensor).enableLight(true);
         start();
-    }
-
-    public ThreadedColorSensor setLight(boolean isOn) {
-        if (sensor instanceof SwitchableLight) ((SwitchableLight) sensor).enableLight(isOn);
-        return this;
     }
 
     public void run() {

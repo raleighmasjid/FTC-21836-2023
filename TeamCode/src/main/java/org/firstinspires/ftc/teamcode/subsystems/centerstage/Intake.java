@@ -117,8 +117,8 @@ public final class Intake {
     }
 
     void start() {
-        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN).setLight(true);
-        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN).setLight(false);
+        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
+        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
     }
 
     void interrupt() {
@@ -139,7 +139,6 @@ public final class Intake {
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
                 if (!colors[0].isEmpty()) {
-                    topSensor.setLight(true);
                     currentState = HAS_1_PIXEL;
                     decrementHeight();
                 }
@@ -168,7 +167,6 @@ public final class Intake {
                 if (justDroppedPixels) {
                     currentState = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                    topSensor.setLight(false);
                 }
                 break;
         }
