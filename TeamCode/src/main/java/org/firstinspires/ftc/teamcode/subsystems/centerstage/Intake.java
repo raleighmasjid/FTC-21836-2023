@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.HAS_1_PIXEL;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.PIVOTING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.HAS_0_PIXELS;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakeState.TRANSFERRING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.IntakingHeight.FLOOR;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.TRANSFERRING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -46,20 +46,20 @@ public final class Intake {
 
     private final SimpleServoPivot pivot, latch;
 
-    private IntakeState currentState = HAS_0_PIXELS;
-    private IntakingHeight intakingHeight = FLOOR;
+    private State state = HAS_0_PIXELS;
+    private Height height = FLOOR;
     private final ElapsedTime timer = new ElapsedTime();
     private final Pixel.Color[] colors = {EMPTY, EMPTY};
     private boolean justDroppedPixels = false;
 
-    enum IntakeState {
+    enum State {
         HAS_0_PIXELS,
         HAS_1_PIXEL,
         PIVOTING,
         TRANSFERRING,
     }
 
-    public enum IntakingHeight {
+    public enum Height {
         FLOOR,
         TWO_STACK,
         THREE_STACK,
@@ -68,12 +68,12 @@ public final class Intake {
 
         private final double deltaX, deltaTheta;
 
-        private static final IntakingHeight[] values = values();
-        static IntakingHeight get(int ordinal) {
+        private static final Height[] values = values();
+        private static Height get(int ordinal) {
             return values[ordinal];
         }
 
-        IntakingHeight() {
+        Height() {
             if (ordinal() == 0) {
                 deltaTheta = 0;
                 deltaX = 0;
@@ -130,16 +130,16 @@ public final class Intake {
         motor.set(motorPower);
     }
 
-    void run () {
+    void run() {
 
         if (justDroppedPixels) justDroppedPixels = false;
 
-        switch (currentState) {
+        switch (state) {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
                 if (!colors[0].isEmpty()) {
-                    currentState = HAS_1_PIXEL;
+                    state = HAS_1_PIXEL;
                     decrementHeight();
                 }
                 break;
@@ -147,7 +147,7 @@ public final class Intake {
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 if (!colors[1].isEmpty()) {
-                    currentState = PIVOTING;
+                    state = PIVOTING;
                     decrementHeight();
                     timer.reset();
                     latch.setActivated(true);
@@ -158,20 +158,20 @@ public final class Intake {
                 if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
                 if (timer.seconds() >= TIME_PIVOTING) {
                     setMotorPower(0);
-                    currentState = TRANSFERRING;
+                    state = TRANSFERRING;
                     latch.setActivated(false);
                 }
                 break;
             case TRANSFERRING:
                 justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty();
                 if (justDroppedPixels) {
-                    currentState = HAS_0_PIXELS;
+                    state = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 }
                 break;
         }
 
-        pivot.updateAngles(ANGLE_PIVOT_OFFSET + intakingHeight.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
+        pivot.updateAngles(ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
         latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
 
         pivot.run();
@@ -191,15 +191,15 @@ public final class Intake {
     }
 
     private void decrementHeight() {
-        setHeight(IntakingHeight.get(max(intakingHeight.ordinal() - 1, 0)));
+        setHeight(Height.get(max(height.ordinal() - 1, 0)));
     }
 
-    public void setHeight(IntakingHeight intakingHeight) {
-        this.intakingHeight = intakingHeight;
+    public void setHeight(Height height) {
+        this.height = height;
     }
 
     public double getStackXOffset() {
-        return intakingHeight.deltaX;
+        return height.deltaX;
     }
 
     private void printHSV(MultipleTelemetry telemetry, HSV color, String title) {
