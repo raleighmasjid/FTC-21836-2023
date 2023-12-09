@@ -324,7 +324,7 @@ public final class PlacementCalculator {
         Collections.sort(pixelsToPlace);
     }
 
-    private static boolean willPlaceColored() {
+    private static boolean willPlaceAny() {
         for (Pixel p1 : pixelsToPlace) if (p1.color == ANY) return true;
         return false;
     }
@@ -339,7 +339,7 @@ public final class PlacementCalculator {
         scanForSetLinePixels();
         int i = 0;
         do scanForEmptySpot();
-        while (++i < 8 && !willPlaceColored());
+        while (++i < 8 && !willPlaceAny());
 
         removeDuplicates(pixelsToPlace);
         removeOverridingPixels(pixelsToPlace);
