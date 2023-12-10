@@ -24,15 +24,15 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 public final class Lift {
 
     public static PIDGains pidGains = new PIDGains(
-            0,
-            0,
-            0,
+            0.05,
+            0.01,
+            0.025,
             1
     );
 
     public static LowPassGains filterGains = new LowPassGains(
-            0,
-            2
+            0.8,
+            10
     );
 
     public static double

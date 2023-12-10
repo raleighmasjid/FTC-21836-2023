@@ -14,9 +14,10 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 public final class Deposit {
 
     public static double
+            ANGLE_PIVOT_OFFSET = 0,
             ANGLE_CLAW_OPEN = 0,
             ANGLE_CLAW_CLOSED = 7,
-            ANGLE_OFFSET_HOOK = 0,
+            ANGLE_OFFSET_HOOK = 5,
             TIME_DROP = 1;
 
     private final SimpleServoPivot pivot, hook, claw;
@@ -27,8 +28,8 @@ public final class Deposit {
 
     Deposit(HardwareMap hardwareMap) {
         pivot = new SimpleServoPivot(
-                0,
-                120,
+                ANGLE_PIVOT_OFFSET,
+                ANGLE_PIVOT_OFFSET + 120,
                 getAxonServo(hardwareMap, "deposit left"),
                 getReversedServo(getAxonServo(hardwareMap, "deposit right"))
         );
@@ -80,6 +81,7 @@ public final class Deposit {
     void run() {
         if (droppedBothPixels()) setExtended(false);
 
+        pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
         hook.updateAngles(ANGLE_OFFSET_HOOK, ANGLE_OFFSET_HOOK + 180);
 

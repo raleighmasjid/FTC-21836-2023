@@ -82,7 +82,7 @@ public final class Pixel implements Comparable<Pixel> {
             maxWhite = new HSV(
                     0,
                     0.6,
-                    0.3
+                    0.45
             ),
             minPurple = new HSV(
                     205,
