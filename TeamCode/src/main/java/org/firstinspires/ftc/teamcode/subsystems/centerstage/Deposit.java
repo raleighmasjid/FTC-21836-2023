@@ -15,10 +15,9 @@ public final class Deposit {
 
     public static double
             ANGLE_CLAW_OPEN = 0,
-            ANGLE_CLAW_CLOSED = 50,
-            ANGLE_OFFSET_HOOK = 145,
-            ANGLE_OFFSET_PIVOT = 0,
-            TIME_DROP = 0.25;
+            ANGLE_CLAW_CLOSED = 7,
+            ANGLE_OFFSET_HOOK = 0,
+            TIME_DROP = 1;
 
     private final SimpleServoPivot pivot, hook, claw;
 
@@ -28,8 +27,8 @@ public final class Deposit {
 
     Deposit(HardwareMap hardwareMap) {
         pivot = new SimpleServoPivot(
-                ANGLE_OFFSET_PIVOT,
-                ANGLE_OFFSET_PIVOT + 120,
+                0,
+                120,
                 getAxonServo(hardwareMap, "deposit left"),
                 getReversedServo(getAxonServo(hardwareMap, "deposit right"))
         );
@@ -81,7 +80,6 @@ public final class Deposit {
     void run() {
         if (droppedBothPixels()) setExtended(false);
 
-        pivot.updateAngles(ANGLE_OFFSET_PIVOT, ANGLE_OFFSET_PIVOT + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
         hook.updateAngles(ANGLE_OFFSET_HOOK, ANGLE_OFFSET_HOOK + 180);
 

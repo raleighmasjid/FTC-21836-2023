@@ -31,14 +31,13 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 0,
-            ANGLE_PIVOT_CLEARANCE = 3,
+            ANGLE_PIVOT_CLEARANCE = 0,
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 30,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 1,
+            TIME_PIVOTING = 5,
             COLOR_SENSOR_GAIN = 1,
-            COLOR_VALUE_MULTIPLIER;
+            SPEED_SLOW_REVERSING = -0.1;
 
     private final MotorEx motor;
 
@@ -98,10 +97,10 @@ public final class Intake {
     Intake(HardwareMap hardwareMap) {
 
         pivot = new SimpleServoPivot(
-                ANGLE_PIVOT_OFFSET,
-                ANGLE_PIVOT_OFFSET + 180,
-                getReversedServo(getAxonServo(hardwareMap, "intake right")),
-                getAxonServo(hardwareMap, "intake left")
+                0,
+                180,
+                getAxonServo(hardwareMap, "intake right"),
+                getReversedServo(getAxonServo(hardwareMap, "intake left"))
         );
 
         latch = new SimpleServoPivot(
@@ -138,23 +137,24 @@ public final class Intake {
             case HAS_0_PIXELS:
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
-//                if (!colors[0].isEmpty()) {
-//                    state = HAS_1_PIXEL;
-//                    decrementHeight();
-//                }
-//                break;
-//            case HAS_1_PIXEL:
+                if (!colors[0].isEmpty()) {
+                    state = HAS_1_PIXEL;
+                    decrementHeight();
+                }
+                break;
+            case HAS_1_PIXEL:
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
-//                if (!colors[1].isEmpty()) {
-//                    state = PIVOTING;
-//                    decrementHeight();
-//                    timer.reset();
-//                    latch.setActivated(true);
+                if (!colors[1].isEmpty()) {
+                    decrementHeight();
+                    timer.reset();
+                    latch.setActivated(true);
 //                    pivot.setActivated(true);
-//                }
+//                    state = PIVOTING;
+                }
                 break;
             case PIVOTING:
+                if (timer.seconds() > TIME_REVERSING) setMotorPower(SPEED_SLOW_REVERSING);
                 if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
                 if (timer.seconds() >= TIME_PIVOTING) {
                     setMotorPower(0);
@@ -171,7 +171,7 @@ public final class Intake {
                 break;
         }
 
-        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_PIVOT_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
+        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_PIVOT_CLEARANCE) + 0 + height.deltaTheta, 180);
         latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
 
         pivot.run();
