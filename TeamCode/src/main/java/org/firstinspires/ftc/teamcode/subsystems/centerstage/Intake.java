@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.TRANSFERRING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -31,9 +30,9 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_CLEARANCE = 0,
+            ANGLE_FLOOR_CLEARANCE = 0,
             ANGLE_LATCH_OPEN = 0,
-            ANGLE_LATCH_CLOSED = 30,
+            ANGLE_LATCH_CLOSED = 120,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 5,
             COLOR_SENSOR_GAIN = 1,
@@ -171,7 +170,7 @@ public final class Intake {
                 break;
         }
 
-        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_PIVOT_CLEARANCE) + 0 + height.deltaTheta, 180);
+        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_FLOOR_CLEARANCE) + 0 + height.deltaTheta, 180);
         latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
 
         pivot.run();
