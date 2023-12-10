@@ -14,10 +14,11 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 public final class Deposit {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 0,
+            ANGLE_PIVOT_OFFSET = 5,
             ANGLE_CLAW_OPEN = 0,
-            ANGLE_CLAW_CLOSED = 7,
-            ANGLE_OFFSET_HOOK = 5,
+            ANGLE_CLAW_CLOSED = 15,
+            ANGLE_HOOK_OPEN = 5,
+            ANGLE_HOOK_CLOSED = 35,
             TIME_DROP = 1;
 
     private final SimpleServoPivot pivot, hook, claw;
@@ -35,8 +36,8 @@ public final class Deposit {
         );
 
         hook = new SimpleServoPivot(
-                ANGLE_OFFSET_HOOK,
-                ANGLE_OFFSET_HOOK + 180,
+                ANGLE_HOOK_OPEN,
+                ANGLE_HOOK_CLOSED,
                 getGoBildaServo(hardwareMap, "pixel hook")
         );
 
@@ -83,7 +84,7 @@ public final class Deposit {
 
         pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
-        hook.updateAngles(ANGLE_OFFSET_HOOK, ANGLE_OFFSET_HOOK + 180);
+        hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 
         claw.setActivated(pixelsLocked >= 1);
         hook.setActivated(pixelsLocked == 2);

@@ -31,14 +31,15 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 0,
-            ANGLE_FLOOR_CLEARANCE = 10,
+            ANGLE_PIVOT_OFFSET = 6,
+            ANGLE_PIVOT_TRANSFERRING = 200,
+            ANGLE_FLOOR_CLEARANCE = 4,
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 149,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 5,
+            TIME_PIVOTING = 10,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.1;
+            SPEED_SLOW_REVERSING = -0.25;
 
     private final MotorEx motor;
 
@@ -99,7 +100,7 @@ public final class Intake {
 
         pivot = new SimpleServoPivot(
                 ANGLE_PIVOT_OFFSET,
-                ANGLE_PIVOT_OFFSET + 180,
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING,
                 getAxonServo(hardwareMap, "intake right"),
                 getReversedServo(getAxonServo(hardwareMap, "intake left"))
         );
@@ -172,7 +173,7 @@ public final class Intake {
                 break;
         }
 
-        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_FLOOR_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + 180);
+        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_FLOOR_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING);
         latch.updateAngles(ANGLE_LATCH_OPEN, ANGLE_LATCH_CLOSED);
 
         pivot.run();

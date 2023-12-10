@@ -25,8 +25,8 @@ public final class Lift {
 
     public static PIDGains pidGains = new PIDGains(
             0.05,
-            0.01,
             0.025,
+            0,
             1
     );
 
