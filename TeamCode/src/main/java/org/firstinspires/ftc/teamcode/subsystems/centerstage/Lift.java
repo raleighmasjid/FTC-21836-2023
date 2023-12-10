@@ -1,25 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
-import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
+import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 
@@ -60,7 +57,6 @@ public final class Lift {
         };
         motors[1].setInverted(true);
         for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
-//        motors[1].encoder.setDirection(REVERSE);
         reset();
     }
 
