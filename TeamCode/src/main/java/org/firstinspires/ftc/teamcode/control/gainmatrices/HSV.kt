@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.control.gainmatrices
 
 data class HSV @JvmOverloads constructor(
-    @JvmField var hue: Float = 0.0F,
-    @JvmField var saturation: Float = 0.0F,
-    @JvmField var value: Float = 0.0F,
+    @JvmField var hue: Double = 0.0,
+    @JvmField var saturation: Double = 0.0,
+    @JvmField var value: Double = 0.0,
 ) {
     fun inRange(min:HSV, max:HSV): Boolean {
 

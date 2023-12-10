@@ -23,7 +23,7 @@ public class SimpleServoPivot {
     }
 
     public static SimpleServo getGoBildaServo(HardwareMap hardwareMap, String name) {
-        return new SimpleServo(hardwareMap, name, 0, 300);
+        return new SimpleServo(hardwareMap, name, 0, 280);
     }
 
     private final SimpleServo[] servos;

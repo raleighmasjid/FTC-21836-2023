@@ -14,9 +14,9 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 public final class Deposit {
 
     public static double
-            ANGLE_CLAW_OPEN = 8,
-            ANGLE_CLAW_CLOSED = 0,
-            ANGLE_OFFSET_HOOK = 0,
+            ANGLE_CLAW_OPEN = 0,
+            ANGLE_CLAW_CLOSED = 50,
+            ANGLE_OFFSET_HOOK = 145,
             ANGLE_OFFSET_PIVOT = 0,
             TIME_DROP = 0.25;
 
@@ -43,7 +43,7 @@ public final class Deposit {
         claw = new SimpleServoPivot(
                 ANGLE_CLAW_OPEN,
                 ANGLE_CLAW_CLOSED,
-                getGoBildaServo(hardwareMap, "pixel claw")
+                getReversedServo(getGoBildaServo(hardwareMap, "pixel claw"))
         );
     }
 

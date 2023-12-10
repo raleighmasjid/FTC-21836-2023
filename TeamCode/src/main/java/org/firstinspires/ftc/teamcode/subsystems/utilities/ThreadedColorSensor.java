@@ -35,17 +35,17 @@ public final class ThreadedColorSensor extends Thread {
     public HSV getHSV() {
         Color.colorToHSV(rgba.toColor(), hsv);
         return new HSV(
-                hsv[0],
-                hsv[1],
-                hsv[2]
+                (float) hsv[0],
+                (float) hsv[1],
+                (float) hsv[2]
         );
     }
 
     public RGB getRGB() {
         return new RGB(
-                rgba.red * 255,
-                rgba.green * 255,
-                rgba.blue * 255
+                (float) rgba.red * 255,
+                (float) rgba.green * 255,
+                (float) rgba.blue * 255
         );
     }
 }

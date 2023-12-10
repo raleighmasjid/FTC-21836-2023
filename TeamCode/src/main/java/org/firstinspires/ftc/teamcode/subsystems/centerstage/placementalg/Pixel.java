@@ -73,6 +73,48 @@ public final class Pixel implements Comparable<Pixel> {
         System.out.println(this);
     }
 
+    public static HSV
+            minWhite = new HSV(
+            0,
+            0,
+            0.15
+    ),
+            maxWhite = new HSV(
+                    0,
+                    0.6,
+                    0.3
+            ),
+            minPurple = new HSV(
+                    205,
+                    0.55,
+                    0.1
+            ),
+            maxPurple = new HSV(
+                    225,
+                    1,
+                    0.35
+            ),
+            minYellow = new HSV(
+                    90,
+                    0.55,
+                    0.08
+            ),
+            maxYellow = new HSV(
+                    110,
+                    1,
+                    0.15
+            ),
+            minGreen = new HSV(
+                    120,
+                    0.7,
+                    0.05
+            ),
+            maxGreen = new HSV(
+                    140,
+                    1,
+                    0.2
+            );
+
     @Config
     public enum Color {
         EMPTY,
@@ -85,48 +127,6 @@ public final class Pixel implements Comparable<Pixel> {
         INVALID,
         HIGHLIGHTED;
 
-        public static HSV
-                minWhite = new HSV(
-                        0,
-                        0,
-                        0
-                ),
-                maxWhite = new HSV(
-                        1,
-                        0.5F,
-                        0.5F
-                ),
-                minPurple = new HSV(
-                        0,
-                        0,
-                        0
-                ),
-                maxPurple = new HSV(
-                        1,
-                        0.5F,
-                        0.5F
-                ),
-                minYellow = new HSV(
-                        0,
-                        0,
-                        0
-                ),
-                maxYellow = new HSV(
-                        1,
-                        0.5F,
-                        0.5F
-                ),
-                minGreen = new HSV(
-                        0,
-                        0,
-                        0
-                ),
-                maxGreen = new HSV(
-                        1,
-                        0.5F,
-                        0.5F
-                );
-
         private static final String RESET = "\u001B[0m";
         private static final Color[] values = values();
         static Color get(int ordinal) {
@@ -136,16 +136,16 @@ public final class Pixel implements Comparable<Pixel> {
         @NonNull
         public String toString() {
             switch (this) {
+                case PURPLE:
+//                    return "\u001B[35m" + "P" + RESET;
+                case YELLOW:
+//                    return "\u001B[33m" + "Y" + RESET;
+                case GREEN:
+//                    return "\u001B[32m" + "G" + RESET;
                 case WHITE:
                 case ANY:
                 case COLORED:
                     return "" + name().charAt(0);
-                case PURPLE:
-                    return "\u001B[35m" + "P" + RESET;
-                case YELLOW:
-                    return "\u001B[33m" + "Y" + RESET;
-                case GREEN:
-                    return "\u001B[32m" + "G" + RESET;
                 case INVALID:
                     return " ";
                 case HIGHLIGHTED:
@@ -183,7 +183,7 @@ public final class Pixel implements Comparable<Pixel> {
             return hsv.inRange(minPurple, maxPurple) ? PURPLE :
                     hsv.inRange(minGreen, maxGreen) ? GREEN :
                     hsv.inRange(minYellow, maxYellow) ? YELLOW :
-                    hsv.inRange(minWhite, maxWhite) ? WHITE :
+                    new HSV(0, hsv.saturation, hsv.value).inRange(minWhite, maxWhite) ? WHITE :
                     EMPTY;
         }
 

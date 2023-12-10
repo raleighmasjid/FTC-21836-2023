@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 
 import static java.lang.Math.max;
@@ -9,6 +10,7 @@ import static java.lang.Math.min;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -38,7 +40,7 @@ public final class Lift {
 
     public static double
             kG = 0,
-            INCHES_PER_TICK = 1;
+            INCHES_PER_TICK = 0.0322835;
 
     // Motors and variables to manage their readings:
     private final MotorEx[] motors;
@@ -57,7 +59,8 @@ public final class Lift {
                 new MotorEx(hardwareMap, "lift left", RPM_1150)
         };
         motors[1].setInverted(true);
-        motors[1].encoder.setDirection(REVERSE);
+        for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+//        motors[1].encoder.setDirection(REVERSE);
         reset();
     }
 
