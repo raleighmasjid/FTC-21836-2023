@@ -78,7 +78,7 @@ public final class Pixel implements Comparable<Pixel> {
             0,
             0,
             0.15
-    ),
+            ),
             maxWhite = new HSV(
                     0,
                     0.6,

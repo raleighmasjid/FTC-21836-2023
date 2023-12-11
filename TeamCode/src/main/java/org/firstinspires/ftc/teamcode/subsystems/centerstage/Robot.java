@@ -39,7 +39,7 @@ public final class Robot {
 
     public void run() {
 
-        if (intake.justDroppedPixels()) deposit.lockPixels();
+        if (intake.justDroppedPixels()) deposit.lockPixels(intake.getRequiredPixelCount());
         if (deposit.droppedBothPixels()) lift.retract();
         boolean liftExtended = lift.isExtended();
         if (deposit.isExtended() != liftExtended) deposit.setExtended(liftExtended);
@@ -60,6 +60,7 @@ public final class Robot {
         lift.printTelemetry(telemetry);
         telemetry.addLine();
         intake.printTelemetry(telemetry);
+        telemetry.addLine();
         telemetry.addLine();
         telemetry.addLine();
         drivetrain.printNumericalTelemetry(telemetry);

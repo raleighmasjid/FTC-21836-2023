@@ -2,9 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
+import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -73,7 +72,7 @@ public final class Lift {
     }
 
     public void setTargetRow(int targetRow) {
-        this.targetRow = max(min(targetRow, 10), -1);
+        this.targetRow = clip(targetRow, -1, 10);
         targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
         controller.setTarget(targetState);
     }
@@ -89,7 +88,8 @@ public final class Lift {
         kDFilter.setGains(filterGains);
         controller.setGains(pidGains);
 
-        for (MotorEx motor : motors) motor.set(controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage()));
+        double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
+        for (MotorEx motor : motors) motor.set(output);
     }
 
     private double kG() {

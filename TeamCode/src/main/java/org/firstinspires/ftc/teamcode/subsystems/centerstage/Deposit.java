@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
+import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -48,8 +49,8 @@ public final class Deposit {
         );
     }
 
-    void lockPixels() {
-        pixelsLocked = 2;
+    void lockPixels(int pixelCount) {
+        pixelsLocked = clip(pixelCount, 0, 2);
     }
 
     public void dropPixel() {
@@ -68,7 +69,6 @@ public final class Deposit {
 
     void setExtended(boolean extended) {
         pivot.setActivated(extended);
-        if (!extended) retracted = true;
     }
 
     boolean isExtended() {
@@ -80,7 +80,7 @@ public final class Deposit {
     }
 
     void run() {
-        if (droppedBothPixels()) setExtended(false);
+        if (droppedBothPixels()) retracted = true;
 
         pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
         claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
