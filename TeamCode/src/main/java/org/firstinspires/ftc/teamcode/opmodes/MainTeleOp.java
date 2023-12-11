@@ -83,8 +83,8 @@ public final class MainTeleOp extends LinearOpMode {
                 if (keyPressed(2, X))               robot.intake.setRequiredPixelCount(1);
                 if (keyPressed(2, A))               robot.intake.setRequiredPixelCount(0);
             } else {
-                if (keyPressed(2, DPAD_DOWN))       robot.lift.decrementRow();
-                if (keyPressed(2, DPAD_UP))         robot.lift.incrementRow();
+                if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.decrementRow();
+                if (keyPressed(2, DPAD_UP))         robot.deposit.lift.incrementRow();
 
                 if (keyPressed(2, Y))               robot.intake.setHeight(FIVE_STACK);
                 if (keyPressed(2, X))               robot.intake.setHeight(FOUR_STACK);

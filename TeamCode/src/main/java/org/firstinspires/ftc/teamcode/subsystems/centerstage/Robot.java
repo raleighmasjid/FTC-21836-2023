@@ -17,7 +17,6 @@ public final class Robot {
     public boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
-    public final Lift lift;
     public final Intake intake;
     public final Deposit deposit;
 
@@ -28,7 +27,6 @@ public final class Robot {
         for (LynxModule hub : revHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         drivetrain = new AutoTurnMecanum(hardwareMap);
-        lift = new Lift(hardwareMap);
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
     }
@@ -40,13 +38,9 @@ public final class Robot {
     public void run() {
 
         if (intake.justDroppedPixels()) deposit.lockPixels(intake.getRequiredPixelCount());
-        if (deposit.droppedBothPixels()) lift.retract();
-        boolean liftExtended = lift.isExtended();
-        if (deposit.isExtended() != liftExtended) deposit.setExtended(liftExtended);
 
-        lift.run();
-        intake.run();
         deposit.run();
+        intake.run();
     }
 
     public void interrupt() {
@@ -57,7 +51,7 @@ public final class Robot {
     public void printTelemetry(MultipleTelemetry telemetry) {
         drivetrain.printTelemetry(telemetry);
         telemetry.addLine();
-        lift.printTelemetry(telemetry);
+        deposit.lift.printTelemetry(telemetry);
         telemetry.addLine();
         intake.printTelemetry(telemetry);
         telemetry.addLine();
@@ -65,7 +59,7 @@ public final class Robot {
         telemetry.addLine();
         drivetrain.printNumericalTelemetry(telemetry);
         telemetry.addLine();
-        lift.printNumericalTelemetry(telemetry);
+        deposit.lift.printNumericalTelemetry(telemetry);
         telemetry.addLine();
         intake.printNumericalTelemetry(telemetry);
     }
