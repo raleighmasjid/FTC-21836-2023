@@ -141,10 +141,6 @@ public final class Intake {
     public void setRequiredPixelCount(int pixelCount) {
         this.requiredPixelCount = clip(pixelCount, 0, 2);
     }
-    
-    public int getRequiredPixelCount() {
-        return requiredPixelCount;
-    }
 
     void run() {
 
