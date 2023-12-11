@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -32,14 +33,15 @@ public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 6,
-            ANGLE_PIVOT_TRANSFERRING = 200,
+            ANGLE_PIVOT_TRANSFERRING = 195,
             ANGLE_FLOOR_CLEARANCE = 4,
             ANGLE_LATCH_OPEN = 0,
             ANGLE_LATCH_CLOSED = 149,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 10,
+            TIME_PIVOTING = 5,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25;
+            SPEED_SLOW_REVERSING = -0.25,
+            SETTLING_TIME = 1;
 
     private final MotorEx motor;
 
@@ -59,6 +61,7 @@ public final class Intake {
         HAS_1_PIXEL,
         PIVOTING,
         TRANSFERRING,
+        PIXELS_SETTLING,
     }
 
     public enum Height {
@@ -156,16 +159,20 @@ public final class Intake {
                 }
                 break;
             case PIVOTING:
-                if (timer.seconds() > TIME_REVERSING) setMotorPower(SPEED_SLOW_REVERSING);
-                if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
                 if (timer.seconds() >= TIME_PIVOTING) {
                     setMotorPower(0);
                     state = TRANSFERRING;
                     latch.setActivated(false);
-                }
+                } else setMotorPower(SPEED_SLOW_REVERSING);
                 break;
             case TRANSFERRING:
-                justDroppedPixels = Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty();
+                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty()) {
+                    state = PIXELS_SETTLING;
+                    timer.reset();
+                }
+                break;
+            case PIXELS_SETTLING:
+                justDroppedPixels = timer.seconds() >= SETTLING_TIME;
                 if (justDroppedPixels) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
@@ -212,13 +219,13 @@ public final class Intake {
     }
 
     void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Bottom color", colors[0].name());
         telemetry.addData("Top color", colors[1].name());
+        telemetry.addData("Bottom color", colors[0].name());
     }
 
     void printNumericalTelemetry(MultipleTelemetry telemetry) {
-        printHSV(telemetry, bottomHSV, "Bottom HSV");
-        telemetry.addLine();
         printHSV(telemetry, topHSV, "Top HSV");
+        telemetry.addLine();
+        printHSV(telemetry, bottomHSV, "Bottom HSV");
     }
 }
