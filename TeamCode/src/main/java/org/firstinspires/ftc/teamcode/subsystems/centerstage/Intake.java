@@ -8,7 +8,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.TRANSFERRING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -64,7 +64,7 @@ public final class Intake {
         HAS_0_PIXELS,
         HAS_1_PIXEL,
         PIVOTING,
-        TRANSFERRING,
+        PIXELS_FALLING,
         PIXELS_SETTLING,
     }
 
@@ -163,7 +163,7 @@ public final class Intake {
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 boolean topFull = !colors[1].isEmpty();
-                if (topFull || requiredPixelCount == 1) {
+                if (topFull || requiredPixelCount < 1) {
                     if (topFull) decrementHeight();
                     timer.reset();
                     latch.setActivated(true);
@@ -176,16 +176,16 @@ public final class Intake {
 
                 if (timer.seconds() >= TIME_PIVOTING) {
                     setMotorPower(0);
-                    state = TRANSFERRING;
+                    state = PIXELS_FALLING;
                     latch.setActivated(false);
                 }
                 else if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
                 else setMotorPower(SPEED_SLOW_REVERSING);
                 break;
 
-            case TRANSFERRING:
+            case PIXELS_FALLING:
 
-                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty()) {
+                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty() && requiredPixelCount > 0) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 }
@@ -212,11 +212,13 @@ public final class Intake {
     }
 
     Pixel.Color[] getColors() {
-        return colors;
+        return colors.clone();
     }
 
     int pixelCount() {
-        return (colors[0].isEmpty() ? 0 : 1) + (colors[1].isEmpty() ? 0 : 1);
+        int count = 0;
+        for (int i = 0; i < colors.length; i++) if (!getColors()[i].isEmpty()) count++;
+        return count;
     }
 
     boolean justDroppedPixels() {
