@@ -27,8 +27,8 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 @Config
 public final class Deposit {
 
-    public Paintbrush paintbrush;
-    public Lift lift;
+    private final Paintbrush paintbrush;
+    public final Lift lift;
 
     Deposit(HardwareMap hardwareMap) {
         lift = new Lift(hardwareMap);
@@ -48,12 +48,109 @@ public final class Deposit {
         if (paintbrush.droppedBothPixels()) lift.retract();
         boolean liftExtended = lift.isExtended();
         if (paintbrush.isExtended() != liftExtended) paintbrush.setExtended(liftExtended);
-        
+
         lift.run();
         paintbrush.run();
     }
 
-    public static final class Paintbrush {
+    public static final class Lift {
+
+        public static PIDGains pidGains = new PIDGains(
+                0.05,
+                0.025,
+                0,
+                1
+        );
+
+        public static LowPassGains filterGains = new LowPassGains(
+                0.8,
+                10
+        );
+
+        public static double
+                kG = 0,
+                INCHES_PER_TICK = 0.0322835;
+
+        // Motors and variables to manage their readings:
+        private final MotorEx[] motors;
+        private State currentState = new State(), targetState = new State();
+        private int targetRow = -1;
+        private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
+        private final PIDController controller = new PIDController(kDFilter);
+
+        // Battery voltage sensor and variable to track its readings:
+        private final VoltageSensor batteryVoltageSensor;
+
+        private Lift(HardwareMap hardwareMap) {
+            this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
+            this.motors = new MotorEx[]{
+                    new MotorEx(hardwareMap, "lift right", RPM_1150),
+                    new MotorEx(hardwareMap, "lift left", RPM_1150)
+            };
+            motors[1].setInverted(true);
+            for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+            reset();
+        }
+
+        public void setTargetRow(int targetRow) {
+            this.targetRow = clip(targetRow, -1, 10);
+            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
+            controller.setTarget(targetState);
+        }
+
+        public void incrementRow() {
+            setTargetRow(targetRow + 1);
+        }
+
+        public void decrementRow() {
+            setTargetRow(targetRow - 1);
+        }
+
+        private void retract() {
+            setTargetRow(-1);
+        }
+
+        private boolean isExtended() {
+            return targetRow > -1;
+        }
+
+        private void run() {
+
+            currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
+
+            kDFilter.setGains(filterGains);
+            controller.setGains(pidGains);
+
+            double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
+            for (MotorEx motor : motors) motor.set(output);
+        }
+
+        private double kG() {
+            return currentState.x > 0.15 ? kG : 0;
+        }
+
+        private void reset() {
+            targetRow = -1;
+            currentState = new State();
+            targetState = new State();
+            controller.reset();
+            for (MotorEx motor : motors) motor.encoder.reset();
+        }
+
+        void printTelemetry(MultipleTelemetry telemetry) {
+            telemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
+        }
+
+        void printNumericalTelemetry(MultipleTelemetry telemetry) {
+            telemetry.addData("Current position (in)", currentState.x);
+            telemetry.addData("Target position (in)", targetState.x);
+            telemetry.addLine();
+            telemetry.addData("Lift error derivative (in/s)", controller.getErrorDerivative());
+
+        }
+    }
+
+    private static final class Paintbrush {
 
         public static double
                 ANGLE_PIVOT_OFFSET = 5,
@@ -134,103 +231,6 @@ public final class Deposit {
             pivot.run();
             claw.run();
             hook.run();
-        }
-    }
-
-    public static final class Lift {
-
-        public static PIDGains pidGains = new PIDGains(
-                0.05,
-                0.025,
-                0,
-                1
-        );
-
-        public static LowPassGains filterGains = new LowPassGains(
-                0.8,
-                10
-        );
-
-        public static double
-                kG = 0,
-                INCHES_PER_TICK = 0.0322835;
-
-        // Motors and variables to manage their readings:
-        private final MotorEx[] motors;
-        private State currentState = new State(), targetState = new State();
-        private int targetRow = -1;
-        private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
-        private final PIDController controller = new PIDController(kDFilter);
-
-        // Battery voltage sensor and variable to track its readings:
-        private final VoltageSensor batteryVoltageSensor;
-
-        private Lift(HardwareMap hardwareMap) {
-            this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-            this.motors = new MotorEx[]{
-                    new MotorEx(hardwareMap, "lift right", RPM_1150),
-                    new MotorEx(hardwareMap, "lift left", RPM_1150)
-            };
-            motors[1].setInverted(true);
-            for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
-            reset();
-        }
-
-        public void incrementRow() {
-            setTargetRow(targetRow + 1);
-        }
-
-        public void decrementRow() {
-            setTargetRow(targetRow - 1);
-        }
-
-        private void retract() {
-            setTargetRow(-1);
-        }
-
-        public void setTargetRow(int targetRow) {
-            this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
-            controller.setTarget(targetState);
-        }
-
-        private boolean isExtended() {
-            return targetRow > -1;
-        }
-
-        private void run() {
-
-            currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
-
-            kDFilter.setGains(filterGains);
-            controller.setGains(pidGains);
-
-            double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
-            for (MotorEx motor : motors) motor.set(output);
-        }
-
-        private double kG() {
-            return currentState.x > 0.15 ? kG : 0;
-        }
-
-        private void reset() {
-            targetRow = -1;
-            currentState = new State();
-            targetState = new State();
-            controller.reset();
-            for (MotorEx motor : motors) motor.encoder.reset();
-        }
-
-        void printTelemetry(MultipleTelemetry telemetry) {
-            telemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
-        }
-
-        void printNumericalTelemetry(MultipleTelemetry telemetry) {
-            telemetry.addData("Current position (in)", currentState.x);
-            telemetry.addData("Target position (in)", targetState.x);
-            telemetry.addLine();
-            telemetry.addData("Lift error derivative (in/s)", controller.getErrorDerivative());
-
         }
     }
 }
