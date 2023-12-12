@@ -20,8 +20,14 @@ public final class MainAuton extends LinearOpMode {
     static MultipleTelemetry mTelemetry;
     static Robot robot = null;
 
-    static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
-        return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
+    static boolean keyPressed(int gamepad, GamepadKeys.Button... buttons) {
+        boolean pressed = false;
+        GamepadEx g = (gamepad == 2 ? gamepadEx2 : gamepadEx1);
+        for (GamepadKeys.Button button : buttons) if (g.wasJustPressed(button)) {
+            pressed = true;
+            break;
+        }
+        return pressed;
     }
 
     @Override

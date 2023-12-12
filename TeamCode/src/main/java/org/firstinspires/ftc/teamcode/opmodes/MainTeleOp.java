@@ -67,30 +67,31 @@ public final class MainTeleOp extends LinearOpMode {
             gamepadEx2.readButtons();
 
             // Reset current heading as per these keybinds:
-            if (keyPressed(1, DPAD_UP))             robot.drivetrain.setCurrentHeading(0);
-            if (keyPressed(1, DPAD_LEFT))           robot.drivetrain.setCurrentHeading(PI / 2);
-            if (keyPressed(1, DPAD_DOWN))           robot.drivetrain.setCurrentHeading(PI);
-            if (keyPressed(1, DPAD_RIGHT))          robot.drivetrain.setCurrentHeading(-PI / 2);
+            if (keyPressed(1, DPAD_UP))     robot.drivetrain.setCurrentHeading(0);
+            if (keyPressed(1, DPAD_LEFT))   robot.drivetrain.setCurrentHeading(PI / 2);
+            if (keyPressed(1, DPAD_DOWN))   robot.drivetrain.setCurrentHeading(PI);
+            if (keyPressed(1, DPAD_RIGHT))  robot.drivetrain.setCurrentHeading(-PI / 2);
 
-            if (keyPressed(1, A))                   robot.deposit.dropPixels(1);
 
             robot.intake.setMotorPower(
                     gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
             );
 
             if (gamepadEx2.isDown(LEFT_BUMPER)) {
-                if (keyPressed(2, Y))               robot.intake.setRequiredPixelCount(2);
-                if (keyPressed(2, X))               robot.intake.setRequiredPixelCount(1);
-                if (keyPressed(2, A))               robot.intake.setRequiredPixelCount(0);
+                if (keyPressed(2, Y))                       robot.intake.setRequiredPixelCount(2);
+                if (keyPressed(2, X))                       robot.intake.setRequiredPixelCount(1);
+                if (keyPressed(2, A))                       robot.intake.setRequiredPixelCount(0);
             } else {
-                if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
-                if (keyPressed(2, DPAD_UP))         robot.deposit.lift.changeRow(1);
+                if (keyPressed(2, DPAD_DOWN))               robot.deposit.lift.changeRow(-1);
+                if (keyPressed(2, DPAD_UP))                 robot.deposit.lift.changeRow(1);
 
-                if (keyPressed(2, Y))               robot.intake.setHeight(FIVE_STACK);
-                if (keyPressed(2, X))               robot.intake.setHeight(FOUR_STACK);
-                if (keyPressed(2, B))               robot.intake.setHeight(THREE_STACK);
-                if (keyPressed(2, A))               robot.intake.setHeight(TWO_STACK);
-                if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
+                if (keyPressed(2, Y))                       robot.intake.setHeight(FIVE_STACK);
+                if (keyPressed(2, X))                       robot.intake.setHeight(FOUR_STACK);
+                if (keyPressed(2, B))                       robot.intake.setHeight(THREE_STACK);
+                if (keyPressed(2, A))                       robot.intake.setHeight(TWO_STACK);
+                if (keyPressed(2, RIGHT_BUMPER))            robot.intake.setHeight(FLOOR);
+
+                if (keyPressed(2, DPAD_LEFT, DPAD_RIGHT))   robot.deposit.dropPixels(1);
             }
 
             // Field-centric driving with control stick inputs:
