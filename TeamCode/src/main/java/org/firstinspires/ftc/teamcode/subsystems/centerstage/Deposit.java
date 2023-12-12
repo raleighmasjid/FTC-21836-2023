@@ -53,6 +53,7 @@ public final class Deposit {
         paintbrush.run();
     }
 
+    @Config
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
@@ -146,6 +147,7 @@ public final class Deposit {
         }
     }
 
+    @Config
     private static final class Paintbrush {
 
         public static double
