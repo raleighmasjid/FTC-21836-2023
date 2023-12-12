@@ -215,12 +215,6 @@ public final class Intake {
         return colors.clone();
     }
 
-    int pixelCount() {
-        int count = 0;
-        for (int i = 0; i < colors.length; i++) if (!getColors()[i].isEmpty()) count++;
-        return count;
-    }
-
     boolean justDroppedPixels() {
         return justDroppedPixels;
     }

@@ -35,12 +35,12 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    void lockPixels(int pixelCount) {
-        paintbrush.lockPixels(pixelCount);
+    void lockPixels(Pixel.Color[] colors) {
+        paintbrush.lockPixels(colors);
     }
 
-    public void dropPixel() {
-        paintbrush.dropPixel();
+    public void dropPixels(int numToDrop) {
+        paintbrush.dropPixels(numToDrop);
     }
 
     void run() {
@@ -98,12 +98,8 @@ public final class Deposit {
             controller.setTarget(targetState);
         }
 
-        public void incrementRow() {
-            setTargetRow(targetRow + 1);
-        }
-
-        public void decrementRow() {
-            setTargetRow(targetRow - 1);
+        public void changeRow(int deltaRow) {
+            setTargetRow(targetRow + deltaRow);
         }
 
         private void retract() {
@@ -187,23 +183,18 @@ public final class Deposit {
             );
         }
 
-        private void lockPixels(int pixelCount) {
+        private void lockPixels(Pixel.Color[] colors) {
+            int pixelCount = 0;
+            for (Pixel.Color color : colors) if (!color.isEmpty()) pixelCount++;
             pixelsLocked = clip(pixelCount, 0, 2);
         }
 
-        private void dropPixel() {
-            if (pixelsLocked == 2) dropFirstPixel();
-            else dropSecondPixel();
-        }
-
-        private void dropFirstPixel() {
-            pixelsLocked = 1;
-        }
-
-        private void dropSecondPixel() {
-            pixelsLocked = 0;
-            retracted = false;
-            timer.reset();
+        private void dropPixels(int numToDrop) {
+            pixelsLocked = clip(pixelsLocked - numToDrop, 0, 2);
+            if (pixelsLocked == 0) {
+                retracted = false;
+                timer.reset();
+            }
         }
 
         private void setExtended(boolean extended) {
