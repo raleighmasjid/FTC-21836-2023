@@ -202,7 +202,7 @@ public final class Intake {
 
         }
 
-        pivot.updateAngles((motor.get() > 0 ? 0 : ANGLE_FLOOR_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING);
+        pivot.updateAngles((motorPower > 0 ? 0 : ANGLE_FLOOR_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING);
         latch.updateAngles((state == HAS_0_PIXELS || state == HAS_1_PIXEL ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING), ANGLE_LATCH_LOCKED);
 
         pivot.run();
