@@ -41,7 +41,6 @@ public final class Intake {
             ANGLE_LATCH_INTAKING = 50,
             ANGLE_LATCH_LOCKED = 149,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 5,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             SETTLING_TIME = 1;
