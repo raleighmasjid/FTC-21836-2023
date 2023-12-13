@@ -22,6 +22,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
@@ -50,12 +51,16 @@ public final class Intake {
     private final ThreadedColorSensor bottomSensor, topSensor;
     private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
+    private final TouchSensor pivotSensor;
+
     private final SimpleServoPivot pivot, latch;
 
     private Intake.State state = HAS_0_PIXELS;
     private Intake.Height height = FLOOR;
+
     private final ElapsedTime timer = new ElapsedTime();
     private final Pixel.Color[] colors = {EMPTY, EMPTY};
+
     private boolean pixelsTransferred = false;
     private int requiredPixelCount = 2;
     private double motorPower = 0;
@@ -126,6 +131,8 @@ public final class Intake {
         bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
         topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
 
+        pivotSensor = hardwareMap.get(TouchSensor.class, "intake pivot sensor");
+
         timer.reset();
     }
 
@@ -174,7 +181,7 @@ public final class Intake {
 
             case PIVOTING:
 
-                if (timer.seconds() >= TIME_PIVOTING) {
+                if (pivotSensor.isPressed()) {
                     setMotorPower(0);
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
