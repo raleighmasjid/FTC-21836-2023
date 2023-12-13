@@ -49,7 +49,7 @@ public final class Backdrop {
         }
     }
 
-    public Pixel get(int x, int y) {
+    Pixel get(int x, int y) {
         return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, INVALID);
     }
 

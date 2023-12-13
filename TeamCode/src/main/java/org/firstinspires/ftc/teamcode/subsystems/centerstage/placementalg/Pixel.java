@@ -10,9 +10,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 @Config
 public final class Pixel implements Comparable<Pixel> {
 
@@ -27,7 +24,8 @@ public final class Pixel implements Comparable<Pixel> {
         return (int) (diff * 1000000000);
     }
 
-    final int x, y;
+    final int x;
+    public final int y;
     Pixel mosaic = null;
     public final Pixel.Color color;
     double scoreValue = 0;
@@ -57,10 +55,6 @@ public final class Pixel implements Comparable<Pixel> {
                 (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
                 toRadians(0)
         );
-    }
-
-    public int getY() {
-        return y;
     }
 
     @NonNull
@@ -185,15 +179,6 @@ public final class Pixel implements Comparable<Pixel> {
                     hsv.inRange(minYellow, maxYellow) ? YELLOW :
                     new HSV(0, hsv.saturation, hsv.value).inRange(minWhite, maxWhite) ? WHITE :
                     EMPTY;
-        }
-
-        static Color getRemainingColor(Color c1, Color c2) {
-            if (c1 == EMPTY || c2 == EMPTY) return COLORED;
-            if (c1 == c2) return c1;
-            ArrayList<Color> colors = new ArrayList<>(Arrays.asList(GREEN, PURPLE, YELLOW));
-            colors.remove(c1);
-            colors.remove(c2);
-            return colors.get(0);
         }
 
         public boolean matches(Color other) {
