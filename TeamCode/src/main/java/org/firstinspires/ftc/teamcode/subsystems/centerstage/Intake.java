@@ -153,7 +153,7 @@ public final class Intake {
 
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
-                boolean bottomFull = !colors[0].isEmpty();
+                boolean bottomFull = !(colors[0] == EMPTY);
                 if (bottomFull || requiredIntakingAmount == 0) {
                     if (bottomFull) decrementHeight();
                     state = PIXEL_1_SETTLING;
@@ -169,7 +169,7 @@ public final class Intake {
 
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
-                boolean topFull = !colors[1].isEmpty();
+                boolean topFull = !(colors[1] == EMPTY);
                 if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
                     timer.reset();
@@ -191,7 +191,9 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty() && requiredIntakingAmount > 0) {
+                boolean topEmpty = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
+
+                if (topEmpty && Pixel.Color.fromHSV(bottomSensor.getHSV()) == EMPTY && requiredIntakingAmount > 0) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;

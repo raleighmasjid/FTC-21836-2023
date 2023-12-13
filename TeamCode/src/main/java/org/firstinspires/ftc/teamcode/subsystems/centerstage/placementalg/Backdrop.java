@@ -106,14 +106,16 @@ public final class Backdrop {
     }
 
     boolean isSupported(Pixel pixel) {
-        return !get(pixel.x, pixel.y - 1).color.isEmpty() && !get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color.isEmpty();
+        get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1);
+        get(pixel.x, pixel.y - 1);
+        return !(get(pixel.x, pixel.y - 1).color == EMPTY) && !(get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color == EMPTY);
     }
 
     int getHighestPixelY() {
         int highestY = 0;
         for (Pixel[] row : slots)
             for (Pixel p : row) {
-                if (!p.color.isEmpty() && p.color != INVALID) highestY = p.y;
+                if (!(p.color == EMPTY) && p.color != INVALID) highestY = p.y;
             }
         return highestY;
     }
@@ -129,7 +131,7 @@ public final class Backdrop {
     }
 
     public boolean notFull() {
-        for (Pixel pixel : slots[10]) if (pixel.color.isEmpty()) return true;
+        for (Pixel pixel : slots[10]) if (pixel.color == EMPTY) return true;
         return false;
     }
 
@@ -137,7 +139,7 @@ public final class Backdrop {
         int pixelCount = 0;
         for (Pixel[] row : slots) {
             for (Pixel pixel : row) {
-                if (!(pixel.color.isEmpty() || pixel.color == INVALID)) pixelCount++;
+                if (!(pixel.color == EMPTY || pixel.color == INVALID)) pixelCount++;
             }
         }
         return pixelCount;

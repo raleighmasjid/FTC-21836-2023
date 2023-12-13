@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -183,7 +184,7 @@ public final class Deposit {
 
         void lockPixels(Pixel.Color[] colors) {
             int pixelCount = 0;
-            for (Pixel.Color color : colors) if (!color.isEmpty()) pixelCount++;
+            for (Pixel.Color color : colors) if (color != EMPTY) pixelCount++;
             pixelsLocked = clip(pixelCount, 0, 2);
         }
 
