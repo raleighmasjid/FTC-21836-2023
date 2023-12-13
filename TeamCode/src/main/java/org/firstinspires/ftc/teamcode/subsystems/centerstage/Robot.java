@@ -37,7 +37,7 @@ public final class Robot {
 
     public void run() {
 
-        if (intake.justDroppedPixels()) deposit.lockPixels(intake.getColors());
+        if (intake.pixelsTransferred()) deposit.lockPixels(intake.getColors());
 
         deposit.run();
         intake.run();

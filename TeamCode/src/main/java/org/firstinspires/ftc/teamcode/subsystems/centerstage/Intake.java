@@ -56,7 +56,7 @@ public final class Intake {
     private Intake.Height height = FLOOR;
     private final ElapsedTime timer = new ElapsedTime();
     private final Pixel.Color[] colors = {EMPTY, EMPTY};
-    private boolean justDroppedPixels = false;
+    private boolean pixelsTransferred = false;
     private int requiredPixelCount = 2;
     private double motorPower = 0;
 
@@ -144,7 +144,7 @@ public final class Intake {
 
     void run() {
 
-        if (justDroppedPixels) justDroppedPixels = false;
+        if (pixelsTransferred) pixelsTransferred = false;
 
         switch (state) {
             case HAS_0_PIXELS:
@@ -193,8 +193,8 @@ public final class Intake {
 
             case PIXELS_SETTLING:
 
-                justDroppedPixels = timer.seconds() >= SETTLING_TIME;
-                if (justDroppedPixels) {
+                pixelsTransferred = timer.seconds() >= SETTLING_TIME;
+                if (pixelsTransferred) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 }
@@ -215,8 +215,8 @@ public final class Intake {
         return colors.clone();
     }
 
-    boolean justDroppedPixels() {
-        return justDroppedPixels;
+    boolean pixelsTransferred() {
+        return pixelsTransferred;
     }
 
     private void decrementHeight() {
