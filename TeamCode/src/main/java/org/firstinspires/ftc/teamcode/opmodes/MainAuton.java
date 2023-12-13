@@ -16,9 +16,9 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
-    static GamepadEx gamepadEx1 = null, gamepadEx2;
+    static GamepadEx gamepadEx1, gamepadEx2;
     static MultipleTelemetry mTelemetry;
-    static Robot robot = null;
+    static Robot robot;
 
     static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
@@ -33,8 +33,9 @@ public final class MainAuton extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(hardwareMap);
 
-        // Initialize gamepad:
+        // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
+        gamepadEx2 = new GamepadEx(gamepad2);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         boolean isRight = true;
