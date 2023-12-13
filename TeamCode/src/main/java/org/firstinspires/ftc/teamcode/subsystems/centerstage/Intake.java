@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -41,6 +42,8 @@ public final class Intake {
             ANGLE_LATCH_INTAKING = 50,
             ANGLE_LATCH_LOCKED = 149,
             TIME_REVERSING = 1,
+            TIME_PIVOTING = 5,
+            TIME_PIXEL_1_SETTLING = 1,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             SETTLING_TIME = 1;
@@ -66,6 +69,7 @@ public final class Intake {
 
     enum State {
         HAS_0_PIXELS,
+        PIXEL_1_SETTLING,
         HAS_1_PIXEL,
         PIVOTING,
         PIXELS_FALLING,
@@ -152,9 +156,14 @@ public final class Intake {
                 boolean bottomFull = !colors[0].isEmpty();
                 if (bottomFull || requiredIntakingAmount == 0) {
                     if (bottomFull) decrementHeight();
-                    state = HAS_1_PIXEL;
-                }
-                break;
+                    state = PIXEL_1_SETTLING;
+                    timer.reset();
+                } else break;
+
+            case PIXEL_1_SETTLING:
+
+                if (timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
+                else break;
 
             case HAS_1_PIXEL:
 
@@ -167,27 +176,25 @@ public final class Intake {
                     latch.setActivated(true);
                     pivot.setActivated(true);
                     state = PIVOTING;
-                }
-                break;
+                } else break;
 
             case PIVOTING:
 
-                if (pivotSensor.isPressed()) {
+                if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
+                else setMotorPower(SPEED_SLOW_REVERSING);
+
+                if (timer.seconds() >= TIME_PIVOTING && pivotSensor.isPressed()) {
                     setMotorPower(0);
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
-                }
-                else if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
-                else setMotorPower(SPEED_SLOW_REVERSING);
-                break;
+                } else break;
 
             case PIXELS_FALLING:
 
                 if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty() && requiredIntakingAmount > 0) {
                     state = PIXELS_SETTLING;
                     timer.reset();
-                }
-                break;
+                } else break;
 
             case PIXELS_SETTLING:
 
@@ -195,8 +202,7 @@ public final class Intake {
                 if (pixelsTransferred) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                }
-                break;
+                } else break;
 
         }
 
