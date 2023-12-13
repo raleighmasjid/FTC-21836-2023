@@ -163,7 +163,7 @@ public final class Intake {
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 boolean topFull = !colors[1].isEmpty();
-                if (topFull || requiredPixelCount < 1) {
+                if (topFull || requiredPixelCount <= 1) {
                     if (topFull) decrementHeight();
                     timer.reset();
                     latch.setActivated(true);
