@@ -27,16 +27,12 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 @Config
 public final class Deposit {
 
-    private final Paintbrush paintbrush;
+    final Paintbrush paintbrush;
     public final Lift lift;
 
     Deposit(HardwareMap hardwareMap) {
         lift = new Lift(hardwareMap);
         paintbrush = new Paintbrush(hardwareMap);
-    }
-
-    void lockPixels(Pixel.Color[] colors) {
-        paintbrush.lockPixels(colors);
     }
 
     public void dropPixels(int numToDrop) {
@@ -148,7 +144,7 @@ public final class Deposit {
     }
 
     @Config
-    private static final class Paintbrush {
+    static final class Paintbrush {
 
         public static double
                 ANGLE_PIVOT_OFFSET = 5,
@@ -185,7 +181,7 @@ public final class Deposit {
             );
         }
 
-        private void lockPixels(Pixel.Color[] colors) {
+        void lockPixels(Pixel.Color[] colors) {
             int pixelCount = 0;
             for (Pixel.Color color : colors) if (!color.isEmpty()) pixelCount++;
             pixelsLocked = clip(pixelCount, 0, 2);

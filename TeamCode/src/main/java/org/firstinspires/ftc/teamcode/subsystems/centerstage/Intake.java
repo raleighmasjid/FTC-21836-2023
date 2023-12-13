@@ -61,7 +61,7 @@ public final class Intake {
     private final Pixel.Color[] colors = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false;
-    private int requiredPixelCount = 2;
+    private int requiredIntakingAmount = 2;
     private double motorPower = 0;
 
     enum State {
@@ -140,14 +140,6 @@ public final class Intake {
         topSensor.interrupt();
     }
 
-    public void setMotorPower(double motorPower) {
-        this.motorPower = motorPower;
-    }
-
-    public void setRequiredPixelCount(int pixelCount) {
-        this.requiredPixelCount = clip(pixelCount, 0, 2);
-    }
-
     void run() {
 
         if (pixelsTransferred) pixelsTransferred = false;
@@ -158,7 +150,7 @@ public final class Intake {
                 bottomHSV = bottomSensor.getHSV();
                 colors[0] = Pixel.Color.fromHSV(bottomHSV);
                 boolean bottomFull = !colors[0].isEmpty();
-                if (bottomFull || requiredPixelCount == 0) {
+                if (bottomFull || requiredIntakingAmount == 0) {
                     if (bottomFull) decrementHeight();
                     state = HAS_1_PIXEL;
                 }
@@ -169,7 +161,7 @@ public final class Intake {
                 topHSV = topSensor.getHSV();
                 colors[1] = Pixel.Color.fromHSV(topHSV);
                 boolean topFull = !colors[1].isEmpty();
-                if (topFull || requiredPixelCount <= 1) {
+                if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
                     timer.reset();
                     latch.setActivated(true);
@@ -191,7 +183,7 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty() && requiredPixelCount > 0) {
+                if (Pixel.Color.fromHSV(topSensor.getHSV()).isEmpty() && Pixel.Color.fromHSV(bottomSensor.getHSV()).isEmpty() && requiredIntakingAmount > 0) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 }
@@ -235,6 +227,14 @@ public final class Intake {
 
     public double getStackXOffset() {
         return height.deltaX;
+    }
+
+    public void setMotorPower(double motorPower) {
+        this.motorPower = motorPower;
+    }
+
+    public void setRequiredIntakingAmount(int pixelCount) {
+        this.requiredIntakingAmount = clip(pixelCount, 0, 2);
     }
 
     private void printHSV(MultipleTelemetry telemetry, HSV color, String title) {
