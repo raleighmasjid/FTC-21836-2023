@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_2_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -36,14 +37,15 @@ public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 6,
-            ANGLE_PIVOT_TRANSFERRING = 195,
+            ANGLE_PIVOT_TRANSFERRING = 180,
             ANGLE_FLOOR_CLEARANCE = 4,
             ANGLE_LATCH_TRANSFERRING = 0,
             ANGLE_LATCH_INTAKING = 50,
             ANGLE_LATCH_LOCKED = 149,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 5,
+            TIME_PIVOTING = 20,
             TIME_PIXEL_1_SETTLING = 1,
+            TIME_PIXEL_2_SETTLING = 1,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             SETTLING_TIME = 1;
@@ -70,6 +72,7 @@ public final class Intake {
     enum State {
         HAS_0_PIXELS,
         PIXEL_1_SETTLING,
+        PIXEL_2_SETTLING,
         HAS_1_PIXEL,
         PIVOTING,
         PIXELS_FALLING,
@@ -175,19 +178,27 @@ public final class Intake {
                     timer.reset();
                     latch.setActivated(true);
                     pivot.setActivated(true);
-                    state = PIVOTING;
+                    state = PIXEL_2_SETTLING;
                 } else break;
 
-            case PIVOTING:
+            case PIXEL_2_SETTLING:
 
-                if (timer.seconds() <= TIME_REVERSING) setMotorPower(-1);
-                else setMotorPower(SPEED_SLOW_REVERSING);
+                if (timer.seconds() >= TIME_PIXEL_2_SETTLING) {
+                    state = PIVOTING;
+                    timer.reset();
+                }
+                else break;
+
+            case PIVOTING:
 
                 if (timer.seconds() >= TIME_PIVOTING && pivotSensor.isPressed()) {
                     setMotorPower(0);
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
-                } else break;
+                } else {
+                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : SPEED_SLOW_REVERSING);
+                    break;
+                }
 
             case PIXELS_FALLING:
 
@@ -208,8 +219,14 @@ public final class Intake {
 
         }
 
-        pivot.updateAngles((motorPower > 0 || height != FLOOR ? 0 : ANGLE_FLOOR_CLEARANCE) + ANGLE_PIVOT_OFFSET + height.deltaTheta, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING);
-        latch.updateAngles((state == HAS_0_PIXELS || state == HAS_1_PIXEL ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING), ANGLE_LATCH_LOCKED);
+        pivot.updateAngles(
+                ANGLE_PIVOT_OFFSET + (motorPower <= 0 && height == FLOOR ? ANGLE_FLOOR_CLEARANCE : 0) + height.deltaTheta,
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
+        );
+        latch.updateAngles(
+                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
+                ANGLE_LATCH_LOCKED
+        );
 
         pivot.run();
         latch.run();
