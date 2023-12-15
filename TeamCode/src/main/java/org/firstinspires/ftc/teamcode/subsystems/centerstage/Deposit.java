@@ -49,8 +49,8 @@ public final class Deposit {
         paintbrush.run();
     }
 
-    boolean isExtended() {
-        return paintbrush.isExtended() && lift.currentState.x <= 0.5;
+    boolean isRetracted() {
+        return !paintbrush.isExtended() && lift.currentState.x <= 0.5;
     }
 
     @Config

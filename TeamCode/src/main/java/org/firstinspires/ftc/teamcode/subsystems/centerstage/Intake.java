@@ -37,11 +37,11 @@ public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 2,
+            ANGLE_PIVOT_FLOOR_CLEARANCE = 4,
             ANGLE_PIVOT_TRANSFERRING = 230,
-            ANGLE_FLOOR_CLEARANCE = 4,
-            ANGLE_LATCH_TRANSFERRING = 0,
             ANGLE_LATCH_INTAKING = 100,
             ANGLE_LATCH_LOCKED = 149,
+            ANGLE_LATCH_TRANSFERRING = 0,
             TIME_PIXEL_1_SETTLING = 0.5,
             TIME_PIXEL_2_SETTLING = 0.5,
             TIME_REVERSING = 1,
@@ -146,7 +146,7 @@ public final class Intake {
         topSensor.interrupt();
     }
 
-    void run(int pixelsInDeposit, boolean depositExtended) {
+    void run(int pixelsInDeposit, boolean depositRetracted) {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
@@ -174,13 +174,13 @@ public final class Intake {
                 boolean topFull = !(colors[1] == EMPTY);
                 if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
-                    timer.reset();
                     state = PIXEL_2_SETTLING;
+                    timer.reset();
                 } else break;
 
             case PIXEL_2_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_2_SETTLING && requiredIntakingAmount + pixelsInDeposit <= 2 && !depositExtended) {
+                if (timer.seconds() >= TIME_PIXEL_2_SETTLING && requiredIntakingAmount + pixelsInDeposit <= 2 && depositRetracted) {
                     state = PIVOTING;
                     latch.setActivated(true);
                     pivot.setActivated(true);
@@ -219,7 +219,7 @@ public final class Intake {
         }
 
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET + (motorPower <= 0 && height == FLOOR ? ANGLE_FLOOR_CLEARANCE : 0) + height.deltaTheta,
+                ANGLE_PIVOT_OFFSET + (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) + height.deltaTheta,
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
         latch.updateAngles(

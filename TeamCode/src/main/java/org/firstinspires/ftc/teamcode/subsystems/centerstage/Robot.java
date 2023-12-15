@@ -40,7 +40,7 @@ public final class Robot {
         if (intake.pixelsTransferred()) deposit.paintbrush.lockPixels(intake.getColors());
 
         deposit.run();
-        intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isExtended());
+        intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
     }
 
     public void interrupt() {
