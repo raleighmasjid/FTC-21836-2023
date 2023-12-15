@@ -147,7 +147,7 @@ public final class Intake {
         topSensor.interrupt();
     }
 
-    void run() {
+    void run(int pixelsInDeposit, boolean depositExtended) {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
@@ -176,15 +176,15 @@ public final class Intake {
                 if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
                     timer.reset();
-                    latch.setActivated(true);
-                    pivot.setActivated(true);
                     state = PIXEL_2_SETTLING;
                 } else break;
 
             case PIXEL_2_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_2_SETTLING) {
+                if (timer.seconds() >= TIME_PIXEL_2_SETTLING && requiredIntakingAmount + pixelsInDeposit <= 2 && !depositExtended) {
                     state = PIVOTING;
+                    latch.setActivated(true);
+                    pivot.setActivated(true);
                     timer.reset();
                 }
                 else break;

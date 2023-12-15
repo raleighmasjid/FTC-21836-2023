@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
+import static java.util.Arrays.asList;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -25,19 +26,17 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdr
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
+import java.util.ArrayList;
+
 @Config
 public final class Deposit {
 
-    final Paintbrush paintbrush;
+    public final Paintbrush paintbrush;
     public final Lift lift;
 
     Deposit(HardwareMap hardwareMap) {
         lift = new Lift(hardwareMap);
         paintbrush = new Paintbrush(hardwareMap);
-    }
-
-    public void dropPixels(int numToDrop) {
-        paintbrush.dropPixels(numToDrop);
     }
 
     void run() {
@@ -145,7 +144,7 @@ public final class Deposit {
     }
 
     @Config
-    static final class Paintbrush {
+    public static final class Paintbrush {
 
         public static double
                 ANGLE_PIVOT_OFFSET = 5,
@@ -160,6 +159,7 @@ public final class Deposit {
         private final ElapsedTime timer = new ElapsedTime();
         private boolean retracted = true;
         private int pixelsLocked = 0;
+        private Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
@@ -182,15 +182,33 @@ public final class Deposit {
             );
         }
 
-        void lockPixels(Pixel.Color[] colors) {
-            int pixelCount = 0;
-            for (Pixel.Color color : colors) if (color != EMPTY) pixelCount++;
-            pixelsLocked = clip(pixelCount, 0, 2);
+        int getPixelsLocked() {
+            return pixelsLocked;
         }
 
-        private void dropPixels(int numToDrop) {
+        Pixel.Color[] getColors() {
+            return colors.clone();
+        }
+
+        void lockPixels(Pixel.Color[] colors) {
+            ArrayList<Pixel.Color> allColors = new ArrayList<>(asList(this.colors[1], this.colors[0], colors[1], colors[0]));
+            ArrayList<Pixel.Color> actualColors = new ArrayList<>();
+            for (Pixel.Color color : allColors) if (color != EMPTY) actualColors.add(color);
+            actualColors.add(EMPTY);
+            actualColors.add(EMPTY);
+
+            this.colors[1] = actualColors.get(0);
+            this.colors[0] = actualColors.get(1);
+
+            for (Pixel.Color color : this.colors) if (color != EMPTY) pixelsLocked++;
+            pixelsLocked = clip(pixelsLocked, 0, 2);
+        }
+
+        public void dropPixels(int numToDrop) {
             pixelsLocked = clip(pixelsLocked - numToDrop, 0, 2);
+            if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
+                colors[1] = EMPTY;
                 retracted = false;
                 timer.reset();
             }
@@ -200,7 +218,7 @@ public final class Deposit {
             pivot.setActivated(extended);
         }
 
-        private boolean isExtended() {
+        boolean isExtended() {
             return pivot.getActivated();
         }
 
@@ -221,6 +239,11 @@ public final class Deposit {
             pivot.run();
             claw.run();
             hook.run();
+        }
+
+        void printTelemetry(MultipleTelemetry telemetry) {
+            telemetry.addData("First color", colors[0].name());
+            telemetry.addData("Second color", colors[1].name());
         }
     }
 }

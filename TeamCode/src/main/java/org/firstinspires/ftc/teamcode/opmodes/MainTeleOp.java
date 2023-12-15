@@ -92,7 +92,7 @@ public final class MainTeleOp extends LinearOpMode {
                 if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
 
                 if (keyPressed(2, DPAD_LEFT) ||
-                        keyPressed(2, DPAD_RIGHT))  robot.deposit.dropPixels(1);
+                        keyPressed(2, DPAD_RIGHT))  robot.deposit.paintbrush.dropPixels(1);
             }
 
             // Field-centric driving with control stick inputs:

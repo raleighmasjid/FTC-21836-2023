@@ -40,7 +40,7 @@ public final class Robot {
         if (intake.pixelsTransferred()) deposit.paintbrush.lockPixels(intake.getColors());
 
         deposit.run();
-        intake.run();
+        intake.run(deposit.paintbrush.getPixelsLocked(), deposit.paintbrush.isExtended());
     }
 
     public void interrupt() {
@@ -48,19 +48,21 @@ public final class Robot {
         intake.interrupt();
     }
 
-    public void printTelemetry(MultipleTelemetry telemetry) {
-        drivetrain.printTelemetry(telemetry);
-        telemetry.addLine();
-        deposit.lift.printTelemetry(telemetry);
-        telemetry.addLine();
-        intake.printTelemetry(telemetry);
-        telemetry.addLine();
-        telemetry.addLine();
-        telemetry.addLine();
-        drivetrain.printNumericalTelemetry(telemetry);
-        telemetry.addLine();
-        deposit.lift.printNumericalTelemetry(telemetry);
-        telemetry.addLine();
-        intake.printNumericalTelemetry(telemetry);
+    public void printTelemetry(MultipleTelemetry mTelemetry) {
+        drivetrain.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        deposit.paintbrush.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        deposit.lift.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        intake.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        mTelemetry.addLine();
+        mTelemetry.addLine();
+        drivetrain.printNumericalTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        deposit.lift.printNumericalTelemetry(mTelemetry);
+        mTelemetry.addLine();
+        intake.printNumericalTelemetry(mTelemetry);
     }
 }
