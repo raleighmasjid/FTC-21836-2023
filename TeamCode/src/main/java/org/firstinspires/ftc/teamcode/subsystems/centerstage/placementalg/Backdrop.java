@@ -15,7 +15,7 @@ import java.util.Arrays;
 public final class Backdrop {
 
     public static double
-            BOTTOM_ROW_HEIGHT = 7.25,
+            BOTTOM_ROW_HEIGHT = 4,
             X = 47,
             Y_MAX_BLUE = 45,
             Y_MAX_RED = -25;

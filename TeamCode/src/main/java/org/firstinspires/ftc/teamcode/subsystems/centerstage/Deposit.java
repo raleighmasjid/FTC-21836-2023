@@ -54,19 +54,19 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.05,
-                0.025,
-                0,
-                1
+                0.25,
+                0.25,
+                0.015,
+                0.5
         );
 
         public static LowPassGains filterGains = new LowPassGains(
-                0.8,
-                10
+                0,
+                2
         );
 
         public static double
-                kG = 0,
+                kG = 0.1,
                 INCHES_PER_TICK = 0.0322835;
 
         // Motors and variables to manage their readings:

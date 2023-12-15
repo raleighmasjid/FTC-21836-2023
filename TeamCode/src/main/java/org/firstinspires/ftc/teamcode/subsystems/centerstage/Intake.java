@@ -36,19 +36,19 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 6,
-            ANGLE_PIVOT_TRANSFERRING = 180,
+            ANGLE_PIVOT_OFFSET = 2,
+            ANGLE_PIVOT_TRANSFERRING = 230,
             ANGLE_FLOOR_CLEARANCE = 4,
             ANGLE_LATCH_TRANSFERRING = 0,
-            ANGLE_LATCH_INTAKING = 50,
+            ANGLE_LATCH_INTAKING = 100,
             ANGLE_LATCH_LOCKED = 149,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 20,
-            TIME_PIXEL_1_SETTLING = 1,
-            TIME_PIXEL_2_SETTLING = 1,
+            TIME_PIVOTING = 0.5,
+            TIME_PIXEL_1_SETTLING = 0.5,
+            TIME_PIXEL_2_SETTLING = 0.5,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
-            SETTLING_TIME = 1;
+            SETTLING_TIME = 0.8;
 
     private final MotorEx motor;
 
