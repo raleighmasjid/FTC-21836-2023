@@ -48,7 +48,11 @@ public final class Intake {
             TIME_PIVOTING = 0.5,
             TIME_SETTLING = 1,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25;
+            SPEED_SLOW_REVERSING = -0.25,
+            r = 9.5019488189,
+            theta0 = -0.496183876745,
+            y0 = -4.523622,
+            x0 = 8.35606811024;
 
     private final MotorEx motor;
 
@@ -99,11 +103,6 @@ public final class Intake {
                 deltaX = 0;
                 return;
             }
-
-            double r = 9.5019488189;
-            double theta0 = -0.496183876745;
-            double y0 = -4.523622;
-            double x0 = 8.35606811024;
 
             double deltaY = ordinal() * 0.5 - 0.1;
 
