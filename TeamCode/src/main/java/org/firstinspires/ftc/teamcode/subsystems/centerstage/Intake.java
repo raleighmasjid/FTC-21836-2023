@@ -42,13 +42,13 @@ public final class Intake {
             ANGLE_LATCH_TRANSFERRING = 0,
             ANGLE_LATCH_INTAKING = 100,
             ANGLE_LATCH_LOCKED = 149,
-            TIME_REVERSING = 1,
-            TIME_PIVOTING = 0.5,
             TIME_PIXEL_1_SETTLING = 0.5,
             TIME_PIXEL_2_SETTLING = 0.5,
+            TIME_REVERSING = 1,
+            TIME_PIVOTING = 0.5,
+            TIME_SETTLING = 1,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25,
-            SETTLING_TIME = 0.8;
+            SPEED_SLOW_REVERSING = -0.25;
 
     private final MotorEx motor;
 
@@ -211,7 +211,7 @@ public final class Intake {
 
             case PIXELS_SETTLING:
 
-                pixelsTransferred = timer.seconds() >= SETTLING_TIME;
+                pixelsTransferred = timer.seconds() >= TIME_SETTLING;
                 if (pixelsTransferred) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);

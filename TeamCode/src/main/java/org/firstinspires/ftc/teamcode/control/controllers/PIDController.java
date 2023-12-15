@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.control.controllers;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.signum;
+
 import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.Integrator;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -39,13 +42,13 @@ public class PIDController implements FeedbackController {
         State lastError = error;
         error = target.minus(measurement);
 
-        if (Math.signum(error.x) != Math.signum(lastError.x)) reset();
+        if (signum(error.x) != signum(lastError.x)) reset();
         errorIntegral = integrator.getIntegral(error.x);
         errorDerivative = derivFilter.calculate(differentiator.getDerivative(error.x));
 
         double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * errorDerivative);
 
-        stopIntegration(Math.abs(output) >= gains.maxOutputWithIntegral && Math.signum(output) == Math.signum(error.x));
+        stopIntegration(abs(output) >= gains.maxOutputWithIntegral && signum(output) == signum(error.x));
 
         return output;
     }
