@@ -159,7 +159,7 @@ public final class Deposit {
         private final ElapsedTime timer = new ElapsedTime();
         private boolean retracted = true;
         private int pixelsLocked = 0;
-        private Pixel.Color[] colors = {EMPTY, EMPTY};
+        private final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
