@@ -49,6 +49,10 @@ public final class Deposit {
         paintbrush.run();
     }
 
+    boolean isExtended() {
+        return paintbrush.isExtended() && lift.currentState.x <= 0.5;
+    }
+
     @Config
     public static final class Lift {
 
@@ -218,7 +222,7 @@ public final class Deposit {
             pivot.setActivated(extended);
         }
 
-        boolean isExtended() {
+        private boolean isExtended() {
             return pivot.getActivated();
         }
 
