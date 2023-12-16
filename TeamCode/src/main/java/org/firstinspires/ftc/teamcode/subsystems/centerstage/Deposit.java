@@ -161,7 +161,7 @@ public final class Deposit {
         private final SimpleServoPivot pivot, hook, claw;
 
         private final ElapsedTime timer = new ElapsedTime();
-        private boolean retracted = true;
+        private boolean doneRetracting = true;
         private int pixelsLocked = 0;
         private final Pixel.Color[] colors = {EMPTY, EMPTY};
 
@@ -213,7 +213,7 @@ public final class Deposit {
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;
-                retracted = false;
+                doneRetracting = false;
                 timer.reset();
             }
         }
@@ -227,12 +227,14 @@ public final class Deposit {
         }
 
         private boolean droppedBothPixels() {
-            return !retracted && timer.seconds() >= TIME_DROP;
+            if (!doneRetracting && timer.seconds() >= TIME_DROP) {
+                doneRetracting = true;
+                return true;
+            }
+            return false;
         }
 
         private void run() {
-            if (droppedBothPixels()) retracted = true;
-
             pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
