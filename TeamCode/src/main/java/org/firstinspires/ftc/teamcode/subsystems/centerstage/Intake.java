@@ -36,9 +36,9 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 2,
-            ANGLE_PIVOT_FLOOR_CLEARANCE = 4,
-            ANGLE_PIVOT_TRANSFERRING = 230,
+            ANGLE_PIVOT_OFFSET = 0,
+            ANGLE_PIVOT_FLOOR_CLEARANCE = 0,
+            ANGLE_PIVOT_TRANSFERRING = 235,
             ANGLE_LATCH_INTAKING = 100,
             ANGLE_LATCH_LOCKED = 149,
             ANGLE_LATCH_TRANSFERRING = 0,

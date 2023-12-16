@@ -151,10 +151,10 @@ public final class Deposit {
     public static final class Paintbrush {
 
         public static double
-                ANGLE_PIVOT_OFFSET = 5,
-                ANGLE_CLAW_OPEN = 0,
-                ANGLE_CLAW_CLOSED = 15,
-                ANGLE_HOOK_OPEN = 5,
+                ANGLE_PIVOT_OFFSET = 3,
+                ANGLE_CLAW_OPEN = 20,
+                ANGLE_CLAW_CLOSED = 50,
+                ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 40,
                 TIME_DROP = 1;
 
