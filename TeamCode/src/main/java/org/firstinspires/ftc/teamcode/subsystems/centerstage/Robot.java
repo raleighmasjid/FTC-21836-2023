@@ -31,6 +31,7 @@ public final class Robot {
     private Backdrop latestScan = null;
     private final BackdropScanner scanner = new BackdropScanner();
     private final Pixel[] placements = new Pixel[2];
+    private ArrayList<Pixel> optPlacements = new ArrayList<>();
 
     public Robot(HardwareMap hardwareMap) {
         revHubs = hardwareMap.getAll(LynxModule.class);
@@ -57,36 +58,30 @@ public final class Robot {
                 placements[0] = null;
                 placements[1] = null;
 
-                ArrayList<Pixel> optPlacements = PlacementCalculator.calculate(latestScan);
+                optPlacements = PlacementCalculator.calculate(latestScan);
                 Pixel.Color[] depositColors = deposit.paintbrush.getColors();
-                Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-                if (firstColor != EMPTY) for (Pixel pixel1 : optPlacements) {
-                    if (firstColor.matches(pixel1.color)) {
-
-                        Pixel placement = new Pixel(pixel1, firstColor);
-
-                        placements[0] = placement;
-                        latestScan.add(placement);
-                        optPlacements = PlacementCalculator.calculate(latestScan);
-                        break;
-                    }
-                }
-                if (secondColor != EMPTY) for (Pixel pixel : optPlacements) {
-                    if (secondColor.matches(pixel.color)) {
-
-                        Pixel placement = new Pixel(pixel, secondColor);
-
-                        placements[1] = placement;
-                        latestScan.add(placement);
-                        break;
-                    }
-                }
+                matchDepositColorToPlacement(depositColors[0], 0);
+                matchDepositColorToPlacement(depositColors[1], 1);
             }
         }
 
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
+    }
+
+    private void matchDepositColorToPlacement(Pixel.Color firstColor, int x) {
+        if (firstColor != EMPTY) for (Pixel pixel1 : optPlacements) {
+            if (firstColor.matches(pixel1.color)) {
+
+                Pixel placement = new Pixel(pixel1, firstColor);
+
+                placements[x] = placement;
+                latestScan.add(placement);
+                optPlacements = PlacementCalculator.calculate(latestScan);
+                break;
+            }
+        }
     }
 
     public void interrupt() {
