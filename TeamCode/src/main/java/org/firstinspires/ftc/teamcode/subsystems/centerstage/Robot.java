@@ -70,11 +70,11 @@ public final class Robot {
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
     }
 
-    private void matchDepositColorToPlacement(Pixel.Color firstColor, int x) {
-        if (firstColor != EMPTY) for (Pixel pixel1 : optPlacements) {
-            if (firstColor.matches(pixel1.color)) {
+    private void matchDepositColorToPlacement(Pixel.Color color, int x) {
+        if (color != EMPTY) for (Pixel pixel1 : optPlacements) {
+            if (color.matches(pixel1.color)) {
 
-                Pixel placement = new Pixel(pixel1, firstColor);
+                Pixel placement = new Pixel(pixel1, color);
 
                 placements[x] = placement;
                 latestScan.add(placement);
