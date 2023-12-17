@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -41,7 +42,10 @@ public final class Deposit {
 
     void run() {
 
-        if (paintbrush.droppedBothPixels()) lift.retract();
+        if (!paintbrush.droppedPixel && paintbrush.timer.seconds() >= TIME_DROP) {
+            paintbrush.droppedPixel = true;
+            lift.retract();
+        }
         boolean liftExtended = lift.isExtended();
         if (paintbrush.isExtended() != liftExtended) paintbrush.setExtended(liftExtended);
 
@@ -161,7 +165,7 @@ public final class Deposit {
         private final SimpleServoPivot pivot, hook, claw;
 
         private final ElapsedTime timer = new ElapsedTime();
-        private boolean doneRetracting = true;
+        private boolean droppedPixel = true;
         private int pixelsLocked = 0;
         private final Pixel.Color[] colors = {EMPTY, EMPTY};
 
@@ -213,7 +217,7 @@ public final class Deposit {
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;
-                doneRetracting = false;
+                droppedPixel = false;
                 timer.reset();
             }
         }
@@ -224,14 +228,6 @@ public final class Deposit {
 
         private boolean isExtended() {
             return pivot.getActivated();
-        }
-
-        private boolean droppedBothPixels() {
-            if (!doneRetracting && timer.seconds() >= TIME_DROP) {
-                doneRetracting = true;
-                return true;
-            }
-            return false;
         }
 
         private void run() {
