@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
+import static java.lang.Double.min;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -8,7 +9,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
@@ -29,9 +29,9 @@ public final class Robot {
 
     private final List<LynxModule> revHubs;
     private Backdrop latestScan = null;
-    private final BackdropScanner scanner = new BackdropScanner();
+//    private final BackdropScanner scanner = new BackdropScanner();
     private final Pixel[] placements = new Pixel[2];
-    private ArrayList<Pixel> optPlacements = new ArrayList<>();
+    private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
 
     public Robot(HardwareMap hardwareMap) {
         revHubs = hardwareMap.getAll(LynxModule.class);
@@ -48,19 +48,18 @@ public final class Robot {
 
     public void run() {
 
-        scanner.run();
-        if (scanner.newScanAvailable()) {
-            latestScan = scanner.getBackdrop();
-            optPlacements = PlacementCalculator.calculate(latestScan);
-        }
+//        if (scanner.newScanAvailable()) {
+//            latestScan = scanner.getBackdrop();
+//            optimalPlacements = scanner.getOptimalPlacements();
+//        }
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
 
             if (latestScan != null) {
 
-                ArrayList<Pixel> optPlacementsCopy = new ArrayList<>(optPlacements);
                 Backdrop latestScanCopy = latestScan.clone();
+                ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
 
                 Pixel.Color[] depositColors = deposit.paintbrush.getColors();
                 Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
@@ -68,18 +67,18 @@ public final class Robot {
                 placements[0] = null;
                 placements[1] = null;
 
-                if (firstColor != EMPTY) for (Pixel pixel : optPlacementsCopy) {
+                if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
                     if (firstColor.matches(pixel.color)) {
 
                         Pixel placement = new Pixel(pixel, firstColor);
 
                         placements[0] = placement;
                         latestScanCopy.add(placement);
-                        optPlacementsCopy = PlacementCalculator.calculate(latestScanCopy);
+                        optimalPlacementsCopy = PlacementCalculator.calculate(latestScanCopy);
                         break;
                     }
                 }
-                if (secondColor != EMPTY) for (Pixel pixel : optPlacementsCopy) {
+                if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
                     if (secondColor.matches(pixel.color)) {
 
                         Pixel placement = new Pixel(pixel, secondColor);
@@ -102,6 +101,10 @@ public final class Robot {
     }
 
     public void printTelemetry(MultipleTelemetry mTelemetry) {
+        for (int i = 0; i < min(2, optimalPlacements.size()); i++) {
+            mTelemetry.addLine(optimalPlacements.get(i).color.name());
+        }
+        mTelemetry.addLine();
         drivetrain.printTelemetry(mTelemetry);
         mTelemetry.addLine();
         deposit.paintbrush.printTelemetry(mTelemetry);
