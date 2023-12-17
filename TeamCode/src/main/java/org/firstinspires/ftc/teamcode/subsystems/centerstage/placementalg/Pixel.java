@@ -36,7 +36,7 @@ public final class Pixel implements Comparable<Pixel> {
         this.color = color;
     }
 
-    Pixel(Pixel p, Pixel.Color color) {
+    public Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
