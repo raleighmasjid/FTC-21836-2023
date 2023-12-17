@@ -61,10 +61,10 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.25,
-                0.25,
-                0.015,
-                0.5
+                0.05,
+                0.025,
+                0,
+                1
         );
 
         public static LowPassGains filterGains = new LowPassGains(
