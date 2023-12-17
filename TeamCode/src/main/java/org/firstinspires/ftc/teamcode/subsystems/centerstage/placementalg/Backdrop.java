@@ -34,6 +34,15 @@ public final class Backdrop {
             }
     }
 
+    @NonNull
+    public Backdrop clone() {
+        Backdrop backdrop = new Backdrop();
+        backdrop.mosaicCount = mosaicCount;
+        backdrop.printRectangular = printRectangular;
+        for (Pixel[] row : slots) for (Pixel pixel : row) backdrop.add(pixel);
+        return backdrop;
+    }
+
     public void add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:

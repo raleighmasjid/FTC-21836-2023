@@ -136,8 +136,8 @@ public final class PlacementCalculator {
                     } else if (pMosaic[1].color == EMPTY && pMosaic[2].color == EMPTY) {
                         pixelsToPlace.add(new Pixel(pMosaic[1], COLORED));
                         pixelsToPlace.add(new Pixel(pMosaic[2], COLORED));
-                        Pixel p1 = new Pixel(pMosaic[1]);
-                        Pixel p2 = new Pixel(pMosaic[2]);
+                        Pixel p1 = pMosaic[1].clone();
+                        Pixel p2 = pMosaic[2].clone();
                         p1.scoreValue += 22 / 3.0;
                         p2.scoreValue += 22 / 3.0;
                         colorsToGetSPixels.add(p1);
@@ -173,7 +173,7 @@ public final class PlacementCalculator {
 
     private static void oneRemainingCase(Pixel pixel, Pixel x1, Pixel x2) {
         pixelsToPlace.add(new Pixel(x1, getRemainingColor(pixel.color, x2.color)));
-        Pixel b = new Pixel(x1);
+        Pixel b = x1.clone();
         b.scoreValue += 11;
         colorsToGetSPixels.add(b);
     }

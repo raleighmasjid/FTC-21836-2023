@@ -49,39 +49,51 @@ public final class Robot {
     public void run() {
 
         scanner.run();
-        if (scanner.newScanAvailable()) latestScan = scanner.getBackdrop();
+        if (scanner.newScanAvailable()) {
+            latestScan = scanner.getBackdrop();
+            optPlacements = PlacementCalculator.calculate(latestScan);
+        }
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
 
             if (latestScan != null) {
+
+                ArrayList<Pixel> optPlacementsCopy = new ArrayList<>(optPlacements);
+                Backdrop latestScanCopy = latestScan.clone();
+
+                Pixel.Color[] depositColors = deposit.paintbrush.getColors();
+                Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
+
                 placements[0] = null;
                 placements[1] = null;
 
-                optPlacements = PlacementCalculator.calculate(latestScan);
-                Pixel.Color[] depositColors = deposit.paintbrush.getColors();
+                if (firstColor != EMPTY) for (Pixel pixel : optPlacementsCopy) {
+                    if (firstColor.matches(pixel.color)) {
 
-                matchDepositColorToPlacement(depositColors[0], 0);
-                matchDepositColorToPlacement(depositColors[1], 1);
+                        Pixel placement = new Pixel(pixel, firstColor);
+
+                        placements[0] = placement;
+                        latestScanCopy.add(placement);
+                        optPlacementsCopy = PlacementCalculator.calculate(latestScanCopy);
+                        break;
+                    }
+                }
+                if (secondColor != EMPTY) for (Pixel pixel : optPlacementsCopy) {
+                    if (secondColor.matches(pixel.color)) {
+
+                        Pixel placement = new Pixel(pixel, secondColor);
+
+                        placements[1] = placement;
+                        break;
+                    }
+                }
+
             }
         }
 
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
-    }
-
-    private void matchDepositColorToPlacement(Pixel.Color color, int x) {
-        if (color != EMPTY) for (Pixel pixel1 : optPlacements) {
-            if (color.matches(pixel1.color)) {
-
-                Pixel placement = new Pixel(pixel1, color);
-
-                placements[x] = placement;
-                latestScan.add(placement);
-                optPlacements = PlacementCalculator.calculate(latestScan);
-                break;
-            }
-        }
     }
 
     public void interrupt() {

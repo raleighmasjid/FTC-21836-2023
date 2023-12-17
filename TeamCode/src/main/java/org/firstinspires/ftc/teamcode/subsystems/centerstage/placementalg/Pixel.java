@@ -41,8 +41,9 @@ public final class Pixel implements Comparable<Pixel> {
         this.scoreValue = p.scoreValue;
     }
 
-    Pixel(Pixel p) {
-        this(p, p.color);
+    @NonNull
+    protected Pixel clone() {
+        return new Pixel(this, color);
     }
 
     boolean inMosaic() {
