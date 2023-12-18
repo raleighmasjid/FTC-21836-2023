@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.OFF;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.RED;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -9,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup;
 
 import java.util.List;
 
@@ -26,6 +31,7 @@ public final class Robot {
     public final Deposit deposit;
 
     private final List<LynxModule> revHubs;
+    private final LEDIndicatorGroup indicators;
 
     private final BackdropScanner scanner;
 
@@ -41,6 +47,8 @@ public final class Robot {
         deposit = new Deposit(hardwareMap);
 
         scanner = new BackdropScanner(drivetrain);
+
+        indicators = new LEDIndicatorGroup(hardwareMap, 2);
     }
 
     public void readSensors() {
@@ -71,6 +79,9 @@ public final class Robot {
 
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
+
+        indicators.setState(scanner.trajectoryGenerated() ? GREEN : drivetrain.isBusy() ? RED : OFF);
+        indicators.run();
     }
 
     public void interrupt() {
