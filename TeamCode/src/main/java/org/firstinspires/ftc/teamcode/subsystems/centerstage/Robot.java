@@ -46,7 +46,7 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        scanner = new BackdropScanner(drivetrain);
+        scanner = new BackdropScanner(drivetrain, deposit);
 
         indicators = new LEDIndicatorGroup(hardwareMap, 2);
     }

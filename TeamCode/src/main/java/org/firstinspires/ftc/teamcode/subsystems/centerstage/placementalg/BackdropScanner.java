@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 
@@ -8,6 +10,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 
 import java.util.ArrayList;
@@ -21,7 +24,7 @@ public final class BackdropScanner extends Thread {
     private boolean run = true;
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
-    private Backdrop newScan = new Backdrop();
+    private final Backdrop latestScan = new Backdrop();
     private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
@@ -29,11 +32,13 @@ public final class BackdropScanner extends Thread {
     private TrajectorySequence scoringTrajectory = null;
 
     private final MecanumDrivetrain drivetrain;
+    private final Deposit deposit;
     private boolean isRed = true, pixelsTransferred = false;
     private Pixel.Color[] depositColors = {EMPTY, EMPTY};
 
-    public BackdropScanner(MecanumDrivetrain drivetrain) {
+    public BackdropScanner(MecanumDrivetrain drivetrain, Deposit deposit) {
         this.drivetrain = drivetrain;
+        this.deposit = deposit;
         start();
     }
 
@@ -45,7 +50,7 @@ public final class BackdropScanner extends Thread {
 
     public void run() {
         while (run) {
-            Backdrop lastScan = newScan.clone();
+            Backdrop lastScan = latestScan.clone();
 
             // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
 
@@ -57,9 +62,9 @@ public final class BackdropScanner extends Thread {
 
             // Save colors to corresponding locations in newScan
 
-            if (!newScan.equals(lastScan)) {
+            if (!latestScan.equals(lastScan)) {
                 timeSinceUpdate.reset();
-                optimalPlacements = getOptimalPlacements(newScan);
+                optimalPlacements = getOptimalPlacements(latestScan);
                 colorsNeeded[0] = EMPTY;
                 colorsNeeded[1] = EMPTY;
                 if (!optimalPlacements.isEmpty()) {
@@ -67,7 +72,7 @@ public final class BackdropScanner extends Thread {
 
                     colorsNeeded[0] = optimalPlacement.color;
 
-                    ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(newScan.clone().add(optimalPlacement));
+                    ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
                     if (!futureOptimalPlacements.isEmpty()) {
                         colorsNeeded[1] = futureOptimalPlacements.get(0).color;
                     }
@@ -88,7 +93,7 @@ public final class BackdropScanner extends Thread {
                         Pixel placement = new Pixel(pixel, firstColor);
 
                         placements[0] = placement;
-                        optimalPlacementsCopy = getOptimalPlacements(newScan.clone().add(placement));
+                        optimalPlacementsCopy = getOptimalPlacements(latestScan.clone().add(placement));
                         break;
                     }
                 }
@@ -113,11 +118,19 @@ public final class BackdropScanner extends Thread {
                 scoringTrajectory = drivetrain.trajectorySequenceBuilder(startPose)
                         .setReversed(true)
                         .splineTo(scoringPos1.vec(), scoringPos1.getHeading())
-                        .waitSeconds(1)
+                        .addTemporalMarker(() -> {
+                            deposit.paintbrush.dropPixels(1);
+                            latestScan.add(placements[0]);
+                        })
+                        .waitSeconds(TIME_DROP_FIRST)
                         .lineTo(scoringPos2.vec())
+                        .addTemporalMarker(() -> {
+                            deposit.paintbrush.dropPixels(2);
+                            latestScan.add(placements[1]);
+                        })
+                        .waitSeconds(TIME_DROP_SECOND)
                         .build()
                 ;
-
 
                 pixelsTransferred = false;
             }
