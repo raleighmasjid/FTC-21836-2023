@@ -47,7 +47,7 @@ public final class Robot {
         for (LynxModule hub : revHubs) hub.clearBulkCache();
     }
 
-    public void generateAutoPath() {
+    public void startAutoDrive() {
         TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
         if (scoringTrajectory == null) return;
         drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
@@ -55,7 +55,7 @@ public final class Robot {
         autoTimer.reset();
     }
 
-    public boolean readyToStartAutoDrive() {
+    public boolean beginUpdatingRunner() {
         if (!autoDriveStarted && autoTimer.seconds() >= TIME_TRAJECTORY_GEN) {
             autoDriveStarted = true;
             return true;
