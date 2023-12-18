@@ -79,15 +79,7 @@ public final class Robot {
     }
 
     public void printTelemetry(MultipleTelemetry mTelemetry) {
-        mTelemetry.addLine("Colors needed in wing:");
-        mTelemetry.addLine("First: " +  scanner.getColorsNeeded()[0].name());
-        mTelemetry.addLine("Second: " + scanner.getColorsNeeded()[1].name());
-        mTelemetry.addLine();
-        mTelemetry.addLine("Place on backdrop:");
-        mTelemetry.addLine("First: " + scanner.getPlacements()[0].coordsString());
-        mTelemetry.addLine("Second: " + scanner.getPlacements()[1].coordsString());
-        mTelemetry.addLine();
-        mTelemetry.addLine(scanner.backdropChanged() ? "Backdrop changed!" : "No changes to backdrop");
+        scanner.printTelemetry(mTelemetry);
         mTelemetry.addLine();
         drivetrain.printTelemetry(mTelemetry);
         mTelemetry.addLine();

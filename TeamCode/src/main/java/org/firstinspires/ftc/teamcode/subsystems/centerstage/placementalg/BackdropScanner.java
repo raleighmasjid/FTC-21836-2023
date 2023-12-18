@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -123,23 +124,23 @@ public final class BackdropScanner extends Thread {
         }
     }
 
-    public boolean backdropChanged() {
-        return timeSinceUpdate.seconds() <= 1;
-    }
-
-    public Pixel.Color[] getColorsNeeded() {
-        return colorsNeeded;
-    }
-
-    public Pixel[] getPlacements() {
-        return placements;
-    }
-
     public TrajectorySequence getScoringTrajectory() {
         return scoringTrajectory;
     }
 
     public void interrupt() {
         run = false;
+    }
+
+    public void printTelemetry(MultipleTelemetry mTelemetry) {
+        mTelemetry.addLine("Colors needed in wing:");
+        mTelemetry.addLine("First: " +  colorsNeeded[0].name());
+        mTelemetry.addLine("Second: " + colorsNeeded[1].name());
+        mTelemetry.addLine();
+        mTelemetry.addLine("Place on backdrop:");
+        mTelemetry.addLine("First: " + placements[0].coordsString());
+        mTelemetry.addLine("Second: " + placements[1].coordsString());
+        mTelemetry.addLine();
+        mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop changed!" : "No changes to backdrop");
     }
 }
