@@ -37,7 +37,7 @@ final class AlgorithmTesting {
                 backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
             }
         }
-        ArrayList<Pixel> pixelsToPlace = PlacementCalculator.calculate(backdrop);
+        ArrayList<Pixel> pixelsToPlace = PlacementCalculator.getOptimalPlacements(backdrop);
         backdrop.print();
         printLine();
         for (Pixel pixel : pixelsToPlace) pixel.print();
@@ -58,7 +58,7 @@ final class AlgorithmTesting {
                 if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
                 backdrop.add(pToPlace);
             }
-            pixelsToPlace = PlacementCalculator.calculate(backdrop);
+            pixelsToPlace = PlacementCalculator.getOptimalPlacements(backdrop);
             if (!solve || printPerIteration) {
                 printLine();
                 printLine();

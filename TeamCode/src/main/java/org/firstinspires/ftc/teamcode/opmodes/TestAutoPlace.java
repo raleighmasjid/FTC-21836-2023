@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.RUNNING_OFFSET_X;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.RUNNING_OFFSET_Y;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner.RUNNING_OFFSET_X;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner.RUNNING_OFFSET_Y;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;

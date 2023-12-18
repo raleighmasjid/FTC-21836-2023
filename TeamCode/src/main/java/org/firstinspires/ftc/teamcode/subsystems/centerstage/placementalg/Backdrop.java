@@ -43,7 +43,16 @@ public final class Backdrop {
         return backdrop;
     }
 
-    public void add(Pixel pixel) {
+    public boolean equals(Object other) {
+        if (!(other instanceof Backdrop)) return false;
+        Backdrop other1 = (Backdrop) other;
+        for (Pixel[] row : slots) for (Pixel pixel : row) {
+            if (other1.get(pixel).color != pixel.color) return false;
+        }
+        return true;
+    }
+
+    public Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:
                 add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3) + 1)));
@@ -56,6 +65,7 @@ public final class Backdrop {
                 int y = pixel.y;
                 if (coordsInRange(x, y) && !(y % 2 == 0 && x == 0)) slots[y][x] = pixel;
         }
+        return this;
     }
 
     Pixel get(int x, int y) {

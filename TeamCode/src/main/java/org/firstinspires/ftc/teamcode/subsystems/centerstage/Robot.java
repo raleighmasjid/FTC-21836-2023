@@ -1,22 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static java.lang.Double.min;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Config
@@ -24,8 +17,6 @@ public final class Robot {
 
     public static double
             maxVoltage = 13,
-            RUNNING_OFFSET_X = 10,
-            RUNNING_OFFSET_Y = 10,
             TIME_TRAJECTORY_GEN = 0;
 
     public boolean isRed = true;
@@ -35,10 +26,8 @@ public final class Robot {
     public final Deposit deposit;
 
     private final List<LynxModule> revHubs;
-    private Backdrop latestScan = null;
-//    private final BackdropScanner scanner = new BackdropScanner();
-    public final Pixel[] placements;
-    private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
+
+    private final BackdropScanner scanner;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -51,8 +40,7 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        Pixel initial = new Pixel(-2, 0, EMPTY);
-        placements = new Pixel[]{initial, initial};
+        scanner = new BackdropScanner(drivetrain);
     }
 
     public void readSensors() {
@@ -60,23 +48,8 @@ public final class Robot {
     }
 
     public void generateAutoPath() {
-
-        double side = isRed ? -1 : 1;
-
-        Pose2d scoringPose1 = placements[0].toPose2d(isRed);
-        Pose2d scoringPose2 = placements[2].toPose2d(isRed);
-
-        Pose2d currentPose = drivetrain.getPoseEstimate();
-        Pose2d startPose = new Pose2d(currentPose.getX() + RUNNING_OFFSET_X, currentPose.getY() + side * RUNNING_OFFSET_Y, currentPose.getHeading());
-
-        TrajectorySequence scoringTrajectory = drivetrain.trajectorySequenceBuilder(startPose)
-                .setReversed(true)
-                .splineTo(scoringPose1.vec(), scoringPose1.getHeading())
-                .waitSeconds(1)
-                .lineTo(scoringPose2.vec())
-                .build()
-        ;
-
+        TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
+        if (scoringTrajectory == null) return;
         drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
         autoDriveStarted = false;
         autoTimer.reset();
@@ -91,47 +64,9 @@ public final class Robot {
 
     public void run() {
 
-//        if (scanner.newScanAvailable()) {
-//            latestScan = scanner.getBackdrop();
-//            optimalPlacements = scanner.getOptimalPlacements();
-//        }
-
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-
-            if (latestScan != null) {
-
-                Backdrop latestScanCopy = latestScan.clone();
-                ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
-
-                Pixel.Color[] depositColors = deposit.paintbrush.getColors();
-                Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
-
-                placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-                placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-
-                if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
-                    if (firstColor.matches(pixel.color)) {
-
-                        Pixel placement = new Pixel(pixel, firstColor);
-
-                        placements[0] = placement;
-                        latestScanCopy.add(placement);
-                        optimalPlacementsCopy = PlacementCalculator.calculate(latestScanCopy);
-                        break;
-                    }
-                }
-                if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
-                    if (secondColor.matches(pixel.color)) {
-
-                        Pixel placement = new Pixel(pixel, secondColor);
-
-                        placements[1] = placement;
-                        break;
-                    }
-                }
-
-            }
+            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
         }
 
         deposit.run();
@@ -144,9 +79,15 @@ public final class Robot {
     }
 
     public void printTelemetry(MultipleTelemetry mTelemetry) {
-        for (int i = 0; i < min(2, optimalPlacements.size()); i++) {
-            mTelemetry.addLine(optimalPlacements.get(i).color.name());
-        }
+        mTelemetry.addLine("Colors needed in wing:");
+        mTelemetry.addLine("First: " +  scanner.getColorsNeeded()[0].name());
+        mTelemetry.addLine("Second: " + scanner.getColorsNeeded()[1].name());
+        mTelemetry.addLine();
+        mTelemetry.addLine("Place on backdrop:");
+        mTelemetry.addLine("First: " + scanner.getPlacements()[0].coordsString());
+        mTelemetry.addLine("Second: " + scanner.getPlacements()[1].coordsString());
+        mTelemetry.addLine();
+        mTelemetry.addLine(scanner.backdropChanged() ? "Backdrop changed!" : "No changes to backdrop");
         mTelemetry.addLine();
         drivetrain.printTelemetry(mTelemetry);
         mTelemetry.addLine();

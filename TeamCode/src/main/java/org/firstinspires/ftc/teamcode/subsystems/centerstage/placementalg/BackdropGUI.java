@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.HIGHLIGHTED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.calculate;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 import static java.lang.System.out;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -20,7 +20,7 @@ public final class BackdropGUI {
     public static double flashingTime = 0.5;
 
     private final Backdrop backdrop = new Backdrop();
-    public ArrayList<Pixel> pixelsToPlace = calculate(backdrop);
+    public ArrayList<Pixel> pixelsToPlace = getOptimalPlacements(backdrop);
 
     private Pixel selectedPixel;
     private boolean showSelection = true;
@@ -31,7 +31,7 @@ public final class BackdropGUI {
 
         for (int i = 0; i < 15; i++) {
             backdrop.add(pixelsToPlace.get(0));
-            pixelsToPlace = calculate(backdrop);
+            pixelsToPlace = getOptimalPlacements(backdrop);
         }
         selectedPixel = backdrop.get(1, 0);
     }
@@ -65,7 +65,7 @@ public final class BackdropGUI {
     public void update(Pixel.Color color) {
         backdrop.add(new Pixel(selectedPixel, color));
         selectedPixel = backdrop.get(selectedPixel.x, selectedPixel.y);
-        pixelsToPlace = calculate(backdrop);
+        pixelsToPlace = getOptimalPlacements(backdrop);
     }
 
     public void toTelemetry(MultipleTelemetry mTelemetry) {

@@ -61,7 +61,11 @@ public final class Pixel implements Comparable<Pixel> {
     @NonNull
     public String toString() {
         double decPlaces = 100000;
-        return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
+        return coordsString() + ", " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
+    }
+
+    public String coordsString() {
+        return "(" + x + ", " + y + ")";
     }
 
     void print() {

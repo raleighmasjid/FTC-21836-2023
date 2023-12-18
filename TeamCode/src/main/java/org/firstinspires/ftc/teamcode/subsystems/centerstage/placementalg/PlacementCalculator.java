@@ -27,13 +27,13 @@ public final class PlacementCalculator {
 
     static {
         PERFECT_BACKDROP = new Backdrop();
-        calculate(PERFECT_BACKDROP);
+        getOptimalPlacements(PERFECT_BACKDROP);
         while (PERFECT_BACKDROP.notFull()) {
             Pixel pToPlace = optimalPlacements.get(0);
             if (pToPlace.color == ANY)
                 pToPlace = new Pixel(pToPlace, COLORED);
             PERFECT_BACKDROP.add(pToPlace);
-            calculate(PERFECT_BACKDROP);
+            getOptimalPlacements(PERFECT_BACKDROP);
         }
         PERFECT_BACKDROP.printRectangular = false;
     }
@@ -340,7 +340,7 @@ public final class PlacementCalculator {
         return false;
     }
 
-    public static ArrayList<Pixel> calculate(Backdrop backdrop) {
+    public static ArrayList<Pixel> getOptimalPlacements(Backdrop backdrop) {
         PlacementCalculator.backdrop = backdrop;
         backdrop.mosaicCount = 0;
         optimalPlacements.clear();
