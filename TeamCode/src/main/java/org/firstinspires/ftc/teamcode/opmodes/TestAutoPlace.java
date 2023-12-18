@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner.RUNNING_OFFSET_X;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner.RUNNING_OFFSET_Y;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -42,7 +40,7 @@ public class TestAutoPlace extends LinearOpMode {
         Pose2d scoringPos2 = placements[1].toPose2d(robot.isRed);
 
         Pose2d currentPose = robot.drivetrain.getPoseEstimate();
-        Pose2d startPose = new Pose2d(currentPose.getX() + RUNNING_OFFSET_X, currentPose.getY() + side * RUNNING_OFFSET_Y, currentPose.getHeading());
+        Pose2d startPose = new Pose2d(currentPose.getX() + (double) 0, currentPose.getY() + side * (double) 0, currentPose.getHeading());
 
         TrajectorySequence scoringTrajectory = robot.drivetrain.trajectorySequenceBuilder(startPose)
                 .setReversed(true)

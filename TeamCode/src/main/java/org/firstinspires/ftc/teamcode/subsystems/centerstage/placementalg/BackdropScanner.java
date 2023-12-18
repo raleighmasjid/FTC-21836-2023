@@ -16,10 +16,6 @@ import java.util.ArrayList;
 
 public final class BackdropScanner extends Thread {
 
-    public static double
-            RUNNING_OFFSET_X = 10,
-            RUNNING_OFFSET_Y = 10;
-
     private boolean run = true;
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
@@ -110,7 +106,7 @@ public final class BackdropScanner extends Thread {
                 Pose2d scoringPos2 = placements[1].toPose2d(isRed);
 
                 Pose2d currentPose = robot.drivetrain.getPoseEstimate();
-                Pose2d startPose = new Pose2d(currentPose.getX() + RUNNING_OFFSET_X, currentPose.getY() + side * RUNNING_OFFSET_Y, currentPose.getHeading());
+                Pose2d startPose = new Pose2d(currentPose.getX() + (double) 0, currentPose.getY() + side * (double) 0, currentPose.getHeading());
 
                 scoringTrajectory = robot.drivetrain.trajectorySequenceBuilder(startPose)
                         .setReversed(true)
