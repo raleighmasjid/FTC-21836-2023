@@ -10,8 +10,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 import java.util.ArrayList;
 
@@ -31,14 +30,12 @@ public final class BackdropScanner extends Thread {
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
     private TrajectorySequence scoringTrajectory = null;
 
-    private final MecanumDrivetrain drivetrain;
-    private final Deposit deposit;
+    private final Robot robot;
     private boolean isRed = true, pixelsTransferred = false;
     private Pixel.Color[] depositColors = {EMPTY, EMPTY};
 
-    public BackdropScanner(MecanumDrivetrain drivetrain, Deposit deposit) {
-        this.drivetrain = drivetrain;
-        this.deposit = deposit;
+    public BackdropScanner(Robot robot) {
+        this.robot = robot;
         start();
     }
 
@@ -112,20 +109,22 @@ public final class BackdropScanner extends Thread {
                 Pose2d scoringPos1 = placements[0].toPose2d(isRed);
                 Pose2d scoringPos2 = placements[1].toPose2d(isRed);
 
-                Pose2d currentPose = drivetrain.getPoseEstimate();
+                Pose2d currentPose = robot.drivetrain.getPoseEstimate();
                 Pose2d startPose = new Pose2d(currentPose.getX() + RUNNING_OFFSET_X, currentPose.getY() + side * RUNNING_OFFSET_Y, currentPose.getHeading());
 
-                scoringTrajectory = drivetrain.trajectorySequenceBuilder(startPose)
+                scoringTrajectory = robot.drivetrain.trajectorySequenceBuilder(startPose)
                         .setReversed(true)
+                        .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[0].y))
                         .splineTo(scoringPos1.vec(), scoringPos1.getHeading())
                         .addTemporalMarker(() -> {
-                            deposit.paintbrush.dropPixels(1);
+                            robot.deposit.paintbrush.dropPixels(1);
                             latestScan.add(placements[0]);
                         })
                         .waitSeconds(TIME_DROP_FIRST)
+                        .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[1].y))
                         .lineTo(scoringPos2.vec())
                         .addTemporalMarker(() -> {
-                            deposit.paintbrush.dropPixels(2);
+                            robot.deposit.paintbrush.dropPixels(2);
                             latestScan.add(placements[1]);
                         })
                         .waitSeconds(TIME_DROP_SECOND)

@@ -46,7 +46,7 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        scanner = new BackdropScanner(drivetrain, deposit);
+        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicatorGroup(hardwareMap, 2);
     }
@@ -74,7 +74,7 @@ public final class Robot {
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
+//            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
         }
 
         deposit.run();
