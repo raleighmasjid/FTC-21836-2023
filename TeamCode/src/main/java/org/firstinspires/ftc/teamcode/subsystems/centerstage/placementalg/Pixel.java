@@ -30,7 +30,7 @@ public final class Pixel implements Comparable<Pixel> {
     public final Pixel.Color color;
     double scoreValue = 0;
 
-    Pixel(int x, int y, Pixel.Color color) {
+    public Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
         this.y = y;
         this.color = color;

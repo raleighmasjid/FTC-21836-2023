@@ -19,7 +19,7 @@ public class MeepMeepTesting {
         boolean isRed = true;
         double side = isRed ? -1 : 1;
 
-        Pixel pixel1 = new Pixel(1, 0);
+        Pixel pixel1 = new Pixel((isRed ? -2 : 9), 0);
         Pixel pixel2 = new Pixel(5, 0);
         Pose2d scoringPose1 = pixel1.toPose2d(isRed);
         Pose2d scoringPose2 = pixel2.toPose2d(isRed);

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -42,7 +42,7 @@ public final class Deposit {
 
     void run() {
 
-        if (!paintbrush.droppedPixel && paintbrush.timer.seconds() >= TIME_DROP) {
+        if (!paintbrush.droppedPixel && paintbrush.timer.seconds() >= TIME_DROP_SECOND) {
             paintbrush.droppedPixel = true;
             lift.retract();
         }
@@ -160,7 +160,8 @@ public final class Deposit {
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 40,
-                TIME_DROP = 1;
+                TIME_DROP_FIRST = 1,
+                TIME_DROP_SECOND = 1;
 
         private final SimpleServoPivot pivot, hook, claw;
 

@@ -33,7 +33,7 @@ public final class Robot {
     private final List<LynxModule> revHubs;
     private Backdrop latestScan = null;
 //    private final BackdropScanner scanner = new BackdropScanner();
-    private final Pixel[] placements = new Pixel[2];
+    private final Pixel[] placements = {new Pixel((isRed ? -2 : 9), 0, EMPTY), new Pixel((isRed ? -2 : 9), 0, EMPTY)};
     private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
 
     public Robot(HardwareMap hardwareMap) {
@@ -67,8 +67,8 @@ public final class Robot {
                 Pixel.Color[] depositColors = deposit.paintbrush.getColors();
                 Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-                placements[0] = null;
-                placements[1] = null;
+                placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+                placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
 
                 if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
                     if (firstColor.matches(pixel.color)) {
