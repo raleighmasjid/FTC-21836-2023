@@ -5,9 +5,12 @@ import static java.lang.Double.min;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator;
@@ -22,7 +25,8 @@ public final class Robot {
     public static double
             maxVoltage = 13,
             RUNNING_OFFSET_X = 10,
-            RUNNING_OFFSET_Y = 10;
+            RUNNING_OFFSET_Y = 10,
+            TIME_TRAJECTORY_GEN = 0;
 
     public boolean isRed = true;
 
@@ -33,8 +37,11 @@ public final class Robot {
     private final List<LynxModule> revHubs;
     private Backdrop latestScan = null;
 //    private final BackdropScanner scanner = new BackdropScanner();
-    private final Pixel[] placements = {new Pixel((isRed ? -2 : 9), 0, EMPTY), new Pixel((isRed ? -2 : 9), 0, EMPTY)};
+    private final Pixel[] placements;
     private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
+
+    private boolean autoDriveStarted = true;
+    private final ElapsedTime autoTimer = new ElapsedTime();
 
     public Robot(HardwareMap hardwareMap) {
         revHubs = hardwareMap.getAll(LynxModule.class);
@@ -43,10 +50,43 @@ public final class Robot {
         drivetrain = new AutoTurnMecanum(hardwareMap);
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
+
+        Pixel initial = new Pixel(-2, 0, EMPTY);
+        placements = new Pixel[]{initial, initial};
     }
 
     public void readSensors() {
         for (LynxModule hub : revHubs) hub.clearBulkCache();
+    }
+
+    public void generateAutoPath() {
+
+        double side = isRed ? -1 : 1;
+
+        Pose2d scoringPose1 = placements[0].toPose2d(isRed);
+        Pose2d scoringPose2 = placements[2].toPose2d(isRed);
+
+        Pose2d currentPose = drivetrain.getPoseEstimate();
+        Pose2d startPose = new Pose2d(currentPose.getX() + RUNNING_OFFSET_X, currentPose.getY() + side * RUNNING_OFFSET_Y, currentPose.getHeading());
+
+        TrajectorySequence scoringTrajectory = drivetrain.trajectorySequenceBuilder(startPose)
+                .setReversed(true)
+                .splineTo(scoringPose1.vec(), scoringPose1.getHeading())
+                .waitSeconds(1)
+                .lineTo(scoringPose2.vec())
+                .build()
+        ;
+
+        drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
+        autoDriveStarted = false;
+        autoTimer.reset();
+    }
+
+    public boolean readyToStartAutoDrive() {
+        if (!autoDriveStarted && autoTimer.seconds() >= TIME_TRAJECTORY_GEN) {
+            autoDriveStarted = true;
+            return true;
+        } else return false;
     }
 
     public void run() {
