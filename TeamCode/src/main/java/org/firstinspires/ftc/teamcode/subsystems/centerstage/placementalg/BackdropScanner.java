@@ -135,14 +135,8 @@ public final class BackdropScanner extends Thread {
         return placements;
     }
 
-    public boolean trajectoryGenerated() {
-        return scoringTrajectory != null;
-    }
-
     public TrajectorySequence getScoringTrajectory() {
-        TrajectorySequence copy = scoringTrajectory;
-        scoringTrajectory = null;
-        return copy;
+        return scoringTrajectory;
     }
 
     public void interrupt() {
