@@ -74,7 +74,7 @@ public final class Robot {
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-//            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
+            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
         }
 
         deposit.run();

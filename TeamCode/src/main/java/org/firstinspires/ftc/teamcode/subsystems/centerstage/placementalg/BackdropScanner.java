@@ -156,9 +156,9 @@ public final class BackdropScanner extends Thread {
         mTelemetry.addLine("Second: " + colorsNeeded[1].name());
         mTelemetry.addLine();
         mTelemetry.addLine("Place on backdrop:");
-        mTelemetry.addLine("First: " + placements[0].coordsString());
-        mTelemetry.addLine("Second: " + placements[1].coordsString());
+        mTelemetry.addLine("First: (" + placements[0].x + ", " + placements[0].y + ")");
+        mTelemetry.addLine("Second: (" + placements[1].x + ", " + placements[1].y + ")");
         mTelemetry.addLine();
-        mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop changed!" : "No changes to backdrop");
+        mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
     }
 }
