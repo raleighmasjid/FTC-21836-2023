@@ -37,7 +37,7 @@ public final class Robot {
     private final List<LynxModule> revHubs;
     private Backdrop latestScan = null;
 //    private final BackdropScanner scanner = new BackdropScanner();
-    private final Pixel[] placements;
+    public final Pixel[] placements;
     private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
 
     private boolean autoDriveStarted = true;
