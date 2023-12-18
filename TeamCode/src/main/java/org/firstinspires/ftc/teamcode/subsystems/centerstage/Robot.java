@@ -19,7 +19,10 @@ import java.util.List;
 @Config
 public final class Robot {
 
-    public static double maxVoltage = 13;
+    public static double
+            maxVoltage = 13,
+            RUNNING_OFFSET_X = 10,
+            RUNNING_OFFSET_Y = 10;
 
     public boolean isRed = true;
 
