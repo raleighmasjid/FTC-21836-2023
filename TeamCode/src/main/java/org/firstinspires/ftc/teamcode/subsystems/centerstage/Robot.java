@@ -74,13 +74,13 @@ public final class Robot {
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-            scanner.generateTrajectory(isRed, deposit.paintbrush.getColors());
+            scanner.generateTrajectory(deposit.paintbrush.getColors());
         }
 
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
-        indicators.setState(drivetrain.isBusy() ? RED : scanner.trajectoryGenerated() ? GREEN : OFF);
+        indicators.setState(drivetrain.isBusy() ? RED : scanner.trajectoryReady() ? GREEN : OFF);
         indicators.run();
     }
 

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static java.lang.Math.toRadians;
+import static java.lang.Math.PI;
 
 import androidx.annotation.NonNull;
 
@@ -54,7 +54,7 @@ public final class Pixel implements Comparable<Pixel> {
         return new Pose2d(
                 Backdrop.X,
                 (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
-                0
+                PI
         );
     }
 

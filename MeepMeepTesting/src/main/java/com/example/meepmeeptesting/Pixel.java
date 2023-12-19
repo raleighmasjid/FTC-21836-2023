@@ -3,7 +3,7 @@ package com.example.meepmeeptesting;
 import static com.example.meepmeeptesting.Backdrop.X;
 import static com.example.meepmeeptesting.Backdrop.Y_MAX_BLUE;
 import static com.example.meepmeeptesting.Backdrop.Y_MAX_RED;
-import static java.lang.Math.toRadians;
+import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
@@ -25,7 +25,7 @@ public final class Pixel {
         return new Pose2d(
                 X,
                 (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
-                toRadians(0)
+                PI
         );
     }
 }
