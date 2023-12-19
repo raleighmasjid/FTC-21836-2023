@@ -25,7 +25,7 @@ public final class BackdropScanner extends Thread {
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
     private TrajectorySequence scoringTrajectory = null;
-    private boolean trajectoryGenerated = false;
+    private boolean trajectoryIsGenerated = false;
 
     private final Robot robot;
     private boolean isRed = true, pixelsTransferred = false;
@@ -121,23 +121,21 @@ public final class BackdropScanner extends Thread {
                         latestScan.add(placements[1]);
                     })
                     .waitSeconds(TIME_DROP_SECOND)
+                    .addTemporalMarker(() -> trajectoryIsGenerated = false)
                     .build()
             ;
-            trajectoryGenerated = true;
+            trajectoryIsGenerated = true;
 
             pixelsTransferred = false;
         }
     }}
 
-    public boolean trajectoryGenerated() {
-        return trajectoryGenerated;
+    public boolean trajectoryIsGenerated() {
+        return trajectoryIsGenerated;
     }
 
     public TrajectorySequence getScoringTrajectory() {
-        if (trajectoryGenerated) {
-            trajectoryGenerated = false;
-            return scoringTrajectory;
-        } else return null;
+        return trajectoryIsGenerated ? scoringTrajectory : null;
     }
 
     public void interrupt() {
