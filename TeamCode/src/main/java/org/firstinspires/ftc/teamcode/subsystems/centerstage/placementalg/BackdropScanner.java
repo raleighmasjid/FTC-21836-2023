@@ -25,6 +25,7 @@ public final class BackdropScanner extends Thread {
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
     private TrajectorySequence scoringTrajectory = null;
+    private boolean trajectoryGenerated = false;
 
     private final Robot robot;
     private boolean isRed = true, pixelsTransferred = false;
@@ -41,105 +42,102 @@ public final class BackdropScanner extends Thread {
         pixelsTransferred = true;
     }
 
-    public void run() {
-        while (run) {
-            Backdrop lastScan = latestScan.clone();
+    public void run() { while (run) {
+        Backdrop lastScan = latestScan.clone();
 
-            // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
+        // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
 
-            // Skew image to fit april tag to square proportions
+        // Skew image to fit april tag to square proportions
 
-            // Shift image to some "standard configuration"
+        // Shift image to some "standard configuration"
 
-            // Check specific screen pixel coordinates to get colors
+        // Check specific screen pixel coordinates to get colors
 
-            // Save colors to corresponding locations in newScan
+        // Save colors to corresponding locations in newScan
 
-            if (!latestScan.equals(lastScan)) {
-                timeSinceUpdate.reset();
-                optimalPlacements = getOptimalPlacements(latestScan);
-                colorsNeeded[0] = EMPTY;
-                colorsNeeded[1] = EMPTY;
-                if (!optimalPlacements.isEmpty()) {
-                    Pixel optimalPlacement = optimalPlacements.get(0);
+        if (!latestScan.equals(lastScan)) {
+            timeSinceUpdate.reset();
+            optimalPlacements = getOptimalPlacements(latestScan);
+            colorsNeeded[0] = EMPTY;
+            colorsNeeded[1] = EMPTY;
+            if (!optimalPlacements.isEmpty()) {
+                Pixel optimalPlacement = optimalPlacements.get(0);
 
-                    colorsNeeded[0] = optimalPlacement.color;
+                colorsNeeded[0] = optimalPlacement.color;
 
-                    ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
-                    if (!futureOptimalPlacements.isEmpty()) {
-                        colorsNeeded[1] = futureOptimalPlacements.get(0).color;
-                    }
+                ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
+                if (!futureOptimalPlacements.isEmpty()) {
+                    colorsNeeded[1] = futureOptimalPlacements.get(0).color;
                 }
-            }
-
-            if (pixelsTransferred) {
-                ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
-
-                Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
-
-                placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-                placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-
-                if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
-                    if (firstColor.matches(pixel.color)) {
-
-                        Pixel placement = new Pixel(pixel, firstColor);
-
-                        placements[0] = placement;
-                        optimalPlacementsCopy = getOptimalPlacements(latestScan.clone().add(placement));
-                        break;
-                    }
-                }
-                if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
-                    if (secondColor.matches(pixel.color)) {
-
-                        Pixel placement = new Pixel(pixel, secondColor);
-
-                        placements[1] = placement;
-                        break;
-                    }
-                }
-
-                double side = isRed ? -1 : 1;
-
-                Pose2d scoringPos1 = placements[0].toPose2d(isRed);
-                Pose2d scoringPos2 = placements[1].toPose2d(isRed);
-
-                Pose2d currentPose = robot.drivetrain.getPoseEstimate();
-                Pose2d startPose = new Pose2d(currentPose.getX() + (double) 0, currentPose.getY() + side * (double) 0, currentPose.getHeading());
-
-                scoringTrajectory = robot.drivetrain.trajectorySequenceBuilder(startPose)
-                        .setReversed(true)
-                        .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[0].y))
-                        .splineTo(scoringPos1.vec(), scoringPos1.getHeading())
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(1);
-                            latestScan.add(placements[0]);
-                        })
-                        .waitSeconds(TIME_DROP_FIRST)
-                        .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[1].y))
-                        .lineTo(scoringPos2.vec())
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(2);
-                            latestScan.add(placements[1]);
-                        })
-                        .waitSeconds(TIME_DROP_SECOND)
-                        .build()
-                ;
-
-                pixelsTransferred = false;
             }
         }
-    }
+
+        if (pixelsTransferred) {
+            ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
+
+            Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
+
+            placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+            placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+
+            if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+                if (firstColor.matches(pixel.color)) {
+
+                    Pixel placement = new Pixel(pixel, firstColor);
+
+                    placements[0] = placement;
+                    optimalPlacementsCopy = getOptimalPlacements(latestScan.clone().add(placement));
+                    break;
+                }
+            }
+            if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+                if (secondColor.matches(pixel.color)) {
+
+                    Pixel placement = new Pixel(pixel, secondColor);
+
+                    placements[1] = placement;
+                    break;
+                }
+            }
+
+            Pose2d scoringPos1 = placements[0].toPose2d(isRed);
+            Pose2d scoringPos2 = placements[1].toPose2d(isRed);
+
+            Pose2d startPose = robot.drivetrain.getPoseEstimate();
+
+            scoringTrajectory = robot.drivetrain.trajectorySequenceBuilder(startPose)
+                    .setReversed(true)
+                    .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[0].y))
+                    .splineTo(scoringPos1.vec(), scoringPos1.getHeading())
+                    .addTemporalMarker(() -> {
+                        robot.deposit.paintbrush.dropPixels(1);
+                        latestScan.add(placements[0]);
+                    })
+                    .waitSeconds(TIME_DROP_FIRST)
+                    .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[1].y))
+                    .lineTo(scoringPos2.vec())
+                    .addTemporalMarker(() -> {
+                        robot.deposit.paintbrush.dropPixels(2);
+                        latestScan.add(placements[1]);
+                    })
+                    .waitSeconds(TIME_DROP_SECOND)
+                    .build()
+            ;
+            trajectoryGenerated = true;
+
+            pixelsTransferred = false;
+        }
+    }}
 
     public boolean trajectoryGenerated() {
-        return scoringTrajectory != null;
+        return trajectoryGenerated;
     }
 
     public TrajectorySequence getScoringTrajectory() {
-        TrajectorySequence copy = scoringTrajectory;
-        scoringTrajectory = null;
-        return copy;
+        if (trajectoryGenerated) {
+            trajectoryGenerated = false;
+            return scoringTrajectory;
+        } else return null;
     }
 
     public void interrupt() {
