@@ -80,7 +80,7 @@ public final class Robot {
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
-        indicators.setState(scanner.trajectoryGenerated() ? GREEN : drivetrain.isBusy() ? RED : OFF);
+        indicators.setState(drivetrain.isBusy() ? RED : scanner.trajectoryGenerated() ? GREEN : OFF);
         indicators.run();
     }
 
