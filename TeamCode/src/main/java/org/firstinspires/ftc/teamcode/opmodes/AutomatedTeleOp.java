@@ -72,21 +72,17 @@ public final class AutomatedTeleOp extends LinearOpMode {
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            if (keyPressed(1, X)) {
-                if (mode == AUTO) {
-                    robot.drivetrain.breakFollowing();
-                    mode = MANUAL;
-                }
-                else robot.startAutoDrive();
-            }
-
             if (robot.beginUpdatingRunner()) mode = AUTO;
 
             if (mode == AUTO) {
                 robot.drivetrain.update();
-                if (!robot.drivetrain.isBusy()) mode = MANUAL;
-            }
-            else {
+                if (!robot.drivetrain.isBusy() || keyPressed(1, X)) {
+                    robot.drivetrain.breakFollowing();
+                    mode = MANUAL;
+                }
+            } else {
+                if (keyPressed(1, X)) robot.startAutoDrive();
+
                 // Reset current heading as per these keybinds:
                 if (keyPressed(1, DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
                 if (keyPressed(1, DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI / 2);
