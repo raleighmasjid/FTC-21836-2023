@@ -24,8 +24,8 @@ public class LEDIndicatorGroup {
     public LEDIndicatorGroup(HardwareMap hardwareMap, String... names) {
         indicators = new DigitalChannel[names.length][2];
         for (int i = 0; i < names.length; i++) {
-            indicators[i][0] = hardwareMap.get(DigitalChannel.class, "led " + names[i] + " red");
-            indicators[i][1] = hardwareMap.get(DigitalChannel.class, "led " + names[i] + " green");
+            indicators[i][0] = hardwareMap.get(DigitalChannel.class, names[i] + " green");
+            indicators[i][1] = hardwareMap.get(DigitalChannel.class, names[i] + " red");
             indicators[i][0].setMode(OUTPUT);
             indicators[i][1].setMode(OUTPUT);
         }
@@ -37,8 +37,8 @@ public class LEDIndicatorGroup {
 
     public void run() {
         for (DigitalChannel[] indicator : indicators) {
-            indicator[0].setState(state == RED || state == AMBER);
-            indicator[1].setState(state == GREEN || state == AMBER);
+            indicator[0].setState(state == GREEN || state == AMBER);
+            indicator[1].setState(state == RED || state == AMBER);
         }
     }
 }
