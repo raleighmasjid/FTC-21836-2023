@@ -21,11 +21,11 @@ public class LEDIndicatorGroup {
     private State state = OFF;
     private final DigitalChannel[][] indicators;
 
-    public LEDIndicatorGroup(HardwareMap hardwareMap, int indicatorCount) {
-        indicators = new DigitalChannel[indicatorCount][2];
-        for (int i = 0; i < indicatorCount; i++) {
-            indicators[i][0] = hardwareMap.get(DigitalChannel.class, "led " + (i + 1) + " red");
-            indicators[i][1] = hardwareMap.get(DigitalChannel.class, "led " + (i + 1) + " green");
+    public LEDIndicatorGroup(HardwareMap hardwareMap, String... names) {
+        indicators = new DigitalChannel[names.length][2];
+        for (int i = 0; i < names.length; i++) {
+            indicators[i][0] = hardwareMap.get(DigitalChannel.class, "led " + names[i] + " red");
+            indicators[i][1] = hardwareMap.get(DigitalChannel.class, "led " + names[i] + " green");
             indicators[i][0].setMode(OUTPUT);
             indicators[i][1].setMode(OUTPUT);
         }

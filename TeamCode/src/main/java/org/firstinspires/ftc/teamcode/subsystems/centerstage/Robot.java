@@ -48,7 +48,7 @@ public final class Robot {
 
         scanner = new BackdropScanner(this);
 
-        indicators = new LEDIndicatorGroup(hardwareMap, 2);
+        indicators = new LEDIndicatorGroup(hardwareMap, "left", "right");
     }
 
     public void readSensors() {
