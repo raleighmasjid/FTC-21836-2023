@@ -87,6 +87,7 @@ public final class Robot {
     public void interrupt() {
         drivetrain.interrupt();
         intake.interrupt();
+        scanner.interrupt();
     }
 
     public void printTelemetry(MultipleTelemetry mTelemetry) {
