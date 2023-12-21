@@ -77,6 +77,8 @@ public final class TuningLiftKvKa extends LinearOpMode {
 
         profiler = new MotionProfiler();
 
+        waitForStart();
+
         // Control loop:
         while (opModeIsActive()) {
             gamepadEx1.readButtons();
