@@ -146,7 +146,7 @@ public final class Deposit {
             telemetry.addData("Current position (in)", currentState.x);
             telemetry.addData("Target position (in)", targetState.x);
             telemetry.addLine();
-            telemetry.addData("Lift error derivative (in/s)", controller.getErrorDerivative());
+            telemetry.addData("Lift error derivative (in/s)", controller.getFilteredErrorDerivative());
 
         }
     }

@@ -20,8 +20,7 @@ public class PIDController implements FeedbackController {
     private final Integrator integrator = new Integrator();
 
     private State error = new State();
-    private double errorIntegral;
-    private double errorDerivative;
+    private double errorIntegral, filteredErrorDerivative, rawErrorDerivative;
 
     public PIDController() {
         this(new NoFilter());
@@ -44,9 +43,10 @@ public class PIDController implements FeedbackController {
 
         if (signum(error.x) != signum(lastError.x)) reset();
         errorIntegral = integrator.getIntegral(error.x);
-        errorDerivative = derivFilter.calculate(differentiator.getDerivative(error.x));
+        rawErrorDerivative = differentiator.getDerivative(error.x);
+        filteredErrorDerivative = derivFilter.calculate(rawErrorDerivative);
 
-        double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * errorDerivative);
+        double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * filteredErrorDerivative);
 
         stopIntegration(abs(output) >= gains.maxOutputWithIntegral && signum(output) == signum(error.x));
 
@@ -57,8 +57,12 @@ public class PIDController implements FeedbackController {
         this.target = target;
     }
 
-    public double getErrorDerivative() {
-        return errorDerivative;
+    public double getFilteredErrorDerivative() {
+        return filteredErrorDerivative;
+    }
+
+    public double getRawErrorDerivative() {
+        return rawErrorDerivative;
     }
 
     public double getErrorIntegral() {
