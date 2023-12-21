@@ -7,6 +7,10 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.INCHES_PER_TICK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.feedforwardGains;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.kG;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.lowPassGains;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -20,9 +24,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.control.controllers.FeedforwardController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -30,20 +32,10 @@ import org.firstinspires.ftc.teamcode.control.motion.State;
 @TeleOp(group = "21836 Backup")
 public final class TuningLiftKvKa extends LinearOpMode {
 
-    public static FeedforwardGains feedforwardGains = new FeedforwardGains(
-            0,
-            0
-    );
-
     public static ProfileConstraints constraints = new ProfileConstraints(
             20,
             10,
             5
-    );
-
-    public static LowPassGains lowPassGains = new LowPassGains(
-            0.8,
-            10
     );
 
     public static KalmanGains kalmanGains = new KalmanGains(
@@ -53,8 +45,6 @@ public final class TuningLiftKvKa extends LinearOpMode {
     );
 
     public static double
-            kG = 0.1,
-            INCHES_PER_TICK = 0.0322835,
             POS_1 = 0,
             POS_2 = 25;
 

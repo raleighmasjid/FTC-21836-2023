@@ -70,11 +70,10 @@ public final class Deposit {
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
                 0,
-                0,
                 0
         );
 
-        public static LowPassGains filterGains = new LowPassGains(
+        public static LowPassGains lowPassGains = new LowPassGains(
                 0,
                 2
         );
@@ -88,7 +87,7 @@ public final class Deposit {
         private final MotorEx[] motors;
         private State currentState = new State(), targetState = new State();
         private int targetRow = -1;
-        private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(filterGains);
+        private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(lowPassGains);
         private final PIDController controller = new PIDController(kDFilter);
 
         // Battery voltage sensor and variable to track its readings:
@@ -129,7 +128,7 @@ public final class Deposit {
 
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
-            kDFilter.setGains(filterGains);
+            kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT));
 
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
