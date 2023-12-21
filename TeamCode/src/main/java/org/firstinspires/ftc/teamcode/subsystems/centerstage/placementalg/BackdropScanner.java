@@ -112,14 +112,18 @@ public final class BackdropScanner extends Thread {
 
                         // one pixel in deposit:
                         robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements[1].y))
+                                .addTemporalMarker(() -> {
+                                    robot.deposit.lift.setTargetRow(placements[1].y);
+                                })
                                 .lineToSplineHeading(scoringPos2)
                                 .addTemporalMarker(() -> {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> trajectoryReady = false)
+                                .addTemporalMarker(() -> {
+                                    trajectoryReady = false;
+                                })
                                 .build()
                         :
 
