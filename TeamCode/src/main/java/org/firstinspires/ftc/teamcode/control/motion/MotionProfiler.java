@@ -52,6 +52,10 @@ public final class MotionProfiler {
         return profileState.getJ();
     }
 
+    public State getState() {
+        return new State(getX(), getV(), getA(), getJ());
+    }
+
     public boolean isDone() {
         return profileTimer.seconds() >= profile.duration();
     }
