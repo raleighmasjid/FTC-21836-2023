@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -67,6 +68,12 @@ public final class Deposit {
                 1
         );
 
+        public static FeedforwardGains feedforwardGains = new FeedforwardGains(
+                0,
+                0,
+                0
+        );
+
         public static LowPassGains filterGains = new LowPassGains(
                 0,
                 2
@@ -74,7 +81,8 @@ public final class Deposit {
 
         public static double
                 kG = 0.1,
-                INCHES_PER_TICK = 0.0322835;
+                INCHES_PER_TICK = 0.0322835,
+                PERCENT_OVERSHOOT = 0;
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
@@ -93,8 +101,10 @@ public final class Deposit {
                     new MotorEx(hardwareMap, "lift left", RPM_1150)
             };
             motors[1].setInverted(true);
-            for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
-            reset();
+            for (MotorEx motor : motors) {
+                motor.setZeroPowerBehavior(FLOAT);
+                motor.encoder.reset();
+            }
         }
 
         public void setTargetRow(int targetRow) {
@@ -120,7 +130,7 @@ public final class Deposit {
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
             kDFilter.setGains(filterGains);
-            controller.setGains(pidGains);
+            controller.setGains(pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT));
 
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
             for (MotorEx motor : motors) motor.set(output);
@@ -128,14 +138,6 @@ public final class Deposit {
 
         private double kG() {
             return currentState.x > 0.15 ? kG : 0;
-        }
-
-        private void reset() {
-            targetRow = -1;
-            currentState = new State();
-            targetState = new State();
-            controller.reset();
-            for (MotorEx motor : motors) motor.encoder.reset();
         }
 
         void printTelemetry(MultipleTelemetry telemetry) {
@@ -147,7 +149,9 @@ public final class Deposit {
             telemetry.addData("Target position (in)", targetState.x);
             telemetry.addLine();
             telemetry.addData("Lift error derivative (in/s)", controller.getFilteredErrorDerivative());
-
+            telemetry.addLine();
+            telemetry.addData("kP (corrected)", pidGains.kP);
+            telemetry.addData("kD (computed)", pidGains.kD);
         }
     }
 
