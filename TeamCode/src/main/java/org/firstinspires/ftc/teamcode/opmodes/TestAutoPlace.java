@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdr
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 
 
-@TeleOp(group = "21836 Backup")
+@TeleOp(group = "21836 B")
 public class TestAutoPlace extends LinearOpMode {
 
     public static int

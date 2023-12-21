@@ -32,7 +32,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
-@TeleOp(group = "21836 Main")
+@TeleOp(group = "21836 A")
 public final class MainTeleOp extends LinearOpMode {
 
     @Override

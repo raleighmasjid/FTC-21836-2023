@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 
-@TeleOp(group = "21836 Backup")
+@TeleOp(group = "21836 B")
 public final class TuningLiftKvKa extends LinearOpMode {
 
     public static ProfileConstraints constraints = new ProfileConstraints(

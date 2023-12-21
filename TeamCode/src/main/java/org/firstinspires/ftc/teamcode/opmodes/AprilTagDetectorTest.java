@@ -29,7 +29,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(group = "21836 Backup")
+@Autonomous(group = "21836 B")
 public final class AprilTagDetectorTest extends LinearOpMode {
 
     @Override

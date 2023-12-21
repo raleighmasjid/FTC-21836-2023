@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
-@TeleOp(group = "21836 Backup")
+@TeleOp(group = "21836 B")
 public final class AutomatedTeleOp extends LinearOpMode {
 
     enum Mode {MANUAL, AUTO}

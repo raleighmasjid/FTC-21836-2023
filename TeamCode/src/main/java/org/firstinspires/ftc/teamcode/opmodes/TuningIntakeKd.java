@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
-@TeleOp(group = "21836 Backup")
+@TeleOp(group = "21836 B")
 public final class TuningIntakeKd extends LinearOpMode {
 
     SimpleServoPivot pivot;
