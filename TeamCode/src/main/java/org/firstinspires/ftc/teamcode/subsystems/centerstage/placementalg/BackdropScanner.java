@@ -77,8 +77,9 @@ public final class BackdropScanner extends Thread {
 
                 Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-                placements[0] = new Pixel((robot.isRed ? -2 : 9), 0, EMPTY);
-                placements[1] = new Pixel((robot.isRed ? -2 : 9), 0, EMPTY);
+                Pixel floorDrop = new Pixel((robot.isRed ? -2 : 9), 0, EMPTY);
+                placements[0] = floorDrop;
+                placements[1] = floorDrop;
 
                 if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
                     if (firstColor.matches(pixel.color)) {
@@ -105,52 +106,50 @@ public final class BackdropScanner extends Thread {
 
                 Pose2d startPose = robot.drivetrain.getPoseEstimate();
 
-                scoringTrajectory = firstColor == EMPTY ? secondColor == EMPTY ?
+                boolean firstEmpty = firstColor == EMPTY;
+                boolean secondEmpty = secondColor == EMPTY;
 
-                        // no pixels in deposit:
-                        null :
-
-                        // one pixel in deposit:
-                        robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.lift.setTargetRow(placements[1].y);
-                                })
-                                .lineToSplineHeading(scoringPos2)
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
-                                    latestScan.add(placements[1]);
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> {
-                                    trajectoryReady = false;
-                                })
-                                .build()
-                        :
-
-                        // two pixels in deposit:
-                        robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.lift.setTargetRow(placements[0].y);
-                                })
-                                .lineToSplineHeading(scoringPos1)
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(1);
-                                    latestScan.add(placements[0]);
-                                })
-                                .waitSeconds(TIME_DROP_FIRST)
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.lift.setTargetRow(placements[1].y);
-                                })
-                                .lineToConstantHeading(scoringPos2.vec())
-                                .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
-                                    latestScan.add(placements[1]);
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> {
-                                    trajectoryReady = false;
-                                })
-                                .build()
+                scoringTrajectory =
+                        firstEmpty && secondEmpty ?
+                                null :
+                                firstEmpty || placements[0] == placements[1] && placements[0] == floorDrop ?
+                                        robot.drivetrain.trajectorySequenceBuilder(startPose)
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.lift.setTargetRow(placements[1].y);
+                                                })
+                                                .lineToSplineHeading(scoringPos2)
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.paintbrush.dropPixels(2);
+                                                    latestScan.add(placements[1]);
+                                                })
+                                                .waitSeconds(TIME_DROP_SECOND)
+                                                .addTemporalMarker(() -> {
+                                                    trajectoryReady = false;
+                                                })
+                                                .build() :
+                                        robot.drivetrain.trajectorySequenceBuilder(startPose)
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.lift.setTargetRow(placements[0].y);
+                                                })
+                                                .lineToSplineHeading(scoringPos1)
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.paintbrush.dropPixels(1);
+                                                    latestScan.add(placements[0]);
+                                                })
+                                                .waitSeconds(TIME_DROP_FIRST)
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.lift.setTargetRow(placements[1].y);
+                                                })
+                                                .lineToConstantHeading(scoringPos2.vec())
+                                                .addTemporalMarker(() -> {
+                                                    robot.deposit.paintbrush.dropPixels(2);
+                                                    latestScan.add(placements[1]);
+                                                })
+                                                .waitSeconds(TIME_DROP_SECOND)
+                                                .addTemporalMarker(() -> {
+                                                    trajectoryReady = false;
+                                                })
+                                                .build()
                 ;
 
                 if (scoringTrajectory != null) trajectoryReady = true;
