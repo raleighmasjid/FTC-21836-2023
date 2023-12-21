@@ -14,14 +14,13 @@ public final class KalmanFilter extends com.ThermalEquilibrium.homeostasis.Filte
         super(
                 gains.sensorGain,
                 gains.modelGain,
-                gains.count
+                max(gains.count, 2)
         );
     }
 
     public void setGains(KalmanGains gains) {
         Q = gains.sensorGain;
         R = gains.modelGain;
-        N = max(gains.count, 2);
     }
 
     @Override
