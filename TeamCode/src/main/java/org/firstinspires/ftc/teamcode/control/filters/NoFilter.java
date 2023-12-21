@@ -2,16 +2,13 @@ package org.firstinspires.ftc.teamcode.control.filters;
 
 public final class NoFilter implements Filter {
 
-    private double lastValue;
-
     @Override
     public double calculate(double newValue) {
-        lastValue = newValue;
-        return lastValue;
+        return newValue;
     }
 
     @Override
     public void reset() {
-        lastValue = 0;
+
     }
 }
