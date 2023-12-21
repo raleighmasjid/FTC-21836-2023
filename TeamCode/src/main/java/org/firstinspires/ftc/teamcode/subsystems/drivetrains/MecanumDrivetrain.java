@@ -275,10 +275,12 @@ public class MecanumDrivetrain extends MecanumDrive {
         return wheelVelocities;
     }
 
+    public boolean normalizeMotors = true;
+
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
 
-        double max = max(asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0));
+        double max = normalizeMotors ? max(asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0)) : 1;
 
         leftFront.setPower(v / max);
         leftBack.setPower(v1 / max);
