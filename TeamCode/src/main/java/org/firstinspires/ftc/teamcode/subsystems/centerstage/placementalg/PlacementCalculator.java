@@ -357,6 +357,6 @@ public final class PlacementCalculator {
         removeUnsupportedPixelsToPlace();
 
         sortPixelsToPlace();
-        return optimalPlacements;
+        return new ArrayList<>(optimalPlacements);
     }
 }
