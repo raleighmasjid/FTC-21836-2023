@@ -109,10 +109,12 @@ public final class BackdropScanner extends Thread {
                 boolean firstEmpty = firstColor == EMPTY;
                 boolean secondEmpty = secondColor == EMPTY;
 
+                boolean sameScoringLocation = scoringPos1.epsilonEquals(scoringPos2);
+
                 scoringTrajectory =
                         firstEmpty && secondEmpty ?
                                 null :
-                                firstEmpty || placements[0] == placements[1] && placements[0] == floorDrop ?
+                                firstEmpty || sameScoringLocation ?
                                         robot.drivetrain.trajectorySequenceBuilder(startPose)
                                                 .addTemporalMarker(() -> {
                                                     robot.deposit.lift.setTargetRow(placements[1].y);
