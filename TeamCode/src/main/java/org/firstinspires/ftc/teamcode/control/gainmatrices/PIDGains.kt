@@ -13,10 +13,11 @@ constructor(
     @JvmField var maxOutputWithIntegral: Double = POSITIVE_INFINITY,
 ) {
 
-    fun criticallyDamped(gains: FeedforwardGains, percentOver: Double = 0.0): PIDGains {
+    @JvmOverloads
+    fun criticallyDamp(gains: FeedforwardGains, percentOver: Double = 0.0): PIDGains {
         kP = max(gains.kV.pow(2) / (4 * gains.kA), kP)
         val overshoot: Double = percentOver / 100.0
-        val zeta: Double = if (overshoot == 0.0) 1.0 else -ln(overshoot) / sqrt(PI.pow(2) + ln(overshoot).pow(2))
+        val zeta: Double = if (overshoot <= 0.0) 1.0 else -ln(overshoot) / sqrt(PI.pow(2) + ln(overshoot).pow(2))
         kD = 2 * zeta * sqrt(gains.kA * kP) - gains.kV
         return this
     }
