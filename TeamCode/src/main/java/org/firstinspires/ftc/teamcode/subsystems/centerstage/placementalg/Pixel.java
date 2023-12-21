@@ -36,7 +36,7 @@ public final class Pixel implements Comparable<Pixel> {
         this.color = color;
     }
 
-    public Pixel(Pixel p, Pixel.Color color) {
+    Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
@@ -132,11 +132,11 @@ public final class Pixel implements Comparable<Pixel> {
         public String toString() {
             switch (this) {
                 case PURPLE:
-//                    return "\u001B[35m" + "P" + RESET;
+                    return "\u001B[35m" + "P" + RESET;
                 case YELLOW:
-//                    return "\u001B[33m" + "Y" + RESET;
+                    return "\u001B[33m" + "Y" + RESET;
                 case GREEN:
-//                    return "\u001B[32m" + "G" + RESET;
+                    return "\u001B[32m" + "G" + RESET;
                 case WHITE:
                 case ANY:
                 case COLORED:
