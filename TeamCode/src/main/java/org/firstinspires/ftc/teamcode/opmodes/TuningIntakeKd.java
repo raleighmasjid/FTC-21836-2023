@@ -42,6 +42,11 @@ public final class TuningIntakeKd extends LinearOpMode {
             bulkReader.bulkRead();
             gamepadEx1.readButtons();
 
+            pivot.updateAngles(
+                    ANGLE_PIVOT_OFFSET,
+                    ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
+            );
+
             if (keyPressed(1, X)) pivot.toggle();
 
             pivot.run();
