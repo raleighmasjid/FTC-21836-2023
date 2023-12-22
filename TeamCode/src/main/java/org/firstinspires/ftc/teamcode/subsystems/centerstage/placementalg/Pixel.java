@@ -25,13 +25,12 @@ public final class Pixel implements Comparable<Pixel> {
         return (int) (diff * 1000000000);
     }
 
-    final int x;
-    public final int y;
+    final int x, y;
     Pixel mosaic = null;
-    public final Pixel.Color color;
+    final Pixel.Color color;
     double scoreValue = 0;
 
-    public Pixel(int x, int y, Pixel.Color color) {
+    Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -183,7 +182,7 @@ public final class Pixel implements Comparable<Pixel> {
                     EMPTY;
         }
 
-        public boolean matches(Color other) {
+        boolean matches(Color other) {
             return (this != INVALID && other != INVALID) && (
                     this == ANY ||
                             other == ANY ||
