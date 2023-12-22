@@ -53,7 +53,7 @@ public final class TestNormalizationDisabled extends LinearOpMode {
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   robot.drivetrain.toggleSlowModeLock();
+            if (keyPressed(1, RIGHT_BUMPER))   robot.drivetrain.lockSlowMode();
             if (keyPressed(1, B))              robot.isRed = true;
             if (keyPressed(1, X))              robot.isRed = false;
             mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");

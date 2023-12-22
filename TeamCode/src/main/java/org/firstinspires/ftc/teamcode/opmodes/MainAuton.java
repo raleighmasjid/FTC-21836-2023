@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -38,18 +41,17 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx2 = new GamepadEx(gamepad2);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
-        boolean isRight = true;
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
             if (keyPressed(1, DPAD_RIGHT))  isRight = true;
             if (keyPressed(1, DPAD_LEFT))   isRight = false;
-            if (keyPressed(1, B))           robot.isRed = true;
-            if (keyPressed(1, X))           robot.isRed = false;
-            mTelemetry.addLine("Selected " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
+            if (keyPressed(1, B))           isRed = true;
+            if (keyPressed(1, X))           isRed = false;
+            mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
             mTelemetry.update();
         }
-        mTelemetry.addLine("Confirmed " + (robot.isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
+        mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
         mTelemetry.update();
 
         waitForStart();

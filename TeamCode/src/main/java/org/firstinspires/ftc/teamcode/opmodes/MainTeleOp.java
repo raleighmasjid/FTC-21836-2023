@@ -48,16 +48,16 @@ public final class MainTeleOp extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        boolean slowModeLocked = false;
+
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   robot.drivetrain.toggleSlowModeLock();
-            if (keyPressed(1, B))              robot.isRed = true;
-            if (keyPressed(1, X))              robot.isRed = false;
-            mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
+            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
+            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
         }
+        if (slowModeLocked) robot.drivetrain.lockSlowMode();
 
         // Control loop:
         while (opModeIsActive()) {

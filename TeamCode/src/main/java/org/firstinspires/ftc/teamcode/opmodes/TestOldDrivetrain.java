@@ -30,6 +30,8 @@ public final class TestOldDrivetrain extends LinearOpMode {
                 new MotorEx(hardwareMap, "right back", RPM_312)
         );
 
+        waitForStart();
+
         // Control loop:
         while (opModeIsActive()) {
             gamepadEx1.readButtons();

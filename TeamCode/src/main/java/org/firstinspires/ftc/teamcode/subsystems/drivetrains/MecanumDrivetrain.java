@@ -368,12 +368,8 @@ public class MecanumDrivetrain extends MecanumDrive {
         ));
     }
 
-    public void toggleSlowModeLock() {
-        slowModeLocked = !slowModeLocked;
-    }
-
-    public boolean isSlowModeLocked() {
-        return slowModeLocked;
+    public void lockSlowMode() {
+        this.slowModeLocked = true;
     }
 
     public void printNumericalTelemetry(MultipleTelemetry telemetry) {

@@ -12,8 +12,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.Mode.AUTO;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.Mode.MANUAL;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
@@ -24,6 +22,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.THREE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.TWO_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -34,10 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
-@TeleOp(group = "21836 B")
+@TeleOp(group = "21836 A")
 public final class AutomatedTeleOp extends LinearOpMode {
-
-    enum Mode {MANUAL, AUTO}
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -52,18 +49,20 @@ public final class AutomatedTeleOp extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
-        Mode mode = MANUAL;
+        boolean autoScoring = false;
+        boolean slowModeLocked = false;
 
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   robot.drivetrain.toggleSlowModeLock();
-            if (keyPressed(1, B))              robot.isRed = true;
-            if (keyPressed(1, X))              robot.isRed = false;
-            mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
+            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
+            if (keyPressed(1, B))              isRed = true;
+            if (keyPressed(1, X))              isRed = false;
+            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
+            mTelemetry.addLine((isRed ? "RED" : "BLUE") + " alliance");
             mTelemetry.update();
         }
+        if (slowModeLocked) robot.drivetrain.lockSlowMode();
 
         // Control loop:
         while (opModeIsActive()) {
@@ -72,13 +71,13 @@ public final class AutomatedTeleOp extends LinearOpMode {
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            if (robot.beginUpdatingRunner()) mode = AUTO;
+            if (robot.beginUpdatingRunner()) autoScoring = true;
 
-            if (mode == AUTO) {
+            if (autoScoring) {
                 robot.drivetrain.update();
                 if (!robot.drivetrain.isBusy() || keyPressed(1, X)) {
                     robot.drivetrain.breakFollowing();
-                    mode = MANUAL;
+                    autoScoring = false;
                 }
             } else {
                 if (keyPressed(1, X)) robot.startAutoDrive();

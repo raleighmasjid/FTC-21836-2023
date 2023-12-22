@@ -35,8 +35,8 @@ public class TestAutoPlace extends LinearOpMode {
         };
         Backdrop latestScan = new Backdrop();
 
-        Pose2d scoringPos1 = placements[0].toPose2d(robot.isRed);
-        Pose2d scoringPos2 = placements[1].toPose2d(robot.isRed);
+        Pose2d scoringPos1 = placements[0].toPose2d();
+        Pose2d scoringPos2 = placements[1].toPose2d();
 
         Pose2d startPose = robot.drivetrain.getPoseEstimate();
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static java.lang.Math.PI;
 
@@ -50,7 +51,7 @@ public final class Pixel implements Comparable<Pixel> {
         return mosaic != null && mosaic.color != INVALID;
     }
 
-    public Pose2d toPose2d(boolean isRed) {
+    public Pose2d toPose2d() {
         return new Pose2d(
                 Backdrop.X,
                 (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
