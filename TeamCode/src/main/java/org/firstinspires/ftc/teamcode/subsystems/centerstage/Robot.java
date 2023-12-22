@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.OFF;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.RED;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
 @Config
 public final class Robot {
@@ -29,7 +29,7 @@ public final class Robot {
     public final Deposit deposit;
 
     private final BulkReader bulkReader;
-    private final LEDIndicatorGroup indicators;
+    private final LEDIndicator[] indicators;
 
     private final BackdropScanner scanner;
 
@@ -45,7 +45,10 @@ public final class Robot {
 
         scanner = new BackdropScanner(this);
 
-        indicators = new LEDIndicatorGroup(hardwareMap, "led left", "led right");
+        indicators = new LEDIndicator[]{
+                new LEDIndicator(hardwareMap, "led right"),
+                new LEDIndicator(hardwareMap, "led left")
+        };
     }
 
     public void readSensors() {
@@ -77,8 +80,10 @@ public final class Robot {
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
-        indicators.setState(drivetrain.isBusy() ? RED : scanner.trajectoryReady() ? GREEN : OFF);
-        indicators.run();
+        for (LEDIndicator indicator : indicators) {
+            indicator.setState(drivetrain.isBusy() ? RED : scanner.trajectoryReady() ? GREEN : OFF);
+            indicator.run();
+        }
     }
 
     public void interrupt() {

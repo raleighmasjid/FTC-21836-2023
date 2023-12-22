@@ -6,21 +6,23 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.AMBER;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.OFF;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup.State.RED;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.AMBER;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
 
 @TeleOp(group = "21836 B")
 public class TestIndicators extends LinearOpMode {
+
+    LEDIndicator[] indicators;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -29,19 +31,25 @@ public class TestIndicators extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
-        LEDIndicatorGroup indicators = new LEDIndicatorGroup(hardwareMap, "led left", "led right");
+
+        indicators = new LEDIndicator[]{
+                new LEDIndicator(hardwareMap, "led right"),
+                new LEDIndicator(hardwareMap, "led left")
+        };
 
         waitForStart();
 
         while (opModeIsActive()) {
             bulkReader.bulkRead();
 
-            if (keyPressed(1, B)) indicators.setState(RED);
-            if (keyPressed(1, A)) indicators.setState(GREEN);
-            if (keyPressed(1, X)) indicators.setState(OFF);
-            if (keyPressed(1, Y)) indicators.setState(AMBER);
+            for (LEDIndicator indicator : indicators) {
+                if (keyPressed(1, B)) indicator.setState(RED);
+                if (keyPressed(1, A)) indicator.setState(GREEN);
+                if (keyPressed(1, X)) indicator.setState(OFF);
+                if (keyPressed(1, Y)) indicator.setState(AMBER);
 
-            indicators.run();
+                indicator.run();
+            }
         }
     }
 }
