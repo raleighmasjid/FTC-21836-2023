@@ -15,6 +15,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup;
 
 
@@ -26,12 +27,15 @@ public class TestIndicators extends LinearOpMode {
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
+        BulkReader bulkReader = new BulkReader(hardwareMap);
 
         LEDIndicatorGroup indicators = new LEDIndicatorGroup(hardwareMap, "led left", "led right");
 
         waitForStart();
 
         while (opModeIsActive()) {
+            bulkReader.bulkRead();
+
             if (keyPressed(1, B)) indicators.setState(RED);
             if (keyPressed(1, A)) indicators.setState(GREEN);
             if (keyPressed(1, X)) indicators.setState(OFF);

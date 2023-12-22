@@ -6,16 +6,14 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGr
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicatorGroup;
-
-import java.util.List;
 
 @Config
 public final class Robot {
@@ -30,7 +28,7 @@ public final class Robot {
     public final Intake intake;
     public final Deposit deposit;
 
-    private final List<LynxModule> revHubs;
+    private final BulkReader bulkReader;
     private final LEDIndicatorGroup indicators;
 
     private final BackdropScanner scanner;
@@ -39,8 +37,7 @@ public final class Robot {
     private final ElapsedTime autoTimer = new ElapsedTime();
 
     public Robot(HardwareMap hardwareMap) {
-        revHubs = hardwareMap.getAll(LynxModule.class);
-        for (LynxModule hub : revHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        bulkReader = new BulkReader(hardwareMap);
 
         drivetrain = new AutoTurnMecanum(hardwareMap);
         intake = new Intake(hardwareMap);
@@ -52,7 +49,7 @@ public final class Robot {
     }
 
     public void readSensors() {
-        for (LynxModule hub : revHubs) hub.clearBulkCache();
+        bulkReader.bulkRead();
     }
 
     public void startAutoDrive() {

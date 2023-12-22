@@ -88,6 +88,7 @@ public class TestAutoScoring extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            robot.readSensors();
             robot.drivetrain.update();
             robot.run();
         }

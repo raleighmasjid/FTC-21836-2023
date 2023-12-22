@@ -12,6 +12,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedIMU;
 
 @TeleOp(group = "21836 B")
@@ -22,6 +23,8 @@ public final class TestOldDrivetrain extends LinearOpMode {
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
+        BulkReader bulkReader = new BulkReader(hardwareMap);
+
         ThreadedIMU imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
         MecanumDrive drivetrain = new MecanumDrive(
                 new MotorEx(hardwareMap, "left front", RPM_312),
@@ -34,6 +37,7 @@ public final class TestOldDrivetrain extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
+            bulkReader.bulkRead();
             gamepadEx1.readButtons();
 
             drivetrain.driveFieldCentric(

@@ -28,6 +28,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 
 @TeleOp(group = "21836 B")
 public final class TuningLiftKvKa extends LinearOpMode {
@@ -67,6 +68,8 @@ public final class TuningLiftKvKa extends LinearOpMode {
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
 
+        BulkReader bulkReader = new BulkReader(hardwareMap);
+
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         this.motors = new MotorEx[]{
                 new MotorEx(hardwareMap, "lift right", RPM_1150),
@@ -81,6 +84,7 @@ public final class TuningLiftKvKa extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
+            bulkReader.bulkRead();
             gamepadEx1.readButtons();
 
             firFilter.setGains(lowPassGains);
