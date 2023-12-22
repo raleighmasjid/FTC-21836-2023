@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
 
 @TeleOp(group = "21836 B")
-public class TestIndicators extends LinearOpMode {
+public final class TestIndicators extends LinearOpMode {
 
     LEDIndicator[] indicators;
 

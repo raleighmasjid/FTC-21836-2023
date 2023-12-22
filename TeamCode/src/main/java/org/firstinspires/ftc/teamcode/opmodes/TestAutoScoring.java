@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 
 
 @TeleOp(group = "21836 B")
-public class TestAutoScoring extends LinearOpMode {
+public final class TestAutoScoring extends LinearOpMode {
 
     public static int
                     X1 = 1,
