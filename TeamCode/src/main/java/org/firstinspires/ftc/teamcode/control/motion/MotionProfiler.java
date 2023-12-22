@@ -11,13 +11,13 @@ public final class MotionProfiler {
 
     private MotionProfile profile;
 
-    private MotionState profileState = new MotionState(0.0, 0.0, 0.0, 0.0);
+    private State state = new State();
 
     private final ElapsedTime profileTimer = new ElapsedTime();
 
     private ProfileConstraints constraints = new ProfileConstraints();
 
-    public void updateConstraints(ProfileConstraints constraints) {
+    public void setConstraints(ProfileConstraints constraints) {
         this.constraints = constraints;
     }
 
@@ -33,27 +33,33 @@ public final class MotionProfiler {
     }
 
     public void update() {
-        profileState = profile.get(profileTimer.seconds());
+        MotionState mState = profile.get(profileTimer.seconds());
+        this.state = new State(
+                mState.getX(),
+                mState.getV(),
+                mState.getA(),
+                mState.getJ()
+        );
     }
 
     public double getX() {
-        return profileState.getX();
+        return state.x;
     }
 
     public double getV() {
-        return profileState.getV();
+        return state.v;
     }
 
     public double getA() {
-        return profileState.getA();
+        return state.a;
     }
 
     public double getJ() {
-        return profileState.getJ();
+        return state.j;
     }
 
     public State getState() {
-        return new State(getX(), getV(), getA(), getJ());
+        return state;
     }
 
     public boolean isDone() {
