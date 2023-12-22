@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(group = "21836 B")
-public final class AprilTagDetectorTest extends LinearOpMode {
+public final class TestAprilTagDetector extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
