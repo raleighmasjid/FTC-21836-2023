@@ -31,8 +31,8 @@ public class TestIndicators extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Initialize robot:
-        robot = new Robot(hardwareMap);
+        // Initialize gamepads:
+        gamepadEx1 = new GamepadEx(gamepad1);
 
         LEDIndicatorGroup indicators = new LEDIndicatorGroup(hardwareMap, "led left", "led right");
 
