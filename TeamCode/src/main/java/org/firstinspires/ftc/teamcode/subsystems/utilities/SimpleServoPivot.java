@@ -28,18 +28,18 @@ public class SimpleServoPivot {
 
     private final SimpleServo[] servos;
 
-    private double ANGLE_A, ANGLE_B;
+    private double ANGLE_INITIAL, ANGLE_ACTIVATED;
 
     private boolean activated = false;
 
-    public SimpleServoPivot(double ANGLE_A, double ANGLE_B, SimpleServo... servos) {
+    public SimpleServoPivot(double ANGLE_INITIAL, double ANGLE_ACTIVATED, SimpleServo... servos) {
         this.servos = servos;
-        updateAngles(ANGLE_A, ANGLE_B);
+        updateAngles(ANGLE_INITIAL, ANGLE_ACTIVATED);
     }
 
     public void updateAngles(double ANGLE_A, double ANGLE_B) {
-        this.ANGLE_A = ANGLE_A;
-        this.ANGLE_B = ANGLE_B;
+        this.ANGLE_INITIAL = ANGLE_A;
+        this.ANGLE_ACTIVATED = ANGLE_B;
     }
 
     /**
@@ -71,6 +71,6 @@ public class SimpleServoPivot {
      * Hold {@link #servos} position
      */
     public void run() {
-        for (SimpleServo servo : servos) servo.turnToAngle(activated ? ANGLE_B : ANGLE_A);
+        for (SimpleServo servo : servos) servo.turnToAngle(activated ? ANGLE_ACTIVATED : ANGLE_INITIAL);
     }
 }
