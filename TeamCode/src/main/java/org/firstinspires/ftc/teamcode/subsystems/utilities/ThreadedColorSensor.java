@@ -13,9 +13,11 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.RGB;
 public final class ThreadedColorSensor extends Thread {
 
     private final NormalizedColorSensor sensor;
-    private NormalizedRGBA rgba = new NormalizedRGBA();
-    private final float[] hsv = new float[3];
+    private final float[] hsvArray = new float[3];
     private boolean run = true;
+
+    private final HSV hsv = new HSV();
+    private final RGB rgb = new RGB();
 
     public ThreadedColorSensor(HardwareMap hardwareMap, String name, float gain) {
         sensor = hardwareMap.get(NormalizedColorSensor.class, name);
@@ -25,7 +27,18 @@ public final class ThreadedColorSensor extends Thread {
     }
 
     public void run() {
-        while (run) rgba = sensor.getNormalizedColors();
+        while (run) {
+            NormalizedRGBA rgba = sensor.getNormalizedColors();
+            Color.colorToHSV(rgba.toColor(), hsvArray);
+
+            rgb.red = (double) rgba.red * 255;
+            rgb.green = (double) rgba.green * 255;
+            rgb.blue = (double) rgba.blue * 255;
+
+            hsv.hue = (double) hsvArray[0];
+            hsv.saturation = (double) hsvArray[1];
+            hsv.value = (double) hsvArray[2];
+        }
     }
 
     public void interrupt() {
@@ -33,19 +46,10 @@ public final class ThreadedColorSensor extends Thread {
     }
 
     public HSV getHSV() {
-        Color.colorToHSV(rgba.toColor(), hsv);
-        return new HSV(
-                (float) hsv[0],
-                (float) hsv[1],
-                (float) hsv[2]
-        );
+        return hsv;
     }
 
     public RGB getRGB() {
-        return new RGB(
-                (float) rgba.red * 255,
-                (float) rgba.green * 255,
-                (float) rgba.blue * 255
-        );
+        return rgb;
     }
 }
