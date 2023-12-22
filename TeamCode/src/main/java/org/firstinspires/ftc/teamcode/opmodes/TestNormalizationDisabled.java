@@ -32,7 +32,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
-@TeleOp(group = "21836 B")
+@TeleOp(group = "21836 A")
 public final class TestNormalizationDisabled extends LinearOpMode {
 
     @Override
@@ -43,23 +43,22 @@ public final class TestNormalizationDisabled extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
-
-        robot.drivetrain.normalizeMotors = false;
+        robot.drivetrain.normalizeMotorPowers = false;
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        boolean slowModeLocked = false;
+
         // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   robot.drivetrain.lockSlowMode();
-            if (keyPressed(1, B))              robot.isRed = true;
-            if (keyPressed(1, X))              robot.isRed = false;
-            mTelemetry.addLine((robot.drivetrain.isSlowModeLocked() ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.addLine((robot.isRed ? "RED" : "BLUE") + " alliance");
+            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
+            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
         }
+        if (slowModeLocked) robot.drivetrain.lockSlowMode();
 
         // Control loop:
         while (opModeIsActive()) {

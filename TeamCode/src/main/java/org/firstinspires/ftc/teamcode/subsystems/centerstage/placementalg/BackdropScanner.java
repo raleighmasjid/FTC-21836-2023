@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 
@@ -77,9 +78,8 @@ public final class BackdropScanner extends Thread {
 
                 Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-                Pixel floorDrop = new Pixel((robot.isRed ? -2 : 9), 0, EMPTY);
-                placements[0] = floorDrop;
-                placements[1] = floorDrop;
+                placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+                placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
 
                 if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
                     if (firstColor.matches(pixel.color)) {
