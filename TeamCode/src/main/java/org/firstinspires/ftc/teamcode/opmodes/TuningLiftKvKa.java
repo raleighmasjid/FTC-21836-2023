@@ -90,6 +90,7 @@ public final class TuningLiftKvKa extends LinearOpMode {
             firFilter.setGains(lowPassGains);
             kalmanFilter.setGains(kalmanGains);
             controller.setGains(feedforwardGains);
+            profiler.setConstraints(constraints);
 
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
