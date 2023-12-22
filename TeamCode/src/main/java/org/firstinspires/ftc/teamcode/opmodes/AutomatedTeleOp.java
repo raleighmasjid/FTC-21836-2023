@@ -83,10 +83,10 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 if (keyPressed(1, X)) robot.startAutoDrive();
 
                 // Reset current heading as per these keybinds:
-                if (keyPressed(1, DPAD_UP)) robot.drivetrain.setCurrentHeading(0);
-                if (keyPressed(1, DPAD_LEFT)) robot.drivetrain.setCurrentHeading(PI / 2);
-                if (keyPressed(1, DPAD_DOWN)) robot.drivetrain.setCurrentHeading(PI);
-                if (keyPressed(1, DPAD_RIGHT)) robot.drivetrain.setCurrentHeading(-PI / 2);
+                if (keyPressed(1, DPAD_UP))     robot.drivetrain.setCurrentHeading(0);
+                if (keyPressed(1, DPAD_LEFT))   robot.drivetrain.setCurrentHeading(PI / 2);
+                if (keyPressed(1, DPAD_DOWN))   robot.drivetrain.setCurrentHeading(PI);
+                if (keyPressed(1, DPAD_RIGHT))  robot.drivetrain.setCurrentHeading(-PI / 2);
 
                 robot.intake.setMotorPower(
                         gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
