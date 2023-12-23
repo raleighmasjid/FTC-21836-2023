@@ -69,8 +69,8 @@ public final class Deposit {
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
-                0,
-                0
+                0.01,
+                0.01
         );
 
         public static LowPassGains lowPassGains = new LowPassGains(
