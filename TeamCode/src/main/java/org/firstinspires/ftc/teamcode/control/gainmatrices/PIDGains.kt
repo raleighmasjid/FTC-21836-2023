@@ -21,4 +21,12 @@ constructor(
         kD = 2 * zeta * sqrt(gains.kA * kP) - gains.kV
         return this
     }
+
+    fun copyFrom(other:PIDGains): PIDGains {
+        kP = other.kP
+        kI = other.kI
+        kD = other.kD
+        maxOutputWithIntegral = other.maxOutputWithIntegral
+        return this
+    }
 }

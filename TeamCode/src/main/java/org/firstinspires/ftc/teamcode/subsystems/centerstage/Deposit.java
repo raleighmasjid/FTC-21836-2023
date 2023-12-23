@@ -68,6 +68,8 @@ public final class Deposit {
                 1
         );
 
+        private final PIDGains lastPidGains = new PIDGains();
+
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
                 0.01,
                 0.01
@@ -128,8 +130,12 @@ public final class Deposit {
 
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
+            if (pidGains.kP != lastPidGains.kP || pidGains.kD != lastPidGains.kD) {
+                pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT);
+                lastPidGains.copyFrom(pidGains);
+            }
             kDFilter.setGains(lowPassGains);
-            controller.setGains(pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT));
+            controller.setGains(pidGains);
 
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
             for (MotorEx motor : motors) motor.set(output);
