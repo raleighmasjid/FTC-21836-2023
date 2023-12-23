@@ -130,9 +130,9 @@ public final class Deposit {
 
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
-            if (pidGains.kP != lastPidGains.kP || pidGains.kD != lastPidGains.kD) {
-                pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT);
-                lastPidGains.copyFrom(pidGains);
+            if (lastPidGains.kP != pidGains.kP) {
+                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
+                lastPidGains.kP = pidGains.kP;
             }
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);

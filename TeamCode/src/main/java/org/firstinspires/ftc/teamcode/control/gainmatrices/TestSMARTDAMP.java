@@ -8,7 +8,7 @@ public final class TestSMARTDAMP {
 
     public static void main(String[] args) {
 
-        pidGains.criticallyDamp(feedforwardGains, PERCENT_OVERSHOOT);
+        pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
 
         System.out.println(pidGains.kP);
         System.out.println(pidGains.kD);
