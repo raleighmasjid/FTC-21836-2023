@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
 
+import static java.lang.Math.toDegrees;
+
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -44,7 +46,7 @@ public final class TestOldDrivetrain extends LinearOpMode {
                     gamepadEx1.getLeftX(),
                     gamepadEx1.getLeftY(),
                     gamepadEx1.getRightX(),
-                    imu.getHeading()
+                    toDegrees(imu.getHeading())
             );
         }
     }
