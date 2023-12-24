@@ -21,7 +21,7 @@ public final class Backdrop {
             Y_MAX_RED = -26.25;
 
     final static int ROWS = 11, COLUMNS = 7;
-    public boolean printRectangular = true;
+    public boolean printRectangular = false;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
@@ -103,6 +103,7 @@ public final class Backdrop {
     void print() {
         System.out.println(this);
         System.out.println();
+        System.out.println(mosaicCount + " mosaics");
         System.out.println("Auton score: " + getPixelCount() * 5);
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
