@@ -347,11 +347,12 @@ public class MecanumDrivetrain extends MecanumDrive {
     public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
 
         // counter-rotate translation vector by current heading
-        double x = xCommand;
-        double y = yCommand;
         double theta = -getHeading();
-        xCommand = x * cos(theta) - y * sin(theta);
-        yCommand = x * sin(theta) + y * cos(theta);
+        double cos = cos(theta);
+        double sin = sin(theta);
+        double x = xCommand;
+        xCommand = xCommand * cos - yCommand * sin;
+        yCommand = yCommand * cos + x * sin;
 
         if (useSlowMode) slowModeLocked = false;
         if (useSlowMode || slowModeLocked) {
