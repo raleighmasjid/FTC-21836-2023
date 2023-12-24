@@ -90,6 +90,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        setCurrentHeading(0);
 
         // TODO: adjust the names of the following hardware devices to match your configuration
 
