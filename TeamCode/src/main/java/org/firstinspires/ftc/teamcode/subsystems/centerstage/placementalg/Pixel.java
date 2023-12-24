@@ -21,7 +21,6 @@ public final class Pixel implements Comparable<Pixel> {
     public int compareTo(Pixel other) {
         double diff = other.scoreValue - scoreValue;
         if (diff == 0) diff = y - other.y;
-        if (diff == 0) diff = x - other.x;
         return (int) (diff * 1000000000);
     }
 
