@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.RawIMUMecanumDrivetrain;
 
-@TeleOp(group = "21836 A")
+@TeleOp(group = "21836 B")
 public final class TestNonThreadedIMU extends LinearOpMode {
 
     @Override
