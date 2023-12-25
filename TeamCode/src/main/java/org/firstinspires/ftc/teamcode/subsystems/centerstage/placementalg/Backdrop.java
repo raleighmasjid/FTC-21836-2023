@@ -122,7 +122,7 @@ public final class Backdrop {
     }
 
     boolean touching(Pixel p1, Pixel p2) {
-        return inArray(get(p1), Arrays.asList(getNeighbors(get(p2))));
+        return get(p1).isIn(Arrays.asList(getNeighbors(get(p2))));
     }
 
     boolean isSupported(Pixel pixel) {
@@ -138,11 +138,6 @@ public final class Backdrop {
                 if (!(p.color == EMPTY) && p.color != INVALID) highestY = p.y;
             }
         return highestY;
-    }
-
-    static boolean inArray(Pixel pixel, Iterable<Pixel> array) {
-        for (Pixel p1 : array) if (pixel.x == p1.x && pixel.y == p1.y) return true;
-        return false;
     }
 
     static boolean allTrue(boolean... booleans) {

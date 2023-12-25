@@ -49,12 +49,17 @@ public final class Pixel implements Comparable<Pixel> {
         return mosaic != null && mosaic.color != INVALID;
     }
 
-    public Pose2d toPose2d() {
+    Pose2d toPose2d() {
         return new Pose2d(
                 Backdrop.X,
                 (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
                 PI
         );
+    }
+
+    boolean isIn(Iterable<Pixel> array) {
+        for (Pixel p1 : array) if (x == p1.x && y == p1.y) return true;
+        return false;
     }
 
     @NonNull
