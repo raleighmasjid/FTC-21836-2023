@@ -20,29 +20,23 @@ public final class AutonPixelSupplier {
         }
 
         final int x1, x2;
+        static final Randomization[] randomizations = {LEFT, CENTER, RIGHT};
     }
 
-    public static ArrayList<Pixel> getPlacements(
-            Randomization randomization,
-            boolean partnerWillDoRandomization
-    ) {
-        if (partnerWillDoRandomization) {
-            return getPlacementsForRandomization(
-                    new Pixel(randomization.x1, 0, YELLOW),
-                    new Pixel(randomization.x2, 0, YELLOW)
-            );
-        }
-        return getPlacementsForRandomization(new Pixel(randomization.x1, 0, YELLOW));
+    public static ArrayList<Pixel> getPlacements(Randomization randomization, boolean partnerWillDoRandomization) {
+        return partnerWillDoRandomization ?
+                getPlacementsForRandomization(randomization.x1, randomization.x2) :
+                getPlacementsForRandomization(randomization.x1);
     }
 
-    public static ArrayList<Pixel> getPlacementsForRandomization(Pixel... yellowPixels) {
+    private static ArrayList<Pixel> getPlacementsForRandomization(int... yellowPixelXs) {
         PlacementCalculator.auton = true;
 
         ArrayList<Pixel> placements = new ArrayList<>();
 
         Backdrop backdrop = new Backdrop();
-        for (Pixel pixel : yellowPixels) {
-            Pixel yellowEnforced = new Pixel(pixel, YELLOW);
+        for (int x : yellowPixelXs) {
+            Pixel yellowEnforced = new Pixel(x, 0, YELLOW);
             backdrop.add(yellowEnforced);
             placements.add(yellowEnforced);
         }
