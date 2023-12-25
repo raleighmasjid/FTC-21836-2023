@@ -30,17 +30,17 @@ final class AlgorithmTesting {
         };
 
         for (int y = 0; y < colors.length; y++) {
-            if (y % 2 == 0) colors[y] = ". " + colors[y].substring(1, 12);
+            if (y % 2 == 0) colors[y] = "." + colors[y].substring(0, 12);
             String[] rowList = colors[y].split(" ");
             for (int x = 0; x < rowList.length; x++) {
                 if (y % 2 == 0 && x == 0) continue;
                 backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
             }
         }
-        ArrayList<Pixel> pixelsToPlace = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
         backdrop.print();
         printLine();
-        for (Pixel pixel : pixelsToPlace) pixel.print();
+        for (Pixel pixel : optimalPlacements) pixel.print();
         printLine();
 
         boolean solve = false;
@@ -54,17 +54,16 @@ final class AlgorithmTesting {
                 backdrop.add(new Pixel(x, y, Pixel.Color.fromString(color)));
             }
             if (solve) {
-                Pixel pToPlace = pixelsToPlace.get(0);
-                if (alwaysPlaceColored && pToPlace.color == ANY) pToPlace = new Pixel(pToPlace, COLORED);
-                backdrop.add(pToPlace);
+                Pixel placement = optimalPlacements.get(0);
+                backdrop.add(alwaysPlaceColored && placement.color == ANY ? new Pixel(placement, COLORED) : placement);
             }
-            pixelsToPlace = PlacementCalculator.getOptimalPlacements(backdrop);
+            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
             if (!solve || printPerIteration) {
                 printLine();
                 printLine();
                 backdrop.print();
                 printLine();
-                for (Pixel pixel : pixelsToPlace) pixel.print();
+                for (Pixel pixel : optimalPlacements) pixel.print();
             }
         }
         if (solve && !printPerIteration) {
@@ -72,7 +71,7 @@ final class AlgorithmTesting {
             printLine();
             backdrop.print();
             printLine();
-            for (Pixel pixel : pixelsToPlace) pixel.print();
+            for (Pixel pixel : optimalPlacements) pixel.print();
         }
         System.out.println(backdrop.mosaicCount + " mosaics");
     }
