@@ -21,7 +21,7 @@ public final class PlacementCalculator {
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
-    public static boolean noColor = false;
+    public static boolean noColor = false, auton = false;
     public static final Backdrop PERFECT_BACKDROP;
 
     private PlacementCalculator() {}
@@ -252,7 +252,7 @@ public final class PlacementCalculator {
         }
     }
 
-    private static ArrayList<Pixel> getSupportPixels(Pixel pixel) {
+    private static ArrayList<Pixel> getSupportPixelsIncludingOverriding(Pixel pixel) {
         ArrayList<Pixel> sPixels = new ArrayList<>();
         if (pixel.color == EMPTY) {
             sPixels.add(getSafeColor(pixel));
@@ -262,6 +262,11 @@ public final class PlacementCalculator {
             sPixels.addAll(getSupportPixels(s2));
         }
         removeDuplicates(sPixels);
+        return sPixels;
+    }
+
+    private static ArrayList<Pixel> getSupportPixels(Pixel pixel) {
+        ArrayList<Pixel> sPixels = getSupportPixelsIncludingOverriding(pixel);
         removeOverridingPixels(sPixels);
         return sPixels;
     }
@@ -275,10 +280,16 @@ public final class PlacementCalculator {
         int leastSPixels = 100;
         Pixel bestSetPixel = backdrop.get(6, 8);
 
+        setPixels:
         for (int x : iterationXs(setY)) {
             Pixel pixel = backdrop.get(x, setY);
             if (pixel.color == INVALID) continue;
-            ArrayList<Pixel> sPixels = getSupportPixels(pixel);
+            ArrayList<Pixel> sPixels = getSupportPixelsIncludingOverriding(pixel);
+            if (auton) for (Pixel p : sPixels) {
+                Pixel counterpart = p.getCounterpartIn(optimalPlacements);
+                if (counterpart != null && counterpart.color.matches(COLORED)) continue setPixels;
+            }
+            removeOverridingPixels(sPixels);
             if (sPixels.size() < leastSPixels) {
                 leastSPixels = sPixels.size();
                 bestSetPixel = pixel;

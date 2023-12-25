@@ -36,6 +36,8 @@ public final class AutonPixelSupplier {
     }
 
     public static ArrayList<Pixel> getPlacementsForRandomization(Pixel... yellowPixels) {
+        PlacementCalculator.auton = true;
+
         ArrayList<Pixel> placements = new ArrayList<>();
 
         Backdrop backdrop = new Backdrop();
@@ -44,8 +46,8 @@ public final class AutonPixelSupplier {
             backdrop.add(yellowEnforced);
             placements.add(yellowEnforced);
         }
-        ArrayList<Pixel> optimalPlacements = getOptimalPlacements(backdrop);
 
+        ArrayList<Pixel> optimalPlacements = getOptimalPlacements(backdrop);
         while (backdrop.notFull()) {
             Pixel optimalPlacement = null;
             for (Pixel placement : optimalPlacements) {
@@ -58,6 +60,8 @@ public final class AutonPixelSupplier {
             optimalPlacements = getOptimalPlacements(backdrop.add(optimalPlacement));
             placements.add(optimalPlacement);
         }
+
+        PlacementCalculator.auton = false;
 
         return placements;
     }

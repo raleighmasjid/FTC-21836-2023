@@ -58,8 +58,12 @@ public final class Pixel implements Comparable<Pixel> {
     }
 
     boolean isIn(Iterable<Pixel> array) {
-        for (Pixel p1 : array) if (x == p1.x && y == p1.y) return true;
-        return false;
+        return getCounterpartIn(array) != null;
+    }
+
+    Pixel getCounterpartIn(Iterable<Pixel> array) {
+        for (Pixel p1 : array) if (x == p1.x && y == p1.y) return p1;
+        return null;
     }
 
     @NonNull
