@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.CENTER;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.LEFT;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.RIGHT;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.randomizations;
 
 import java.util.ArrayList;
 
@@ -10,7 +8,7 @@ public final class AutonPlacementVisualizer {
 
     public static void main(String[] args) {
 
-        for (AutonPixelSupplier.Randomization rand : new AutonPixelSupplier.Randomization[]{LEFT, CENTER, RIGHT}) {
+        for (AutonPixelSupplier.Randomization rand : randomizations) {
             ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacements(rand, true);
             Backdrop backdrop = new Backdrop();
 
@@ -22,12 +20,3 @@ public final class AutonPlacementVisualizer {
         }
     }
 }
-
-/*
-1 : 30 : 6
-2 : 29 :
-3 : 17 :
-4 : 17 :
-5 : 29 :
-6 : 30 : 6
- */
