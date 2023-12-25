@@ -21,13 +21,13 @@ public final class Backdrop {
             Y_MAX_RED = -26.25;
 
     final static int ROWS = 11, COLUMNS = 7;
-    public boolean printRectangular = false;
+    boolean printRectangular = false;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
     int mosaicCount = 0;
 
-    public Backdrop() {
+    Backdrop() {
         for (int y = 0; y < slots.length; y++)
             for (int x = 0; x < slots[y].length; x++) {
                 slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
@@ -35,7 +35,7 @@ public final class Backdrop {
     }
 
     @NonNull
-    public Backdrop clone() {
+    protected Backdrop clone() {
         Backdrop backdrop = new Backdrop();
         backdrop.mosaicCount = mosaicCount;
         backdrop.printRectangular = printRectangular;
@@ -52,7 +52,7 @@ public final class Backdrop {
         return true;
     }
 
-    public Backdrop add(Pixel pixel) {
+    Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:
                 add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3) + 1)));
@@ -150,7 +150,7 @@ public final class Backdrop {
         return true;
     }
 
-    public boolean notFull() {
+    boolean notFull() {
         for (Pixel pixel : slots[10]) if (pixel.color == EMPTY) return true;
         return false;
     }
