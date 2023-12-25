@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.allTrue;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.inArray;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.COLORED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
@@ -227,7 +226,7 @@ public final class PlacementCalculator {
     private static void removeDuplicates(ArrayList<Pixel> pixels) {
         ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
         pixels.clear();
-        for (Pixel pixel : pixelsCopy) if (!inArray(pixel, pixels)) pixels.add(pixel);
+        for (Pixel pixel : pixelsCopy) if (!pixel.isIn(pixels)) pixels.add(pixel);
     }
 
     private static void removeOverridingPixels(ArrayList<Pixel> pixels) {
@@ -300,7 +299,7 @@ public final class PlacementCalculator {
         for (int y = 0; y < backdrop.slots.length; y++) {
             for (int x : iterationXs(y)) {
                 Pixel pixel = backdrop.get(x, y);
-                if (pixel.color == EMPTY && !inArray(pixel, optimalPlacements) && backdrop.isSupported(pixel)) {
+                if (pixel.color == EMPTY && !pixel.isIn(optimalPlacements) && backdrop.isSupported(pixel)) {
                     optimalPlacements.add(getSafeColor(pixel));
                     return;
                 }
@@ -335,14 +334,14 @@ public final class PlacementCalculator {
                 if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
-                    if (inArray(pixel, mosaicSPixels)) {
+                    if (pixel.isIn(mosaicSPixels)) {
                         pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
                     }
                 }
                 if (pixel.color.matches(COLORED)) pixel.scoreValue += abs(3 - pixel.x);
             }
 
-            if (inArray(pixel, setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
+            if (pixel.isIn(setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
         }
         Collections.sort(optimalPlacements);
     }
