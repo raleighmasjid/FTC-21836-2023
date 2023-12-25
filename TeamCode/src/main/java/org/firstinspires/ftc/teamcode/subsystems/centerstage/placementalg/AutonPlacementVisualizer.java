@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 
 import java.util.ArrayList;
 
-public final class PlacementGenerator {
+public final class AutonPlacementVisualizer {
 
     public static void main(String[] args) {
 
