@@ -10,13 +10,13 @@ import java.util.ArrayList;
 public final class AutonPixelSupplier {
 
     public enum Randomization {
-        LEFT,
-        CENTER,
-        RIGHT;
+        LEFT(1, 2),
+        CENTER(3, 4),
+        RIGHT(6, 5);
 
-        Randomization() {
-            this.x1 = ordinal() * 2 + 1;
-            this.x2 = x1 + 1;
+        Randomization(int x1, int x2) {
+            this.x1 = x1;
+            this.x2 = x2;
         }
 
         final int x1, x2;
@@ -24,7 +24,6 @@ public final class AutonPixelSupplier {
 
     public static ArrayList<Pixel> getPlacements(
             Randomization randomization,
-            int cycles,
             boolean partnerWillDoRandomization
     ) {
         if (partnerWillDoRandomization) {
@@ -33,8 +32,7 @@ public final class AutonPixelSupplier {
                     new Pixel(randomization.x2, 0, YELLOW)
             );
         }
-
-        return null;
+        return getPlacementsForRandomization(new Pixel(randomization.x1, 0, YELLOW));
     }
 
     public static ArrayList<Pixel> getPlacementsForRandomization(Pixel... yellowPixels) {
