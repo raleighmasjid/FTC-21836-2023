@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.LEFT;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.RIGHT;
 
 import java.util.ArrayList;
 
@@ -8,10 +10,8 @@ public final class PlacementGenerator {
 
     public static void main(String[] args) {
 
-        for (int i = 1; i <= 6; i++) {
-            ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacementsForRandomization(
-                    new Pixel(i, 0, YELLOW)
-            );
+        for (AutonPixelSupplier.Randomization rand : new AutonPixelSupplier.Randomization[]{LEFT, CENTER, RIGHT}) {
+            ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacements(rand, true);
             Backdrop backdrop = new Backdrop();
 
             for (int j = 0; j < 15; j++) {
