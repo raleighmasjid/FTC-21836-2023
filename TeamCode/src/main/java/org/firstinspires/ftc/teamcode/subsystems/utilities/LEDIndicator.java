@@ -1,11 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.utilities;
 
-import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.OUTPUT;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.AMBER;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
-
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,22 +12,26 @@ public class LEDIndicator {
         OFF,
     }
 
-    private State state = OFF;
-    private final DigitalChannel green, red;
+    private final DigitalChannel red, green;
+    private boolean greenOn, redOn;
 
     public LEDIndicator(HardwareMap hardwareMap, String name) {
+        // Get the LED colors and touch sensor from the hardwaremap
         green = hardwareMap.get(DigitalChannel.class, name + " green");
         red = hardwareMap.get(DigitalChannel.class, name + " red");
-        green.setMode(OUTPUT);
-        red.setMode(OUTPUT);
+
+        // change LED mode from input to output
+        red.setMode(DigitalChannel.Mode.OUTPUT);
+        green.setMode(DigitalChannel.Mode.OUTPUT);
     }
 
     public void setState(State state) {
-        this.state = state;
+        greenOn = state == State.GREEN || state == State.AMBER;
+        redOn = state == State.RED || state == State.AMBER;
     }
 
     public void run() {
-        green.setState(state == GREEN || state == AMBER);
-        red.setState(state == RED || state == AMBER);
+        green.setState(greenOn);
+        red.setState(redOn);
     }
 }
