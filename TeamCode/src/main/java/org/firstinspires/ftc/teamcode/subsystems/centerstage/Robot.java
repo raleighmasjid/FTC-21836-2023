@@ -82,7 +82,6 @@ public final class Robot {
 
         for (LEDIndicator indicator : indicators) {
             indicator.setState(drivetrain.isBusy() ? RED : scanner.trajectoryReady() ? GREEN : OFF);
-            indicator.run();
         }
     }
 

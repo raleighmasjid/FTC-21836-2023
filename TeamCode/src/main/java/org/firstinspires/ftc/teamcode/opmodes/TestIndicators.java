@@ -47,8 +47,6 @@ public final class TestIndicators extends LinearOpMode {
                 if (keyPressed(1, A)) indicator.setState(GREEN);
                 if (keyPressed(1, X)) indicator.setState(OFF);
                 if (keyPressed(1, Y)) indicator.setState(AMBER);
-
-                indicator.run();
             }
         }
     }

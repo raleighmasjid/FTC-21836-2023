@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.utilities;
 
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.AMBER;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
+
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -13,7 +17,6 @@ public class LEDIndicator {
     }
 
     private final DigitalChannel red, green;
-    private boolean greenOn, redOn;
 
     public LEDIndicator(HardwareMap hardwareMap, String name) {
         // Get the LED colors and touch sensor from the hardwaremap
@@ -26,12 +29,7 @@ public class LEDIndicator {
     }
 
     public void setState(State state) {
-        greenOn = state == State.GREEN || state == State.AMBER;
-        redOn = state == State.RED || state == State.AMBER;
-    }
-
-    public void run() {
-        green.setState(greenOn);
-        red.setState(redOn);
+        green.setState(state == GREEN || state == AMBER);
+        red.setState(state == RED || state == AMBER);
     }
 }
