@@ -43,6 +43,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
+import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
@@ -123,7 +124,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        // setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+        setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
