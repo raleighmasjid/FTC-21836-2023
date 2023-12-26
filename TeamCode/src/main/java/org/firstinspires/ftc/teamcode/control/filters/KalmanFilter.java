@@ -21,6 +21,7 @@ public final class KalmanFilter extends com.ThermalEquilibrium.homeostasis.Filte
     public void setGains(KalmanGains gains) {
         Q = gains.sensorGain;
         R = gains.modelGain;
+        solveDARE();
     }
 
     @Override
