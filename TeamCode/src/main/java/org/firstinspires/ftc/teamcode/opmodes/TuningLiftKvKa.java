@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 
-@TeleOp(group = "21836 B")
+@TeleOp(group = "Single mechanism test")
 public final class TuningLiftKvKa extends LinearOpMode {
 
     public static ProfileConstraints constraints = new ProfileConstraints(

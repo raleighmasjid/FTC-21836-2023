@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 @Config
-@Autonomous(group = "21836 A", preselectTeleOp = "MainTeleOp")
+@Autonomous(preselectTeleOp = "MainTeleOp")
 public final class MainAuton extends LinearOpMode {
 
     // Declare objects:

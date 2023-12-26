@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
-@TeleOp(group = "21836 B")
+@TeleOp(group = "Single mechanism test")
 public final class TuningIntakeKd extends LinearOpMode {
 
     SimpleServoPivot pivot;

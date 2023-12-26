@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
 
-@TeleOp(group = "21836 B")
+@TeleOp(group = "Single mechanism test")
 public final class TestIndicators extends LinearOpMode {
 
     LEDIndicator[] indicators;
