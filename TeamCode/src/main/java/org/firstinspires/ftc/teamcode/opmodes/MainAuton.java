@@ -19,11 +19,11 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
-    static GamepadEx gamepadEx1, gamepadEx2;
-    static MultipleTelemetry mTelemetry;
-    static Robot robot;
+    public static GamepadEx gamepadEx1, gamepadEx2;
+    public static MultipleTelemetry mTelemetry;
+    public static Robot robot;
 
-    static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
+    public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
 

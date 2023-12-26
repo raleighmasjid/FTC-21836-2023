@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;

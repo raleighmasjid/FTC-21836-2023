@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.ANGLE_PIVOT_OFFSET;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.ANGLE_PIVOT_OFFSET;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.ANGLE_PIVOT_TRANSFERRING;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @TeleOp(group = "Single mechanism test")
-public final class TuningPaintbrushKd extends LinearOpMode {
+public final class TuningIntakeKd extends LinearOpMode {
 
     SimpleServoPivot pivot;
 
@@ -26,9 +27,9 @@ public final class TuningPaintbrushKd extends LinearOpMode {
 
         pivot = new SimpleServoPivot(
                 ANGLE_PIVOT_OFFSET,
-                ANGLE_PIVOT_OFFSET + 120,
-                getAxonServo(hardwareMap, "deposit left"),
-                getReversedServo(getAxonServo(hardwareMap, "deposit right"))
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING,
+                getAxonServo(hardwareMap, "intake right"),
+                getReversedServo(getAxonServo(hardwareMap, "intake left"))
         );
 
         // Initialize gamepads:
@@ -41,7 +42,10 @@ public final class TuningPaintbrushKd extends LinearOpMode {
             bulkReader.bulkRead();
             gamepadEx1.readButtons();
 
-            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
+            pivot.updateAngles(
+                    ANGLE_PIVOT_OFFSET,
+                    ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
+            );
 
             if (keyPressed(1, X)) pivot.toggle();
 
