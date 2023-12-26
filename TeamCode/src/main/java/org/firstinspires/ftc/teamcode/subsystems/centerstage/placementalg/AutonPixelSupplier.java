@@ -25,11 +25,11 @@ public final class AutonPixelSupplier {
 
     public static ArrayList<Pixel> getPlacements(Randomization randomization, boolean partnerWillDoRandomization) {
         return partnerWillDoRandomization ?
-                getPlacementsForRandomization(randomization.x1, randomization.x2) :
-                getPlacementsForRandomization(randomization.x1);
+                getWhitePixelPlacements(randomization.x1, randomization.x2) :
+                getWhitePixelPlacements(randomization.x1);
     }
 
-    private static ArrayList<Pixel> getPlacementsForRandomization(int... yellowPixelXs) {
+    private static ArrayList<Pixel> getWhitePixelPlacements(int... yellowPixelXs) {
         PlacementCalculator.auton = true;
 
         ArrayList<Pixel> placements = new ArrayList<>();
