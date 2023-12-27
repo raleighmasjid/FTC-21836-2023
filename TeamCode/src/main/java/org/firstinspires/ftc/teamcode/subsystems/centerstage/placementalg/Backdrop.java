@@ -55,10 +55,10 @@ public final class Backdrop {
     Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:
-                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3) + 1)));
+                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3))));
                 break;
             case COLORED:
-                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 2) + 2)));
+                add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 2))));
                 break;
             default:
                 int x = pixel.x;

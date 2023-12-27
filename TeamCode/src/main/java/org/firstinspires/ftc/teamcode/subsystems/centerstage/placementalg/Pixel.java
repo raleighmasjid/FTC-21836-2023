@@ -120,11 +120,11 @@ public final class Pixel implements Comparable<Pixel> {
 
     @Config
     public enum Color {
-        EMPTY,
-        WHITE,
         PURPLE,
         YELLOW,
         GREEN,
+        WHITE,
+        EMPTY,
         ANY,
         COLORED,
         INVALID,
