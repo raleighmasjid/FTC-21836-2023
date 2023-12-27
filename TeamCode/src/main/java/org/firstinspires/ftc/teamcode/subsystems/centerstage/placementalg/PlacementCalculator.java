@@ -61,17 +61,17 @@ public final class PlacementCalculator {
         int x = pixel.x;
         int y = pixel.y;
         Pixel[] up = {
-                pixel,
+                backdrop.get(x, y),
                 backdrop.get(x, y + 1),
                 backdrop.get(x - 1 + 2 * (y % 2), y + 1)
         };
         Pixel[] right = {
-                pixel,
+                backdrop.get(x, y),
                 backdrop.get(x + 1, y),
                 backdrop.get(x + (y % 2), y + 1)
         };
         Pixel[] left = {
-                pixel,
+                backdrop.get(x, y),
                 backdrop.get(x - 1, y),
                 backdrop.get(x + (y % 2) - 1, y + 1)
         };
