@@ -364,7 +364,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         // run motors
         double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-        setWeightedDrivePower(new Pose2d(
+        setDrivePower(new Pose2d(
                 yCommand * voltageScalar,
                 -xCommand * voltageScalar,
                 -turnCommand * voltageScalar
