@@ -56,7 +56,7 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    private final ThreadedColorSensor bottomSensor, topSensor;
+    final ThreadedColorSensor bottomSensor, topSensor;
     private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
     private final TouchSensor pivotSensor;
@@ -142,8 +142,6 @@ public final class Intake {
     }
 
     void interrupt() {
-        bottomSensor.interrupt();
-        topSensor.interrupt();
     }
 
     void run(int pixelsInDeposit, boolean depositRetracted) {

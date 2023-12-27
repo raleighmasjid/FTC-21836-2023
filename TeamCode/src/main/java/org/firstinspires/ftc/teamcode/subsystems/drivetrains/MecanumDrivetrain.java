@@ -315,14 +315,13 @@ public class MecanumDrivetrain extends MecanumDrive {
         return imu.getAngularVelo();
     }
 
-    private final ThreadedIMU imu;
+    public final ThreadedIMU imu;
 
     private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
     private boolean slowModeLocked = false;
 
     public void interrupt() {
-        imu.interrupt();
     }
 
     /**
