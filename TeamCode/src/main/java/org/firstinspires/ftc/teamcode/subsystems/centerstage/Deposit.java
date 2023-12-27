@@ -155,7 +155,6 @@ public final class Deposit {
             telemetry.addLine();
             telemetry.addData("Lift error derivative (in/s)", controller.getFilteredErrorDerivative());
             telemetry.addLine();
-            telemetry.addData("kP (corrected)", pidGains.kP);
             telemetry.addData("kD (computed)", pidGains.kD);
         }
     }
