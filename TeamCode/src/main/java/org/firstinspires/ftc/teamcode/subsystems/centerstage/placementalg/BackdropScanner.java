@@ -158,6 +158,7 @@ public final class BackdropScanner extends Thread {
 
                 pixelsTransferred = false;
             }
+            Thread.yield();
         }
     }
 

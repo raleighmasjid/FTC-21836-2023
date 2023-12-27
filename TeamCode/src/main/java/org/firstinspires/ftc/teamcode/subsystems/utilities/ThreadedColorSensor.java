@@ -38,6 +38,7 @@ public final class ThreadedColorSensor extends Thread {
             hsv.hue = (double) hsvArray[0];
             hsv.saturation = (double) hsvArray[1];
             hsv.value = (double) hsvArray[2];
+            Thread.yield();
         }
     }
 

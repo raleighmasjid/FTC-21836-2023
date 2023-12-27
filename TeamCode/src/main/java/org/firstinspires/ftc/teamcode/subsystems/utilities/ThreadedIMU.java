@@ -28,6 +28,7 @@ public final class ThreadedIMU extends Thread {
         while (run) {
             heading = imu.getRobotYawPitchRollAngles().getYaw(RADIANS);
             angularVelo = imu.getRobotAngularVelocity(RADIANS).zRotationRate;
+            Thread.yield();
         }
     }
 
