@@ -65,7 +65,7 @@ public final class MainAuton extends LinearOpMode {
             robot.run();
 
             // Push telemetry data
-            robot.printTelemetry(mTelemetry);
+            robot.printTelemetry();
             mTelemetry.update();
         }
     }

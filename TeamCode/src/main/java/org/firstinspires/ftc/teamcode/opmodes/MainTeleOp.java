@@ -114,7 +114,7 @@ public final class MainTeleOp extends LinearOpMode {
 
             // Push telemetry data to multiple outputs (set earlier):
             mTelemetry.addData("Loop time", loopTimer.seconds());
-            robot.printTelemetry(mTelemetry);
+            robot.printTelemetry();
             mTelemetry.update();
             loopTimer.reset();
         }

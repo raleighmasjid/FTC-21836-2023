@@ -107,8 +107,8 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     }
 
     @Override
-    public void printNumericalTelemetry(MultipleTelemetry telemetry) {
-        super.printNumericalTelemetry(telemetry);
+    public void printNumericalTelemetry() {
+        super.printNumericalTelemetry();
         telemetry.addLine();
         telemetry.addData("Target heading (radians)", targetHeading);
         telemetry.addData("Target heading (degrees)", toDegrees(targetHeading));

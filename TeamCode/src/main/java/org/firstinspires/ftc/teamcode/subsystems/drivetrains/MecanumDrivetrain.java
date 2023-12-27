@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
@@ -18,7 +19,6 @@ import static java.util.Collections.max;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
@@ -375,8 +375,8 @@ public class MecanumDrivetrain extends MecanumDrive {
         this.slowModeLocked = true;
     }
 
-    public void printNumericalTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Current heading (radians)", getHeading());
-        telemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
+    public void printNumericalTelemetry() {
+        mTelemetry.addData("Current heading (radians)", getHeading());
+        mTelemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
     }
 }

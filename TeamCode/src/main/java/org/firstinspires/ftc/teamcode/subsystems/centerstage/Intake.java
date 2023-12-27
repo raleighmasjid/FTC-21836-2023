@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
@@ -21,7 +22,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -261,21 +261,21 @@ public final class Intake {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
     }
 
-    private void printHSV(MultipleTelemetry telemetry, HSV color, String title) {
-        telemetry.addLine(title + ":");
-        telemetry.addData("Hue", color.hue);
-        telemetry.addData("Saturation", color.saturation);
-        telemetry.addData("Value", color.value);
+    private void printHSV(HSV color, String title) {
+        mTelemetry.addLine(title + ":");
+        mTelemetry.addData("Hue", color.hue);
+        mTelemetry.addData("Saturation", color.saturation);
+        mTelemetry.addData("Value", color.value);
     }
 
-    void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Top color", colors[1].name());
-        telemetry.addData("Bottom color", colors[0].name());
+    void printTelemetry() {
+        mTelemetry.addData("Top color", colors[1].name());
+        mTelemetry.addData("Bottom color", colors[0].name());
     }
 
-    void printNumericalTelemetry(MultipleTelemetry telemetry) {
-        printHSV(telemetry, topHSV, "Top HSV");
-        telemetry.addLine();
-        printHSV(telemetry, bottomHSV, "Bottom HSV");
+    void printNumericalTelemetry() {
+        printHSV(topHSV, "Top HSV");
+        mTelemetry.addLine();
+        printHSV(bottomHSV, "Bottom HSV");
     }
 }

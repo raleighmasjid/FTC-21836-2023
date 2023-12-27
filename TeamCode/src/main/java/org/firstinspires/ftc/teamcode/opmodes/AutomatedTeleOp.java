@@ -123,7 +123,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
             robot.run();
 
             // Push telemetry data to multiple outputs (set earlier):
-            robot.printTelemetry(mTelemetry);
+            robot.printTelemetry();
             mTelemetry.update();
         }
         robot.interrupt();

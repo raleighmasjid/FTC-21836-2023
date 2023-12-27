@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -174,7 +174,7 @@ public final class BackdropScanner extends Thread {
         run = false;
     }
 
-    public void printTelemetry(MultipleTelemetry mTelemetry) {
+    public void printTelemetry() {
         mTelemetry.addLine("Colors needed in wing:");
         mTelemetry.addLine("First: " + colorsNeeded[0].name());
         mTelemetry.addLine("Second: " + colorsNeeded[1].name());

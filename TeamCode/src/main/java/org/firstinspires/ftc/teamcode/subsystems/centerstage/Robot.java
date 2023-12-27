@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.S
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -98,23 +97,23 @@ public final class Robot {
         scanner.interrupt();
     }
 
-    public void printTelemetry(MultipleTelemetry mTelemetry) {
-        scanner.printTelemetry(mTelemetry);
+    public void printTelemetry() {
+        scanner.printTelemetry();
         mTelemetry.addLine();
 //        drivetrain.printTelemetry(mTelemetry);
 //        mTelemetry.addLine();
-        deposit.paintbrush.printTelemetry(mTelemetry);
+        deposit.paintbrush.printTelemetry();
         mTelemetry.addLine();
-        deposit.lift.printTelemetry(mTelemetry);
+        deposit.lift.printTelemetry();
         mTelemetry.addLine();
-        intake.printTelemetry(mTelemetry);
+        intake.printTelemetry();
         mTelemetry.addLine();
         mTelemetry.addLine();
         mTelemetry.addLine();
-        drivetrain.printNumericalTelemetry(mTelemetry);
+        drivetrain.printNumericalTelemetry();
         mTelemetry.addLine();
-        deposit.lift.printNumericalTelemetry(mTelemetry);
+        deposit.lift.printNumericalTelemetry();
         mTelemetry.addLine();
-        intake.printNumericalTelemetry(mTelemetry);
+        intake.printNumericalTelemetry();
     }
 }

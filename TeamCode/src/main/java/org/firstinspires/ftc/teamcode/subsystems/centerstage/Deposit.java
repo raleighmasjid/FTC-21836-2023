@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPiv
 import static java.util.Arrays.asList;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -160,17 +159,17 @@ public final class Deposit {
             return currentState.x > 0.15 ? kG : 0;
         }
 
-        void printTelemetry(MultipleTelemetry telemetry) {
-            telemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
+        void printTelemetry() {
+            mTelemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
         }
 
-        void printNumericalTelemetry(MultipleTelemetry telemetry) {
-            telemetry.addData("Current position (in)", currentState.x);
-            telemetry.addData("Target position (in)", targetState.x);
-            telemetry.addLine();
-            telemetry.addData("Lift error derivative (in/s)", controller.getFilteredErrorDerivative());
-            telemetry.addLine();
-            telemetry.addData("kD (computed)", pidGains.kD);
+        void printNumericalTelemetry() {
+            mTelemetry.addData("Current position (in)", currentState.x);
+            mTelemetry.addData("Target position (in)", targetState.x);
+            mTelemetry.addLine();
+            mTelemetry.addData("Lift error derivative (in/s)", controller.getFilteredErrorDerivative());
+            mTelemetry.addLine();
+            mTelemetry.addData("kD (computed)", pidGains.kD);
         }
     }
 
@@ -267,9 +266,9 @@ public final class Deposit {
             hook.run();
         }
 
-        void printTelemetry(MultipleTelemetry telemetry) {
-            telemetry.addData("First color", colors[0].name());
-            telemetry.addData("Second color", colors[1].name());
+        void printTelemetry() {
+            mTelemetry.addData("First color", colors[0].name());
+            mTelemetry.addData("Second color", colors[1].name());
         }
     }
 }
