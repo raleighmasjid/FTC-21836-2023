@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
@@ -41,17 +42,24 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
+    private final ElapsedTime loopTimer = new ElapsedTime();
+
     void run() {
 
-        if (!paintbrush.droppedPixel && paintbrush.timer.seconds() >= TIME_DROP_SECOND) {
+        mTelemetry.addData("Before lift.retract()", loopTimer.seconds());
+        if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
             lift.retract();
         }
+        mTelemetry.addData("Before matching extension states", loopTimer.seconds());
         boolean liftExtended = lift.isExtended();
         if (paintbrush.isExtended() != liftExtended) paintbrush.setExtended(liftExtended);
 
+        mTelemetry.addData("Before lift.run()", loopTimer.seconds());
         lift.run();
+        mTelemetry.addData("Before paintbrush.run()", loopTimer.seconds());
         paintbrush.run();
+        loopTimer.reset();
     }
 
     boolean isRetracted() {
@@ -126,19 +134,26 @@ public final class Deposit {
             return targetRow > -1;
         }
 
-        private void run() {
+        private final ElapsedTime loopTimer = new ElapsedTime();
 
+        private void run() {
+            mTelemetry.addData("Before currentState =", loopTimer.seconds());
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
+            mTelemetry.addData("Before SMARTDAMP", loopTimer.seconds());
             if (lastKp != pidGains.kP) {
                 pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
                 lastKp = pidGains.kP;
             }
+            mTelemetry.addData("Before setGains()", loopTimer.seconds());
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);
 
+            mTelemetry.addData("Before controller.calculate", loopTimer.seconds());
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
+            mTelemetry.addData("Before motor.set", loopTimer.seconds());
             for (MotorEx motor : motors) motor.set(output);
+            loopTimer.reset();
         }
 
         private double kG() {
