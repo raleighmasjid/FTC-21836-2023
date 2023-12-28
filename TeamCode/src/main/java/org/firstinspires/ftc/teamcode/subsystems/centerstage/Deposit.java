@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTimer;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
@@ -38,23 +39,30 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    private final ElapsedTime loopTimer = new ElapsedTime();
-
     void run() {
 
-        mTelemetry.addData("Before lift.retract()", loopTimer.seconds());
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
             lift.setTargetRow(-1);
         }
-        mTelemetry.addData("Before matching extension states", loopTimer.seconds());
+
+        mTelemetry.addData("if dropped pixels", loopTimer.seconds());
+        loopTimer.reset();
+
         boolean liftExtended = lift.targetRow > -1;
         if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
 
-        mTelemetry.addData("Before lift.run()", loopTimer.seconds());
+        mTelemetry.addData("match extension states", loopTimer.seconds());
+        loopTimer.reset();
+
         lift.run();
-        mTelemetry.addData("Before paintbrush.run()", loopTimer.seconds());
+
+        mTelemetry.addData("lift.run()", loopTimer.seconds());
+        loopTimer.reset();
+
         paintbrush.run();
+
+        mTelemetry.addData("paintbrush.run()", loopTimer.seconds());
         loopTimer.reset();
     }
 
@@ -132,26 +140,38 @@ public final class Deposit {
 
         private void run() {
 
-            mTelemetry.addData("Before currentState =", loopTimer.seconds());
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
+
+            mTelemetry.addData("currentState = new state", loopTimer.seconds());
+            loopTimer.reset();
 
             if (climbing) {
                 for (MotorEx motor : motors) motor.set(-1);
                 return;
             }
 
-            mTelemetry.addData("Before SMARTDAMP", loopTimer.seconds());
             if (lastKp != pidGains.kP) {
                 pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
                 lastKp = pidGains.kP;
             }
-            mTelemetry.addData("Before setGains()", loopTimer.seconds());
+
+            mTelemetry.addData("compute kd", loopTimer.seconds());
+            loopTimer.reset();
+
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);
-            mTelemetry.addData("Before controller.calculate", loopTimer.seconds());
+
+            mTelemetry.addData("set gains", loopTimer.seconds());
+            loopTimer.reset();
+
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
-            mTelemetry.addData("Before motor.set", loopTimer.seconds());
+
+            mTelemetry.addData("calculate", loopTimer.seconds());
+            loopTimer.reset();
+
             for (MotorEx motor : motors) motor.set(output);
+
+            mTelemetry.addData("motors run", loopTimer.seconds());
             loopTimer.reset();
         }
 
