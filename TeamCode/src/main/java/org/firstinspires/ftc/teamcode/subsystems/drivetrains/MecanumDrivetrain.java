@@ -321,9 +321,6 @@ public class MecanumDrivetrain extends MecanumDrive {
     public static double SLOW_FACTOR = 0.3;
     private boolean slowModeLocked = false;
 
-    public void interrupt() {
-    }
-
     /**
      * Set internal heading of the robot to correct field-centric direction
      *

@@ -93,6 +93,7 @@ public final class Intake {
         private final double deltaX, deltaTheta;
 
         private static final Intake.Height[] values = values();
+
         private static Intake.Height get(int ordinal) {
             return values[ordinal];
         }
@@ -141,9 +142,6 @@ public final class Intake {
         timer.reset();
     }
 
-    void interrupt() {
-    }
-
     void run(int pixelsInDeposit, boolean depositRetracted) {
 
         if (pixelsTransferred) pixelsTransferred = false;
@@ -162,7 +160,8 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
+                if (timer.seconds() >= TIME_PIXEL_1_SETTLING || requiredIntakingAmount == 0)
+                    state = HAS_1_PIXEL;
                 else break;
 
             case HAS_1_PIXEL:
@@ -178,13 +177,15 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_2_SETTLING && requiredIntakingAmount + pixelsInDeposit <= 2 && depositRetracted) {
+                if (depositRetracted && (requiredIntakingAmount == 0 || (
+                        timer.seconds() >= TIME_PIXEL_2_SETTLING &&
+                                requiredIntakingAmount + pixelsInDeposit <= 2
+                ))) {
                     state = PIVOTING;
-                    latch.setActivated(true);
+                    if (requiredIntakingAmount > 0) latch.setActivated(true);
                     pivot.setActivated(true);
                     timer.reset();
-                }
-                else break;
+                } else break;
 
             case PIVOTING:
 
@@ -232,7 +233,7 @@ public final class Intake {
     }
 
     Pixel.Color[] getColors() {
-        return colors.clone();
+        return colors;
     }
 
     boolean pixelsTransferred() {

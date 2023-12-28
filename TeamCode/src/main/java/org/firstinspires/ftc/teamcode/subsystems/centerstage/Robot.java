@@ -8,7 +8,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
@@ -21,7 +21,7 @@ public final class Robot {
 
     public static boolean isRed = true, isRight = true;
 
-    public final MecanumDrivetrain drivetrain;
+    public final AutoTurnMecanum drivetrain;
     public final Intake intake;
     public final Deposit deposit;
 
@@ -36,7 +36,7 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap) {
         bulkReader = new BulkReader(hardwareMap);
 
-        drivetrain = new MecanumDrivetrain(hardwareMap);
+        drivetrain = new AutoTurnMecanum(hardwareMap);
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
@@ -94,16 +94,14 @@ public final class Robot {
     }
 
     public void interrupt() {
-        drivetrain.interrupt();
-        intake.interrupt();
 //        scanner.interrupt();
     }
 
     public void printTelemetry() {
 //        scanner.printTelemetry();
         mTelemetry.addLine();
-//        drivetrain.printTelemetry(mTelemetry);
-//        mTelemetry.addLine();
+        drivetrain.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();
         mTelemetry.addLine();
         deposit.lift.printTelemetry();

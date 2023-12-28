@@ -77,6 +77,8 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, DPAD_DOWN))   robot.drivetrain.setCurrentHeading(PI);
             if (keyPressed(1, DPAD_RIGHT))  robot.drivetrain.setCurrentHeading(-PI / 2);
 
+            if (keyPressed(1, Y)) robot.deposit.lift.toggleClimb();
+
             robot.intake.setMotorPower(
                     gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
             );

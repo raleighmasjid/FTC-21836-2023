@@ -10,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
-import static java.util.Arrays.asList;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -27,8 +26,6 @@ import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
-
-import java.util.ArrayList;
 
 @Config
 public final class Deposit {
@@ -48,11 +45,11 @@ public final class Deposit {
         mTelemetry.addData("Before lift.retract()", loopTimer.seconds());
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
-            lift.retract();
+            lift.setTargetRow(-1);
         }
         mTelemetry.addData("Before matching extension states", loopTimer.seconds());
-        boolean liftExtended = lift.isExtended();
-        if (paintbrush.isExtended() != liftExtended) paintbrush.setExtended(liftExtended);
+        boolean liftExtended = lift.targetRow > -1;
+        if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
 
         mTelemetry.addData("Before lift.run()", loopTimer.seconds());
         lift.run();
@@ -62,7 +59,7 @@ public final class Deposit {
     }
 
     boolean isRetracted() {
-        return !paintbrush.isExtended() && lift.currentState.x <= 0.5;
+        return !paintbrush.pivot.isActivated() && lift.currentState.x <= 0.5;
     }
 
     @Config
@@ -102,6 +99,8 @@ public final class Deposit {
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
 
+        private boolean climbing = false;
+
         private Lift(HardwareMap hardwareMap) {
             this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
             this.motors = new MotorEx[]{
@@ -125,19 +124,21 @@ public final class Deposit {
             setTargetRow(targetRow + deltaRow);
         }
 
-        private void retract() {
-            setTargetRow(-1);
-        }
-
-        private boolean isExtended() {
-            return targetRow > -1;
-        }
-
         private final ElapsedTime loopTimer = new ElapsedTime();
 
+        public void toggleClimb() {
+            climbing = !climbing;
+        }
+
         private void run() {
+
             mTelemetry.addData("Before currentState =", loopTimer.seconds());
             currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
+
+            if (climbing) {
+                for (MotorEx motor : motors) motor.set(-1);
+                return;
+            }
 
             mTelemetry.addData("Before SMARTDAMP", loopTimer.seconds());
             if (lastKp != pidGains.kP) {
@@ -147,7 +148,6 @@ public final class Deposit {
             mTelemetry.addData("Before setGains()", loopTimer.seconds());
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);
-
             mTelemetry.addData("Before controller.calculate", loopTimer.seconds());
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
             mTelemetry.addData("Before motor.set", loopTimer.seconds());
@@ -156,11 +156,13 @@ public final class Deposit {
         }
 
         private double kG() {
-            return currentState.x > 0.15 ? kG : 0;
+            return (currentState.x > 0.15 && !climbing) ? kG : 0;
         }
 
         void printTelemetry() {
             mTelemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
+            mTelemetry.addLine();
+            mTelemetry.addData("Lift mode", climbing ? "climbing" : "scoring");
         }
 
         void printNumericalTelemetry() {
@@ -218,21 +220,17 @@ public final class Deposit {
         }
 
         Pixel.Color[] getColors() {
-            return colors.clone();
+            return colors;
         }
 
         void lockPixels(Pixel.Color[] colors) {
-            ArrayList<Pixel.Color> allColors = new ArrayList<>(asList(this.colors[1], this.colors[0], colors[1], colors[0]));
-            ArrayList<Pixel.Color> actualColors = new ArrayList<>();
-            for (Pixel.Color color : allColors) if (color != EMPTY) actualColors.add(color);
-            actualColors.add(EMPTY);
-            actualColors.add(EMPTY);
+            int pixelsInIntake = 0;
+            for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
-            this.colors[1] = actualColors.get(0);
-            this.colors[0] = actualColors.get(1);
+            if (pixelsInIntake >= 1) this.colors[1] = colors[1];
+            if (pixelsInIntake == 2) this.colors[0] = colors[0];
 
-            for (Pixel.Color color : this.colors) if (color != EMPTY) pixelsLocked++;
-            pixelsLocked = clip(pixelsLocked, 0, 2);
+            pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
         public void dropPixels(int numToDrop) {
@@ -243,14 +241,6 @@ public final class Deposit {
                 droppedPixel = false;
                 timer.reset();
             }
-        }
-
-        private void setExtended(boolean extended) {
-            pivot.setActivated(extended);
-        }
-
-        private boolean isExtended() {
-            return pivot.getActivated();
         }
 
         private void run() {
