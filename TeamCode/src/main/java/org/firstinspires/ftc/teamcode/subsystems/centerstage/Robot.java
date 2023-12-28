@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTimer;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 
@@ -77,27 +76,14 @@ public final class Robot {
 //            scanner.generateTrajectory(deposit.paintbrush.getColors());
         }
 
-        mTelemetry.addData("intake pixels transferred, lock pixels", loopTimer.seconds());
-        loopTimer.reset();
-
         deposit.run();
-
-        mTelemetry.addData("deposit.run()", loopTimer.seconds());
-        loopTimer.reset();
-
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
-
-        mTelemetry.addData("intake.run()", loopTimer.seconds());
-        loopTimer.reset();
 
         for (LEDIndicator indicator : indicators) {
             indicator.setState(drivetrain.isBusy() ? RED :
 //                    scanner.trajectoryReady() ? GREEN :
                             OFF);
         }
-
-        mTelemetry.addData("indicators", loopTimer.seconds());
-        loopTimer.reset();
     }
 
     public void interrupt() {

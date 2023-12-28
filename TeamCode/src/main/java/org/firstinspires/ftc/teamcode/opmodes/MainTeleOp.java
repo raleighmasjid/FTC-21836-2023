@@ -36,8 +36,6 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    public static ElapsedTime loopTimer = new ElapsedTime();
-
     @Override
     public void runOpMode() throws InterruptedException {
         ElapsedTime fullLoopTimer = new ElapsedTime();
@@ -65,17 +63,10 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
-            mTelemetry.addData("Between loop time", loopTimer.seconds());
-            loopTimer.reset();
             // Read sensors + gamepads:
             robot.readSensors();
-            mTelemetry.addData("robot.readSensors()", loopTimer.seconds());
-            loopTimer.reset();
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
-
-            mTelemetry.addData("read buttons", loopTimer.seconds());
-            loopTimer.reset();
 
             // Reset current heading as per these keybinds:
             if (keyPressed(1, DPAD_UP))     robot.drivetrain.setCurrentHeading(0);
@@ -83,14 +74,9 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, DPAD_DOWN))   robot.drivetrain.setCurrentHeading(PI);
             if (keyPressed(1, DPAD_RIGHT))  robot.drivetrain.setCurrentHeading(-PI / 2);
 
-            if (keyPressed(1, Y)) robot.deposit.lift.toggleClimb();
-
             robot.intake.setMotorPower(
                     gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
             );
-
-            mTelemetry.addData("Controller 1 binds", loopTimer.seconds());
-            loopTimer.reset();
 
             if (gamepadEx2.isDown(LEFT_BUMPER)) {
                 if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
@@ -111,9 +97,6 @@ public final class MainTeleOp extends LinearOpMode {
                 }
             }
 
-            mTelemetry.addData("Controller 2 binds", loopTimer.seconds());
-            loopTimer.reset();
-
             // Field-centric driving with control stick inputs:
             robot.drivetrain.run(
                     gamepadEx1.getLeftX(),
@@ -122,17 +105,11 @@ public final class MainTeleOp extends LinearOpMode {
                     gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
             );
 
-            mTelemetry.addData("drivetrain.run()", loopTimer.seconds());
-            loopTimer.reset();
-
             robot.run();
 
-            mTelemetry.addData("robot.run()", loopTimer.seconds());
-            loopTimer.reset();
-
-            robot.printTelemetry();
             mTelemetry.addData("full loop time", fullLoopTimer.seconds());
             fullLoopTimer.reset();
+            robot.printTelemetry();
             mTelemetry.update();
         }
         robot.interrupt();

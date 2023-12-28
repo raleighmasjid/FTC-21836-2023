@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTimer;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
@@ -46,24 +45,12 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        mTelemetry.addData("if dropped pixels", loopTimer.seconds());
-        loopTimer.reset();
-
         boolean liftExtended = lift.targetRow > -1;
         if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
 
-        mTelemetry.addData("match extension states", loopTimer.seconds());
-        loopTimer.reset();
-
         lift.run();
 
-        mTelemetry.addData("lift.run()", loopTimer.seconds());
-        loopTimer.reset();
-
         paintbrush.run();
-
-        mTelemetry.addData("paintbrush.run()", loopTimer.seconds());
-        loopTimer.reset();
     }
 
     boolean isRetracted() {
@@ -99,15 +86,14 @@ public final class Deposit {
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
-        private State currentState = new State(), targetState = new State();
+        private final State currentState = new State();
+        private final State targetState = new State();
         private int targetRow = -1;
         private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(lowPassGains);
         private final PIDController controller = new PIDController(kDFilter);
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
-
-        private boolean climbing = false;
 
         private Lift(HardwareMap hardwareMap) {
             this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -124,7 +110,7 @@ public final class Deposit {
 
         public void setTargetRow(int targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
+            targetState.x = this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT);
             controller.setTarget(targetState);
         }
 
@@ -132,57 +118,28 @@ public final class Deposit {
             setTargetRow(targetRow + deltaRow);
         }
 
-        private final ElapsedTime loopTimer = new ElapsedTime();
-
-        public void toggleClimb() {
-            climbing = !climbing;
-        }
-
         private void run() {
 
-            currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
-
-            mTelemetry.addData("currentState = new state", loopTimer.seconds());
-            loopTimer.reset();
-
-            if (climbing) {
-                for (MotorEx motor : motors) motor.set(-1);
-                return;
-            }
+            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
 
             if (lastKp != pidGains.kP) {
                 pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
                 lastKp = pidGains.kP;
             }
 
-            mTelemetry.addData("compute kd", loopTimer.seconds());
-            loopTimer.reset();
-
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);
 
-            mTelemetry.addData("set gains", loopTimer.seconds());
-            loopTimer.reset();
-
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
-
-            mTelemetry.addData("calculate", loopTimer.seconds());
-            loopTimer.reset();
-
             for (MotorEx motor : motors) motor.set(output);
-
-            mTelemetry.addData("motors run", loopTimer.seconds());
-            loopTimer.reset();
         }
 
         private double kG() {
-            return (currentState.x > 0.15 && !climbing) ? kG : 0;
+            return (currentState.x > 0.15) ? kG : 0;
         }
 
         void printTelemetry() {
             mTelemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
-            mTelemetry.addLine();
-            mTelemetry.addData("Lift mode", climbing ? "climbing" : "scoring");
         }
 
         void printNumericalTelemetry() {
