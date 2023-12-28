@@ -63,6 +63,7 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
+            fullLoopTimer.reset();
             // Read sensors + gamepads:
             robot.readSensors();
             gamepadEx1.readButtons();
@@ -108,7 +109,6 @@ public final class MainTeleOp extends LinearOpMode {
             robot.run();
 
             mTelemetry.addData("full loop time", fullLoopTimer.seconds());
-            fullLoopTimer.reset();
             robot.printTelemetry();
             mTelemetry.update();
         }
