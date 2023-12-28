@@ -30,7 +30,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.ColorSensor;
 
 @Config
 public final class Intake {
@@ -56,7 +56,7 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    final ThreadedColorSensor bottomSensor, topSensor;
+    final ColorSensor bottomSensor, topSensor;
     private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
     private final TouchSensor pivotSensor;
@@ -133,8 +133,8 @@ public final class Intake {
         motor.setZeroPowerBehavior(FLOAT);
         motor.setInverted(true);
 
-        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
-        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
+        bottomSensor = new ColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
+        topSensor = new ColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
 
         pivotSensor = hardwareMap.get(TouchSensor.class, "intake pivot sensor");
 

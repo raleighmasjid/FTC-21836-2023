@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedIMU;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.HeadingIMU;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +70,7 @@ public class SampleTankDrive extends TankDrive {
     private TrajectoryFollower follower;
 
     private List<DcMotorEx> motors, leftMotors, rightMotors;
-    private ThreadedIMU imu;
+    private HeadingIMU imu;
 
     private VoltageSensor batteryVoltageSensor;
 
@@ -89,7 +89,7 @@ public class SampleTankDrive extends TankDrive {
 //        }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
 
         // add/remove motors depending on your robot (e.g., 6WD)
         DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");

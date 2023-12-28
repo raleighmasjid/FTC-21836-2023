@@ -6,13 +6,13 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-public final class ThreadedIMU {
+public final class HeadingIMU {
 
     private final IMU imu;
 
     private double heading, angularVelo;
 
-    public ThreadedIMU(HardwareMap hw, String name, RevHubOrientationOnRobot imuOrientation) {
+    public HeadingIMU(HardwareMap hw, String name, RevHubOrientationOnRobot imuOrientation) {
         imu = hw.get(IMU.class, name);
         imu.resetDeviceConfigurationForOpMode();
         imu.resetYaw();

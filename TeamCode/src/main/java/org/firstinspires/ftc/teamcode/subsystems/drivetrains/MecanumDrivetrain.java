@@ -48,7 +48,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedIMU;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.HeadingIMU;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +90,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        imu = new ThreadedIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
         setCurrentHeading(0);
 
         // TODO: adjust the names of the following hardware devices to match your configuration
@@ -315,7 +315,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         return imu.getAngularVelo();
     }
 
-    public final ThreadedIMU imu;
+    public final HeadingIMU imu;
 
     private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
@@ -338,7 +338,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     /**
-     * Field-centric driving using (threaded) {@link ThreadedIMU}
+     * Field-centric driving using (threaded) {@link HeadingIMU}
      *
      * @param xCommand strafing input
      * @param yCommand forward input

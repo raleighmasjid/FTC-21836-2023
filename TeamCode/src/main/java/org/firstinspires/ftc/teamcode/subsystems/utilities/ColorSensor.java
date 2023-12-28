@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.RGB;
 
-public final class ThreadedColorSensor {
+public final class ColorSensor {
 
     private final NormalizedColorSensor sensor;
     private final float[] hsvArray = new float[3];
@@ -18,7 +18,7 @@ public final class ThreadedColorSensor {
     private final HSV hsv = new HSV();
     private final RGB rgb = new RGB();
 
-    public ThreadedColorSensor(HardwareMap hardwareMap, String name, float gain) {
+    public ColorSensor(HardwareMap hardwareMap, String name, float gain) {
         sensor = hardwareMap.get(NormalizedColorSensor.class, name);
         sensor.setGain(gain);
         if (sensor instanceof SwitchableLight) ((SwitchableLight) sensor).enableLight(true);
