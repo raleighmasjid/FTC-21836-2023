@@ -222,7 +222,7 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
         latch.updateAngles(
-                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
+                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING && requiredIntakingAmount > 0 ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
                 ANGLE_LATCH_LOCKED
         );
 
