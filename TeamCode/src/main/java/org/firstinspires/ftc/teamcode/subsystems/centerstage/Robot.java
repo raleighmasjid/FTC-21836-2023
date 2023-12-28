@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 
@@ -9,8 +8,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -31,7 +28,7 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-    private final BackdropScanner scanner;
+//    private final BackdropScanner scanner;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -43,7 +40,7 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        scanner = new BackdropScanner(this);
+//        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led right"),
@@ -56,9 +53,9 @@ public final class Robot {
     }
 
     public void startAutoDrive() {
-        TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
-        if (scoringTrajectory == null) return;
-        drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
+//        TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
+//        if (scoringTrajectory == null) return;
+//        drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
         autoDriveStarted = false;
         autoTimer.reset();
     }
@@ -86,7 +83,9 @@ public final class Robot {
 
         mTelemetry.addData("Before indicators", loopTimer.seconds());
         for (LEDIndicator indicator : indicators) {
-            indicator.setState(drivetrain.isBusy() ? RED : scanner.trajectoryReady() ? GREEN : OFF);
+            indicator.setState(drivetrain.isBusy() ? RED :
+//                    scanner.trajectoryReady() ? GREEN :
+                            OFF);
         }
         loopTimer.reset();
     }
@@ -94,11 +93,11 @@ public final class Robot {
     public void interrupt() {
         drivetrain.interrupt();
         intake.interrupt();
-        scanner.interrupt();
+//        scanner.interrupt();
     }
 
     public void printTelemetry() {
-        scanner.printTelemetry();
+//        scanner.printTelemetry();
         mTelemetry.addLine();
 //        drivetrain.printTelemetry(mTelemetry);
 //        mTelemetry.addLine();
