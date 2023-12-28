@@ -63,7 +63,7 @@ public class SimpleServoPivot {
      * False if position A (default) <p>
      * True if in position B
      */
-    public boolean getActivated() {
+    public boolean isActivated() {
         return activated;
     }
 
