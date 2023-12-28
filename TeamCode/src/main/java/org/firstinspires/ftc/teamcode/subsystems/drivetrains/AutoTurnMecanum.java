@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 
 import static java.lang.Math.toDegrees;
@@ -109,10 +110,10 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     @Override
     public void printNumericalTelemetry() {
         super.printNumericalTelemetry();
-        telemetry.addLine();
-        telemetry.addData("Target heading (radians)", targetHeading);
-        telemetry.addData("Target heading (degrees)", toDegrees(targetHeading));
-        telemetry.addLine();
-        telemetry.addData("Heading error derivative (ticks/s)", headingController.getFilteredErrorDerivative());
+        mTelemetry.addLine();
+        mTelemetry.addData("Target heading (radians)", targetHeading);
+        mTelemetry.addData("Target heading (degrees)", toDegrees(targetHeading));
+        mTelemetry.addLine();
+        mTelemetry.addData("Heading error derivative (ticks/s)", headingController.getFilteredErrorDerivative());
     }
 }
