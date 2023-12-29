@@ -43,8 +43,8 @@ public final class Robot {
 //        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led right"),
-                new LEDIndicator(hardwareMap, "led left")
+                new LEDIndicator(hardwareMap, "led right green", "led right red"),
+                new LEDIndicator(hardwareMap, "led left green", "led left red")
         };
     }
 

@@ -9,13 +9,19 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 
 public final class MotionProfiler {
 
-    private MotionProfile profile;
-
     private State state = new State();
 
     private final ElapsedTime timer = new ElapsedTime();
 
     private ProfileConstraints constraints = new ProfileConstraints();
+
+    private MotionProfile profile = MotionProfileGenerator.generateSimpleMotionProfile(
+            new MotionState(0, 0),
+            new MotionState(0, 0),
+            constraints.maxV,
+            constraints.maxA,
+            constraints.maxJ
+    );
 
     public void setConstraints(ProfileConstraints constraints) {
         this.constraints = constraints;
