@@ -48,11 +48,15 @@ public final class Robot {
         };
     }
 
+    private final ElapsedTime i2cTimer = new ElapsedTime();
+
     public void readSensors() {
         bulkReader.bulkRead();
+        i2cTimer.reset();
         drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
+        mTelemetry.addData("I2C read time", i2cTimer.seconds());
     }
 
     public void startAutoDrive() {
