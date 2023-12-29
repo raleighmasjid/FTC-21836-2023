@@ -38,7 +38,7 @@ public final class MainTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        ElapsedTime fullLoopTimer = new ElapsedTime();
+        ElapsedTime loopTimer = new ElapsedTime();
 
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -63,7 +63,7 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
-            fullLoopTimer.reset();
+            loopTimer.reset();
             // Read sensors + gamepads:
             robot.readSensors();
             gamepadEx1.readButtons();
@@ -108,7 +108,7 @@ public final class MainTeleOp extends LinearOpMode {
 
             robot.run();
 
-            mTelemetry.addData("full loop time", fullLoopTimer.seconds());
+            mTelemetry.addData("full loop time", loopTimer.seconds());
             robot.printTelemetry();
             mTelemetry.update();
         }
