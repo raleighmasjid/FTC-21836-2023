@@ -72,29 +72,30 @@ public final class Deposit {
         private double lastKp = pidGains.kP;
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
+                0.025,
                 0.01,
-                0.01
+                0.05
         );
 
         public static LowPassGains lowPassGains = new LowPassGains(
-                0,
-                2
+                0.85,
+                20
         );
 
         public static ProfileConstraints profileConstraints = new ProfileConstraints(
-                20,
                 10,
-                5
+                20,
+                15
         );
 
         public static KalmanGains kalmanGains = new KalmanGains(
                 0.3,
-                3,
-                3
+                10,
+                5
         );
 
         public static double
-                kG = 0.1,
+                kG = 0.15,
                 INCHES_PER_TICK = 0.0322835,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
