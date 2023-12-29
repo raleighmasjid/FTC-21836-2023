@@ -20,8 +20,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
@@ -79,10 +81,24 @@ public final class Deposit {
                 2
         );
 
+        public static ProfileConstraints profileConstraints = new ProfileConstraints(
+                20,
+                10,
+                5
+        );
+
+        public static KalmanGains kalmanGains = new KalmanGains(
+                0.3,
+                3,
+                3
+        );
+
         public static double
                 kG = 0.1,
                 INCHES_PER_TICK = 0.0322835,
-                PERCENT_OVERSHOOT = 0;
+                PERCENT_OVERSHOOT = 0,
+                POS_1 = 0,
+                POS_2 = 25;
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;

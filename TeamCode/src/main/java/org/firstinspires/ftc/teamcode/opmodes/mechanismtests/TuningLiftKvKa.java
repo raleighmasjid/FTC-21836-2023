@@ -8,8 +8,12 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.INCHES_PER_TICK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.POS_1;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.POS_2;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.profileConstraints;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.feedforwardGains;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.kG;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.kalmanGains;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.lowPassGains;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 
@@ -24,8 +28,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.control.controllers.FeedforwardController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -33,22 +35,6 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 
 @TeleOp(group = "Single mechanism test")
 public final class TuningLiftKvKa extends LinearOpMode {
-
-    public static ProfileConstraints constraints = new ProfileConstraints(
-            20,
-            10,
-            5
-    );
-
-    public static KalmanGains kalmanGains = new KalmanGains(
-            0.3,
-            3,
-            3
-    );
-
-    public static double
-            POS_1 = 0,
-            POS_2 = 25;
 
     // Motors and variables to manage their readings:
     public MotorEx[] motors;
@@ -93,10 +79,10 @@ public final class TuningLiftKvKa extends LinearOpMode {
             firFilter.setGains(lowPassGains);
             kalmanFilter.setGains(kalmanGains);
             controller.setGains(feedforwardGains);
-            profiler.setConstraints(constraints);
+            profiler.setConstraints(profileConstraints);
 
-            currentState.x = INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0;
-            currentState.v = differentiator.getDerivative(currentState.x);
+            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
+            currentState.v = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getCorrectedVelocity() + motors[1].encoder.getCorrectedVelocity());
 
             if (keyPressed(1, DPAD_DOWN)) profiler.generateProfile(currentState, new State(POS_1));
             if (keyPressed(1, DPAD_UP)) profiler.generateProfile(currentState, new State(POS_2));
