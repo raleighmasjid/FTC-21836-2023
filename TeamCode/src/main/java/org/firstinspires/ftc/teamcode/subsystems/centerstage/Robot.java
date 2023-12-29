@@ -37,14 +37,15 @@ public final class Robot {
         bulkReader = new BulkReader(hardwareMap);
 
         drivetrain = new AutoTurnMecanum(hardwareMap);
+        drivetrain.update();
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
 //        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led right green", "led right red"),
-                new LEDIndicator(hardwareMap, "led left green", "led left red")
+                new LEDIndicator(hardwareMap, "led left green", "led left red"),
+                new LEDIndicator(hardwareMap, "led right green", "led right red")
         };
     }
 
@@ -83,11 +84,11 @@ public final class Robot {
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
-        for (LEDIndicator indicator : indicators) {
-            indicator.setState(drivetrain.isBusy() ? RED :
-//                    scanner.trajectoryReady() ? GREEN :
-                            OFF);
-        }
+        for (LEDIndicator indicator : indicators) indicator.setState(
+                drivetrain.isBusy() ? RED :
+//                scanner.trajectoryReady() ? GREEN :
+                OFF
+        );
     }
 
     public void interrupt() {

@@ -14,7 +14,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.S
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -30,24 +29,31 @@ public final class TestIndicators extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
-        DigitalChannel redLED = hardwareMap.get(DigitalChannel.class, "led left red");
-        DigitalChannel greenLED = hardwareMap.get(DigitalChannel.class, "led left green");
-        redLED.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLED.setMode(DigitalChannel.Mode.OUTPUT);
-
-        LEDIndicator.State state = RED;
+        LEDIndicator[] indicators = {
+                new LEDIndicator(hardwareMap, "led left green", "led left red"),
+                new LEDIndicator(hardwareMap, "led right green", "led right red")
+        };
 
         waitForStart();
 
         while (opModeIsActive()) {
+            // Read stuff
             bulkReader.bulkRead();
 
-            if (keyPressed(1, B)) state = RED;
-            if (keyPressed(1, A)) state = GREEN;
-            if (keyPressed(1, X)) state = OFF;
-            if (keyPressed(1, Y)) state = AMBER;
-            redLED.setState(state == RED || state == AMBER);
-            greenLED.setState(state == GREEN || state == AMBER);
+            gamepadEx1.readButtons();
+
+            if (keyPressed(1, B)) {
+                for (LEDIndicator indicator : indicators) indicator.setState(RED);
+            }
+            if (keyPressed(1, A)) {
+                for (LEDIndicator indicator : indicators) indicator.setState(GREEN);
+            }
+            if (keyPressed(1, X)) {
+                for (LEDIndicator indicator : indicators) indicator.setState(OFF);
+            }
+            if (keyPressed(1, Y)) {
+                for (LEDIndicator indicator : indicators) indicator.setState(AMBER);
+            }
         }
     }
 }
