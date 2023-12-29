@@ -30,7 +30,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
 
 @Config
 public final class Intake {
