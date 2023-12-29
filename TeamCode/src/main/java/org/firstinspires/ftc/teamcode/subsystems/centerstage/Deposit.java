@@ -10,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
-import static java.util.Arrays.asList;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -28,8 +27,6 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdr
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
-import java.util.ArrayList;
-
 @Config
 public final class Deposit {
 
@@ -41,28 +38,23 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    private final ElapsedTime loopTimer = new ElapsedTime();
-
     void run() {
 
-        mTelemetry.addData("Before lift.retract()", loopTimer.seconds());
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
-            lift.retract();
+            lift.setTargetRow(-1);
         }
-        mTelemetry.addData("Before matching extension states", loopTimer.seconds());
-        boolean liftExtended = lift.isExtended();
-        if (paintbrush.isExtended() != liftExtended) paintbrush.setExtended(liftExtended);
 
-        mTelemetry.addData("Before lift.run()", loopTimer.seconds());
+        boolean liftExtended = lift.targetRow > -1;
+        if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
+
         lift.run();
-        mTelemetry.addData("Before paintbrush.run()", loopTimer.seconds());
+
         paintbrush.run();
-        loopTimer.reset();
     }
 
     boolean isRetracted() {
-        return !paintbrush.isExtended() && lift.currentState.x <= 0.5;
+        return !paintbrush.pivot.isActivated() && lift.currentState.x <= 0.5;
     }
 
     @Config
@@ -94,7 +86,8 @@ public final class Deposit {
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
-        private State currentState = new State(), targetState = new State();
+        private final State currentState = new State();
+        private final State targetState = new State();
         private int targetRow = -1;
         private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(lowPassGains);
         private final PIDController controller = new PIDController(kDFilter);
@@ -117,7 +110,7 @@ public final class Deposit {
 
         public void setTargetRow(int targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
+            targetState.x = this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT);
             controller.setTarget(targetState);
         }
 
@@ -125,38 +118,24 @@ public final class Deposit {
             setTargetRow(targetRow + deltaRow);
         }
 
-        private void retract() {
-            setTargetRow(-1);
-        }
-
-        private boolean isExtended() {
-            return targetRow > -1;
-        }
-
-        private final ElapsedTime loopTimer = new ElapsedTime();
-
         private void run() {
-            mTelemetry.addData("Before currentState =", loopTimer.seconds());
-            currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
 
-            mTelemetry.addData("Before SMARTDAMP", loopTimer.seconds());
+            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
+
             if (lastKp != pidGains.kP) {
                 pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
                 lastKp = pidGains.kP;
             }
-            mTelemetry.addData("Before setGains()", loopTimer.seconds());
+
             kDFilter.setGains(lowPassGains);
             controller.setGains(pidGains);
 
-            mTelemetry.addData("Before controller.calculate", loopTimer.seconds());
             double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
-            mTelemetry.addData("Before motor.set", loopTimer.seconds());
             for (MotorEx motor : motors) motor.set(output);
-            loopTimer.reset();
         }
 
         private double kG() {
-            return currentState.x > 0.15 ? kG : 0;
+            return (currentState.x > 0.15) ? kG : 0;
         }
 
         void printTelemetry() {
@@ -218,21 +197,17 @@ public final class Deposit {
         }
 
         Pixel.Color[] getColors() {
-            return colors.clone();
+            return colors;
         }
 
         void lockPixels(Pixel.Color[] colors) {
-            ArrayList<Pixel.Color> allColors = new ArrayList<>(asList(this.colors[1], this.colors[0], colors[1], colors[0]));
-            ArrayList<Pixel.Color> actualColors = new ArrayList<>();
-            for (Pixel.Color color : allColors) if (color != EMPTY) actualColors.add(color);
-            actualColors.add(EMPTY);
-            actualColors.add(EMPTY);
+            int pixelsInIntake = 0;
+            for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
-            this.colors[1] = actualColors.get(0);
-            this.colors[0] = actualColors.get(1);
+            if (pixelsInIntake >= 1) this.colors[1] = colors[1];
+            if (pixelsInIntake == 2) this.colors[0] = colors[0];
 
-            for (Pixel.Color color : this.colors) if (color != EMPTY) pixelsLocked++;
-            pixelsLocked = clip(pixelsLocked, 0, 2);
+            pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
         public void dropPixels(int numToDrop) {
@@ -243,14 +218,6 @@ public final class Deposit {
                 droppedPixel = false;
                 timer.reset();
             }
-        }
-
-        private void setExtended(boolean extended) {
-            pivot.setActivated(extended);
-        }
-
-        private boolean isExtended() {
-            return pivot.getActivated();
         }
 
         private void run() {

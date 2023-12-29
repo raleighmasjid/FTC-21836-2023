@@ -30,7 +30,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.ThreadedColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.ColorSensor;
 
 @Config
 public final class Intake {
@@ -38,15 +38,15 @@ public final class Intake {
     public static double
             ANGLE_PIVOT_OFFSET = 15,
             ANGLE_PIVOT_FLOOR_CLEARANCE = 0,
-            ANGLE_PIVOT_TRANSFERRING = 197,
+            ANGLE_PIVOT_TRANSFERRING = 195,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
             TIME_PIXEL_1_SETTLING = 0.5,
             TIME_PIXEL_2_SETTLING = 0.5,
             TIME_REVERSING = 1,
-            TIME_PIVOTING = 0.5,
-            TIME_SETTLING = 1,
+            TIME_PIVOTING = 0,
+            TIME_SETTLING = 0.2,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             r = 9.5019488189,
@@ -56,7 +56,7 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    private final ThreadedColorSensor bottomSensor, topSensor;
+    final ColorSensor bottomSensor, topSensor;
     private HSV bottomHSV = new HSV(), topHSV = new HSV();
 
     private final TouchSensor pivotSensor;
@@ -93,6 +93,7 @@ public final class Intake {
         private final double deltaX, deltaTheta;
 
         private static final Intake.Height[] values = values();
+
         private static Intake.Height get(int ordinal) {
             return values[ordinal];
         }
@@ -133,17 +134,12 @@ public final class Intake {
         motor.setZeroPowerBehavior(FLOAT);
         motor.setInverted(true);
 
-        bottomSensor = new ThreadedColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
-        topSensor = new ThreadedColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
+        bottomSensor = new ColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
+        topSensor = new ColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
 
         pivotSensor = hardwareMap.get(TouchSensor.class, "intake pivot sensor");
 
         timer.reset();
-    }
-
-    void interrupt() {
-        bottomSensor.interrupt();
-        topSensor.interrupt();
     }
 
     void run(int pixelsInDeposit, boolean depositRetracted) {
@@ -164,7 +160,8 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
+                if (timer.seconds() >= TIME_PIXEL_1_SETTLING || requiredIntakingAmount == 0)
+                    state = HAS_1_PIXEL;
                 else break;
 
             case HAS_1_PIXEL:
@@ -180,13 +177,15 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_2_SETTLING && requiredIntakingAmount + pixelsInDeposit <= 2 && depositRetracted) {
+                if (depositRetracted && (requiredIntakingAmount == 0 || (
+                        timer.seconds() >= TIME_PIXEL_2_SETTLING &&
+                                requiredIntakingAmount + pixelsInDeposit <= 2
+                ))) {
                     state = PIVOTING;
-                    latch.setActivated(true);
+                    if (requiredIntakingAmount > 0) latch.setActivated(true);
                     pivot.setActivated(true);
                     timer.reset();
-                }
-                else break;
+                } else break;
 
             case PIVOTING:
 
@@ -223,7 +222,7 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
         latch.updateAngles(
-                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
+                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING && requiredIntakingAmount > 0 ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
                 ANGLE_LATCH_LOCKED
         );
 
@@ -234,7 +233,7 @@ public final class Intake {
     }
 
     Pixel.Color[] getColors() {
-        return colors.clone();
+        return colors;
     }
 
     boolean pixelsTransferred() {

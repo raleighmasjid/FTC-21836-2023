@@ -18,14 +18,16 @@ public class LEDIndicator {
 
     private final DigitalChannel red, green;
 
-    public LEDIndicator(HardwareMap hardwareMap, String name) {
+    public LEDIndicator(HardwareMap hardwareMap, String greenName, String redName) {
         // Get the LED colors and touch sensor from the hardwaremap
-        green = hardwareMap.get(DigitalChannel.class, name + " green");
-        red = hardwareMap.get(DigitalChannel.class, name + " red");
+        green = hardwareMap.get(DigitalChannel.class, greenName);
+        red = hardwareMap.get(DigitalChannel.class, redName);
+    }
 
+    public void start() {
         // change LED mode from input to output
-        red.setMode(DigitalChannel.Mode.OUTPUT);
         green.setMode(DigitalChannel.Mode.OUTPUT);
+        red.setMode(DigitalChannel.Mode.OUTPUT);
     }
 
     public void setState(State state) {

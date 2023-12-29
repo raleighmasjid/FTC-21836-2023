@@ -8,7 +8,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 
@@ -21,7 +21,7 @@ public final class Robot {
 
     public static boolean isRed = true, isRight = true;
 
-    public final MecanumDrivetrain drivetrain;
+    public final AutoTurnMecanum drivetrain;
     public final Intake intake;
     public final Deposit deposit;
 
@@ -36,20 +36,23 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap) {
         bulkReader = new BulkReader(hardwareMap);
 
-        drivetrain = new MecanumDrivetrain(hardwareMap);
+        drivetrain = new AutoTurnMecanum(hardwareMap);
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
 //        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led right"),
-                new LEDIndicator(hardwareMap, "led left")
+                new LEDIndicator(hardwareMap, "led right green", "led right red"),
+                new LEDIndicator(hardwareMap, "led left green", "led left red")
         };
     }
 
     public void readSensors() {
         bulkReader.bulkRead();
+        drivetrain.imu.update();
+        intake.topSensor.update();
+        intake.bottomSensor.update();
     }
 
     public void startAutoDrive() {
@@ -67,40 +70,31 @@ public final class Robot {
         } else return false;
     }
 
-    private final ElapsedTime loopTimer = new ElapsedTime();
-
     public void run() {
-        mTelemetry.addData("Before intake.pixelsTransferred()", loopTimer.seconds());
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
 //            scanner.generateTrajectory(deposit.paintbrush.getColors());
         }
 
-        mTelemetry.addData("Before deposit.run()", loopTimer.seconds());
         deposit.run();
-        mTelemetry.addData("Before intake.run()", loopTimer.seconds());
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
-        mTelemetry.addData("Before indicators", loopTimer.seconds());
         for (LEDIndicator indicator : indicators) {
             indicator.setState(drivetrain.isBusy() ? RED :
 //                    scanner.trajectoryReady() ? GREEN :
                             OFF);
         }
-        loopTimer.reset();
     }
 
     public void interrupt() {
-        drivetrain.interrupt();
-        intake.interrupt();
 //        scanner.interrupt();
     }
 
     public void printTelemetry() {
 //        scanner.printTelemetry();
-        mTelemetry.addLine();
-//        drivetrain.printTelemetry(mTelemetry);
 //        mTelemetry.addLine();
+        drivetrain.printTelemetry(mTelemetry);
+        mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();
         mTelemetry.addLine();
         deposit.lift.printTelemetry();

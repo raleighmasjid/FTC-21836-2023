@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.S
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -22,8 +23,6 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 @TeleOp(group = "Single mechanism test")
 public final class TestIndicators extends LinearOpMode {
 
-    LEDIndicator[] indicators;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -31,23 +30,24 @@ public final class TestIndicators extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
+        DigitalChannel redLED = hardwareMap.get(DigitalChannel.class, "led left red");
+        DigitalChannel greenLED = hardwareMap.get(DigitalChannel.class, "led left green");
+        redLED.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLED.setMode(DigitalChannel.Mode.OUTPUT);
 
-        indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led right"),
-                new LEDIndicator(hardwareMap, "led left")
-        };
+        LEDIndicator.State state = RED;
 
         waitForStart();
 
         while (opModeIsActive()) {
             bulkReader.bulkRead();
 
-            for (LEDIndicator indicator : indicators) {
-                if (keyPressed(1, B)) indicator.setState(RED);
-                if (keyPressed(1, A)) indicator.setState(GREEN);
-                if (keyPressed(1, X)) indicator.setState(OFF);
-                if (keyPressed(1, Y)) indicator.setState(AMBER);
-            }
+            if (keyPressed(1, B)) state = RED;
+            if (keyPressed(1, A)) state = GREEN;
+            if (keyPressed(1, X)) state = OFF;
+            if (keyPressed(1, Y)) state = AMBER;
+            redLED.setState(state == RED || state == AMBER);
+            greenLED.setState(state == GREEN || state == AMBER);
         }
     }
 }

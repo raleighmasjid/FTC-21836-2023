@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
+import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.MotionProfiler;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
@@ -53,11 +54,13 @@ public final class TuningLiftKvKa extends LinearOpMode {
     public MotorEx[] motors;
     public State currentState = new State(), targetState = new State();
     public VoltageSensor batteryVoltageSensor;
-    public FeedforwardController controller;
-    public MotionProfiler profiler;
+    public FeedforwardController controller = new FeedforwardController(feedforwardGains);
+    public MotionProfiler profiler = new MotionProfiler();
 
     public FIRLowPassFilter firFilter = new FIRLowPassFilter(lowPassGains);
     public KalmanFilter kalmanFilter = new KalmanFilter(kalmanGains);
+
+    public Differentiator differentiator = new Differentiator();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -92,7 +95,8 @@ public final class TuningLiftKvKa extends LinearOpMode {
             controller.setGains(feedforwardGains);
             profiler.setConstraints(constraints);
 
-            currentState = new State(INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0);
+            currentState.x = INCHES_PER_TICK * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()) / 2.0;
+            currentState.v = differentiator.getDerivative(currentState.x);
 
             if (keyPressed(1, DPAD_DOWN)) profiler.generateProfile(currentState, new State(POS_1));
             if (keyPressed(1, DPAD_UP)) profiler.generateProfile(currentState, new State(POS_2));

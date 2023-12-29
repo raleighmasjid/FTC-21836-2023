@@ -80,7 +80,7 @@ public final class Pixel implements Comparable<Pixel> {
             minWhite = new HSV(
             0,
             0,
-            0.15
+            0.05
             ),
             maxWhite = new HSV(
                     0,
@@ -90,7 +90,7 @@ public final class Pixel implements Comparable<Pixel> {
             minPurple = new HSV(
                     205,
                     0.55,
-                    0.1
+                    0.085
             ),
             maxPurple = new HSV(
                     225,
@@ -100,7 +100,7 @@ public final class Pixel implements Comparable<Pixel> {
             minYellow = new HSV(
                     90,
                     0.55,
-                    0.08
+                    0.02
             ),
             maxYellow = new HSV(
                     110,
@@ -109,11 +109,11 @@ public final class Pixel implements Comparable<Pixel> {
             ),
             minGreen = new HSV(
                     120,
-                    0.7,
-                    0.05
+                    0.5,
+                    0.01
             ),
             maxGreen = new HSV(
-                    140,
+                    147.5,
                     1,
                     0.2
             );
