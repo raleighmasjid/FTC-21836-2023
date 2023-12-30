@@ -138,18 +138,7 @@ public final class Deposit {
             this.manualLiftPower = manualLiftPower;
         }
 
-        private final ElapsedTime encoderReadTimer = new ElapsedTime();
-
         private void run() {
-            encoderReadTimer.reset();
-            int pos2 = motors[1].encoder.getPosition();
-            mTelemetry.addData("pos2 time", encoderReadTimer.seconds());
-
-            encoderReadTimer.reset();
-            int pos1 = motors[0].encoder.getPosition();
-            mTelemetry.addData("pos1 time", encoderReadTimer.seconds());
-
-            currentState.x = INCHES_PER_TICK * 0.5 * (pos1 + pos2);
 
             if (lastKp != pidGains.kP) {
                 pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
@@ -158,6 +147,8 @@ public final class Deposit {
 
             kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
+
+            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
