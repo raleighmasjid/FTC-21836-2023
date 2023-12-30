@@ -122,6 +122,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
             robot.run();
 
+            mTelemetry.addData("Scoring mode", autoScoring ? "auto" : "manual");
             // Push telemetry data to multiple outputs (set earlier):
             robot.printTelemetry();
             mTelemetry.update();
