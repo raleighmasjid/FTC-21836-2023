@@ -40,15 +40,16 @@ public final class TestAprilTagDetector extends LinearOpMode {
         mTelemetry = new MultipleTelemetry(telemetry);
         AprilTagDetector camera = new AprilTagDetector(
                 hardwareMap,
-                mTelemetry,
-                new int[]{1, 2, 3},
-                OpenCvCameraRotation.SIDEWAYS_RIGHT
+                OpenCvCameraRotation.UPRIGHT,
+                "camera back",
+                0.166,
+                1, 2, 3
         );
 
         while (opModeInInit()) {
             camera.run();
-            camera.printTagIsVisible(mTelemetry);
-            camera.printDetectedTag(mTelemetry);
+            camera.printTagIsVisible();
+            camera.printDetectedTag();
             mTelemetry.update();
         }
 
