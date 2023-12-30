@@ -27,11 +27,10 @@ public final class Backdrop {
 
     int mosaicCount = 0;
 
-    Backdrop() {
-        for (int y = 0; y < slots.length; y++)
-            for (int x = 0; x < slots[y].length; x++) {
-                slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
-            }
+    public Backdrop() {
+        for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+            slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
+        }
     }
 
     @NonNull

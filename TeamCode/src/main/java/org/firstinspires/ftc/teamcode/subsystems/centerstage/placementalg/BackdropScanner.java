@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -19,7 +20,7 @@ public final class BackdropScanner {
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
-    private final Backdrop latestScan = new Backdrop();
+    private final Backdrop latestScan = autonBackdrop;
     private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
@@ -55,19 +56,7 @@ public final class BackdropScanner {
 
         if (!latestScan.equals(lastScan)) {
             timeSinceUpdate.reset();
-            optimalPlacements = getOptimalPlacements(latestScan);
-            colorsNeeded[0] = EMPTY;
-            colorsNeeded[1] = EMPTY;
-            if (!optimalPlacements.isEmpty()) {
-                Pixel optimalPlacement = optimalPlacements.get(0);
-
-                colorsNeeded[0] = optimalPlacement.color;
-
-                ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
-                if (!futureOptimalPlacements.isEmpty()) {
-                    colorsNeeded[1] = futureOptimalPlacements.get(0).color;
-                }
-            }
+            calculateNeededColors();
         }
 
         if (pixelsTransferred) {
@@ -154,6 +143,22 @@ public final class BackdropScanner {
             if (scoringTrajectory != null) trajectoryReady = true;
 
             pixelsTransferred = false;
+        }
+    }
+
+    private void calculateNeededColors() {
+        optimalPlacements = getOptimalPlacements(latestScan);
+        colorsNeeded[0] = EMPTY;
+        colorsNeeded[1] = EMPTY;
+        if (!optimalPlacements.isEmpty()) {
+            Pixel optimalPlacement = optimalPlacements.get(0);
+
+            colorsNeeded[0] = optimalPlacement.color;
+
+            ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
+            if (!futureOptimalPlacements.isEmpty()) {
+                colorsNeeded[1] = futureOptimalPlacements.get(0).color;
+            }
         }
     }
 

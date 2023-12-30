@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 
 @Config
 @Autonomous(preselectTeleOp = "MainTeleOp")
@@ -22,6 +23,7 @@ public final class MainAuton extends LinearOpMode {
     public static GamepadEx gamepadEx1, gamepadEx2;
     public static MultipleTelemetry mTelemetry;
     public static Robot robot;
+    public static Backdrop autonBackdrop = new Backdrop();
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);

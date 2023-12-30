@@ -36,6 +36,8 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
+    public static double loopTime;
+
     @Override
     public void runOpMode() throws InterruptedException {
         ElapsedTime loopTimer = new ElapsedTime();
@@ -110,7 +112,7 @@ public final class MainTeleOp extends LinearOpMode {
 
             robot.run();
 
-            mTelemetry.addData("full loop time", loopTimer.seconds());
+            mTelemetry.addData("full loop time", loopTime = loopTimer.seconds());
             robot.printTelemetry();
             mTelemetry.update();
         }
