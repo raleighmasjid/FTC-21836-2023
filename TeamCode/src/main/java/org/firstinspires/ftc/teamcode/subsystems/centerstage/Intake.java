@@ -200,17 +200,16 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                boolean topEmpty = Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY;
-
-                if (topEmpty && Pixel.Color.fromHSV(bottomSensor.getHSV()) == EMPTY && requiredIntakingAmount > 0) {
+                if (Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY &&
+                    Pixel.Color.fromHSV(bottomSensor.getHSV()) == EMPTY
+                ) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
 
             case PIXELS_SETTLING:
 
-                pixelsTransferred = timer.seconds() >= TIME_SETTLING;
-                if (pixelsTransferred) {
+                if (requiredIntakingAmount > 0 && (pixelsTransferred = timer.seconds() >= TIME_SETTLING)) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 } else break;
