@@ -75,13 +75,13 @@ public final class Robot {
         } else return false;
     }
 
-    public void run() {
+    public void run(double manualLiftPower) {
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
 //            scanner.generateTrajectory(deposit.paintbrush.getColors());
         }
 
-        deposit.run();
+        deposit.run(manualLiftPower);
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
 
         for (LEDIndicator indicator : indicators) indicator.setState(

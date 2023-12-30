@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
-import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
+import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
@@ -40,7 +40,7 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    void run() {
+    void run(double manualLiftPower) {
 
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
@@ -50,7 +50,7 @@ public final class Deposit {
         boolean liftExtended = lift.targetRow > -1;
         if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
 
-        lift.run();
+        lift.run(manualLiftPower);
 
         paintbrush.run();
     }
@@ -72,9 +72,8 @@ public final class Deposit {
         private double lastKp = pidGains.kP;
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
-                0.025,
-                0.01,
-                0.05
+                0.0015,
+                0.000085
         );
 
         public static LowPassGains lowPassGains = new LowPassGains(
@@ -83,9 +82,9 @@ public final class Deposit {
         );
 
         public static ProfileConstraints profileConstraints = new ProfileConstraints(
-                10,
-                20,
-                15
+                40,
+                100,
+                0
         );
 
         public static KalmanGains kalmanGains = new KalmanGains(
@@ -95,7 +94,7 @@ public final class Deposit {
         );
 
         public static double
-                kG = 0.15,
+                kG = 0.25,
                 INCHES_PER_TICK = 0.0322835,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
@@ -106,7 +105,7 @@ public final class Deposit {
         private final State currentState = new State();
         private final State targetState = new State();
         private int targetRow = -1;
-        private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(lowPassGains);
+        private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
         // Battery voltage sensor and variable to track its readings:
@@ -137,7 +136,7 @@ public final class Deposit {
 
         private final ElapsedTime encoderReadTimer = new ElapsedTime();
 
-        private void run() {
+        private void run(double manualLiftPower) {
             encoderReadTimer.reset();
             int pos1 = motors[0].encoder.getPosition();
             mTelemetry.addData("pos1 time", encoderReadTimer.seconds());
@@ -151,10 +150,11 @@ public final class Deposit {
                 lastKp = pidGains.kP;
             }
 
-            kDFilter.setGains(lowPassGains);
+            kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
 
-            double output = controller.calculate(currentState) + kG() * (maxVoltage / batteryVoltageSensor.getVoltage());
+            double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
+            double output = (manualLiftPower == 0 ? controller.calculate(currentState) : manualLiftPower * voltageScalar) + kG() * voltageScalar;
             for (MotorEx motor : motors) motor.set(output);
         }
 

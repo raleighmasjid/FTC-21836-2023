@@ -106,7 +106,7 @@ public final class MainTeleOp extends LinearOpMode {
                     gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
             );
 
-            robot.run();
+            robot.run(gamepadEx2.getLeftY());
 
             mTelemetry.addData("full loop time", loopTimer.seconds());
             robot.printTelemetry();

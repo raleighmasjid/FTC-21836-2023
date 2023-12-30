@@ -65,7 +65,10 @@ public final class TuningLiftKvKa extends LinearOpMode {
                 new MotorEx(hardwareMap, "lift left", RPM_1150)
         };
         motors[1].setInverted(true);
-        for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+        for (MotorEx motor : motors) {
+            motor.setZeroPowerBehavior(FLOAT);
+            motor.encoder.reset();
+        }
 
         profiler = new MotionProfiler();
 
