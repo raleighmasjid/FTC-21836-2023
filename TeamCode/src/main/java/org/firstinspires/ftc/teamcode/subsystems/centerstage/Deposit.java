@@ -229,8 +229,12 @@ public final class Deposit {
             int pixelsInIntake = 0;
             for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
-            if (pixelsInIntake >= 1) this.colors[1] = colors[1];
-            if (pixelsInIntake == 2) this.colors[0] = colors[0];
+            if (pixelsInIntake == 1) {
+                this.colors[1] = colors[0];
+            } else if (pixelsInIntake == 2) {
+                this.colors[1] = colors[1];
+                this.colors[0] = colors[0];
+            }
 
             pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
