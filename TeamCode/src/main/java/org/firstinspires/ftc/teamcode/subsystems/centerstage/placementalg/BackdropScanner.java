@@ -116,7 +116,6 @@ public final class BackdropScanner {
                                                 robot.deposit.paintbrush.dropPixels(2);
                                                 latestScan.add(placements[1]);
                                                 calculateColorsNeeded();
-                                                optimalPlacements = getOptimalPlacements(latestScan);
                                             })
                                             .waitSeconds(TIME_DROP_SECOND)
                                             .addTemporalMarker(() -> {
@@ -141,7 +140,6 @@ public final class BackdropScanner {
                                                 robot.deposit.paintbrush.dropPixels(2);
                                                 latestScan.add(placements[1]);
                                                 calculateColorsNeeded();
-                                                optimalPlacements = getOptimalPlacements(latestScan);
                                             })
                                             .waitSeconds(TIME_DROP_SECOND)
                                             .addTemporalMarker(() -> {
