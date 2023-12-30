@@ -64,10 +64,10 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.05,
-                0.025,
-                0,
-                1
+                0.1,
+                0.2,
+                0.004330951894845302,
+                0.5
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
@@ -87,9 +87,9 @@ public final class Deposit {
         );
 
         public static KalmanGains kalmanGains = new KalmanGains(
-                0.3,
-                10,
-                5
+                3,
+                5,
+                10
         );
 
         public static double
