@@ -94,10 +94,9 @@ public final class TuningLiftKvKa extends LinearOpMode {
             targetState = profiler.getState();
             controller.setTarget(targetState);
 
-            double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double controlStick = gamepadEx1.getLeftY();
-            double output = (controlStick == 0 ? controller.calculate(voltageScalar) : controlStick * voltageScalar) + (currentState.x > 0.15 ? kG * voltageScalar : 0);
-            for (MotorEx motor : motors) motor.set(output);
+            double output = (controlStick != 0 ? controlStick : controller.calculate()) + (currentState.x > 0.15 ? kG : 0);
+            for (MotorEx motor : motors) motor.set(output * (maxVoltage / batteryVoltageSensor.getVoltage()));
 
             mTelemetry.addData("Current position (in)", currentState.x);
             mTelemetry.addData("Target position (in)", targetState.x);

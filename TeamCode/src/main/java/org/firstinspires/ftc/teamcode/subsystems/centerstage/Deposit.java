@@ -157,7 +157,7 @@ public final class Deposit {
             controller.setGains(pidGains);
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-            double output = (manualLiftPower == 0 ? controller.calculate(currentState) : manualLiftPower * voltageScalar) + kG() * voltageScalar;
+            double output = (manualLiftPower != 0 ? manualLiftPower * voltageScalar : controller.calculate(currentState)) + (currentState.x > 0.15 ? kG * voltageScalar : 0);
             for (MotorEx motor : motors) motor.set(output);
         }
 
