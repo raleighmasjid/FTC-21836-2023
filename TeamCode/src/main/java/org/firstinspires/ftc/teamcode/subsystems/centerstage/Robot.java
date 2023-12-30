@@ -67,6 +67,7 @@ public final class Robot {
         double i2ctime;
         mTelemetry.addData("I2C read time", i2ctime = i2cTimer.seconds());
         mTelemetry.addData("Total - I2C time", loopTime - i2ctime);
+        mTelemetry.addLine();
     }
 
     public void startAutoDrive() {

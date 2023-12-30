@@ -73,7 +73,10 @@ public final class BackdropScanner {
             placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
             placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
 
-            if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+            boolean firstEmpty = firstColor == EMPTY;
+            boolean secondEmpty = secondColor == EMPTY;
+
+            if (!firstEmpty) for (Pixel pixel : optimalPlacementsCopy) {
                 if (firstColor.matches(pixel.color)) {
 
                     Pixel placement = new Pixel(pixel, firstColor);
@@ -83,7 +86,7 @@ public final class BackdropScanner {
                     break;
                 }
             }
-            if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+            if (!secondEmpty) for (Pixel pixel : optimalPlacementsCopy) {
                 if (secondColor.matches(pixel.color)) {
 
                     Pixel placement = new Pixel(pixel, secondColor);
@@ -97,9 +100,6 @@ public final class BackdropScanner {
             Pose2d scoringPos2 = placements[1].toPose2d();
 
             Pose2d startPose = robot.drivetrain.getPoseEstimate();
-
-            boolean firstEmpty = firstColor == EMPTY;
-            boolean secondEmpty = secondColor == EMPTY;
 
             boolean sameScoringLocation = scoringPos1.epsilonEquals(scoringPos2);
 
@@ -188,5 +188,7 @@ public final class BackdropScanner {
         mTelemetry.addLine("Second: (" + placements[1].x + ", " + placements[1].y + ")");
         mTelemetry.addLine();
         mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
+        latestScan.toTelemetry();
+        mTelemetry.addLine();
     }
 }

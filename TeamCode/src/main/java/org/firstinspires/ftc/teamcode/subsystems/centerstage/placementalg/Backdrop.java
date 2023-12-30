@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
 import static java.lang.Math.random;
@@ -112,6 +113,11 @@ public final class Backdrop {
         System.out.println(mosaicCount + " mosaics");
         System.out.println("Auton score: " + getPixelCount() * 5);
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
+    }
+
+    public void toTelemetry() {
+        String[] rows = toString().split("\n");
+        for (String row : rows) mTelemetry.addLine(row);
     }
 
     Pixel[] getNeighbors(Pixel pixel) {
