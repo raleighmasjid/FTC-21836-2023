@@ -40,7 +40,7 @@ public final class BackdropScanner {
         pixelsTransferred = true;
     }
 
-    public void run() {
+    public void update() {
         Backdrop lastScan = latestScan.clone();
 
         // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
