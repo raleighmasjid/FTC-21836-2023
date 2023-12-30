@@ -9,14 +9,16 @@ public final class AutonPlacementVisualizer {
     public static void main(String[] args) {
 
         for (AutonPixelSupplier.Randomization rand : randomizations) {
-            ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacements(rand, true);
-            Backdrop backdrop = new Backdrop();
+            for (boolean partnerWillDoRandomization : new boolean[]{true, false}) {
+                ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRandomization);
+                Backdrop backdrop = new Backdrop();
 
-            for (int j = 0; j < 15; j++) {
-                Pixel placement = optimalPlacements.get(j);
-                backdrop.add(placement);
+                for (int j = 0; j < 15; j++) {
+                    Pixel placement = optimalPlacements.get(j);
+                    backdrop.add(placement);
+                }
+                backdrop.print();
             }
-            backdrop.print();
         }
     }
 }
