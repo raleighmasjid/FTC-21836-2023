@@ -40,7 +40,7 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    void run(double manualLiftPower) {
+    void run() {
 
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
@@ -50,7 +50,7 @@ public final class Deposit {
         boolean liftExtended = lift.targetRow > -1;
         if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
 
-        lift.run(manualLiftPower);
+        lift.run();
 
         paintbrush.run();
     }
@@ -68,8 +68,6 @@ public final class Deposit {
                 0,
                 1
         );
-
-        private double lastKp = pidGains.kP;
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
                 0.0015,
@@ -102,11 +100,12 @@ public final class Deposit {
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
-        private final State currentState = new State();
-        private final State targetState = new State();
+        private final State currentState = new State(), targetState = new State();
         private int targetRow = -1;
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
+
+        private double lastKp = pidGains.kP, manualLiftPower = 0;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -134,9 +133,13 @@ public final class Deposit {
             setTargetRow(targetRow + deltaRow);
         }
 
+        public void setLiftPower(double manualLiftPower) {
+            this.manualLiftPower = manualLiftPower;
+        }
+
         private final ElapsedTime encoderReadTimer = new ElapsedTime();
 
-        private void run(double manualLiftPower) {
+        private void run() {
             encoderReadTimer.reset();
             int pos1 = motors[0].encoder.getPosition();
             mTelemetry.addData("pos1 time", encoderReadTimer.seconds());

@@ -79,6 +79,8 @@ public final class MainTeleOp extends LinearOpMode {
                     gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
             );
 
+            robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
+
             if (gamepadEx2.isDown(LEFT_BUMPER)) {
                 if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
                 if (keyPressed(2, X))               robot.intake.setRequiredIntakingAmount(1);
@@ -106,7 +108,7 @@ public final class MainTeleOp extends LinearOpMode {
                     gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
             );
 
-            robot.run(gamepadEx2.getLeftY());
+            robot.run();
 
             mTelemetry.addData("full loop time", loopTimer.seconds());
             robot.printTelemetry();
