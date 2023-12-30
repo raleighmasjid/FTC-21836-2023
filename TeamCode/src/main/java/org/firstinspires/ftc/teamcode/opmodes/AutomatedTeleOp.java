@@ -96,6 +96,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
                     if (keyPressed(2, Y))           robot.intake.setRequiredIntakingAmount(2);
                     if (keyPressed(2, X))           robot.intake.setRequiredIntakingAmount(1);
                     if (keyPressed(2, A))           robot.intake.setRequiredIntakingAmount(0);
+                    if (gamepadEx2.isDown(RIGHT_BUMPER))    robot.scanner.clearScan();
                 } else {
                     if (keyPressed(2, DPAD_DOWN))   robot.deposit.lift.changeRow(-1);
                     if (keyPressed(2, DPAD_UP))     robot.deposit.lift.changeRow(1);

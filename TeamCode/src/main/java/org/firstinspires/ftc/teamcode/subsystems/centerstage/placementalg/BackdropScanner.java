@@ -42,6 +42,11 @@ public final class BackdropScanner {
         pixelsTransferred = true;
     }
 
+    public void clearScan() {
+        latestScan.clear();
+        calculateColorsNeeded();
+    }
+
     public void update() {
         Backdrop lastScan = latestScan.clone();
 

@@ -51,6 +51,13 @@ public final class Backdrop {
         return true;
     }
 
+    void clear() {
+        for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+            slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
+        }
+        mosaicCount = 0;
+    }
+
     Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:

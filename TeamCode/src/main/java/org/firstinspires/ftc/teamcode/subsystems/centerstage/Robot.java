@@ -33,7 +33,7 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-    private final BackdropScanner scanner;
+    public final BackdropScanner scanner;
     private final ThreadedLoop threadedLoop;
 
     private boolean autoDriveStarted = true;
