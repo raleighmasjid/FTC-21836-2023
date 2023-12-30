@@ -28,8 +28,6 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-//    private final BackdropScanner scanner;
-
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
 
@@ -40,8 +38,6 @@ public final class Robot {
         drivetrain.update();
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
-
-//        scanner = new BackdropScanner(this);
 
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
@@ -61,9 +57,6 @@ public final class Robot {
     }
 
     public void startAutoDrive() {
-//        TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
-//        if (scoringTrajectory == null) return;
-//        drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
         autoDriveStarted = false;
         autoTimer.reset();
     }
@@ -86,18 +79,14 @@ public final class Robot {
 
         for (LEDIndicator indicator : indicators) indicator.setState(
                 drivetrain.isBusy() ? RED :
-//                scanner.trajectoryReady() ? GREEN :
                 OFF
         );
     }
 
     public void interrupt() {
-//        scanner.interrupt();
     }
 
     public void printTelemetry() {
-//        scanner.printTelemetry();
-//        mTelemetry.addLine();
         drivetrain.printTelemetry(mTelemetry);
         mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();
