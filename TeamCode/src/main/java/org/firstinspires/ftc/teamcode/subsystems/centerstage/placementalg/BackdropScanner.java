@@ -21,7 +21,7 @@ public final class BackdropScanner {
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
     private final Backdrop latestScan = autonBackdrop;
-    private ArrayList<Pixel> optimalPlacements = new ArrayList<>();
+    private ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
@@ -115,6 +115,8 @@ public final class BackdropScanner {
                                             .addTemporalMarker(() -> {
                                                 robot.deposit.paintbrush.dropPixels(2);
                                                 latestScan.add(placements[1]);
+                                                calculateColorsNeeded();
+                                                optimalPlacements = getOptimalPlacements(latestScan);
                                             })
                                             .waitSeconds(TIME_DROP_SECOND)
                                             .addTemporalMarker(() -> {
@@ -138,6 +140,8 @@ public final class BackdropScanner {
                                             .addTemporalMarker(() -> {
                                                 robot.deposit.paintbrush.dropPixels(2);
                                                 latestScan.add(placements[1]);
+                                                calculateColorsNeeded();
+                                                optimalPlacements = getOptimalPlacements(latestScan);
                                             })
                                             .waitSeconds(TIME_DROP_SECOND)
                                             .addTemporalMarker(() -> {
