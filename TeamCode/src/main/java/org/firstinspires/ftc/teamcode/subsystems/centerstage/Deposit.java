@@ -48,7 +48,8 @@ public final class Deposit {
         }
 
         boolean liftExtended = lift.targetRow > -1;
-        if (paintbrush.pivot.isActivated() != liftExtended) paintbrush.pivot.setActivated(liftExtended);
+        if (paintbrush.pivot.isActivated() != liftExtended)
+            paintbrush.pivot.setActivated(liftExtended);
 
         lift.run();
 
@@ -143,9 +144,11 @@ public final class Deposit {
             encoderReadTimer.reset();
             int pos1 = motors[0].encoder.getPosition();
             mTelemetry.addData("pos1 time", encoderReadTimer.seconds());
+
             encoderReadTimer.reset();
             int pos2 = motors[1].encoder.getPosition();
             mTelemetry.addData("pos2 time", encoderReadTimer.seconds());
+
             currentState.x = INCHES_PER_TICK * 0.5 * (pos1 + pos2);
 
             if (lastKp != pidGains.kP) {
@@ -157,12 +160,16 @@ public final class Deposit {
             controller.setGains(pidGains);
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-            double output = (manualLiftPower != 0 ? manualLiftPower * voltageScalar : controller.calculate(currentState)) + (currentState.x > 0.15 ? kG * voltageScalar : 0);
+            double output = (
+                    manualLiftPower != 0 ?
+                            manualLiftPower * voltageScalar :
+                            controller.calculate(currentState)
+            ) + (
+                    currentState.x > 0.15 ?
+                            kG * voltageScalar :
+                            0
+            );
             for (MotorEx motor : motors) motor.set(output);
-        }
-
-        private double kG() {
-            return (currentState.x > 0.15) ? kG : 0;
         }
 
         void printTelemetry() {
