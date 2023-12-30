@@ -34,6 +34,7 @@ public final class BackdropScanner {
 
     public BackdropScanner(Robot robot) {
         this.robot = robot;
+        calculateColorsNeeded();
     }
 
     public void generateTrajectory(Pixel.Color[] depositColors) {
@@ -56,7 +57,7 @@ public final class BackdropScanner {
 
         if (!latestScan.equals(lastScan)) {
             timeSinceUpdate.reset();
-            calculateNeededColors();
+            calculateColorsNeeded();
         }
 
         if (pixelsTransferred) {
@@ -146,7 +147,7 @@ public final class BackdropScanner {
         }
     }
 
-    private void calculateNeededColors() {
+    private void calculateColorsNeeded() {
         optimalPlacements = getOptimalPlacements(latestScan);
         colorsNeeded[0] = EMPTY;
         colorsNeeded[1] = EMPTY;
