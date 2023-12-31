@@ -5,8 +5,11 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
 
+import static java.lang.Math.toRadians;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,9 +24,10 @@ public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
     public static GamepadEx gamepadEx1, gamepadEx2;
-    public static MultipleTelemetry mTelemetry;
-    public static Robot robot;
+    static MultipleTelemetry mTelemetry;
+    static Robot robot;
     public static Backdrop autonBackdrop = new Backdrop();
+    static Pose2d autonEndPose = new Pose2d(0, 0, toRadians(90));
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
@@ -66,6 +70,7 @@ public final class MainAuton extends LinearOpMode {
             robot.drivetrain.update();
             robot.run();
 
+            autonEndPose = robot.drivetrain.getPoseEstimate();
             // Push telemetry data
             robot.printTelemetry();
             mTelemetry.update();

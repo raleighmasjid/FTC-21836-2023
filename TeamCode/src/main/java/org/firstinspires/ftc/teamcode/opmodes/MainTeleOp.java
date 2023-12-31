@@ -12,6 +12,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
@@ -23,6 +24,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.THREE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.TWO_STACK;
 import static java.lang.Math.PI;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -47,6 +49,8 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
+        robot.drivetrain.setPoseEstimate(autonEndPose);
+        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - toRadians(90));
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
