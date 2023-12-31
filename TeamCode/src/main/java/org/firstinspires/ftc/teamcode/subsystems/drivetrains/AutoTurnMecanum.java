@@ -3,19 +3,17 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.filters.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
+import org.firstinspires.ftc.teamcode.control.motion.State;
 
 @Config
 public class AutoTurnMecanum extends MecanumDrivetrain {
@@ -103,8 +101,8 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
         useAutoTurn = !useAutoTurn;
     }
 
-    public void printTelemetry(MultipleTelemetry telemetry) {
-        telemetry.addData("Auto turn is", useAutoTurn ? "active" : "inactive");
+    public void printTelemetry() {
+        mTelemetry.addData("Auto turn is", useAutoTurn ? "active" : "inactive");
     }
 
     @Override

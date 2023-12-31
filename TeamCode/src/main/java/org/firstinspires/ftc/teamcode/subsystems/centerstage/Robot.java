@@ -108,7 +108,7 @@ public final class Robot {
     public void printTelemetry() {
         scanner.printTelemetry();
         mTelemetry.addLine();
-        drivetrain.printTelemetry(mTelemetry);
+        drivetrain.printTelemetry();
         mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();
         mTelemetry.addLine();
