@@ -30,7 +30,7 @@ public final class BackdropScanner {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsTransferred = false;
+    private volatile boolean pixelsTransferred = false, clearingScan = false;
     private Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
@@ -44,8 +44,10 @@ public final class BackdropScanner {
     }
 
     public void clearScan() {
+        clearingScan = true;
         latestScan.clear();
         calculateColorsNeeded();
+        clearingScan = false;
     }
 
     public void update() {
@@ -63,7 +65,7 @@ public final class BackdropScanner {
 
         if (!latestScan.equals(lastScan)) {
             timeSinceUpdate.reset();
-            if (!robot.drivetrain.isBusy()) calculateColorsNeeded();
+            if (!(robot.drivetrain.isBusy() || clearingScan)) calculateColorsNeeded();
         }
 
         if (pixelsTransferred) {
