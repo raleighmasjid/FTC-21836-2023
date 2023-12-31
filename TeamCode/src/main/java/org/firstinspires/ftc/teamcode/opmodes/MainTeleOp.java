@@ -58,7 +58,7 @@ public final class MainTeleOp extends LinearOpMode {
 
         boolean slowModeLocked = false;
 
-        // Get gamepad 1 button input, locks slow mode, and saves "red" boolean for teleop configuration:
+        // Get gamepad 1 button input and locks slow mode:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
             if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
