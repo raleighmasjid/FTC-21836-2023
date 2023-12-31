@@ -118,6 +118,8 @@ public final class Pixel implements Comparable<Pixel> {
                     0.2
             );
 
+    static boolean printInColor = true;
+
     @Config
     public enum Color {
         PURPLE,
@@ -126,7 +128,7 @@ public final class Pixel implements Comparable<Pixel> {
         WHITE,
         EMPTY,
         ANY,
-        COLORED,
+        ANYCOLOR,
         INVALID,
         HIGHLIGHTED;
 
@@ -140,14 +142,14 @@ public final class Pixel implements Comparable<Pixel> {
         public String toString() {
             switch (this) {
                 case PURPLE:
-                    return "\u001B[35m" + "P" + RESET;
+                    if (printInColor) return "\u001B[35m" + "P" + RESET;
                 case YELLOW:
-                    return "\u001B[33m" + "Y" + RESET;
+                    if (printInColor) return "\u001B[33m" + "Y" + RESET;
                 case GREEN:
-                    return "\u001B[32m" + "G" + RESET;
+                    if (printInColor) return "\u001B[32m" + "G" + RESET;
                 case WHITE:
                 case ANY:
-                case COLORED:
+                case ANYCOLOR:
                     return "" + name().charAt(0);
                 case INVALID:
                     return " ";
@@ -167,7 +169,7 @@ public final class Pixel implements Comparable<Pixel> {
                 case "A":
                     return ANY;
                 case "C":
-                    return COLORED;
+                    return ANYCOLOR;
                 case "P":
                     return PURPLE;
                 case "Y":
@@ -195,8 +197,8 @@ public final class Pixel implements Comparable<Pixel> {
                     this == ANY ||
                             other == ANY ||
                             this == other ||
-                            isColored() && other == COLORED ||
-                            this == COLORED && other.isColored()
+                            isColored() && other == ANYCOLOR ||
+                            this == ANYCOLOR && other.isColored()
             );
         }
 

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.printInColor;
 import static java.lang.Math.random;
 import static java.lang.Math.round;
 
@@ -64,7 +65,7 @@ public final class Backdrop {
             case ANY:
                 add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3))));
                 break;
-            case COLORED:
+            case ANYCOLOR:
                 add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 2))));
                 break;
             default:
@@ -116,6 +117,7 @@ public final class Backdrop {
     }
 
     public void toTelemetry() {
+        printInColor = false;
         String[] rows = toString().split("\n");
         for (String row : rows) mTelemetry.addLine(row);
     }

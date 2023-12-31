@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop.allTrue;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.COLORED;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANYCOLOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
@@ -31,7 +31,7 @@ public final class PlacementCalculator {
         while (PERFECT_BACKDROP.notFull()) {
             getOptimalPlacements(PERFECT_BACKDROP);
             Pixel placement = optimalPlacements.get(0);
-            PERFECT_BACKDROP.add(placement.color == ANY ? new Pixel(placement, COLORED) : placement);
+            PERFECT_BACKDROP.add(placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
         }
     }
 
@@ -133,8 +133,8 @@ public final class PlacementCalculator {
                     } else if (pMosaic[2].color.isColored() && pMosaic[1].color == EMPTY) {
                         oneRemainingCase(pixel, pMosaic[1], pMosaic[2]);
                     } else if (pMosaic[1].color == EMPTY && pMosaic[2].color == EMPTY) {
-                        optimalPlacements.add(new Pixel(pMosaic[1], COLORED));
-                        optimalPlacements.add(new Pixel(pMosaic[2], COLORED));
+                        optimalPlacements.add(new Pixel(pMosaic[1], ANYCOLOR));
+                        optimalPlacements.add(new Pixel(pMosaic[2], ANYCOLOR));
                         Pixel p1 = pMosaic[1].clone();
                         Pixel p2 = pMosaic[2].clone();
                         p1.scoreValue += 22 / 3.0;
@@ -163,7 +163,7 @@ public final class PlacementCalculator {
     }
 
     private static Pixel.Color getRemainingColor(Pixel.Color c1, Pixel.Color c2) {
-        if (c1 == EMPTY || c2 == EMPTY) return COLORED;
+        if (c1 == EMPTY || c2 == EMPTY) return ANYCOLOR;
         if (c1 == c2) return c1;
         ArrayList<Pixel.Color> colors = new ArrayList<>(Arrays.asList(GREEN, PURPLE, YELLOW));
         colors.remove(c1);
@@ -278,7 +278,7 @@ public final class PlacementCalculator {
             ArrayList<Pixel> sPixels = getSupportPixels(pixel);
             if (auton) for (Pixel p : sPixels) {
                 Pixel counterpart = p.getCounterpartIn(optimalPlacements);
-                if (counterpart != null && counterpart.color.matches(COLORED)) continue setPixels;
+                if (counterpart != null && counterpart.color.matches(ANYCOLOR)) continue setPixels;
             }
             if (sPixels.size() < leastSPixels) {
                 leastSPixels = sPixels.size();
@@ -331,7 +331,7 @@ public final class PlacementCalculator {
         for (Pixel pixel : optimalPlacements) {
             if (!noColor) {
                 if (pixel.color.isColored()) pixel.scoreValue += 11;
-                if (pixel.color == COLORED) pixel.scoreValue += 22 / 3.0;
+                if (pixel.color == ANYCOLOR) pixel.scoreValue += 22 / 3.0;
                 if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
@@ -339,7 +339,7 @@ public final class PlacementCalculator {
                         pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
                     }
                 }
-                if (pixel.color.matches(COLORED)) pixel.scoreValue += abs(3 - pixel.x);
+                if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x);
             }
 
             if (pixel.isIn(setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();

@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.*;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
 
@@ -24,20 +25,20 @@ public final class BackdropScanner {
     private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
-    private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
+    private final Color[] colorsNeeded = {EMPTY, EMPTY};
     private volatile TrajectorySequence scoringTrajectory = null;
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
     private volatile boolean pixelsTransferred = false;
-    private Pixel.Color[] depositColors = {EMPTY, EMPTY};
+    private Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
         this.robot = robot;
         calculateColorsNeeded();
     }
 
-    public void generateTrajectory(Pixel.Color[] depositColors) {
+    public void generateTrajectory(Color[] depositColors) {
         this.depositColors = depositColors;
         pixelsTransferred = true;
     }
@@ -68,7 +69,7 @@ public final class BackdropScanner {
         if (pixelsTransferred) {
             ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
 
-            Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
+            Color firstColor = depositColors[0], secondColor = depositColors[1];
 
             placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
             placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
@@ -189,6 +190,5 @@ public final class BackdropScanner {
         mTelemetry.addLine();
         mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
         latestScan.toTelemetry();
-        mTelemetry.addLine();
     }
 }
