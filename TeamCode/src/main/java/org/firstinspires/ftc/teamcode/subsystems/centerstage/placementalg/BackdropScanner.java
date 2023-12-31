@@ -21,15 +21,15 @@ public final class BackdropScanner {
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
     private final Backdrop latestScan = autonBackdrop;
-    private ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
+    private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
-    private TrajectorySequence scoringTrajectory = null;
-    private boolean trajectoryReady = false;
+    private volatile TrajectorySequence scoringTrajectory = null;
+    private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private boolean pixelsTransferred = false;
+    private volatile boolean pixelsTransferred = false;
     private Pixel.Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
@@ -62,7 +62,7 @@ public final class BackdropScanner {
 
         if (!latestScan.equals(lastScan)) {
             timeSinceUpdate.reset();
-            calculateColorsNeeded();
+            if (!robot.drivetrain.isBusy()) calculateColorsNeeded();
         }
 
         if (pixelsTransferred) {
