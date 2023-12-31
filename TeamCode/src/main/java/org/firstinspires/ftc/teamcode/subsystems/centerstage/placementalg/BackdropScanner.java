@@ -31,7 +31,7 @@ public final class BackdropScanner {
 
     private final Robot robot;
     private volatile boolean pixelsTransferred = false, clearingScan = false;
-    private Color[] depositColors = {EMPTY, EMPTY};
+    private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
         this.robot = robot;
