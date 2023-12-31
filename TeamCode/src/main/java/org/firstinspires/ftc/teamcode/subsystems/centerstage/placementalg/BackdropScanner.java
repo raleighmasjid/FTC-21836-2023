@@ -54,7 +54,7 @@ public final class BackdropScanner {
      * Runs the CV pipeline to detect backdrop changes. <br>
      * This method is run in an infinite loop in a separate thread, so
      * use volatile variables for any data used in this method. <br>
-     * This method calls the generateTrajectory() method.
+     * This method calls {@link #generateTrajectory()}
      */
     public void update() {
         Backdrop lastScan = latestScan.clone();
