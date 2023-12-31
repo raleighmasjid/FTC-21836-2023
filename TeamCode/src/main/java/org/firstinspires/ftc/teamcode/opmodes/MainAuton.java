@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 
 @Config
-@Autonomous(preselectTeleOp = "MainTeleOp")
+@Autonomous(preselectTeleOp = "AutomatedTeleOp")
 public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
