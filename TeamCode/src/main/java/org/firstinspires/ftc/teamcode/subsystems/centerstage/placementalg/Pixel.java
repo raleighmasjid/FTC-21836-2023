@@ -108,7 +108,7 @@ public final class Pixel implements Comparable<Pixel> {
                     0.15
             ),
             minGreen = new HSV(
-                    140,
+                    130,
                     0.5,
                     0.01
             ),
