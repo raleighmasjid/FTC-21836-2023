@@ -19,6 +19,7 @@ public class ThreadedExecution extends java.lang.Thread {
 
     public void run() {
         executeCommands(commands);
+        Thread.yield();
     }
 }
 

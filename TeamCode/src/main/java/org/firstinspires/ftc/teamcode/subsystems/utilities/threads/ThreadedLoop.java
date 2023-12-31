@@ -10,6 +10,7 @@ public class ThreadedLoop {
         new ThreadedExecution(() -> {
             while (run) {
                 executeCommands(commands);
+                Thread.yield();
             }
         });
     }
