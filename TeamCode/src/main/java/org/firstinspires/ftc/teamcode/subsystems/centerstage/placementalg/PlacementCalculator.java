@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * Implementation of Arshad Anas's CENTERSTAGE Optimal Placement Algorithm <br>
+ * @author Arshad Anas
+ */
 public final class PlacementCalculator {
     private static Backdrop backdrop;
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
