@@ -203,7 +203,7 @@ public final class Pixel implements Comparable<Pixel> {
         }
 
         boolean isColored() {
-            return this == PURPLE || this == YELLOW || this == GREEN;
+            return ordinal() <= 2;
         }
     }
 }
