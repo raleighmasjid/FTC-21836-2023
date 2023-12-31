@@ -30,7 +30,7 @@ public final class BackdropScanner {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsTransferred = false, clearingScan = false;
+    private volatile boolean pixelsJustTransferred = false, clearingScan = false;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
@@ -38,9 +38,9 @@ public final class BackdropScanner {
         calculateColorsNeeded();
     }
 
-    public void generateTrajectory(Color[] depositColors) {
+    public void beginTrajectoryGeneration(Color[] depositColors) {
         this.depositColors = depositColors;
-        pixelsTransferred = true;
+        pixelsJustTransferred = true;
     }
 
     public void clearScan() {
@@ -50,6 +50,12 @@ public final class BackdropScanner {
         clearingScan = false;
     }
 
+    /**
+     * Runs the CV pipeline to detect backdrop changes. <br>
+     * This method is run in an infinite loop in a separate thread, so
+     * use volatile variables for any data used in this method. <br>
+     * This method calls the generateTrajectory() method.
+     */
     public void update() {
         Backdrop lastScan = latestScan.clone();
 
@@ -68,16 +74,32 @@ public final class BackdropScanner {
             if (!(robot.drivetrain.isBusy() || clearingScan)) calculateColorsNeeded();
         }
 
-        if (pixelsTransferred) {
-            ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
+        if (pixelsJustTransferred) {
+            pixelsJustTransferred = false;
+            generateTrajectory();
+        }
+    }
 
-            Color firstColor = depositColors[0], secondColor = depositColors[1];
+    /**
+     * Processes the colors from the deposit, matches them to backdrop placements,
+     * and generates a trajectory to score them. <br>
+     * This method is called from a parallel thread, so
+     * use volatile variables for any data used in this method.
+     */
+    private void generateTrajectory() {
+
+        ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
+
+        Color firstColor = depositColors[0], secondColor = depositColors[1];
+
+        boolean firstEmpty = firstColor == EMPTY;
+        boolean secondEmpty = secondColor == EMPTY;
+
+        if (firstEmpty && secondEmpty) trajectoryReady = false;
+        else {
 
             placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
             placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-
-            boolean firstEmpty = firstColor == EMPTY;
-            boolean secondEmpty = secondColor == EMPTY;
 
             if (!firstEmpty) for (Pixel pixel : optimalPlacementsCopy) {
                 if (firstColor.matches(pixel.color)) {
@@ -107,53 +129,48 @@ public final class BackdropScanner {
             boolean sameScoringLocation = scoringPos1.epsilonEquals(scoringPos2);
 
             scoringTrajectory =
-                    firstEmpty && secondEmpty ?
-                            null :
-                            firstEmpty || sameScoringLocation ?
-                                    robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.lift.setTargetRow(placements[1].y);
-                                            })
-                                            .lineToSplineHeading(scoringPos2)
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.paintbrush.dropPixels(2);
-                                                latestScan.add(placements[1]);
-                                                calculateColorsNeeded();
-                                            })
-                                            .waitSeconds(TIME_DROP_SECOND)
-                                            .addTemporalMarker(() -> {
-                                                trajectoryReady = false;
-                                            })
-                                            .build() :
-                                    robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.lift.setTargetRow(placements[0].y);
-                                            })
-                                            .lineToSplineHeading(scoringPos1)
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.paintbrush.dropPixels(1);
-                                                latestScan.add(placements[0]);
-                                            })
-                                            .waitSeconds(TIME_DROP_FIRST)
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.lift.setTargetRow(placements[1].y);
-                                            })
-                                            .lineToConstantHeading(scoringPos2.vec())
-                                            .addTemporalMarker(() -> {
-                                                robot.deposit.paintbrush.dropPixels(2);
-                                                latestScan.add(placements[1]);
-                                                calculateColorsNeeded();
-                                            })
-                                            .waitSeconds(TIME_DROP_SECOND)
-                                            .addTemporalMarker(() -> {
-                                                trajectoryReady = false;
-                                            })
-                                            .build()
+                    firstEmpty || sameScoringLocation ?
+                            robot.drivetrain.trajectorySequenceBuilder(startPose)
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.lift.setTargetRow(placements[1].y);
+                                    })
+                                    .lineToSplineHeading(scoringPos2)
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.paintbrush.dropPixels(2);
+                                        latestScan.add(placements[1]);
+                                        calculateColorsNeeded();
+                                    })
+                                    .waitSeconds(TIME_DROP_SECOND)
+                                    .addTemporalMarker(() -> {
+                                        trajectoryReady = false;
+                                    })
+                                    .build() :
+                            robot.drivetrain.trajectorySequenceBuilder(startPose)
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.lift.setTargetRow(placements[0].y);
+                                    })
+                                    .lineToSplineHeading(scoringPos1)
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.paintbrush.dropPixels(1);
+                                        latestScan.add(placements[0]);
+                                    })
+                                    .waitSeconds(TIME_DROP_FIRST)
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.lift.setTargetRow(placements[1].y);
+                                    })
+                                    .lineToConstantHeading(scoringPos2.vec())
+                                    .addTemporalMarker(() -> {
+                                        robot.deposit.paintbrush.dropPixels(2);
+                                        latestScan.add(placements[1]);
+                                        calculateColorsNeeded();
+                                    })
+                                    .waitSeconds(TIME_DROP_SECOND)
+                                    .addTemporalMarker(() -> {
+                                        trajectoryReady = false;
+                                    })
+                                    .build()
             ;
-
-            if (scoringTrajectory != null) trajectoryReady = true;
-
-            pixelsTransferred = false;
+            trajectoryReady = true;
         }
     }
 
