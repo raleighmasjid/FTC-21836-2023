@@ -22,11 +22,11 @@ final class AlgorithmTesting {
                 "_ _ _ _ _ _ _",
                 " _ _ _ _ _ _",
                 "W _ G _ _ _ _",
-                " p W W _ _ _",
-                "g y W g _ _ _",
-                " W W y p _ _",
-                "g p W W W _ _",
-                " y W P Y W _",
+                " p W W W _ _",
+                "g y W g W _ _",
+                " W W y p W _",
+                "g p W W W W _",
+                " y W P Y W W",
         };
 
         for (int y = 0; y < colors.length; y++) {
