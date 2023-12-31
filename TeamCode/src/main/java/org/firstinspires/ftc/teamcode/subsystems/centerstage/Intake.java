@@ -259,21 +259,14 @@ public final class Intake {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
     }
 
-    private void printHSV(HSV color, String title) {
-        mTelemetry.addLine(title + ":");
-        mTelemetry.addData("Hue", color.hue);
-        mTelemetry.addData("Saturation", color.saturation);
-        mTelemetry.addData("Value", color.value);
-    }
-
     void printTelemetry() {
         mTelemetry.addData("Top color", colors[1].name());
         mTelemetry.addData("Bottom color", colors[0].name());
     }
 
     void printNumericalTelemetry() {
-        printHSV(topHSV, "Top HSV");
+        topHSV.toTelemetry("Top HSV");
         mTelemetry.addLine();
-        printHSV(bottomHSV, "Bottom HSV");
+        bottomHSV.toTelemetry("Bottom HSV");
     }
 }

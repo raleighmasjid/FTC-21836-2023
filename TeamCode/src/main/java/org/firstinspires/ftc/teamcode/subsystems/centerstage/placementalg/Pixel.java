@@ -103,17 +103,17 @@ public final class Pixel implements Comparable<Pixel> {
                     0.02
             ),
             maxYellow = new HSV(
-                    110,
+                    125,
                     1,
                     0.15
             ),
             minGreen = new HSV(
-                    120,
+                    140,
                     0.5,
                     0.01
             ),
             maxGreen = new HSV(
-                    147.5,
+                    160,
                     1,
                     0.2
             );
