@@ -24,7 +24,7 @@ public final class MainAuton extends LinearOpMode {
 
     // Declare objects:
     public static GamepadEx gamepadEx1, gamepadEx2;
-    static MultipleTelemetry mTelemetry;
+    public static MultipleTelemetry mTelemetry;
     static Robot robot;
     public static Backdrop autonBackdrop = new Backdrop();
     static Pose2d autonEndPose = new Pose2d(0, 0, toRadians(90));
