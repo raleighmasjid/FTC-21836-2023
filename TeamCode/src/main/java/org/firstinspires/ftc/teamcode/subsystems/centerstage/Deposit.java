@@ -230,7 +230,8 @@ public final class Deposit {
             for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
             if (pixelsInIntake == 1) {
-                this.colors[1] = colors[0];
+                if (pixelsLocked == 0) this.colors[1] = colors[0];
+                if (pixelsLocked == 1) this.colors[0] = colors[0];
             } else if (pixelsInIntake == 2) {
                 this.colors[1] = colors[1];
                 this.colors[0] = colors[0];
