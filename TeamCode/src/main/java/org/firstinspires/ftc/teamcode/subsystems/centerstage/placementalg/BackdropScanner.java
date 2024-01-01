@@ -176,6 +176,9 @@ public final class BackdropScanner {
 
     private void calculateColorsNeeded() {
         optimalPlacements = getOptimalPlacements(latestScan);
+        PlacementCalculator.specifyColors = false;
+        optimalPlacements.addAll(getOptimalPlacements(latestScan));
+        PlacementCalculator.specifyColors = true;
         colorsNeeded[0] = EMPTY;
         colorsNeeded[1] = EMPTY;
         if (!optimalPlacements.isEmpty()) {
