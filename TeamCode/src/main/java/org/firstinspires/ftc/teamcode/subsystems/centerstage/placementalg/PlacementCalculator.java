@@ -417,6 +417,17 @@ public final class PlacementCalculator {
         Collections.sort(optimalPlacements);
     }
 
+    public static ArrayList<Pixel> getOptimalPlacementsWithExtraWhites(Backdrop backdrop) {
+        ArrayList<Pixel> specificPlacements = getOptimalPlacements(backdrop);
+        specifyColors = false;
+        ArrayList<Pixel> vaguePlacements = getOptimalPlacements(backdrop);
+        specifyColors = true;
+        for (Pixel placement : vaguePlacements) if (placement.color == ANY) {
+            specificPlacements.add(new Pixel(placement, WHITE));
+        }
+        return specificPlacements;
+    }
+
     public static ArrayList<Pixel> getOptimalPlacements(Backdrop backdrop) {
         PlacementCalculator.backdrop = backdrop;
         backdrop.mosaicCount = 0;

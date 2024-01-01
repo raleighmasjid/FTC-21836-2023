@@ -5,11 +5,10 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.*;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacementsWithExtraWhites;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -110,14 +109,7 @@ public final class BackdropScanner {
                     Pixel placement = new Pixel(pixel, firstColor);
 
                     placements[0] = placement;
-                    optimalPlacementsCopy = getOptimalPlacements(latestScan.clone().add(placement));
-
-                    PlacementCalculator.specifyColors = false;
-                    ArrayList<Pixel> vaguePlacements = getOptimalPlacements(latestScan);
-                    PlacementCalculator.specifyColors = true;
-                    for (Pixel p1 : vaguePlacements) {
-                        if (p1.color == ANY) optimalPlacementsCopy.add(new Pixel(p1, WHITE));
-                    }
+                    optimalPlacementsCopy = getOptimalPlacementsWithExtraWhites(latestScan.clone().add(placement));
 
                     break;
                 }
@@ -186,13 +178,7 @@ public final class BackdropScanner {
     }
 
     private void calculateColorsNeeded() {
-        optimalPlacements = getOptimalPlacements(latestScan);
-        PlacementCalculator.specifyColors = false;
-        ArrayList<Pixel> vaguePlacements = getOptimalPlacements(latestScan);
-        PlacementCalculator.specifyColors = true;
-        for (Pixel placement : vaguePlacements) {
-            if (placement.color == ANY) optimalPlacements.add(new Pixel(placement, WHITE));
-        }
+        optimalPlacements = getOptimalPlacementsWithExtraWhites(latestScan);
 
         colorsNeeded[0] = EMPTY;
         colorsNeeded[1] = EMPTY;
