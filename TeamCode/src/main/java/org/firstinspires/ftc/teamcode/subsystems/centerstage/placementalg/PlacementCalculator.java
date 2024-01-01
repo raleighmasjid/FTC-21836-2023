@@ -388,9 +388,11 @@ public final class PlacementCalculator {
         Pixel[][] pMosaics = getPossibleMosaics(pixel);
         boolean[] pMosaicsBlocked = new boolean[pMosaics.length];
         for (int i = 0; i < pMosaics.length; i++) {
-            if (!(pMosaics[i][1].color == EMPTY) || !(pMosaics[i][2].color == EMPTY) || touchingAdjacentMosaic(pMosaics[i][1], true) || touchingAdjacentMosaic(pMosaics[i][2], true)) {
-                pMosaicsBlocked[i] = true;
-            }
+            if (!(pMosaics[i][1].color == EMPTY) ||
+                !(pMosaics[i][2].color == EMPTY) ||
+                touchingAdjacentMosaic(pMosaics[i][1], true) ||
+                touchingAdjacentMosaic(pMosaics[i][2], true)
+            ) pMosaicsBlocked[i] = true;
         }
         return allTrue(pMosaicsBlocked);
     }
