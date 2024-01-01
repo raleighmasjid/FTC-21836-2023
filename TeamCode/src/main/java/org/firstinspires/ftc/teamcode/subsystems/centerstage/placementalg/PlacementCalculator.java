@@ -9,7 +9,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
-
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
@@ -307,7 +306,7 @@ public final class PlacementCalculator {
     private static ArrayList<Pixel> getSupportPixels(Pixel pixel) {
         ArrayList<Pixel> sPixels = new ArrayList<>();
         if (pixel.color == EMPTY) {
-            sPixels.add(getSafeColor(pixel));
+            sPixels.add(getSafePixel(pixel));
             Pixel s1 = backdrop.get(pixel.x, pixel.y - 1);
             Pixel s2 = backdrop.get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1);
             sPixels.addAll(getSupportPixels(s1));
@@ -353,13 +352,11 @@ public final class PlacementCalculator {
     }
 
     private static void scanForEmptySpot() {
-        for (int y = 0; y < backdrop.slots.length; y++) {
-            for (int x : iterationXs(y)) {
-                Pixel pixel = backdrop.get(x, y);
-                if (pixel.color == EMPTY && !pixel.isIn(optimalPlacements) && backdrop.isSupported(pixel)) {
-                    optimalPlacements.add(getSafeColor(pixel));
-                    return;
-                }
+        for (int y = 0; y < backdrop.slots.length; y++) for (int x : iterationXs(y)) {
+            Pixel pixel = backdrop.get(x, y);
+            if (pixel.color == EMPTY && !pixel.isIn(optimalPlacements) && backdrop.isSupported(pixel)) {
+                optimalPlacements.add(getSafePixel(pixel));
+                return;
             }
         }
     }
@@ -368,8 +365,18 @@ public final class PlacementCalculator {
         return (y % 2 == 0) ? new int[]{1, 6, 2, 5, 3, 4} : new int[]{0, 6, 1, 5, 2, 4, 3};
     }
 
-    private static Pixel getSafeColor(Pixel pixel) {
-        return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) ? WHITE : ANY);
+    private static Pixel getSafePixel(Pixel pixel) {
+        return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) ? WHITE : getFirstColor());
+    }
+
+    private static Pixel.Color getFirstColor() {
+        int p = colorsLeft[0], y = colorsLeft[1], g = colorsLeft[2];
+        boolean mosaicPossible = p >= 3 || y >= 3 || g >= 3 || (p >= 1 && y >= 1 && g >= 1);
+        if (!mosaicPossible) return WHITE;
+        int max = max(max(p, y), g);
+        int index = 0;
+        for (int i = 0; i < colorsLeft.length; i++) if (colorsLeft[i] == max) index = i;
+        return Pixel.Color.get(index);
     }
 
     private static boolean noSpaceForMosaics(Pixel pixel) {
@@ -387,7 +394,6 @@ public final class PlacementCalculator {
         for (Pixel pixel : optimalPlacements) {
             if (!noColor) {
                 if (pixel.color.isColored()) pixel.scoreValue += 11;
-                if (pixel.color == ANYCOLOR) pixel.scoreValue += 22 / 3.0;
                 if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
@@ -403,11 +409,6 @@ public final class PlacementCalculator {
         Collections.sort(optimalPlacements);
     }
 
-    private static boolean willPlaceAny() {
-        for (Pixel p1 : optimalPlacements) if (p1.color == ANY) return true;
-        return false;
-    }
-
     public static ArrayList<Pixel> getOptimalPlacements(Backdrop backdrop) {
         PlacementCalculator.backdrop = backdrop;
         backdrop.mosaicCount = 0;
@@ -420,9 +421,7 @@ public final class PlacementCalculator {
         countColorsLeft();
         scanForMosaics();
         scanForSetLinePixels();
-        int i = 0;
-        do scanForEmptySpot();
-        while (++i < 8 && !willPlaceAny());
+        scanForEmptySpot();
 
         removeDuplicates(optimalPlacements);
         removeOverridingPixels(optimalPlacements);

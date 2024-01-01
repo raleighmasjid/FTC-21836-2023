@@ -140,9 +140,7 @@ public final class Backdrop {
     }
 
     boolean isSupported(Pixel pixel) {
-        get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1);
-        get(pixel.x, pixel.y - 1);
-        return !(get(pixel.x, pixel.y - 1).color == EMPTY) && !(get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color == EMPTY);
+        return get(pixel.x, pixel.y - 1).color != EMPTY && get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color != EMPTY;
     }
 
     int getHighestPixelY() {
