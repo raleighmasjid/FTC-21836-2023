@@ -24,7 +24,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.THREE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.TWO_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static java.lang.Math.PI;
+import static java.lang.Math.atan2;
+import static java.lang.Math.hypot;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -86,12 +87,6 @@ public final class AutomatedTeleOp extends LinearOpMode {
             } else {
                 if (keyPressed(1, X)) robot.startAutoDrive();
 
-                // Reset current heading as per these keybinds:
-                if (keyPressed(1, DPAD_UP))     robot.drivetrain.setCurrentHeading(0);
-                if (keyPressed(1, DPAD_LEFT))   robot.drivetrain.setCurrentHeading(PI / 2);
-                if (keyPressed(1, DPAD_DOWN))   robot.drivetrain.setCurrentHeading(PI);
-                if (keyPressed(1, DPAD_RIGHT))  robot.drivetrain.setCurrentHeading(-PI / 2);
-
                 robot.intake.setMotorPower(
                         gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
                 );
@@ -116,11 +111,18 @@ public final class AutomatedTeleOp extends LinearOpMode {
                     }
                 }
 
+                double x = gamepadEx1.getRightX();
+                if (gamepadEx1.isDown(LEFT_BUMPER)) {
+                    double y = gamepadEx1.getRightY();
+                    if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(atan2(y, x));
+                    x = 0;
+                }
+
                 // Field-centric driving with control stick inputs:
                 robot.drivetrain.run(
                         gamepadEx1.getLeftX(),
                         gamepadEx1.getLeftY(),
-                        gamepadEx1.getRightX(),
+                        x,
                         gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
                 );
             }
