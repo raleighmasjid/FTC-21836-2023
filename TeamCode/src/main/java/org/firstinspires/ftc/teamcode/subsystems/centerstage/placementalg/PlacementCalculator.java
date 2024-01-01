@@ -171,7 +171,7 @@ public final class PlacementCalculator {
         removeDuplicates(colorsToGetSPixels);
 
         // remove specifically colored placements from colorsLeft[]
-        for (Pixel pixel : colorsToGetSPixels) if (pixel.color.isColored()) {
+        for (Pixel pixel : optimalPlacements) if (pixel.color.isColored()) {
             int index = pixel.color.ordinal();
             colorsLeft[index] = max(0, colorsLeft[index] - 1);
         }
@@ -181,39 +181,36 @@ public final class PlacementCalculator {
             ArrayList<Pixel> placementsToRemove = new ArrayList<>();
             ArrayList<Pixel> placementsToAdd = new ArrayList<>();
 
-            for (Pixel pixel : optimalPlacements)
-                if (pixel.color == ANYCOLOR) {
-                    int c1 = 0;
-                    for (Pixel neighbor : backdrop.getNeighbors(pixel))
-                        if (neighbor.color.isColored()) {
-                            c1 = neighbor.color.ordinal();
-                            break;
-                        }
-                    int c2 = (c1 + 1) % 3;
-                    int c3 = (c1 + 2) % 3;
-
-                    Pixel other = null;
-                    for (Pixel p1 : optimalPlacements)
-                        if (backdrop.touching(pixel, p1) && p1.color == ANYCOLOR) {
-                            other = p1;
-                            break;
-                        }
-                    placementsToRemove.add(pixel);
-                    if (other != null) placementsToRemove.add(other);
-
-                    if (colorsLeft[c2] >= 1 && colorsLeft[c3] >= 1) {
-                        colorsLeft[c2]--;
-                        colorsLeft[c3]--;
-                        placementsToAdd.add(new Pixel(pixel, Pixel.Color.get(c2)));
-                        if (other != null)
-                            placementsToAdd.add(new Pixel(other, Pixel.Color.get(c3)));
-                    } else if (colorsLeft[c1] >= 2) {
-                        colorsLeft[c1] -= 2;
-                        placementsToAdd.add(new Pixel(pixel, Pixel.Color.get(c1)));
-                        if (other != null)
-                            placementsToAdd.add(new Pixel(other, Pixel.Color.get(c1)));
+            for (Pixel pixel : optimalPlacements) if (pixel.color == ANYCOLOR) {
+                int c1 = 0;
+                for (Pixel neighbor : backdrop.getNeighbors(pixel))
+                    if (neighbor.color.isColored()) {
+                        c1 = neighbor.color.ordinal();
+                        break;
                     }
+                int c2 = (c1 + 1) % 3;
+                int c3 = (c1 + 2) % 3;
+
+                Pixel other = null;
+                for (Pixel p1 : optimalPlacements)
+                    if (backdrop.touching(pixel, p1) && p1.color == ANYCOLOR) {
+                        other = p1;
+                        break;
+                    }
+                placementsToRemove.add(pixel);
+                if (other != null) placementsToRemove.add(other);
+
+                if (colorsLeft[c2] >= 1 && colorsLeft[c3] >= 1) {
+                    colorsLeft[c2]--;
+                    colorsLeft[c3]--;
+                    placementsToAdd.add(new Pixel(pixel, Pixel.Color.get(c2)));
+                    if (other != null) placementsToAdd.add(new Pixel(other, Pixel.Color.get(c3)));
+                } else if (colorsLeft[c1] >= 2) {
+                    colorsLeft[c1] -= 2;
+                    placementsToAdd.add(new Pixel(pixel, Pixel.Color.get(c1)));
+                    if (other != null) placementsToAdd.add(new Pixel(other, Pixel.Color.get(c1)));
                 }
+            }
 
             for (Pixel placement : placementsToRemove) optimalPlacements.remove(placement);
             optimalPlacements.addAll(placementsToAdd);
@@ -235,10 +232,10 @@ public final class PlacementCalculator {
     }
 
     private static void oneRemainingCase(Pixel pixel, Pixel x1, Pixel x2) {
-        optimalPlacements.add(new Pixel(x1, getRemainingColor(pixel.color, x2.color)));
-        Pixel b = x1.clone();
-        b.scoreValue += 11;
-        colorsToGetSPixels.add(b);
+        Pixel lastPixel = new Pixel(x1, getRemainingColor(pixel.color, x2.color));
+        lastPixel.scoreValue += 11;
+        optimalPlacements.add(lastPixel);
+        colorsToGetSPixels.add(lastPixel);
     }
 
     private static boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
@@ -401,7 +398,6 @@ public final class PlacementCalculator {
     private static void sortPixelsToPlace() {
         for (Pixel pixel : optimalPlacements) {
             if (!noColor) {
-                if (pixel.color.isColored()) pixel.scoreValue += 11;
                 if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
