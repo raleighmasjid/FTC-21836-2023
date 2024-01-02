@@ -1,7 +1,7 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static com.example.meepmeeptesting.Pixel.Color.WHITE;
+import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -11,24 +11,45 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
 
-    public static int
-            X1 = 1,
-            Y1 = 0,
-            X2 = 5,
-            Y2 = 0;
+    static boolean isRed = true;
+    static Backdrop backdrop = new Backdrop();
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        boolean isRed = true;
-
-        Pixel[] placements = new Pixel[]{
-                new Pixel(X1, Y1),
-                new Pixel(X2, Y2)
+        Pixel[] placements = {
+                new Pixel(1, 0, YELLOW),
+                new Pixel(6, 0, WHITE),
+                new Pixel(5, 0, WHITE),
+                new Pixel(6, 1, WHITE),
+                new Pixel(5, 1, WHITE),
+                new Pixel(6, 2, WHITE),
+                new Pixel(4, 0, WHITE),
+                new Pixel(4, 1, WHITE),
+                new Pixel(5, 2, WHITE),
+                new Pixel(6, 3, WHITE),
+                new Pixel(5, 3, WHITE),
+                new Pixel(6, 4, WHITE),
+                new Pixel(6, 5, WHITE),
+                new Pixel(3, 0, WHITE),
+                new Pixel(2, 0, WHITE),
+                new Pixel(3, 1, WHITE),
+                new Pixel(2, 1, WHITE),
+                new Pixel(4, 2, WHITE),
+                new Pixel(3, 2, WHITE),
+                new Pixel(4, 3, WHITE),
+                new Pixel(3, 3, WHITE),
+                new Pixel(5, 4, WHITE),
+                new Pixel(4, 4, WHITE),
+                new Pixel(5, 5, WHITE),
+                new Pixel(4, 5, WHITE),
+                new Pixel(6, 6, WHITE),
+                new Pixel(5, 6, WHITE),
+                new Pixel(6, 7, WHITE),
+                new Pixel(5, 7, WHITE),
+                new Pixel(6, 8, WHITE),
+                new Pixel(6, 9, WHITE),
         };
-
-        Pose2d scoringPos1 = placements[0].toPose2d(isRed);
-        Pose2d scoringPos2 = placements[1].toPose2d(isRed);
 
         Pose2d startPose = new Pose2d(0, 0, toRadians(160));
 
@@ -38,27 +59,8 @@ public class MeepMeepTesting {
                 .setDimensions(16.51929, 17.39847)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements[0].y);
-                                })
-                                .lineToSplineHeading(scoringPos1)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(1);
-//                                    latestScan.add(placements[0]);
-                                })
-                                .waitSeconds(TIME_DROP_FIRST)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements[1].y);
-                                })
-                                .lineToConstantHeading(scoringPos2.vec())
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(2);
-//                                    latestScan.add(placements[1]);
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> {
-//                                    trajectoryReady = false;
-                                })
+                                .lineToSplineHeading(placements[0].toPose2d())
+                                .addTemporalMarker(() -> backdrop.add(placements[0]))
                                 .build()
                 );
 
