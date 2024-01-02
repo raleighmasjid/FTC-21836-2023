@@ -11,8 +11,17 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true;
+    static boolean isRed = false, isRight = true;
     static Backdrop backdrop = new Backdrop();
+
+    public static double
+            X_START = 12,
+            Y_START = -61.788975,
+            LEFT = toRadians(180),
+            FORWARD = toRadians(90),
+            RIGHT = toRadians(0),
+            BACKWARD = toRadians(270),
+            SHIFT_LEFT = -47;
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -51,16 +60,15 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE),
         };
 
-        Pose2d startPose = new Pose2d(0, 0, toRadians(160));
+        Pose2d startPose = byBoth(new Pose2d(X_START, Y_START, FORWARD));
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, toRadians(180), toRadians(180), 13.2686055118)
-                .setDimensions(16.51929, 17.39847)
+                .setDimensions(16.42205, 17.39847)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .lineToSplineHeading(placements[0].toPose2d())
-                                .addTemporalMarker(() -> backdrop.add(placements[0]))
+                                .forward(24)
                                 .build()
                 );
 
@@ -69,5 +77,21 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
                 .start();
+    }
+
+    static Pose2d byAlliance(Pose2d pose) {
+        double alliance = isRed ? 1 : -1;
+        pose = new Pose2d(pose.getX(), pose.getY() * alliance, pose.getHeading() * alliance);
+        return pose;
+    }
+
+    static Pose2d bySide(Pose2d pose) {
+        boolean isRight = MeepMeepTesting.isRight == isRed;
+        pose = new Pose2d(pose.getX() + (isRight ? 0 : SHIFT_LEFT), pose.getY(), pose.getHeading());
+        return pose;
+    }
+
+    static Pose2d byBoth(Pose2d pose) {
+        return bySide(byAlliance(pose));
     }
 }
