@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTime;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -54,6 +57,11 @@ public final class Robot {
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
         };
+    }
+
+    public void preload() {
+        intake.setRequiredIntakingAmount(0);
+        deposit.paintbrush.lockPixels(new Pixel.Color[]{YELLOW, EMPTY});
     }
 
     private final ElapsedTime i2cTimer = new ElapsedTime();
