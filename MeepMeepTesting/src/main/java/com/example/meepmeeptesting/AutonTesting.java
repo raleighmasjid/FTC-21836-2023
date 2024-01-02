@@ -62,9 +62,9 @@ public class AutonTesting {
                                 .build()
                 );
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_LIGHT)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(false)
-                .setBackgroundAlpha(0.95f)
+                .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
                 .start();
     }
