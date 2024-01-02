@@ -147,12 +147,12 @@ public final class PlacementCalculator {
                     } else if (pMosaic[2].color.isColored() && pMosaic[1].color == EMPTY) {
                         oneRemainingCase(pixel, pMosaic[1], pMosaic[2]);
                     } else if (pMosaic[1].color == EMPTY && pMosaic[2].color == EMPTY) {
-                        optimalPlacements.add(new Pixel(pMosaic[1], ANYCOLOR));
-                        optimalPlacements.add(new Pixel(pMosaic[2], ANYCOLOR));
-                        Pixel p1 = pMosaic[1].clone();
-                        Pixel p2 = pMosaic[2].clone();
+                        Pixel p1 = new Pixel(pMosaic[1], ANYCOLOR);
+                        Pixel p2 = new Pixel(pMosaic[2], ANYCOLOR);
                         p1.scoreValue += 22 / 3.0;
                         p2.scoreValue += 22 / 3.0;
+                        optimalPlacements.add(p1);
+                        optimalPlacements.add(p2);
                         colorsToGetSPixels.add(p1);
                         colorsToGetSPixels.add(p2);
                     }
@@ -339,8 +339,7 @@ public final class PlacementCalculator {
             if (pixel.color == INVALID) continue;
             ArrayList<Pixel> sPixels = getSupportPixels(pixel);
             if (auton) for (Pixel p : sPixels) {
-                Pixel counterpart = p.getCounterpartIn(optimalPlacements);
-                if (counterpart != null && counterpart.color.matches(ANYCOLOR)) continue setPixels;
+                if (p.isIn(colorsToGetSPixels)) continue setPixels;
             }
             if (sPixels.size() < leastSPixels) {
                 leastSPixels = sPixels.size();
@@ -373,7 +372,7 @@ public final class PlacementCalculator {
     }
 
     private static Pixel getSafePixel(Pixel pixel) {
-        return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) ? WHITE : specifyColors ? getFirstColor() : ANY);
+        return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) || auton ? WHITE : specifyColors ? getFirstColor() : ANY);
     }
 
     private static Pixel.Color getFirstColor() {
