@@ -9,7 +9,7 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class AutoPlaceTesting {
+public class MeepMeepTesting {
 
     public static int
             X1 = 1,
