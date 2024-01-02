@@ -11,7 +11,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = false, isRight = true;
+    static boolean isRed = true, isRight = true;
     static Backdrop backdrop = new Backdrop();
 
     public static double
@@ -60,6 +60,7 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE),
         };
 
+        double alliance = isRed ? 1 : -1;
         Pose2d startPose = byBoth(new Pose2d(X_START, Y_START, FORWARD));
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
