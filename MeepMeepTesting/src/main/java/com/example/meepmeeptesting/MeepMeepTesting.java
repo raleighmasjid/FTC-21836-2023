@@ -23,7 +23,8 @@ public class MeepMeepTesting {
     static Backdrop backdrop = new Backdrop();
 
     public static double
-            X_START_LEFT = -35;
+            X_START_LEFT = -35,
+            X_START_RIGHT = 12;
 
     public static final double
             LEFT = toRadians(180),
@@ -32,8 +33,8 @@ public class MeepMeepTesting {
             BACKWARD = toRadians(270);
 
     public static EditablePose
-            startPose = new EditablePose(12, -61.788975, FORWARD),
-            centerSpike = new EditablePose(startPose.x, -30, FORWARD),
+            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
+            centerSpike = new EditablePose(X_START_RIGHT, -30, FORWARD),
             leftSpike = new EditablePose(7, -40, toRadians(120)),
             rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading),
             afterSpike = new EditablePose(36, leftSpike.y, LEFT);
@@ -121,8 +122,7 @@ public class MeepMeepTesting {
         }
 
         private EditablePose bySide() {
-            boolean isRight = MeepMeepTesting.isRight == isRed;
-            if (!isRight) x += X_START_LEFT - startPose.x;
+            if (isRight != isRed) x += (X_START_LEFT - X_START_RIGHT);
             return this;
         }
 
@@ -133,7 +133,7 @@ public class MeepMeepTesting {
         private EditablePose flipBySide() {
             boolean isRight = MeepMeepTesting.isRight == isRed;
             if (!isRight) heading = PI - heading;
-            if (!isRight) x = (X_START_LEFT + startPose.x) / 2 - x;
+            if (!isRight) x = (X_START_LEFT - X_START_RIGHT) / 2 - x;
             return this;
         }
 
