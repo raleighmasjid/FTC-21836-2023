@@ -2,6 +2,7 @@ package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
+import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -18,14 +19,11 @@ public class MeepMeepTesting {
     }
 
     static Randomization rand = Randomization.LEFT;
-    static boolean isRed = true, isRight = true;
+    static boolean isRed = true, isRight = false;
     static Backdrop backdrop = new Backdrop();
 
     public static double
-            X_START_RIGHT = 12,
-            X_START_LEFT = -35,
-            Y_START = -61.788975,
-            Y_CENTER_SPIKE = -28;
+            X_START_LEFT = -35;
 
     public static final double
             LEFT = toRadians(180),
@@ -33,9 +31,12 @@ public class MeepMeepTesting {
             RIGHT = toRadians(0),
             BACKWARD = toRadians(270);
 
-    static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, Y_CENTER_SPIKE, FORWARD);
+    public static EditablePose
+            startPose = new EditablePose(12, -61.788975, FORWARD),
+            centerSpike = new EditablePose(startPose.x, -30, FORWARD),
+            leftSpike = new EditablePose(7, -40, toRadians(120)),
+            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading),
+            afterSpike = new EditablePose(36, leftSpike.y, LEFT);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -71,12 +72,16 @@ public class MeepMeepTesting {
                 new Pixel(6, 7, WHITE),
                 new Pixel(5, 7, WHITE),
                 new Pixel(6, 8, WHITE),
-                new Pixel(6, 9, WHITE),
-        };
+                new Pixel(6, 9, WHITE),};
+        Pose2d[] locations = new Pose2d[placements.length];
+        for (int i = 0; i < placements.length; i++) locations[i] = placements[i].toPose2d();
 
         double alliance = isRed ? 1 : -1;
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
         Pose2d centerSpike = MeepMeepTesting.centerSpike.byBoth().toPose2d();
+        Pose2d leftSpike = MeepMeepTesting.leftSpike.byBoth().toPose2d();
+        Pose2d rightSpike = MeepMeepTesting.rightSpike.byBoth().toPose2d();
+        Pose2d afterSpike = MeepMeepTesting.afterSpike.flipBySide().byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -84,7 +89,11 @@ public class MeepMeepTesting {
                 .setDimensions(16.42205, 17.39847)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .forward(24)
+                                .setTangent(FORWARD)
+                                .splineTo(leftSpike.vec(), leftSpike.getHeading())
+                                .setTangent(RIGHT)
+                                .splineToSplineHeading(afterSpike, RIGHT)
+                                .splineToConstantHeading(locations[0].vec(), RIGHT)
                                 .build()
                 );
 
@@ -106,20 +115,26 @@ public class MeepMeepTesting {
         }
 
         private EditablePose byAlliance() {
-            double alliance = isRed ? 1 : -1;
-            y *= alliance;
-            heading *= alliance;
+            if (!isRed) y *= -1;
+            if (!isRed) heading *= -1;
             return this;
         }
 
         private EditablePose bySide() {
             boolean isRight = MeepMeepTesting.isRight == isRed;
-            x += isRight ? 0 : X_START_LEFT - X_START_RIGHT;
+            if (!isRight) x += X_START_LEFT - startPose.x;
             return this;
         }
 
         private EditablePose byBoth() {
             return byAlliance().bySide();
+        }
+
+        private EditablePose flipBySide() {
+            boolean isRight = MeepMeepTesting.isRight == isRed;
+            if (!isRight) heading = PI - heading;
+            if (!isRight) x = (X_START_LEFT + startPose.x) / 2 - x;
+            return this;
         }
 
         private Pose2d toPose2d() {
