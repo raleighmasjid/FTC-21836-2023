@@ -11,17 +11,31 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
 
+    public enum Randomization {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
+    static Randomization rand = Randomization.LEFT;
     static boolean isRed = true, isRight = true;
     static Backdrop backdrop = new Backdrop();
 
     public static double
-            X_START = 12,
+            X_START_RIGHT = 12,
+            X_START_LEFT = -35,
             Y_START = -61.788975,
+            Y_CENTER_SPIKE = -28;
+
+    public static final double
             LEFT = toRadians(180),
             FORWARD = toRadians(90),
             RIGHT = toRadians(0),
-            BACKWARD = toRadians(270),
-            SHIFT_LEFT = -47;
+            BACKWARD = toRadians(270);
+
+    static EditablePose
+            startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
+            centerSpike = new EditablePose(X_START_RIGHT, Y_CENTER_SPIKE, FORWARD);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -61,7 +75,8 @@ public class MeepMeepTesting {
         };
 
         double alliance = isRed ? 1 : -1;
-        Pose2d startPose = byBoth(new Pose2d(X_START, Y_START, FORWARD));
+        Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
+        Pose2d centerSpike = MeepMeepTesting.centerSpike.byBoth().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -80,19 +95,35 @@ public class MeepMeepTesting {
                 .start();
     }
 
-    static Pose2d byAlliance(Pose2d pose) {
-        double alliance = isRed ? 1 : -1;
-        pose = new Pose2d(pose.getX(), pose.getY() * alliance, pose.getHeading() * alliance);
-        return pose;
-    }
+    private static class EditablePose {
 
-    static Pose2d bySide(Pose2d pose) {
-        boolean isRight = MeepMeepTesting.isRight == isRed;
-        pose = new Pose2d(pose.getX() + (isRight ? 0 : SHIFT_LEFT), pose.getY(), pose.getHeading());
-        return pose;
-    }
+        public double x, y, heading;
 
-    static Pose2d byBoth(Pose2d pose) {
-        return bySide(byAlliance(pose));
+        private EditablePose(double x, double y, double heading) {
+            this.x = x;
+            this.y = y;
+            this.heading = heading;
+        }
+
+        private EditablePose byAlliance() {
+            double alliance = isRed ? 1 : -1;
+            y *= alliance;
+            heading *= alliance;
+            return this;
+        }
+
+        private EditablePose bySide() {
+            boolean isRight = MeepMeepTesting.isRight == isRed;
+            x += isRight ? 0 : X_START_LEFT - X_START_RIGHT;
+            return this;
+        }
+
+        private EditablePose byBoth() {
+            return byAlliance().bySide();
+        }
+
+        private Pose2d toPose2d() {
+            return new Pose2d(x, y, heading);
+        }
     }
 }
