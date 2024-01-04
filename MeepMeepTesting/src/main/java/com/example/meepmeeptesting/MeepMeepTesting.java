@@ -30,8 +30,7 @@ public class MeepMeepTesting {
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -30, FORWARD),
             leftSpike = new EditablePose(7, -40, toRadians(120)),
-            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading),
-            afterSpike = new EditablePose(36, leftSpike.y, LEFT);
+            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -68,15 +67,12 @@ public class MeepMeepTesting {
                 new Pixel(5, 7, WHITE),
                 new Pixel(6, 8, WHITE),
                 new Pixel(6, 9, WHITE),};
-        Pose2d[] locations = new Pose2d[placements.length];
-        for (int i = 0; i < placements.length; i++) locations[i] = placements[i].toPose2d();
 
         double alliance = isRed ? 1 : -1;
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
         Pose2d centerSpike = MeepMeepTesting.centerSpike.byBoth().toPose2d();
         Pose2d leftSpike = MeepMeepTesting.leftSpike.byBoth().toPose2d();
         Pose2d rightSpike = MeepMeepTesting.rightSpike.byBoth().toPose2d();
-        Pose2d afterSpike = MeepMeepTesting.afterSpike.flipBySide().byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -87,8 +83,6 @@ public class MeepMeepTesting {
                                 .setTangent(FORWARD)
                                 .splineTo(leftSpike.vec(), leftSpike.getHeading())
                                 .setTangent(RIGHT)
-                                .splineToSplineHeading(afterSpike, RIGHT)
-                                .splineToConstantHeading(locations[0].vec(), RIGHT)
                                 .build()
                 );
 
