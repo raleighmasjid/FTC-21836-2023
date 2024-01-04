@@ -27,20 +27,20 @@ public final class PlacementCalculator {
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
     static boolean noColor = false, auton = false, specifyColors;
-    static final Backdrop PERFECT_BACKDROP;
+//    static final Backdrop PERFECT_BACKDROP;
 
     private PlacementCalculator() {}
 
-    static {
-        specifyColors = false;
-        PERFECT_BACKDROP = new Backdrop();
-        while (PERFECT_BACKDROP.notFull()) {
-            getOptimalPlacements(PERFECT_BACKDROP);
-            Pixel placement = optimalPlacements.get(0);
-            PERFECT_BACKDROP.add(placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
-        }
-        specifyColors = true;
-    }
+//    static {
+//        specifyColors = false;
+//        PERFECT_BACKDROP = new Backdrop();
+//        while (PERFECT_BACKDROP.notFull()) {
+//            getOptimalPlacements(PERFECT_BACKDROP);
+//            Pixel placement = optimalPlacements.get(0);
+//            PERFECT_BACKDROP.add(placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
+//        }
+//        specifyColors = true;
+//    }
 
     private static boolean isSpecialCenterCase(Pixel pixel) {
         int x = pixel.x;
