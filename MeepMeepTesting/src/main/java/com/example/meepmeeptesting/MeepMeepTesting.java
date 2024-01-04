@@ -12,13 +12,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
 
-    public enum Randomization {
-        LEFT,
-        CENTER,
-        RIGHT
-    }
-
-    static Randomization rand = Randomization.LEFT;
+    static int rand = 0;
     static boolean isRed = true, isRight = false;
     static Backdrop backdrop = new Backdrop();
 
@@ -27,10 +21,10 @@ public class MeepMeepTesting {
             X_START_RIGHT = 12;
 
     public static final double
-            LEFT = toRadians(180),
-            FORWARD = toRadians(90),
-            RIGHT = toRadians(0),
-            BACKWARD = toRadians(270);
+            LEFT = PI,
+            FORWARD = 1.5707963267948966,
+            RIGHT = 0,
+            BACKWARD = -1.5707963267948966;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -133,7 +127,7 @@ public class MeepMeepTesting {
         private EditablePose flipBySide() {
             boolean isRight = MeepMeepTesting.isRight == isRed;
             if (!isRight) heading = PI - heading;
-            if (!isRight) x = (X_START_LEFT - X_START_RIGHT) / 2 - x;
+            if (!isRight) x = (X_START_LEFT + X_START_RIGHT) / 2 - x;
             return this;
         }
 
