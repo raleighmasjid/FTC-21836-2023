@@ -13,7 +13,7 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 public class MeepMeepTesting {
 
     static int rand = 0;
-    static boolean isRed = true, isRight = false;
+    static boolean isRed = true, isRight = true;
     static Backdrop backdrop = new Backdrop();
 
     public static double
@@ -69,6 +69,10 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE),};
 
         double alliance = isRed ? 1 : -1;
+        if (!isRight) {
+            if (rand == 2) rand = 0;
+            else if (rand == 0) rand = 2;
+        }
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
         Pose2d centerSpike = MeepMeepTesting.centerSpike.byBoth().toPose2d();
         Pose2d leftSpike = MeepMeepTesting.leftSpike.byBoth().toPose2d();
