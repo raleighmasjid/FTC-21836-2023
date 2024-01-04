@@ -33,6 +33,18 @@ public final class MainAuton extends LinearOpMode {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
 
+    public static final double
+            LEFT = toRadians(180),
+            FORWARD = toRadians(90),
+            RIGHT = toRadians(0),
+            BACKWARD = toRadians(270);
+
+    public static double
+            X_START_RIGHT = 12,
+            X_START_LEFT = -35,
+            Y_START = -61.788975,
+            Y_CENTER_SPIKE = -28;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -41,6 +53,7 @@ public final class MainAuton extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
+        robot.preload();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
@@ -74,6 +87,37 @@ public final class MainAuton extends LinearOpMode {
             // Push telemetry data
             robot.printTelemetry();
             mTelemetry.update();
+        }
+    }
+
+    private static class EditablePose {
+
+        public double x, y, heading;
+
+        private EditablePose(double x, double y, double heading) {
+            this.x = x;
+            this.y = y;
+            this.heading = heading;
+        }
+
+        private EditablePose byAlliance() {
+            double alliance = isRed ? 1 : -1;
+            y *= alliance;
+            heading *= alliance;
+            return this;
+        }
+
+        private EditablePose bySide() {
+            x += isRight == isRed ? 0 : X_START_LEFT - X_START_RIGHT;
+            return this;
+        }
+
+        private EditablePose byBoth() {
+            return byAlliance().bySide();
+        }
+
+        private Pose2d toPose2d() {
+            return new Pose2d(x, y, heading);
         }
     }
 }

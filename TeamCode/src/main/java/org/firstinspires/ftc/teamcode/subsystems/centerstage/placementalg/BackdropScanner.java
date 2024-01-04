@@ -5,9 +5,10 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.*;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacementsWithExtraWhites;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -30,7 +31,7 @@ public final class BackdropScanner {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsJustTransferred = false, clearingScan = false;
+    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
@@ -69,9 +70,10 @@ public final class BackdropScanner {
 
         // Save colors to corresponding locations in newScan
 
-        if (!latestScan.equals(lastScan)) {
+        if (justScored || !latestScan.equals(lastScan)) {
+            justScored = false;
             timeSinceUpdate.reset();
-            if (!(robot.drivetrain.isBusy() || clearingScan)) calculateColorsNeeded();
+            if (!clearingScan) calculateColorsNeeded();
         }
 
         if (pixelsJustTransferred) {
@@ -107,7 +109,8 @@ public final class BackdropScanner {
                     Pixel placement = new Pixel(pixel, firstColor);
 
                     placements[0] = placement;
-                    optimalPlacementsCopy = getOptimalPlacements(latestScan.clone().add(placement));
+                    optimalPlacementsCopy = getOptimalPlacementsWithExtraWhites(latestScan.clone().add(placement));
+
                     break;
                 }
             }
@@ -138,7 +141,7 @@ public final class BackdropScanner {
                                     .addTemporalMarker(() -> {
                                         robot.deposit.paintbrush.dropPixels(2);
                                         latestScan.add(placements[1]);
-                                        calculateColorsNeeded();
+                                        justScored = true;
                                     })
                                     .waitSeconds(TIME_DROP_SECOND)
                                     .addTemporalMarker(() -> {
@@ -162,7 +165,7 @@ public final class BackdropScanner {
                                     .addTemporalMarker(() -> {
                                         robot.deposit.paintbrush.dropPixels(2);
                                         latestScan.add(placements[1]);
-                                        calculateColorsNeeded();
+                                        justScored = true;
                                     })
                                     .waitSeconds(TIME_DROP_SECOND)
                                     .addTemporalMarker(() -> {
@@ -175,10 +178,8 @@ public final class BackdropScanner {
     }
 
     private void calculateColorsNeeded() {
-        optimalPlacements = getOptimalPlacements(latestScan);
-        PlacementCalculator.specifyColors = false;
-        optimalPlacements.addAll(getOptimalPlacements(latestScan));
-        PlacementCalculator.specifyColors = true;
+        optimalPlacements = getOptimalPlacementsWithExtraWhites(latestScan);
+
         colorsNeeded[0] = EMPTY;
         colorsNeeded[1] = EMPTY;
         if (!optimalPlacements.isEmpty()) {

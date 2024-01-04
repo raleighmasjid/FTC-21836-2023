@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
@@ -20,7 +19,7 @@ public final class AutonPixelSupplier {
         }
 
         final int x1, x2;
-        static final Randomization[] randomizations = {LEFT, CENTER, RIGHT};
+        static final Randomization[] randomizations = values();
     }
 
     public static ArrayList<Pixel> getPlacements(Randomization randomization, boolean partnerWillDoRandomization) {
@@ -45,8 +44,8 @@ public final class AutonPixelSupplier {
         while (backdrop.notFull()) {
             Pixel optimalPlacement = null;
             for (Pixel placement : optimalPlacements) {
-                if (placement.color == ANY || placement.color == WHITE) {
-                    optimalPlacement = new Pixel(placement, WHITE);
+                if (placement.color == WHITE) {
+                    optimalPlacement = placement;
                     break;
                 }
             }
