@@ -27,11 +27,11 @@ import java.util.List;
 @Config
 public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 1.49606; // in
+    public static double WHEEL_RADIUS = 0.748031; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 10; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET = 4; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 13.87793; // in; distance between the left and right wheels
+    public static double FORWARD_OFFSET = -0.86938; // in; offset of the lateral wheel
 
     private final Encoder leftEncoder, rightEncoder, frontEncoder;
 
