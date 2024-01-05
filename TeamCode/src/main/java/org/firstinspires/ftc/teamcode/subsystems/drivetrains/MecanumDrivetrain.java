@@ -4,7 +4,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGainsKt.computeKd;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
@@ -331,6 +330,7 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     public final HeadingIMU imu;
 
+    private double headingOffset;
     public static double SLOW_FACTOR = 0.3;
     private boolean slowModeLocked = false;
 
@@ -340,12 +340,11 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param angle Angle of the robot in radians, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        Pose2d currentPose = getPoseEstimate();
-        setPoseEstimate(new Pose2d(currentPose.getX(), currentPose.getY(), angle + FORWARD));
+        headingOffset = normalizeRadians(imu.getHeading() - angle);
     }
 
     public double getHeading() {
-        return normalizeRadians(getPoseEstimate().getHeading() - FORWARD);
+        return normalizeRadians(imu.getHeading() - headingOffset);
     }
 
     /**
