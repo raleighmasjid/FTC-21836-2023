@@ -26,7 +26,7 @@ public final class PlacementCalculator {
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
-    static boolean noColor = false, auton = false, specifyColors;
+    static boolean noColor = false, auton = false, specifyColors = true;
 //    static final Backdrop PERFECT_BACKDROP;
 
     private PlacementCalculator() {}
