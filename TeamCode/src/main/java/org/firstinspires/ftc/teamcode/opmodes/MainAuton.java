@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
-
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
-
-import static java.lang.Math.toRadians;
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -22,28 +25,26 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdr
 @Autonomous(preselectTeleOp = "AutomatedTeleOp")
 public final class MainAuton extends LinearOpMode {
 
+    public static final double
+            LEFT = PI,
+            FORWARD = 1.5707963267948966,
+            RIGHT = 0,
+            BACKWARD = -1.5707963267948966;
+
     // Declare objects:
     public static GamepadEx gamepadEx1, gamepadEx2;
     public static MultipleTelemetry mTelemetry;
     static Robot robot;
     public static Backdrop autonBackdrop = new Backdrop();
-    static Pose2d autonEndPose = new Pose2d(0, 0, toRadians(90));
+    static Pose2d autonEndPose = new Pose2d(0, 0, FORWARD);
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
 
-    public static final double
-            LEFT = toRadians(180),
-            FORWARD = toRadians(90),
-            RIGHT = toRadians(0),
-            BACKWARD = toRadians(270);
-
     public static double
-            X_START_RIGHT = 12,
             X_START_LEFT = -35,
-            Y_START = -61.788975,
-            Y_CENTER_SPIKE = -28;
+            X_START_RIGHT = 12;
 
     @Override
     public void runOpMode() throws InterruptedException {
