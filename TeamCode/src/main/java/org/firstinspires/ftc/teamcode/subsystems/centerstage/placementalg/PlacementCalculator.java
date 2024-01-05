@@ -27,10 +27,10 @@ public final class PlacementCalculator {
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
     static boolean noColor = false, auton = false, specifyColors = true;
-//    static final Backdrop PERFECT_BACKDROP;
 
     private PlacementCalculator() {}
 
+//    static final Backdrop PERFECT_BACKDROP;
 //    static {
 //        specifyColors = false;
 //        PERFECT_BACKDROP = new Backdrop();
