@@ -93,9 +93,6 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
-        setCurrentHeading(0);
-
         // TODO: adjust the names of the following hardware devices to match your configuration
 
         leftFront = hardwareMap.get(DcMotorEx.class, "left front");
@@ -128,6 +125,9 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+
+        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        setCurrentHeading(0);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
@@ -340,11 +340,15 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param angle Angle of the robot in radians, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        headingOffset = normalizeRadians(imu.getHeading() - angle);
+        headingOffset = normalizeRadians(getRawHeading() - angle);
     }
 
     public double getHeading() {
-        return normalizeRadians(imu.getHeading() - headingOffset);
+        return normalizeRadians(getRawHeading() - headingOffset);
+    }
+
+    private double getRawHeading() {
+        return imu.getHeading();
     }
 
     /**
