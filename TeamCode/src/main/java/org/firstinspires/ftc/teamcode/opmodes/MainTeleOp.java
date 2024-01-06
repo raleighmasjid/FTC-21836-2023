@@ -124,6 +124,5 @@ public final class MainTeleOp extends LinearOpMode {
             robot.printTelemetry();
             mTelemetry.update();
         }
-        robot.interrupt();
     }
 }
