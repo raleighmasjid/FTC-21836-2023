@@ -36,8 +36,8 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-    public final BackdropScanner scanner;
-    private final ThreadedLoop threadedLoop;
+    public BackdropScanner scanner = null;
+    private ThreadedLoop threadedLoop = null;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -50,9 +50,6 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        scanner = new BackdropScanner(this);
-        threadedLoop = new ThreadedLoop(scanner::update);
-
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
@@ -64,12 +61,17 @@ public final class Robot {
         deposit.paintbrush.lockPixels(new Pixel.Color[]{YELLOW, EMPTY});
     }
 
+    public void algorithmInit() {
+        scanner = new BackdropScanner(this);
+        threadedLoop = new ThreadedLoop(scanner::update);
+    }
+
     private final ElapsedTime i2cTimer = new ElapsedTime();
 
     public void readSensors() {
         bulkReader.bulkRead();
         i2cTimer.reset();
-        drivetrain.imu.update();
+//        drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
         double i2ctime;
@@ -96,7 +98,7 @@ public final class Robot {
     public void run() {
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-            scanner.beginTrajectoryGeneration(deposit.paintbrush.getColors());
+            if (scanner != null) scanner.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 
         deposit.run();
@@ -104,7 +106,7 @@ public final class Robot {
 
         for (LEDIndicator indicator : indicators) indicator.setState(
                 drivetrain.isBusy() ? RED :
-                scanner.trajectoryReady() ? GREEN :
+                scanner != null && scanner.trajectoryReady() ? GREEN :
                 OFF
         );
     }
@@ -114,8 +116,10 @@ public final class Robot {
     }
 
     public void printTelemetry() {
-        scanner.printTelemetry();
-        mTelemetry.addLine();
+        if (scanner != null) {
+            scanner.printTelemetry();
+            mTelemetry.addLine();
+        }
         drivetrain.printTelemetry();
         mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();

@@ -49,6 +49,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
         robot = new Robot(hardwareMap);
         robot.drivetrain.setPoseEstimate(autonEndPose);
         robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - FORWARD);
+        robot.algorithmInit();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
