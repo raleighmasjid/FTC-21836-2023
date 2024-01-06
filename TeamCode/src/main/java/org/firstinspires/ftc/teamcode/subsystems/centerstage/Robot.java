@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.threads.ThreadedLoop;
 
 @Config
 public final class Robot {
@@ -37,7 +36,7 @@ public final class Robot {
     private final LEDIndicator[] indicators;
 
     public BackdropScanner scanner = null;
-    private ThreadedLoop threadedLoop = null;
+    private volatile boolean runScannerLoop = true;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -63,7 +62,16 @@ public final class Robot {
 
     public void algorithmInit() {
         scanner = new BackdropScanner(this);
-        threadedLoop = new ThreadedLoop(scanner::update);
+        new Thread(() -> {
+            while (runScannerLoop) {
+                scanner.update();
+                Thread.yield();
+            }
+        }).start();
+    }
+
+    public void interrupt() {
+        runScannerLoop = false;
     }
 
     private final ElapsedTime i2cTimer = new ElapsedTime();
@@ -109,10 +117,6 @@ public final class Robot {
                 scanner != null && scanner.trajectoryReady() ? GREEN :
                 OFF
         );
-    }
-
-    public void interrupt() {
-        threadedLoop.endLoop();
     }
 
     public void printTelemetry() {
