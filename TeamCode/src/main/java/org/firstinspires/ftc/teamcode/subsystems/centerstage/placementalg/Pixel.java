@@ -21,6 +21,9 @@ public final class Pixel implements Comparable<Pixel> {
             WIDTH = 3,
             HEIGHT = 2.59945;
 
+    /**
+     * @return The difference in {@link #scoreValue} between this {@link Pixel} and the provided {@link Pixel}
+     */
     public int compareTo(Pixel other) {
         double diff = other.scoreValue - scoreValue;
         if (diff == 0) diff = y - other.y;
@@ -28,9 +31,9 @@ public final class Pixel implements Comparable<Pixel> {
     }
 
     final int x, y;
-    Pixel mosaic = null;
-    final Pixel.Color color;
+    final Color color;
     double scoreValue = 0;
+    Pixel mosaic = null;
 
     Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
@@ -38,20 +41,32 @@ public final class Pixel implements Comparable<Pixel> {
         this.color = color;
     }
 
+    /**
+     * Instantiate a new {@link Pixel} object based on an existing {@link Pixel} but with a new {@link Color}
+     */
     Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
 
+    /**
+     * @return A copy of this {@link Pixel}
+     */
     @NonNull
     protected Pixel clone() {
         return new Pixel(this, color);
     }
 
+    /**
+     * @return Whether this {@link Pixel} is part of a valid mosaic
+     */
     boolean inMosaic() {
         return mosaic != null && mosaic.color != INVALID;
     }
 
+    /**
+     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
+     */
     public Pose2d toPose2d() {
         return new Pose2d(
                 Backdrop.X,
@@ -60,25 +75,41 @@ public final class Pixel implements Comparable<Pixel> {
         );
     }
 
+    /**
+     * @return Whether a {@link Pixel} with identical {@link #x} and {@link #y} is present in the provided {@link Iterable}
+     */
     boolean isIn(Iterable<Pixel> array) {
         return getCounterpartIn(array) != null;
     }
 
+    /**
+     * @return The first {@link Pixel} with identical {@link #x} and {@link #y} present in the provided {@link Iterable} <br>
+     * Returns null if no such {@link Pixel} is found
+     */
     Pixel getCounterpartIn(Iterable<Pixel> array) {
         for (Pixel p1 : array) if (x == p1.x && y == p1.y) return p1;
         return null;
     }
 
+    /**
+     * @return A {@link String} representation of this {@link Pixel}, including its {@link #x}, {@link #y}, and {@link #scoreValue} to 5 decimal places
+     */
     @NonNull
     public String toString() {
         double decPlaces = 100000;
         return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
     }
 
+    /**
+     * Outputs the result of {@link #toString()} to the main text output stream
+     */
     void print() {
         System.out.println(this);
     }
 
+    /**
+     * HSV value bound for intake pixel detection
+     */
     public static HSV
             minWhite = new HSV(
             0,
@@ -123,6 +154,10 @@ public final class Pixel implements Comparable<Pixel> {
 
     static boolean printInColor = true;
 
+    /**
+     * An enum representing the color of a given {@link Pixel},
+     * either a real, physical color, or a placeholder in a {@link Backdrop}
+     */
     @Config
     public enum Color {
         PURPLE,
@@ -132,8 +167,7 @@ public final class Pixel implements Comparable<Pixel> {
         EMPTY,
         ANY,
         ANYCOLOR,
-        INVALID,
-        HIGHLIGHTED;
+        INVALID;
 
         private static final String RESET = "\u001B[0m";
         private static final Color[] values = values();
@@ -141,6 +175,10 @@ public final class Pixel implements Comparable<Pixel> {
             return values[ordinal];
         }
 
+        /**
+         * @return A single-letter {@link String} representation of this {@link Color} <br>
+         * {@link #PURPLE}, {@link #GREEN}, and {@link #YELLOW} will have ANSI color codes if {@link #printInColor} is true
+         */
         @NonNull
         public String toString() {
             switch (this) {
@@ -156,14 +194,16 @@ public final class Pixel implements Comparable<Pixel> {
                     return "" + name().charAt(0);
                 case INVALID:
                     return " ";
-                case HIGHLIGHTED:
-                    return "#";
                 case EMPTY:
                 default:
                     return "_";
             }
         }
 
+        /**
+         * @return The {@link Color} corresponding to a given {@link String}
+         * representation of what is (likely) originally a {@link Color}
+         */
         static Color fromString(String color) {
             switch (color.toUpperCase()) {
                 case "W":
@@ -187,6 +227,9 @@ public final class Pixel implements Comparable<Pixel> {
             }
         }
 
+        /**
+         * @return The {@link Color} corresponding to the provided {@link HSV} as per the tuned value bounds
+         */
         public static Color fromHSV(HSV hsv) {
             return hsv.inRange(minPurple, maxPurple) ? PURPLE :
                     hsv.inRange(minGreen, maxGreen) ? GREEN :
@@ -195,6 +238,9 @@ public final class Pixel implements Comparable<Pixel> {
                     EMPTY;
         }
 
+        /**
+         * @return Whether this {@link Color} "matches" the provided {@link Color}, accounting for ambiguous and specific {@link Color}s
+         */
         boolean matches(Color other) {
             return (this != INVALID && other != INVALID) && (
                     this == ANY ||
@@ -205,6 +251,9 @@ public final class Pixel implements Comparable<Pixel> {
             );
         }
 
+        /**
+         * @return Whether this {@link Color} is {@link #PURPLE}, {@link #GREEN}, or {@link #YELLOW}
+         */
         boolean isColored() {
             return ordinal() <= 2;
         }

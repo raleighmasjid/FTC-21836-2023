@@ -43,11 +43,16 @@ public final class PlacementCalculator {
     }
 //*/
 
-    private static boolean isSpecialCenterCase(Pixel pixel) {
+    /**
+     * @return Whether the provided {@link Pixel} is part of a special case of mosaic case priorities
+     * present in the perfect backdrop layout, where the up case is preferred over right or left to allow
+     * the formation of another mosaic to the right
+     */
+    private static boolean upMosaicIsHelpful(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
         if (!(x == 3 && (y == 3 || y == 9))) return false;
-        if (y == 9) return isSpecialCenterCase(new Pixel(x, 3, pixel.color));
+        if (y == 9) return upMosaicIsHelpful(new Pixel(x, 3, pixel.color));
 
         Pixel[] shouldBeColored = {
                 backdrop.get(5, y),
@@ -85,7 +90,7 @@ public final class PlacementCalculator {
         };
         if (x == 1) return new Pixel[][]{left, up, right};
         if (x == 6) return new Pixel[][]{right, up, left};
-        if (isSpecialCenterCase(pixel)) return new Pixel[][]{up, right, left};
+        if (upMosaicIsHelpful(pixel)) return new Pixel[][]{up, right, left};
         if (x == 5 || x == 3) return new Pixel[][]{right, left, up};
         return new Pixel[][]{left, right, up};
     }

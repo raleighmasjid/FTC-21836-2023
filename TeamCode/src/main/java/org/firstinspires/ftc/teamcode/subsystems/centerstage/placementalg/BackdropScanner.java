@@ -39,11 +39,18 @@ public final class BackdropScanner {
         calculateColorsNeeded();
     }
 
+    /**
+     * Place a flag requesting for {@link #scoringTrajectory} to be generated
+     * @param depositColors The colors present in the robot's {@link org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit} ready to be scored
+     */
     public void beginTrajectoryGeneration(Color[] depositColors) {
         this.depositColors = depositColors;
         pixelsJustTransferred = true;
     }
 
+    /**
+     * Reset {@link #latestScan} manually and recalculate {@link #colorsNeeded} for human player instruction
+     */
     public void clearScan() {
         clearingScan = true;
         latestScan.clear();
@@ -172,6 +179,9 @@ public final class BackdropScanner {
         return true;
     }
 
+    /**
+     * Saves the results of {@link PlacementCalculator} as applied to {@link #latestScan} to {@link #optimalPlacements}
+     */
     private void calculateColorsNeeded() {
         optimalPlacements = getOptimalPlacementsWithExtraWhites(latestScan);
 
@@ -189,6 +199,9 @@ public final class BackdropScanner {
         }
     }
 
+    /**
+     * @return Whether {@link #scoringTrajectory} has been generated and is ready to be executed
+     */
     public boolean trajectoryReady() {
         return trajectoryReady;
     }
