@@ -115,9 +115,7 @@ public final class BackdropScanner {
         if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (secondColor.matches(pixel.color)) {
 
-                Pixel placement = new Pixel(pixel, secondColor);
-
-                placements[1] = placement;
+                placements[1] = new Pixel(pixel, secondColor);
                 break;
             }
         }
