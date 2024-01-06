@@ -11,6 +11,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 
+/**
+ * Note: this class has a natural ordering that is not consistent with equals.
+ */
 @Config
 public final class Pixel implements Comparable<Pixel> {
 
@@ -49,7 +52,7 @@ public final class Pixel implements Comparable<Pixel> {
         return mosaic != null && mosaic.color != INVALID;
     }
 
-    Pose2d toPose2d() {
+    public Pose2d toPose2d() {
         return new Pose2d(
                 Backdrop.X,
                 (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
