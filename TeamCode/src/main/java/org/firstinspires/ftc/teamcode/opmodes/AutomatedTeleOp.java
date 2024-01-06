@@ -81,12 +81,14 @@ public final class AutomatedTeleOp extends LinearOpMode {
             if (robot.beginUpdatingRunner()) autoScoring = true;
 
             if (autoScoring) {
+
+                if (keyPressed(1, X)) robot.drivetrain.breakFollowing();
+                if (!robot.drivetrain.isBusy()) autoScoring = false;
+
                 robot.drivetrain.update();
-                if (!robot.drivetrain.isBusy() || keyPressed(1, X)) {
-                    robot.drivetrain.breakFollowing();
-                    autoScoring = false;
-                }
+                
             } else {
+
                 if (keyPressed(1, X)) robot.startAutoDrive();
 
                 robot.intake.setMotorPower(
