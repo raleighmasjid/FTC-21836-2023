@@ -12,6 +12,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BACKWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
@@ -48,7 +49,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(hardwareMap);
         robot.drivetrain.setPoseEstimate(autonEndPose);
-        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - FORWARD);
+        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
         robot.algorithmInit();
 
         // Initialize gamepads:
@@ -126,13 +127,12 @@ public final class AutomatedTeleOp extends LinearOpMode {
                         x,
                         gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
                 );
+                robot.drivetrain.updatePoseEstimate();
             }
 
             robot.run();
-            robot.drivetrain.updatePoseEstimate();
 
             mTelemetry.addData("Scoring mode", autoScoring ? "auto" : "manual");
-            // Push telemetry data to multiple outputs (set earlier):
             robot.printTelemetry();
             mTelemetry.update();
         }
