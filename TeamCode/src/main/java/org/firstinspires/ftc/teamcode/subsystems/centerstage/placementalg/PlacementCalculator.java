@@ -70,6 +70,10 @@ public final class PlacementCalculator {
         return true;
     }
 
+    /**
+     * @return The three possible mosaic cases for the provided {@link Pixel}'s coordinates <br>
+     * Case priorities are hardcoded to aid in finite-space packing
+     */
     private static Pixel[][] getPossibleMosaics(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
@@ -95,6 +99,9 @@ public final class PlacementCalculator {
         return new Pixel[][]{left, right, up};
     }
 
+    /**
+     * Subtract values from {@link #colorsLeft} based on the colors present on {@link #backdrop}
+     */
     private static void countColorsLeft() {
         for (Pixel[] row : backdrop.slots) for (Pixel pixel : row) if (pixel.color.isColored()) {
             int index = pixel.color.ordinal();
@@ -102,6 +109,13 @@ public final class PlacementCalculator {
         }
     }
 
+    /**
+     * Iterate through {@link #backdrop}, detect and mark valid mosaics, mark invalid mosaics
+     * by {@link Pixel}.mosaic attribute and add any {@link Pixel}s required to complete a mosaic
+     * to {@link #optimalPlacements} and {@link #colorsToGetSPixels} <br>
+     * After that, any required {@link Pixel} with ANYCOLOR as its color is given a specific color
+     * as per the values of {@link #colorsLeft}
+     */
     private static void scanForMosaics() {
         for (Pixel[] row : backdrop.slots) for (Pixel pixel : row) pixel.mosaic = null;
         for (int y = 0; y < backdrop.slots.length; y++) for (int x : iterationXs(y)) {
