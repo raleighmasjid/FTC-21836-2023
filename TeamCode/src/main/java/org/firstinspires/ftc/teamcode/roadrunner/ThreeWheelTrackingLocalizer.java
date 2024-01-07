@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
+import static org.firstinspires.ftc.teamcode.roadrunner.util.Encoder.Direction.REVERSE;
 
 import androidx.annotation.NonNull;
 
@@ -39,6 +40,10 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
 
     private final List<Integer> lastEncPositions, lastEncVels;
 
+    /* Lines 37-38 in StandardTrackingWheelLocalizer.java */
+    public static double X_MULTIPLIER = 1; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 1; // Multiplier in the Y direction
+
     public ThreeWheelTrackingLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
                 new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
@@ -54,6 +59,7 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+        leftEncoder.setDirection(REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -73,9 +79,9 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         lastEncPositions.add(frontPos);
 
         return Arrays.asList(
-                encoderTicksToInches(leftPos),
-                encoderTicksToInches(rightPos),
-                encoderTicksToInches(frontPos)
+                encoderTicksToInches(leftPos) * X_MULTIPLIER,
+                encoderTicksToInches(rightPos) * X_MULTIPLIER,
+                encoderTicksToInches(frontPos) * Y_MULTIPLIER
         );
     }
 
@@ -92,9 +98,9 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         lastEncVels.add(frontVel);
 
         return Arrays.asList(
-                encoderTicksToInches(leftVel),
-                encoderTicksToInches(rightVel),
-                encoderTicksToInches(frontVel)
+                encoderTicksToInches(leftVel) * X_MULTIPLIER,
+                encoderTicksToInches(rightVel) * X_MULTIPLIER,
+                encoderTicksToInches(frontVel) * Y_MULTIPLIER
         );
     }
 }

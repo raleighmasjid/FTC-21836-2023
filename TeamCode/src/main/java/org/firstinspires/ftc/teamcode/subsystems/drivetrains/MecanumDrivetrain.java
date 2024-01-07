@@ -318,12 +318,12 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getHeading();
+        return 0;
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return imu.getAngularVelo();
+        return 0.0;
     }
 
     public final HeadingIMU imu;
