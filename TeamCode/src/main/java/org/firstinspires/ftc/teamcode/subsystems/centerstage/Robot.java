@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTime;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
@@ -70,22 +69,15 @@ public final class Robot {
         }).start();
     }
 
-    public void interrupt() {
+    public void stopAlgorithm() {
         runScannerLoop = false;
     }
 
-    private final ElapsedTime i2cTimer = new ElapsedTime();
-
     public void readSensors() {
         bulkReader.bulkRead();
-        i2cTimer.reset();
 //        drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
-        double i2ctime;
-        mTelemetry.addData("I2C read time", i2ctime = i2cTimer.seconds());
-        mTelemetry.addData("Total - I2C time", loopTime - i2ctime);
-        mTelemetry.addLine();
     }
 
     public void startAutoDrive() {

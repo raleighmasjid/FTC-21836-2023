@@ -34,18 +34,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    public static double loopTime;
-
     @Override
     public void runOpMode() throws InterruptedException {
-        ElapsedTime loopTimer = new ElapsedTime();
 
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -72,57 +68,60 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Control loop:
         while (opModeIsActive()) {
-            loopTimer.reset();
             // Read sensors + gamepads:
             robot.readSensors();
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            robot.intake.setMotorPower(
-                    gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
-            );
-
-            robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
-
-            if (gamepadEx2.isDown(LEFT_BUMPER)) {
-                if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
-                if (keyPressed(2, X))               robot.intake.setRequiredIntakingAmount(1);
-                if (keyPressed(2, A))               robot.intake.setRequiredIntakingAmount(0);
-            } else {
-                if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
-                if (keyPressed(2, DPAD_UP))         robot.deposit.lift.changeRow(1);
-
-                if (keyPressed(2, Y))               robot.intake.setHeight(FIVE_STACK);
-                if (keyPressed(2, X))               robot.intake.setHeight(FOUR_STACK);
-                if (keyPressed(2, B))               robot.intake.setHeight(THREE_STACK);
-                if (keyPressed(2, A))               robot.intake.setHeight(TWO_STACK);
-                if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
-
-                if (keyPressed(2, DPAD_LEFT) || keyPressed(2, DPAD_RIGHT)) {
-                    robot.deposit.paintbrush.dropPixels(1);
-                }
-            }
-
-            double x = gamepadEx1.getRightX();
-            if (gamepadEx1.isDown(LEFT_BUMPER)) {
-                double y = gamepadEx1.getRightY();
-                if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(atan2(y, x));
-                x = 0;
-            }
-
-            // Field-centric driving with control stick inputs:
-            robot.drivetrain.run(
-                    gamepadEx1.getLeftX(),
-                    gamepadEx1.getLeftY(),
-                    x,
-                    gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
-            );
+            teleOpControls();
 
             robot.run();
 
-            mTelemetry.addData("full loop time", loopTime = loopTimer.seconds());
             robot.printTelemetry();
             mTelemetry.update();
         }
+    }
+
+    static void teleOpControls() {
+        robot.intake.setMotorPower(
+                gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
+        );
+
+        robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
+
+        if (gamepadEx2.isDown(LEFT_BUMPER)) {
+            if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
+            if (keyPressed(2, X))               robot.intake.setRequiredIntakingAmount(1);
+            if (keyPressed(2, A))               robot.intake.setRequiredIntakingAmount(0);
+        } else {
+            if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
+            if (keyPressed(2, DPAD_UP))         robot.deposit.lift.changeRow(1);
+
+            if (keyPressed(2, Y))               robot.intake.setHeight(FIVE_STACK);
+            if (keyPressed(2, X))               robot.intake.setHeight(FOUR_STACK);
+            if (keyPressed(2, B))               robot.intake.setHeight(THREE_STACK);
+            if (keyPressed(2, A))               robot.intake.setHeight(TWO_STACK);
+            if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
+
+            if (keyPressed(2, DPAD_LEFT) || keyPressed(2, DPAD_RIGHT)) {
+                robot.deposit.paintbrush.dropPixels(1);
+            }
+        }
+
+        double x = gamepadEx1.getRightX();
+        if (gamepadEx1.isDown(LEFT_BUMPER)) {
+            double y = gamepadEx1.getRightY();
+            if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(-atan2(y, x) - FORWARD);
+            x = 0;
+        }
+
+        // Field-centric driving with control stick inputs:
+        robot.drivetrain.run(
+                gamepadEx1.getLeftX(),
+                gamepadEx1.getLeftY(),
+                x,
+                gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
+        );
+        robot.drivetrain.updatePoseEstimate();
     }
 }
