@@ -30,18 +30,18 @@ public final class AutomatedTeleOp extends LinearOpMode {
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            if (robot.beginUpdatingRunner()) autoScoring = true;
-
             if (autoScoring) {
 
                 if (keyPressed(1, X)) robot.drivetrain.breakFollowing();
                 if (!robot.drivetrain.isBusy()) autoScoring = false;
 
                 robot.drivetrain.update();
-                
+
             } else {
 
                 if (keyPressed(1, X)) robot.startAutoDrive();
+                if (robot.beginUpdatingRunner()) autoScoring = true;
+
                 if (gamepadEx2.isDown(LEFT_BUMPER) && gamepadEx2.isDown(RIGHT_BUMPER)) robot.scanner.reset();
                 teleOpControls();
             }
