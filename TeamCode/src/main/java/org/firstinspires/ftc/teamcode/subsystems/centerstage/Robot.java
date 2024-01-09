@@ -78,6 +78,7 @@ public final class Robot {
 //        drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
+        drivetrain.updatePoseEstimate();
     }
 
     public void startAutoDrive() {
