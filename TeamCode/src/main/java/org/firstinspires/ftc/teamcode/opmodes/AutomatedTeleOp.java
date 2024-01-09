@@ -82,6 +82,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
             robot.run();
 
             mTelemetry.addData("Scoring mode", autoScoring ? "auto" : "manual");
+            mTelemetry.addLine();
             robot.printTelemetry();
             mTelemetry.update();
         }
