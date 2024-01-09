@@ -62,6 +62,8 @@ public final class MainTeleOp extends LinearOpMode {
     }
 
     static void teleOpInit(LinearOpMode opMode) {
+        boolean isAutomated = opMode instanceof AutomatedTeleOp;
+
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -69,6 +71,7 @@ public final class MainTeleOp extends LinearOpMode {
         robot = new Robot(opMode.hardwareMap);
         robot.drivetrain.setPoseEstimate(autonEndPose);
         robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
+        if (isAutomated) robot.startAlgorithm();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
@@ -78,11 +81,13 @@ public final class MainTeleOp extends LinearOpMode {
         // Get gamepad 1 button input and locks slow mode:
         while (opMode.opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
-            if (keyPressed(1, B))              isRed = true;
-            if (keyPressed(1, X))              isRed = false;
+            if (keyPressed(1, RIGHT_BUMPER)) slowModeLocked = !slowModeLocked;
+            if (isAutomated) {
+                if (keyPressed(1, B)) isRed = true;
+                if (keyPressed(1, X)) isRed = false;
+                mTelemetry.addLine((isRed ? "RED" : "BLUE") + " alliance");
+            }
             mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.addLine((isRed ? "RED" : "BLUE") + " alliance");
             mTelemetry.update();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
