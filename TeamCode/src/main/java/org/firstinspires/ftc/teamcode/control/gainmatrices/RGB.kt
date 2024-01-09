@@ -17,6 +17,9 @@ constructor(
     @JvmField var green: Double = 0.0,
     @JvmField var blue: Double = 0.0,
 ) {
+    constructor(array: Array<Double>) : this(array[0], array[1], array[2])
+    constructor(array: FloatArray) : this(array[0].toDouble(), array[1].toDouble(), array[2].toDouble())
+
     fun between(min:RGB, max:RGB): Boolean {
 
         val redInRange = (min.red <= red) && (red <= max.red)
@@ -31,6 +34,10 @@ constructor(
         mTelemetry.addData("Red", red)
         mTelemetry.addData("Green", green)
         mTelemetry.addData("Blue", blue)
+    }
+
+    override fun toString(): String {
+        return "$red, $green, $blue"
     }
 
     fun toHSV(): HSV {
@@ -54,8 +61,8 @@ constructor(
                 b -> (60 * ((r - g) / diff) + 240) % 360
                 else -> 0.0
             },
-            if (colorMax == 0.0) 0.0 else diff / colorMax * 100,
-            colorMax * 100
+            if (colorMax == 0.0) 0.0 else diff / colorMax,
+            colorMax
         )
     }
 }
