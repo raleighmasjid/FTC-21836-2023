@@ -1,8 +1,18 @@
 package org.firstinspires.ftc.teamcode.control.gainmatrices
 
-import org.firstinspires.ftc.teamcode.opmodes.MainAuton
+import org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry
+import kotlin.math.max
+import kotlin.math.min
 
-data class RGB @JvmOverloads constructor(
+data class RGB
+
+/**
+ * @param red Red value in [0, 255]
+ * @param green Green value in [0, 255]
+ * @param blue Blue value in [0, 255]
+ */
+@JvmOverloads
+constructor(
     @JvmField var red: Double = 0.0,
     @JvmField var green: Double = 0.0,
     @JvmField var blue: Double = 0.0,
@@ -17,9 +27,35 @@ data class RGB @JvmOverloads constructor(
     }
 
     fun toTelemetry(title: String) {
-        MainAuton.mTelemetry.addLine("$title:")
-        MainAuton.mTelemetry.addData("Red", red)
-        MainAuton.mTelemetry.addData("Green", green)
-        MainAuton.mTelemetry.addData("Blue", blue)
+        mTelemetry.addLine("$title:")
+        mTelemetry.addData("Red", red)
+        mTelemetry.addData("Green", green)
+        mTelemetry.addData("Blue", blue)
+    }
+
+    fun toHSV(): HSV {
+        // R, G, B values are divided by 255
+        // to change the range from 0..255 to 0..1
+        val r = red / 255.0
+        val g = green / 255.0
+        val b = blue / 255.0
+
+        val colorMax = max(r, max(g, b)) // maximum of r, g, b
+
+        val colorMin = min(r, min(g, b)) // minimum of r, g, b
+
+        val diff = colorMax - colorMin // diff of cmax and cmin.
+
+        return HSV(
+            when (colorMax) {
+                colorMin -> 0.0
+                r -> (60 * ((g - b) / diff) + 360) % 360
+                g -> (60 * ((b - r) / diff) + 120) % 360
+                b -> (60 * ((r - g) / diff) + 240) % 360
+                else -> 0.0
+            },
+            if (colorMax == 0.0) 0.0 else diff / colorMax * 100,
+            colorMax * 100
+        )
     }
 }
