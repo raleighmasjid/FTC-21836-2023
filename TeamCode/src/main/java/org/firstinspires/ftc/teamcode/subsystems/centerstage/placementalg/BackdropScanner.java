@@ -31,12 +31,23 @@ public final class BackdropScanner {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false;
+    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false, runScannerLoop = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public BackdropScanner(Robot robot) {
         this.robot = robot;
         calculateColorsNeeded();
+
+        new Thread(() -> {
+            while (runScannerLoop) {
+                update();
+                Thread.yield();
+            }
+        }).start();
+    }
+
+    public void stop() {
+        runScannerLoop = false;
     }
 
     /**
@@ -51,7 +62,7 @@ public final class BackdropScanner {
     /**
      * Reset {@link #latestScan} manually and recalculate {@link #colorsNeeded} for human player instruction
      */
-    public void clearScan() {
+    public void reset() {
         clearingScan = true;
         latestScan.clear();
         calculateColorsNeeded();

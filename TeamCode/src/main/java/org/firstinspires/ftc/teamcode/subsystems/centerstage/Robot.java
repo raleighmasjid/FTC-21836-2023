@@ -35,7 +35,6 @@ public final class Robot {
     private final LEDIndicator[] indicators;
 
     public BackdropScanner scanner = null;
-    private volatile boolean runScannerLoop = true;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -59,18 +58,8 @@ public final class Robot {
         deposit.paintbrush.lockPixels(new Pixel.Color[]{YELLOW, EMPTY});
     }
 
-    public void algorithmInit() {
+    public void startAlgorithm() {
         scanner = new BackdropScanner(this);
-        new Thread(() -> {
-            while (runScannerLoop) {
-                scanner.update();
-                Thread.yield();
-            }
-        }).start();
-    }
-
-    public void stopAlgorithm() {
-        runScannerLoop = false;
     }
 
     public void readSensors() {

@@ -75,7 +75,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
             } else {
 
                 if (keyPressed(1, X)) robot.startAutoDrive();
-
+                if (gamepadEx2.isDown(LEFT_BUMPER) && gamepadEx2.isDown(RIGHT_BUMPER)) robot.scanner.reset();
                 teleOpControls();
             }
 
@@ -86,6 +86,6 @@ public final class AutomatedTeleOp extends LinearOpMode {
             robot.printTelemetry();
             mTelemetry.update();
         }
-        robot.stopAlgorithm();
+        robot.scanner.stop();
     }
 }
