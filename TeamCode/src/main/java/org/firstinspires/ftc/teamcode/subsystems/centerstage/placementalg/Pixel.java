@@ -231,10 +231,10 @@ public final class Pixel implements Comparable<Pixel> {
          * @return The {@link Color} corresponding to the provided {@link HSV} as per the tuned value bounds
          */
         public static Color fromHSV(HSV hsv) {
-            return hsv.inRange(minPurple, maxPurple) ? PURPLE :
-                    hsv.inRange(minGreen, maxGreen) ? GREEN :
-                    hsv.inRange(minYellow, maxYellow) ? YELLOW :
-                    new HSV(0, hsv.saturation, hsv.value).inRange(minWhite, maxWhite) ? WHITE :
+            return hsv.between(minPurple, maxPurple) ? PURPLE :
+                    hsv.between(minGreen, maxGreen) ? GREEN :
+                    hsv.between(minYellow, maxYellow) ? YELLOW :
+                    new HSV(0, hsv.saturation, hsv.value).between(minWhite, maxWhite) ? WHITE :
                     EMPTY;
         }
 
