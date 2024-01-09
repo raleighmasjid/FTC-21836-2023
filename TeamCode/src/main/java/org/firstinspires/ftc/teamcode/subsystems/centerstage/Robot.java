@@ -63,7 +63,6 @@ public final class Robot {
 
     public void readSensors() {
         bulkReader.bulkRead();
-//        drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
         drivetrain.updatePoseEstimate();
