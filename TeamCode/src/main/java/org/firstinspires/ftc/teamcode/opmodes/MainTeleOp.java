@@ -43,28 +43,7 @@ public final class MainTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Initialize multiple telemetry outputs:
-        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        // Initialize robot:
-        robot = new Robot(hardwareMap);
-        robot.drivetrain.setPoseEstimate(autonEndPose);
-        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
-
-        // Initialize gamepads:
-        gamepadEx1 = new GamepadEx(gamepad1);
-        gamepadEx2 = new GamepadEx(gamepad2);
-
-        boolean slowModeLocked = false;
-
-        // Get gamepad 1 button input and locks slow mode:
-        while (opModeInInit()) {
-            gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
-            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.update();
-        }
-        if (slowModeLocked) robot.drivetrain.lockSlowMode();
+        teleOpInit(this);
 
         // Control loop:
         while (opModeIsActive()) {
@@ -80,6 +59,33 @@ public final class MainTeleOp extends LinearOpMode {
             robot.printTelemetry();
             mTelemetry.update();
         }
+    }
+
+    static void teleOpInit(LinearOpMode opMode) {
+        // Initialize multiple telemetry outputs:
+        mTelemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        // Initialize robot:
+        robot = new Robot(opMode.hardwareMap);
+        robot.drivetrain.setPoseEstimate(autonEndPose);
+        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
+
+        // Initialize gamepads:
+        gamepadEx1 = new GamepadEx(opMode.gamepad1);
+        gamepadEx2 = new GamepadEx(opMode.gamepad2);
+
+        boolean slowModeLocked = false;
+        // Get gamepad 1 button input and locks slow mode:
+        while (opMode.opModeInInit()) {
+            gamepadEx1.readButtons();
+            if (keyPressed(1, RIGHT_BUMPER))   slowModeLocked = !slowModeLocked;
+            if (keyPressed(1, B))              isRed = true;
+            if (keyPressed(1, X))              isRed = false;
+            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
+            mTelemetry.addLine((isRed ? "RED" : "BLUE") + " alliance");
+            mTelemetry.update();
+        }
+        if (slowModeLocked) robot.drivetrain.lockSlowMode();
     }
 
     static void teleOpControls() {
