@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -55,7 +54,7 @@ public final class Robot {
 
     public void preload() {
         intake.setRequiredIntakingAmount(0);
-        deposit.paintbrush.lockPixels(new Pixel.Color[]{YELLOW, EMPTY});
+        deposit.paintbrush.lockPixels(YELLOW, EMPTY);
     }
 
     public void startAlgorithm() {
