@@ -122,10 +122,11 @@ public final class BackdropScanner {
         if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (firstColor.matches(pixel.color)) {
 
-                Pixel placement = new Pixel(pixel, firstColor);
-
-                placements[0] = placement;
-                optimalPlacementsCopy = getOptimalPlacementsWithExtraWhites(latestScan.clone().add(placement));
+                optimalPlacementsCopy = getOptimalPlacementsWithExtraWhites(
+                        latestScan.clone().add(
+                                placements[0] = new Pixel(pixel, firstColor)
+                        )
+                );
 
                 break;
             }
