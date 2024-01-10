@@ -53,6 +53,10 @@ public final class Backdrop {
         return true;
     }
 
+    /**
+     * Clears every slot in the backdrop, as if it were a new backdrop <br>
+     * Also resets {@link #mosaicCount} to 0
+     */
     void clear() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
             slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
@@ -60,6 +64,12 @@ public final class Backdrop {
         mosaicCount = 0;
     }
 
+    /**
+     * Add a {@link Pixel} to the {@link Backdrop} based on its <br>
+     * If provided a {@link Pixel} of {@link Pixel.Color} ANY or ANYCOLOR, this method will randomly choose a specified version of the provided {@link Pixel.Color}
+     * @param pixel The {@link Pixel} to add
+     * @return This {@link Backdrop}
+     */
     Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:
@@ -76,18 +86,30 @@ public final class Backdrop {
         return this;
     }
 
+    /**
+     * @return The {@link Pixel} found at the provided x and y coordinates, if {@link #coordsInRange}
+     */
     Pixel get(int x, int y) {
         return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, INVALID);
     }
 
+    /**
+     * @return The {@link Pixel} found at the corresponding location of the provided {@link Pixel}, if {@link #coordsInRange}
+     */
     Pixel get(Pixel pixel) {
         return get(pixel.x, pixel.y);
     }
 
+    /**
+     * @return Whether the provided x, y location is within the bounds of this {@link Backdrop} object
+     */
     private static boolean coordsInRange(int x, int y) {
         return x >= 0 && x < COLUMNS && y >= 0 && y < ROWS;
     }
 
+    /**
+     * @return A multi-line {@link String} representation of the {@link Pixel} contents of this {@link Backdrop} object
+     */
     @NonNull
     public String toString() {
         String spacer = " ";
@@ -108,6 +130,9 @@ public final class Backdrop {
         return backdrop.toString();
     }
 
+    /**
+     * Output the result of {@link #toString()}, {@link #mosaicCount}, and points scored to the main text output stream
+     */
     void print() {
         System.out.println(this);
         System.out.println();
@@ -116,12 +141,19 @@ public final class Backdrop {
         System.out.println("Teleop score: " + (getPixelCount() * 3 + (mosaicCount + getSetLinesReached()) * 10));
     }
 
-    public void toTelemetry() {
+    /**
+     * Output the result of {@link #toString()} to telemetry
+     */
+    void toTelemetry() {
         printInColor = false;
         String[] rows = toString().split("\n");
         for (String row : rows) mTelemetry.addLine(row);
     }
 
+    /**
+     * @param pixel The {@link Pixel} to find the neighbors of
+     * @return The 6 directly adjacent neighbor {@link Pixel} objects of the provided {@link Pixel}
+     */
     Pixel[] getNeighbors(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
@@ -135,33 +167,50 @@ public final class Backdrop {
         };
     }
 
+    /**
+     * @return Whether the two provided {@link Pixel}s are directly adjacent as per {@link #getNeighbors}
+     */
     boolean touching(Pixel p1, Pixel p2) {
         return get(p1).isIn(Arrays.asList(getNeighbors(get(p2))));
     }
 
+    /**
+     * @return Whether the provided {@link Pixel} is supported by two other {@link Pixel}s below it in hexagonal grid space
+     */
     boolean isSupported(Pixel pixel) {
         return get(pixel.x, pixel.y - 1).color != EMPTY && get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color != EMPTY;
     }
 
+    /**
+     * @return The highest y-value of any {@link Pixel} on this {@link Backdrop}
+     */
     int getHighestPixelY() {
         int highestY = 0;
-        for (Pixel[] row : slots)
-            for (Pixel p : row) {
-                if (!(p.color == EMPTY) && p.color != INVALID) highestY = p.y;
-            }
+        for (Pixel[] row : slots) for (Pixel p : row) {
+            if (!(p.color == EMPTY) && p.color != INVALID) highestY = p.y;
+        }
         return highestY;
     }
 
+    /**
+     * @return Whether ALL the provided booleans are true
+     */
     static boolean allTrue(boolean... booleans) {
         for (boolean b : booleans) if (!b) return false;
         return true;
     }
 
+    /**
+     * @return Whether this {@link Backdrop} has any empty slots
+     */
     boolean notFull() {
         for (Pixel pixel : slots[10]) if (pixel.color == EMPTY) return true;
         return false;
     }
 
+    /**
+     * @return The number of pixels present in this {@link Backdrop}
+     */
     private int getPixelCount() {
         int pixelCount = 0;
         for (Pixel[] row : slots) {
@@ -172,6 +221,9 @@ public final class Backdrop {
         return pixelCount;
     }
 
+    /**
+     * @return The number of "set lines" reached by the highest pixel on this {@link Backdrop}
+     */
     private int getSetLinesReached() {
         return (getHighestPixelY() + 1) / 3;
     }

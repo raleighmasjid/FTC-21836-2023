@@ -5,9 +5,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODE
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGainsKt.computeKd;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USE_VELO_PID;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static java.lang.Math.abs;
@@ -34,7 +32,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -93,9 +90,6 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
-        setCurrentHeading(0);
-
         // TODO: adjust the names of the following hardware devices to match your configuration
 
         leftFront = hardwareMap.get(DcMotorEx.class, "left front");
@@ -128,6 +122,10 @@ public class MecanumDrivetrain extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+
+        imu = null;
+//                new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        setCurrentHeading(0);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
@@ -320,12 +318,12 @@ public class MecanumDrivetrain extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getHeading();
+        return 0;
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return imu.getAngularVelo();
+        return 0.0;
     }
 
     public final HeadingIMU imu;
@@ -340,15 +338,19 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param angle Angle of the robot in radians, 0 facing forward and increases counter-clockwise
      */
     public void setCurrentHeading(double angle) {
-        headingOffset = normalizeRadians(imu.getHeading() - angle);
+        headingOffset = normalizeRadians(getRawHeading() - angle);
     }
 
     public double getHeading() {
-        return normalizeRadians(imu.getHeading() - headingOffset);
+        return normalizeRadians(getRawHeading() - headingOffset);
+    }
+
+    private double getRawHeading() {
+        return getPoseEstimate().getHeading();
     }
 
     /**
-     * Field-centric driving using (threaded) {@link HeadingIMU}
+     * Field-centric driving using {@link HeadingIMU}
      *
      * @param xCommand strafing input
      * @param yCommand forward input

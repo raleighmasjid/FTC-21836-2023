@@ -231,7 +231,7 @@ public final class Deposit {
             return colors;
         }
 
-        void lockPixels(Pixel.Color[] colors) {
+        void lockPixels(Pixel.Color... colors) {
             int pixelsInIntake = 0;
             for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 

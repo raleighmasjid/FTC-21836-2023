@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.loopTime;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
@@ -14,11 +13,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.threads.ThreadedLoop;
 
 @Config
 public final class Robot {
@@ -36,8 +33,7 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-    public final BackdropScanner scanner;
-    private final ThreadedLoop threadedLoop;
+    public BackdropScanner scanner = null;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -50,9 +46,6 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
 
-        scanner = new BackdropScanner(this);
-        threadedLoop = new ThreadedLoop(scanner::update);
-
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
@@ -61,21 +54,18 @@ public final class Robot {
 
     public void preload() {
         intake.setRequiredIntakingAmount(0);
-        deposit.paintbrush.lockPixels(new Pixel.Color[]{YELLOW, EMPTY});
+        deposit.paintbrush.lockPixels(YELLOW, EMPTY);
     }
 
-    private final ElapsedTime i2cTimer = new ElapsedTime();
+    public void startAlgorithm() {
+        scanner = new BackdropScanner(this);
+    }
 
     public void readSensors() {
         bulkReader.bulkRead();
-        i2cTimer.reset();
-        drivetrain.imu.update();
         intake.topSensor.update();
         intake.bottomSensor.update();
-        double i2ctime;
-        mTelemetry.addData("I2C read time", i2ctime = i2cTimer.seconds());
-        mTelemetry.addData("Total - I2C time", loopTime - i2ctime);
-        mTelemetry.addLine();
+        drivetrain.updatePoseEstimate();
     }
 
     public void startAutoDrive() {
@@ -96,7 +86,7 @@ public final class Robot {
     public void run() {
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-            scanner.beginTrajectoryGeneration(deposit.paintbrush.getColors());
+            if (scanner != null) scanner.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 
         deposit.run();
@@ -104,18 +94,16 @@ public final class Robot {
 
         for (LEDIndicator indicator : indicators) indicator.setState(
                 drivetrain.isBusy() ? RED :
-                scanner.trajectoryReady() ? GREEN :
+                scanner != null && scanner.trajectoryReady() ? GREEN :
                 OFF
         );
     }
 
-    public void interrupt() {
-        threadedLoop.endLoop();
-    }
-
     public void printTelemetry() {
-        scanner.printTelemetry();
-        mTelemetry.addLine();
+        if (scanner != null) {
+            scanner.printTelemetry();
+            mTelemetry.addLine();
+        }
         drivetrain.printTelemetry();
         mTelemetry.addLine();
         deposit.paintbrush.printTelemetry();
