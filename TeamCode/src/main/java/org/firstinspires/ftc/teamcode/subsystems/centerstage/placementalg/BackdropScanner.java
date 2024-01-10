@@ -75,7 +75,7 @@ public final class BackdropScanner {
      * use volatile variables for any data used in this method. <br>
      * This method calls {@link #generateTrajectory()}
      */
-    public void update() {
+    private void update() {
         Backdrop lastScan = latestScan.clone();
 
         // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
