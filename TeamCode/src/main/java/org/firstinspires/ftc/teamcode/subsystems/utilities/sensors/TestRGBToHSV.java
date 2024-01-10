@@ -10,7 +10,7 @@ public class TestRGBToHSV {
     public static void main(String[] args) {
 
         NormalizedRGBA rgba = new NormalizedRGBA();
-        rgba.red = .5F;
+        rgba.red = .75F;
         rgba.green = 1F;
         rgba.blue = .5F;
         rgba.alpha = 1F;
@@ -26,7 +26,7 @@ public class TestRGBToHSV {
         HSV hsv1 = new HSV(hsvArray);
         HSV hsv2 = rgb.toHSV();
 
-        System.out.println(hsv1);
+        System.out.println(rgb);
         System.out.println(hsv2);
     }
 }
