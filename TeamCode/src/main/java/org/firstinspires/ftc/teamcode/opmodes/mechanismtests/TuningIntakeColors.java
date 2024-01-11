@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.COLOR_SENSOR_GAIN;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -20,6 +22,7 @@ public final class TuningIntakeColors extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         BulkReader bulkReader = new BulkReader(hardwareMap);
+        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         bottomSensor = new ColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
         topSensor = new ColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
@@ -29,6 +32,8 @@ public final class TuningIntakeColors extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             bulkReader.bulkRead();
+            bottomSensor.update();
+            topSensor.update();
 
             HSV top = topSensor.getHSV(), bottom = bottomSensor.getHSV();
 

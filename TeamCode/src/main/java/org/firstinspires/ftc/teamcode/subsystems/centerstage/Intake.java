@@ -36,14 +36,14 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 15,
-            ANGLE_PIVOT_FLOOR_CLEARANCE = 0,
+            ANGLE_PIVOT_OFFSET = 13,
+            ANGLE_PIVOT_FLOOR_CLEARANCE = 5,
             ANGLE_PIVOT_TRANSFERRING = 195,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
             TIME_PIXEL_1_SETTLING = 0.5,
-            TIME_PIXEL_2_SETTLING = 0.5,
+            TIME_PIXEL_2_SETTLING = 0,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
