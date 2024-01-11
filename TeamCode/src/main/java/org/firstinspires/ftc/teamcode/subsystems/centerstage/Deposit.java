@@ -187,7 +187,7 @@ public final class Deposit {
     public static final class Paintbrush {
 
         public static double
-                ANGLE_PIVOT_OFFSET = 3,
+                ANGLE_PIVOT_OFFSET = 4,
                 ANGLE_CLAW_OPEN = 20,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
