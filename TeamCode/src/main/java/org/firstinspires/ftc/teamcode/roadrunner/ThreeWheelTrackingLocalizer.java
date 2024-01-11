@@ -41,8 +41,8 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
     private final List<Integer> lastEncPositions, lastEncVels;
 
     /* Lines 37-38 in StandardTrackingWheelLocalizer.java */
-    public static double X_MULTIPLIER = 0.9885535172584079; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 0.98095712978473765872302613675642; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 0.9909869629095132; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 0.9811520453620283; // Multiplier in the Y direction
 
     public ThreeWheelTrackingLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
