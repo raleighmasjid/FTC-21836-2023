@@ -33,7 +33,7 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
     public static double WHEEL_RADIUS = 0.748031; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 13.84230517027471; // in; distance between the left and right wheels
+    public static double LATERAL_DISTANCE = 13.805145535686535; // in; distance between the left and right wheels
     public static double FORWARD_OFFSET = -0.86938; // in; offset of the lateral wheel
 
     private final Encoder leftEncoder, rightEncoder, frontEncoder;
@@ -41,8 +41,8 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
     private final List<Integer> lastEncPositions, lastEncVels;
 
     /* Lines 37-38 in StandardTrackingWheelLocalizer.java */
-    public static double X_MULTIPLIER = 1.003112488744087; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 0.989507060383304; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 0.9885535172584079; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 0.98095712978473765872302613675642; // Multiplier in the Y direction
 
     public ThreeWheelTrackingLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
