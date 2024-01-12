@@ -9,7 +9,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class SamplePipeline extends OpenCvPipeline{
 
-    private static final double[] UPPER_COLOR =  {150,355,60}, LOWER_COLOR = {0,85,0};
+    private static final double[] UPPER_COLOR =  {255,255,255}, LOWER_COLOR = {0,0,0};
     @Override
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, input,Imgproc.COLOR_RGB2BGR,0);
