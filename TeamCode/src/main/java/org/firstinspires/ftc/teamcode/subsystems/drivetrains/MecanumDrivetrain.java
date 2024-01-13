@@ -58,14 +58,14 @@ import java.util.List;
 public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
-                12,
-                1,
-                0.4261780460041329
+                8,
+                0,
+                0.1
             ),
             HEADING_PID = new PIDCoefficients(
-                6,
-                2,
-                0.29783866769659334
+                10,
+                0,
+                    0
             );
     private double
             lastTranslationKp = TRANSLATIONAL_PID.kP,
