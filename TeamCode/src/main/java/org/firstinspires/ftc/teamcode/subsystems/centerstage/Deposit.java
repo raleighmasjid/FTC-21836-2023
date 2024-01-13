@@ -47,9 +47,9 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        boolean liftExtended = lift.targetRow > -1;
-        if (paintbrush.pivot.isActivated() != liftExtended)
-            paintbrush.pivot.setActivated(liftExtended);
+        if (paintbrush.pivot.isActivated() != lift.isExtended()) {
+            paintbrush.pivot.setActivated(lift.isExtended());
+        }
 
         lift.run();
 
@@ -122,6 +122,10 @@ public final class Deposit {
                 motor.setZeroPowerBehavior(FLOAT);
                 motor.encoder.reset();
             }
+        }
+
+        public boolean isExtended() {
+            return targetRow > -1;
         }
 
         public void setTargetRow(int targetRow) {

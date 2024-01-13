@@ -131,7 +131,7 @@ public final class MainTeleOp extends LinearOpMode {
                 gamepadEx1.getLeftX(),
                 gamepadEx1.getLeftY(),
                 x,
-                gamepadEx1.isDown(RIGHT_BUMPER) // drives slower when right shoulder button held
+                gamepadEx1.isDown(RIGHT_BUMPER) || robot.deposit.lift.isExtended() || gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
         );
     }
 }
