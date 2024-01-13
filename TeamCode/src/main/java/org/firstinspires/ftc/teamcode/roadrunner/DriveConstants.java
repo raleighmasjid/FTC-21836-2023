@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.roadrunner;
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.UP;
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
+import static java.lang.Math.toRadians;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -49,7 +51,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 3.77953; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13.2686055118; // in
+    public static double TRACK_WIDTH = 13.95; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -70,8 +72,8 @@ public class DriveConstants {
      */
     public static double MAX_VEL = 50;
     public static double MAX_ACCEL = 50;
-    public static double MAX_ANG_VEL = Math.toRadians(60);
-    public static double MAX_ANG_ACCEL = Math.toRadians(60);
+    public static double MAX_ANG_VEL = toRadians(250.88438258709715);
+    public static double MAX_ANG_ACCEL = toRadians(250.88438258709715);
 
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.
