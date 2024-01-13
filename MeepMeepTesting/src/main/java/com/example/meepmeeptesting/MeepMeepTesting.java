@@ -18,7 +18,8 @@ public class MeepMeepTesting {
 
     public static double
             X_START_LEFT = -35,
-            X_START_RIGHT = 12;
+            X_START_RIGHT = 12,
+            X_AFTER_SPIKE = 24;
 
     public static final double
             LEFT = PI,
@@ -69,14 +70,18 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE),};
 
         double alliance = isRed ? 1 : -1;
-        if (!isRight) {
+        if (!isRed) {
             if (rand == 2) rand = 0;
             else if (rand == 0) rand = 2;
         }
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
-        Pose2d centerSpike = MeepMeepTesting.centerSpike.byBoth().toPose2d();
-        Pose2d leftSpike = MeepMeepTesting.leftSpike.byBoth().toPose2d();
-        Pose2d rightSpike = MeepMeepTesting.rightSpike.byBoth().toPose2d();
+
+        Pose2d spike = (
+                rand == 0 ? leftSpike :
+                        rand == 2 ? rightSpike :
+                                centerSpike).byBoth().toPose2d();
+
+        Pose2d afterSpike = new Pose2d(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -85,8 +90,10 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
                                 .setTangent(FORWARD)
-                                .splineTo(leftSpike.vec(), leftSpike.getHeading())
+                                .splineTo(spike.vec(), spike.getHeading())
                                 .setTangent(RIGHT)
+                                .splineToLinearHeading(afterSpike, RIGHT)
+                                .lineToSplineHeading(placements[0].toPose2d())
                                 .build()
                 );
 
