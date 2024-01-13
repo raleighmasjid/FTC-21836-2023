@@ -48,7 +48,7 @@ public final class Intake {
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25,
+            SPEED_SLOW_REVERSING = -0.175,
             r = 9.5019488189,
             theta0 = -0.496183876745,
             y0 = -4.523622,
