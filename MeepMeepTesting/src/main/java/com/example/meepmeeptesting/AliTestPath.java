@@ -22,21 +22,30 @@ public class AliTestPath {
                         drive.trajectorySequenceBuilder(new Pose2d(26, 62, Math.toRadians(-90)))
 //                                .lineToSplineHeading(new Pose2d(-55, 24, Math.toRadians(-180)))
                                 .splineTo(new Vector2d(0, 35), Math.toRadians(-180))
-                                .forward(47)
-                                .splineToSplineHeading(new Pose2d(55, 35, Math.toRadians(90)), Math.toRadians(0))
+                                .forward(57)
+                                .back(107)
+                                .strafeRight(6)
+                                .waitSeconds(1) // Waits 1 seconds
+                                .strafeLeft(6)
+                                .forward(107)
+                                .back(107)
+                                .strafeRight(6)
+                                .waitSeconds(1) // Waits 1 seconds
+                                .strafeLeft(6)
+                                .forward(107)
+                                .back(107)
+                                .strafeRight(6)
+                                .waitSeconds(1) // Waits 1 seconds
+                                .strafeLeft(6)
+                                .forward(107)
+                                .back(107)
+                                .strafeRight(6)
+                                .waitSeconds(1) // Waits 1 seconds
+                                .strafeLeft(6)
+                                .waitSeconds(10) // Waits 10 seconds
 
-//                                .turn(Math.toRadians(90))
-//                                .forward(30)
-//                                .addDisplacementMarker(() -> {
-//                                    /* Everything in the marker callback should be commented out */
-//
-//                                    // bot.shooter.shoot()
-//                                    // bot.wobbleArm.lower()
-//                                })
-//                                .turn(Math.toRadians(90))
-//                                .splineTo(new Vector2d(10, 15), 0)
-//                                .turn(Math.toRadians(90))
                                 .build()
+
                 );
 
         // Set field image
