@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
+import static org.firstinspires.ftc.teamcode.roadrunner.util.Encoder.Direction.REVERSE;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -27,21 +30,25 @@ import java.util.List;
 @Config
 public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 1.49606; // in
+    public static double WHEEL_RADIUS = 0.748031; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 10; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET = 4; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 13.84230517027471; // in; distance between the left and right wheels
+    public static double FORWARD_OFFSET = -0.86938; // in; offset of the lateral wheel
 
     private final Encoder leftEncoder, rightEncoder, frontEncoder;
 
     private final List<Integer> lastEncPositions, lastEncVels;
 
+    /* Lines 37-38 in StandardTrackingWheelLocalizer.java */
+    public static double X_MULTIPLIER = 1.003112488744087; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 0.989507060383304; // Multiplier in the Y direction
+
     public ThreeWheelTrackingLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
                 new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
                 new Pose2d(0, -LATERAL_DISTANCE / 2, 0), // right
-                new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
+                new Pose2d(FORWARD_OFFSET, 0, FORWARD) // front
         ));
 
         lastEncPositions = lastTrackingEncPositions;
@@ -52,6 +59,7 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+        leftEncoder.setDirection(REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -71,9 +79,9 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         lastEncPositions.add(frontPos);
 
         return Arrays.asList(
-                encoderTicksToInches(leftPos),
-                encoderTicksToInches(rightPos),
-                encoderTicksToInches(frontPos)
+                encoderTicksToInches(leftPos) * X_MULTIPLIER,
+                encoderTicksToInches(rightPos) * X_MULTIPLIER,
+                encoderTicksToInches(frontPos) * Y_MULTIPLIER
         );
     }
 
@@ -90,9 +98,9 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         lastEncVels.add(frontVel);
 
         return Arrays.asList(
-                encoderTicksToInches(leftVel),
-                encoderTicksToInches(rightVel),
-                encoderTicksToInches(frontVel)
+                encoderTicksToInches(leftVel) * X_MULTIPLIER,
+                encoderTicksToInches(rightVel) * X_MULTIPLIER,
+                encoderTicksToInches(frontVel) * Y_MULTIPLIER
         );
     }
 }

@@ -26,27 +26,33 @@ public final class PlacementCalculator {
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
-    static boolean noColor = false, auton = false, specifyColors;
-    static final Backdrop PERFECT_BACKDROP;
+    static boolean noColor = false, auton = false, specifyColors = true;
 
     private PlacementCalculator() {}
 
+/*
+    static final Backdrop PERFECT_BACKDROP;
     static {
         specifyColors = false;
         PERFECT_BACKDROP = new Backdrop();
         while (PERFECT_BACKDROP.notFull()) {
-            getOptimalPlacements(PERFECT_BACKDROP);
-            Pixel placement = optimalPlacements.get(0);
+            Pixel placement = getOptimalPlacements(PERFECT_BACKDROP).get(0);
             PERFECT_BACKDROP.add(placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
         }
         specifyColors = true;
     }
+//*/
 
-    private static boolean isSpecialCenterCase(Pixel pixel) {
+    /**
+     * @return Whether the provided {@link Pixel} is part of a special case of mosaic case priorities
+     * present in the perfect backdrop layout, where the up case is preferred over right or left to allow
+     * the formation of another mosaic to the right
+     */
+    private static boolean upMosaicIsHelpful(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
         if (!(x == 3 && (y == 3 || y == 9))) return false;
-        if (y == 9) return isSpecialCenterCase(new Pixel(x, 3, pixel.color));
+        if (y == 9) return upMosaicIsHelpful(new Pixel(x, 3, pixel.color));
 
         Pixel[] shouldBeColored = {
                 backdrop.get(5, y),
@@ -64,6 +70,10 @@ public final class PlacementCalculator {
         return true;
     }
 
+    /**
+     * @return The three possible mosaic cases for the provided {@link Pixel}'s coordinates <br>
+     * Case priorities are hardcoded to aid in finite-space packing
+     */
     private static Pixel[][] getPossibleMosaics(Pixel pixel) {
         int x = pixel.x;
         int y = pixel.y;
@@ -84,11 +94,14 @@ public final class PlacementCalculator {
         };
         if (x == 1) return new Pixel[][]{left, up, right};
         if (x == 6) return new Pixel[][]{right, up, left};
-        if (isSpecialCenterCase(pixel)) return new Pixel[][]{up, right, left};
+        if (upMosaicIsHelpful(pixel)) return new Pixel[][]{up, right, left};
         if (x == 5 || x == 3) return new Pixel[][]{right, left, up};
         return new Pixel[][]{left, right, up};
     }
 
+    /**
+     * Subtract values from {@link #colorsLeft} based on the colors present on {@link #backdrop}
+     */
     private static void countColorsLeft() {
         for (Pixel[] row : backdrop.slots) for (Pixel pixel : row) if (pixel.color.isColored()) {
             int index = pixel.color.ordinal();
@@ -96,6 +109,13 @@ public final class PlacementCalculator {
         }
     }
 
+    /**
+     * Iterate through {@link #backdrop}, detect and mark valid mosaics, mark invalid mosaics
+     * by {@link Pixel}.mosaic attribute and add any {@link Pixel}s required to complete a mosaic
+     * to {@link #optimalPlacements} and {@link #colorsToGetSPixels} <br>
+     * After that, any required {@link Pixel} with ANYCOLOR as its color is given a specific color
+     * as per the values of {@link #colorsLeft}
+     */
     private static void scanForMosaics() {
         for (Pixel[] row : backdrop.slots) for (Pixel pixel : row) pixel.mosaic = null;
         for (int y = 0; y < backdrop.slots.length; y++) for (int x : iterationXs(y)) {

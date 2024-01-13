@@ -112,6 +112,6 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
         mTelemetry.addData("Target heading (radians)", targetHeading);
         mTelemetry.addData("Target heading (degrees)", toDegrees(targetHeading));
         mTelemetry.addLine();
-        mTelemetry.addData("Heading error derivative (ticks/s)", headingController.getFilteredErrorDerivative());
+        mTelemetry.addData("Heading error derivative (radians/s)", headingController.getFilteredErrorDerivative());
     }
 }
