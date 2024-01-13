@@ -20,29 +20,24 @@ public class AliTestPath {
                 .setColorScheme(new ColorSchemeRedDark())
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(26, 62, Math.toRadians(-90)))
-//                                .lineToSplineHeading(new Pose2d(-55, 24, Math.toRadians(-180)))
-                                .splineTo(new Vector2d(0, 35), Math.toRadians(-180))
-                                .forward(57)
-                                .back(107)
-                                .strafeRight(6)
-                                .waitSeconds(1) // Waits 1 seconds
-                                .strafeLeft(6)
-                                .forward(107)
-                                .back(107)
-                                .strafeRight(6)
-                                .waitSeconds(1) // Waits 1 seconds
-                                .strafeLeft(6)
-                                .forward(107)
-                                .back(107)
-                                .strafeRight(6)
-                                .waitSeconds(1) // Waits 1 seconds
-                                .strafeLeft(6)
-                                .forward(107)
-                                .back(107)
-                                .strafeRight(6)
-                                .waitSeconds(1) // Waits 1 seconds
-                                .strafeLeft(6)
-                                .waitSeconds(10) // Waits 10 seconds
+                                .splineTo(new Vector2d(0, 35), Math.toRadians(180))
+                                .splineTo(new Vector2d(-58,35), Math.toRadians(180))
+                                .waitSeconds(3) // Waits 3 seconds
+                                .setReversed(true)
+                                .splineTo(new Vector2d(51,35), Math.toRadians(0))
+                                .waitSeconds(3) // Waits 3 seconds
+                                .setReversed(false)
+                                .splineTo(new Vector2d(-58,35), Math.toRadians(180))
+                                .waitSeconds(3) // Waits 3 seconds
+                                .setReversed(true)
+                                .splineTo(new Vector2d(51,35), Math.toRadians(0))
+                                .waitSeconds(3) // Waits 3 seconds
+                                .setReversed(false)
+                                .splineTo(new Vector2d(-58,35), Math.toRadians(180))
+                                .waitSeconds(3) // Waits 3 seconds
+                                .setReversed(true)
+                                .splineTo(new Vector2d(51,35), Math.toRadians(0))
+                                .waitSeconds(5) // Waits 5 seconds
 
                                 .build()
 
