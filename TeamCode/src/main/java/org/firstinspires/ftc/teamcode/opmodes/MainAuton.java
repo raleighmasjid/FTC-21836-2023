@@ -6,9 +6,12 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.randomizations;
 import static java.lang.Math.PI;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -18,8 +21,13 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
+
+import java.util.ArrayList;
 
 @Config
 @Autonomous(preselectTeleOp = "AutomatedTeleOp")
@@ -44,7 +52,14 @@ public final class MainAuton extends LinearOpMode {
 
     public static double
             X_START_LEFT = -35,
-            X_START_RIGHT = 12;
+            X_START_RIGHT = 12,
+            X_AFTER_SPIKE = 24;
+
+    public static EditablePose
+            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
+            centerSpike = new EditablePose(X_START_RIGHT, -30, FORWARD),
+            leftSpike = new EditablePose(7, -40, toRadians(120)),
+            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -60,6 +75,7 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        boolean partnerWillDoRand = false;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
@@ -67,14 +83,52 @@ public final class MainAuton extends LinearOpMode {
             if (keyPressed(1, DPAD_LEFT))   isRight = false;
             if (keyPressed(1, B))           isRed = true;
             if (keyPressed(1, X))           isRed = false;
+            if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
             mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
+            mTelemetry.addLine("Your alliance partner will " + (partnerWillDoRand ? "not " : "") + "be placing a yellow pixel");
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
             mTelemetry.update();
         }
         mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
         mTelemetry.update();
 
+        TrajectorySequence[] sequences = new TrajectorySequence[3];
+
+        for (AutonPixelSupplier.Randomization rand : randomizations) {
+            ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
+
+            AutonPixelSupplier.Randomization tRand = rand;
+            if (!isRed) {
+                if (rand == AutonPixelSupplier.Randomization.RIGHT) tRand = AutonPixelSupplier.Randomization.LEFT;
+                else if (rand == AutonPixelSupplier.Randomization.LEFT) tRand = AutonPixelSupplier.Randomization.RIGHT;
+            }
+            Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
+
+            Pose2d spike = (
+                    tRand == AutonPixelSupplier.Randomization.LEFT ? leftSpike :
+                            tRand == AutonPixelSupplier.Randomization.RIGHT ? rightSpike :
+                                    centerSpike).byBoth().toPose2d();
+
+            Pose2d afterSpike = new Pose2d(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT);
+
+            sequences[rand.ordinal()] = robot.drivetrain.trajectorySequenceBuilder(startPose)
+                    .setTangent(FORWARD)
+                    .splineTo(spike.vec(), spike.getHeading())
+                    .setTangent(RIGHT)
+                    .splineToLinearHeading(afterSpike, RIGHT)
+                    .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements.get(0).y))
+                    .lineToSplineHeading(placements.get(0).toPose2d())
+                    .addTemporalMarker(() -> {
+                        robot.deposit.paintbrush.dropPixels(2);
+                        autonBackdrop.add(placements.get(0));
+                    })
+                    .build()
+            ;
+        }
+
+        robot.preload();
         waitForStart();
+        robot.drivetrain.followTrajectorySequence(sequences[AutonPixelSupplier.Randomization.LEFT.ordinal()]);
 
         // Control loop:
         while (opModeIsActive()) {

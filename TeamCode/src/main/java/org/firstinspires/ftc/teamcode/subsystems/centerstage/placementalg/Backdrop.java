@@ -70,7 +70,7 @@ public final class Backdrop {
      * @param pixel The {@link Pixel} to add
      * @return This {@link Backdrop}
      */
-    Backdrop add(Pixel pixel) {
+    public Backdrop add(Pixel pixel) {
         switch (pixel.color) {
             case ANY:
                 add(new Pixel(pixel, Pixel.Color.get((int) round(random() * 3))));

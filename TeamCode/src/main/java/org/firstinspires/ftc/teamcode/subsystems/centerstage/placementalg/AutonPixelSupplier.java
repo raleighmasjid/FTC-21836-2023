@@ -19,7 +19,7 @@ public final class AutonPixelSupplier {
         }
 
         final int x1, x2;
-        static final Randomization[] randomizations = values();
+        public static final Randomization[] randomizations = values();
     }
 
     /**

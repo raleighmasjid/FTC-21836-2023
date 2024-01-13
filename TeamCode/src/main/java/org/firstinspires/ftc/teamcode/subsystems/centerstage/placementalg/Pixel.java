@@ -30,7 +30,8 @@ public final class Pixel implements Comparable<Pixel> {
         return (int) (diff * 1000000000);
     }
 
-    final int x, y;
+    final int x;
+    public final int y;
     final Color color;
     double scoreValue = 0;
     Pixel mosaic = null;
