@@ -7,8 +7,10 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.CENTER;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.randomizations;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
@@ -94,6 +96,9 @@ public final class MainAuton extends LinearOpMode {
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
+        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
+        robot.drivetrain.setPoseEstimate(startPose);
+
         for (AutonPixelSupplier.Randomization rand : randomizations) {
             ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
 
@@ -102,7 +107,7 @@ public final class MainAuton extends LinearOpMode {
                 if (rand == AutonPixelSupplier.Randomization.RIGHT) tRand = AutonPixelSupplier.Randomization.LEFT;
                 else if (rand == AutonPixelSupplier.Randomization.LEFT) tRand = AutonPixelSupplier.Randomization.RIGHT;
             }
-            Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
+            if (partnerWillDoRand) placements.remove(0);
 
             Pose2d spike = (
                     tRand == AutonPixelSupplier.Randomization.LEFT ? leftSpike :
@@ -116,19 +121,23 @@ public final class MainAuton extends LinearOpMode {
                     .splineTo(spike.vec(), spike.getHeading())
                     .setTangent(RIGHT)
                     .splineToLinearHeading(afterSpike, RIGHT)
-                    .addTemporalMarker(() -> robot.deposit.lift.setTargetRow(placements.get(0).y))
+                    .addTemporalMarker(() -> {
+                        robot.deposit.lift.setTargetRow(placements.get(0).y);
+                        robot.intake.setRequiredIntakingAmount(2);
+                    })
                     .lineToSplineHeading(placements.get(0).toPose2d())
                     .addTemporalMarker(() -> {
                         robot.deposit.paintbrush.dropPixels(2);
                         autonBackdrop.add(placements.get(0));
                     })
+                    .waitSeconds(TIME_DROP_SECOND)
                     .build()
             ;
         }
 
         robot.preload();
         waitForStart();
-        robot.drivetrain.followTrajectorySequence(sequences[AutonPixelSupplier.Randomization.LEFT.ordinal()]);
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[CENTER.ordinal()]);
 
         // Control loop:
         while (opModeIsActive()) {
