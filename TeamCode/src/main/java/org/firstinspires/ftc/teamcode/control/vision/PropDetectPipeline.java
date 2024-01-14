@@ -3,13 +3,10 @@ package org.firstinspires.ftc.teamcode.control.vision;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.LEFT;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.RIGHT;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -22,6 +19,8 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
     private final Telemetry telemetry;
     private final Mat mat = new Mat();
+
+    public boolean isRed = false;
 
     public enum Randomization {
         LEFT(1, 2),
@@ -41,30 +40,31 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
     public static double
             X_LEFT_BOUND = 0,
-            X_LEFT_CENTER_BOUND = 213.3,
-            X_CENTER_RIGHT_BOUND = 426.6,
+            X_CENTER_BOUND = 230,
             X_RIGHT_BOUND = 640,
             Y_TOP = 0,
-            Y_BOTTOM = 480;
+            Y_BOTTOM = 480,
+            RED_MIN = 2,
+            BLUE_MIN = 3;
 
-    public static HSV
-            minBlue = new HSV(
+    public static Scalar
+            minBlue = new Scalar(
                     90,
                     75,
                     5
             ),
-            maxBlue = new HSV(
+            maxBlue = new Scalar(
                     150,
                     255,
                     255
             ),
-            minRed = new HSV(
-                    0,
-                    75,
+            minRed = new Scalar(
+                    -20,
+                    15,
                     5
             ),
-            maxRed = new HSV(
-                    0,
+            maxRed = new Scalar(
+                    20,
                     255,
                     255
             );
@@ -72,14 +72,10 @@ public class PropDetectPipeline extends OpenCvPipeline {
     private final Rect
             LEFT_AREA = new Rect(
                     new Point(X_LEFT_BOUND, Y_TOP),
-                    new Point(X_LEFT_CENTER_BOUND, Y_BOTTOM)
+                    new Point(X_CENTER_BOUND, Y_BOTTOM)
             ),
             CENTER_AREA = new Rect(
-                    new Point(X_LEFT_CENTER_BOUND, Y_TOP),
-                    new Point(X_CENTER_RIGHT_BOUND, Y_BOTTOM)
-            ),
-            RIGHT_AREA = new Rect(
-                    new Point(X_CENTER_RIGHT_BOUND, Y_TOP),
+                    new Point(X_CENTER_BOUND, Y_TOP),
                     new Point(X_RIGHT_BOUND, Y_BOTTOM)
             );
 
@@ -96,31 +92,26 @@ public class PropDetectPipeline extends OpenCvPipeline {
         // Executed every time a new frame is dispatched
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
-        Core.inRange(mat, (isRed ? minRed : minBlue).toScalar(), (isRed ? maxRed : maxBlue).toScalar(), mat);
+        Core.inRange(mat, (isRed ? minRed : minBlue), (isRed ? maxRed : maxBlue), mat);
 
         Mat left = mat.submat(LEFT_AREA);
         Mat middle = mat.submat(CENTER_AREA);
-        Mat right = mat.submat(RIGHT_AREA);
 
         double leftValue = Core.sumElems(left).val[0] / LEFT_AREA.area() / 255;
         double middleValue = Core.sumElems(middle).val[0] / CENTER_AREA.area() / 255;
-        double rightValue = Core.sumElems(right).val[0] / RIGHT_AREA.area() / 255;
 
         int leftInt = (int) round(leftValue * 100);
         int middleInt = (int) round(middleValue * 100);
-        int rightInt = (int) round(rightValue * 100);
 
         left.release();
         middle.release();
-        right.release();
 
         telemetry.addData("Left", leftInt + "%");
         telemetry.addData("Center", middleInt + "%");
-        telemetry.addData("Right", rightInt + "%");
 
-        int max = max(leftInt, max(rightInt, middleInt));
+        int max = max(leftInt, middleInt);
 
-        location = max == rightInt ? RIGHT : max == leftInt ? LEFT : CENTER;
+        location = max < (isRed ? RED_MIN : BLUE_MIN) ? RIGHT : (max == leftInt ? LEFT : max == middleInt ? CENTER : RIGHT);
         telemetry.addData("Prop Location", location.toString());
         telemetry.update();
 
@@ -131,7 +122,6 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
         Imgproc.rectangle(mat, LEFT_AREA, location == LEFT ? colorFound : colorDefault);
         Imgproc.rectangle(mat, CENTER_AREA, location == CENTER ? colorFound : colorDefault);
-        Imgproc.rectangle(mat, RIGHT_AREA, location == RIGHT ? colorFound : colorDefault);
 
         return mat;
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.utilities.sensors;
 
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -31,6 +32,7 @@ public class TeamPropDetector {
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
         );
         pipeline = new PropDetectPipeline(t);
+        pipeline.isRed = isRed;
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
