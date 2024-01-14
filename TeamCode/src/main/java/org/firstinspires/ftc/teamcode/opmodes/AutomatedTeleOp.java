@@ -11,10 +11,12 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
+@Disabled
 public final class AutomatedTeleOp extends LinearOpMode {
 
     @Override
