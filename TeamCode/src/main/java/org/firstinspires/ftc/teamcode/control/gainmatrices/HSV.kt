@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.gainmatrices
 
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry
+import org.opencv.core.Scalar
 
 data class HSV
 
@@ -36,5 +37,9 @@ constructor(
 
     override fun toString(): String {
         return "$hue, $saturation, $value"
+    }
+
+    fun toScalar(): Scalar {
+        return Scalar(hue, saturation, value)
     }
 }

@@ -1,25 +1,21 @@
 package org.firstinspires.ftc.teamcode.subsystems.utilities.sensors;
 
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
-import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.util.ArrayList;
-
 @Config
 public class TeamPropDetector {
 
-    private PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.CENTER;
+    private PropDetectPipeline.Randomization location = CENTER;
 
     private final OpenCvCamera camera;
 
@@ -49,9 +45,14 @@ public class TeamPropDetector {
         });
     }
 
-    public void run () {
+    public void run() {
         location = pipeline.getLocation();
     }
+
+    public PropDetectPipeline.Randomization getLocation() {
+        return location;
+    }
+
     /**
      * Closes the camera
      */

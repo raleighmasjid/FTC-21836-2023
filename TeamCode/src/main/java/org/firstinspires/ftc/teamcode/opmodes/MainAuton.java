@@ -10,8 +10,8 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.CENTER;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
@@ -23,6 +23,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
@@ -99,19 +100,19 @@ public final class MainAuton extends LinearOpMode {
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
 
-        for (AutonPixelSupplier.Randomization rand : randomizations) {
+        for (PropDetectPipeline.Randomization rand : randomizations) {
             ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
 
-            AutonPixelSupplier.Randomization tRand = rand;
+            PropDetectPipeline.Randomization tRand = rand;
             if (!isRed) {
-                if (rand == AutonPixelSupplier.Randomization.RIGHT) tRand = AutonPixelSupplier.Randomization.LEFT;
-                else if (rand == AutonPixelSupplier.Randomization.LEFT) tRand = AutonPixelSupplier.Randomization.RIGHT;
+                if (rand == PropDetectPipeline.Randomization.RIGHT) tRand = PropDetectPipeline.Randomization.LEFT;
+                else if (rand == PropDetectPipeline.Randomization.LEFT) tRand = PropDetectPipeline.Randomization.RIGHT;
             }
             if (partnerWillDoRand) placements.remove(0);
 
             Pose2d spike = (
-                    tRand == AutonPixelSupplier.Randomization.LEFT ? leftSpike :
-                            tRand == AutonPixelSupplier.Randomization.RIGHT ? rightSpike :
+                    tRand == PropDetectPipeline.Randomization.LEFT ? leftSpike :
+                            tRand == PropDetectPipeline.Randomization.RIGHT ? rightSpike :
                                     centerSpike).byBoth().toPose2d();
 
             Pose2d afterSpike = new Pose2d(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT);

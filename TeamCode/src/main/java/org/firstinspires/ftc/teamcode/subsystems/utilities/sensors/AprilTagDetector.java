@@ -71,7 +71,7 @@ public class AprilTagDetector {
 
     /**
      * Gets detections from pipeline<p>
-     * Use {@link #getTagIsVisible()} ()} and {@link #getDetectedTag()}
+     * Use {@link #isTagVisible()} ()} and {@link #getDetectedTag()}
      */
     public void run() {
         ArrayList<AprilTagDetection> detections = pipeline.getLatestDetections();
@@ -91,7 +91,7 @@ public class AprilTagDetector {
         tagVisible = false;
     }
 
-    public boolean getTagIsVisible() {
+    public boolean isTagVisible() {
         return tagVisible;
     }
 
@@ -104,7 +104,7 @@ public class AprilTagDetector {
      * telemetry.update() should be called after this method
      */
     public void printTagIsVisible() {
-        mTelemetry.addLine("A tag of interest is " + (getTagIsVisible() ? "" : "not ") + "visible");
+        mTelemetry.addLine("A tag of interest is " + (isTagVisible() ? "" : "not ") + "visible");
     }
 
     /**
