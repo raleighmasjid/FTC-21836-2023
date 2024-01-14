@@ -36,7 +36,7 @@ public class PropDetectPipeline extends OpenCvPipeline {
         public static final Randomization[] randomizations = values();
     }
 
-    private Randomization location;
+    private Randomization location = RIGHT;
 
     public static double
             X_LEFT_BOUND = 0,

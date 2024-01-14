@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.utilities.sensors;
 
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.RIGHT;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Config
 public class TeamPropDetector {
 
-    private PropDetectPipeline.Randomization location = CENTER;
+    private PropDetectPipeline.Randomization location = RIGHT;
 
     private final OpenCvCamera camera;
 
