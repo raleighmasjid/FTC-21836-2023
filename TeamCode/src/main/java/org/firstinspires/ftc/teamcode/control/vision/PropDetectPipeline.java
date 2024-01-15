@@ -20,7 +20,7 @@ public class PropDetectPipeline extends OpenCvPipeline {
     private final Telemetry telemetry;
     private final Mat mat = new Mat();
 
-    public boolean isRed = false;
+    public boolean isRed = true;
 
     public enum Randomization {
         LEFT(1, 2),
@@ -40,18 +40,18 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
     public static double
             X_LEFT_BOUND = 0,
-            X_CENTER_BOUND = 230,
+            X_CENTER_BOUND = 240,
             X_RIGHT_BOUND = 640,
             Y_TOP = 0,
             Y_BOTTOM = 480,
-            RED_MIN = 2,
+            RED_MIN = 5,
             BLUE_MIN = 3;
 
     public static Scalar
             minBlue = new Scalar(
                     90,
-                    75,
-                    5
+                    95,
+                    1
             ),
             maxBlue = new Scalar(
                     150,
@@ -61,7 +61,7 @@ public class PropDetectPipeline extends OpenCvPipeline {
             minRed = new Scalar(
                     -20,
                     15,
-                    5
+                    1
             ),
             maxRed = new Scalar(
                     20,

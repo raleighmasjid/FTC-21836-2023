@@ -7,9 +7,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
 import static java.lang.Math.PI;
@@ -62,8 +60,8 @@ public final class MainAuton extends LinearOpMode {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -30, FORWARD),
-            leftSpike = new EditablePose(7, -40, toRadians(120)),
+            centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
+            leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, -60, LEFT);
@@ -98,6 +96,7 @@ public final class MainAuton extends LinearOpMode {
         }
         mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
         mTelemetry.update();
+        isRight = isRight == isRed;
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
@@ -106,45 +105,68 @@ public final class MainAuton extends LinearOpMode {
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
             ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
-
+            if (partnerWillDoRand) placements.remove(0);
             PropDetectPipeline.Randomization spikePos = rand;
             if (!isRed) {
+
                 if (rand == PropDetectPipeline.Randomization.RIGHT) spikePos = PropDetectPipeline.Randomization.LEFT;
                 else if (rand == PropDetectPipeline.Randomization.LEFT) spikePos = PropDetectPipeline.Randomization.RIGHT;
             }
-            if (partnerWillDoRand) placements.remove(0);
 
             Pose2d spike = (
                     spikePos == PropDetectPipeline.Randomization.LEFT ? leftSpike :
                             spikePos == PropDetectPipeline.Randomization.RIGHT ? rightSpike :
                                     centerSpike).byBoth().toPose2d();
 
-            Pose2d afterSpike = new Pose2d(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT);
+            Pose2d afterSpike = new EditablePose(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT).byAlliance().toPose2d();
 
-            sequences[rand.ordinal()] = robot.drivetrain.trajectorySequenceBuilder(startPose)
-                    .setTangent(FORWARD)
+            sequences[rand.ordinal()] = spikePos == PropDetectPipeline.Randomization.LEFT || spikePos == PropDetectPipeline.Randomization.RIGHT ?
+
+                    robot.drivetrain.trajectorySequenceBuilder(startPose)
+                    .setTangent(startPose.getHeading())
+                    .forward(17)
                     .splineTo(spike.vec(), spike.getHeading())
-                    .setTangent(RIGHT)
-                    .splineToLinearHeading(afterSpike, RIGHT)
-                    .addTemporalMarker(() -> {
-                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-                        robot.intake.setRequiredIntakingAmount(2);
-                    })
-                    .lineToSplineHeading(placements.get(0).toPose2d())
-                    .addTemporalMarker(() -> {
-                        robot.deposit.paintbrush.dropPixels(2);
-                        autonBackdrop.add(placements.get(0));
-                    })
-                    .waitSeconds(TIME_DROP_SECOND)
-                    .lineTo(parking.byAlliance().toPose2d().vec())
-                    .lineTo(parked.byAlliance().toPose2d().vec())
+                    .back(5)
+//                    .setTangent(afterSpike.getHeading() + LEFT)
+//                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+//                    .addTemporalMarker(() -> {
+//                        robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                        robot.intake.setRequiredIntakingAmount(2);
+//                    })
+//                    .lineToSplineHeading(placements.get(0).toPose2d())
+//                    .addTemporalMarker(() -> {
+//                        robot.deposit.paintbrush.dropPixels(2);
+//                        autonBackdrop.add(placements.get(0));
+//                    })
+//                    .waitSeconds(TIME_DROP_SECOND)
+//                    .lineTo(parking.byAlliance().toPose2d().vec())
+//                    .lineTo(parked.byAlliance().toPose2d().vec())
+                    .build() :
+                    robot.drivetrain.trajectorySequenceBuilder(startPose)
+                            .setTangent(startPose.getHeading())
+                            .splineTo(spike.vec(), spike.getHeading())
+                            .back(5)
+//                    .setTangent(afterSpike.getHeading() + LEFT)
+//                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+//                    .addTemporalMarker(() -> {
+//                        robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                        robot.intake.setRequiredIntakingAmount(2);
+//                    })
+//                    .lineToSplineHeading(placements.get(0).toPose2d())
+//                    .addTemporalMarker(() -> {
+//                        robot.deposit.paintbrush.dropPixels(2);
+//                        autonBackdrop.add(placements.get(0));
+//                    })
+//                    .waitSeconds(TIME_DROP_SECOND)
+//                    .lineTo(parking.byAlliance().toPose2d().vec())
+//                    .lineTo(parked.byAlliance().toPose2d().vec())
                     .build()
             ;
         }
 
         robot.preload();
 
-        PropDetectPipeline.Randomization location = CENTER;
+        PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
         TeamPropDetector detector = new TeamPropDetector(
                 hardwareMap,
                 OpenCvCameraRotation.UPRIGHT,
@@ -153,10 +175,12 @@ public final class MainAuton extends LinearOpMode {
         );
 
         while (opModeInInit()) {
+            detector.run();
             location = detector.getLocation();
-            mTelemetry.addData("Location", location.name());
+            mTelemetry.addData("Location", detector.getLocation().name());
             mTelemetry.update();
         }
+
         detector.stop();
         robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
