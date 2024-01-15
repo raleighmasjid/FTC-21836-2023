@@ -21,6 +21,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -199,34 +200,4 @@ public final class MainAuton extends LinearOpMode {
         }
     }
 
-    private static class EditablePose {
-
-        public double x, y, heading;
-
-        private EditablePose(double x, double y, double heading) {
-            this.x = x;
-            this.y = y;
-            this.heading = heading;
-        }
-
-        private EditablePose byAlliance() {
-            double alliance = isRed ? 1 : -1;
-            y *= alliance;
-            heading *= alliance;
-            return this;
-        }
-
-        private EditablePose bySide() {
-            x += isRight == isRed ? 0 : X_START_LEFT - X_START_RIGHT;
-            return this;
-        }
-
-        private EditablePose byBoth() {
-            return byAlliance().bySide();
-        }
-
-        private Pose2d toPose2d() {
-            return new Pose2d(x, y, heading);
-        }
-    }
 }
