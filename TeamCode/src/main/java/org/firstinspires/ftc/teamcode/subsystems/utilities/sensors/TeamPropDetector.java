@@ -46,8 +46,8 @@ public class TeamPropDetector {
         });
     }
 
-    public void run() {
-        location = pipeline.getLocation();
+    public PropDetectPipeline.Randomization run() {
+        return location = pipeline.getLocation();
     }
 
     public PropDetectPipeline.Randomization getLocation() {

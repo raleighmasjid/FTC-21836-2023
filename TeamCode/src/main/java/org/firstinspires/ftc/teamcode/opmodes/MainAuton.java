@@ -190,9 +190,7 @@ public final class MainAuton extends LinearOpMode {
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
-            detector.run();
-            location = detector.getLocation();
-            mTelemetry.addData("Location", detector.getLocation().name());
+            mTelemetry.addData("Location", (location = detector.run()).name());
             mTelemetry.update();
         }
 
