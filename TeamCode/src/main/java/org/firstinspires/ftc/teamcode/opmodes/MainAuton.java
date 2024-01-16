@@ -8,6 +8,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
 import static java.lang.Math.PI;
@@ -63,7 +64,6 @@ public final class MainAuton extends LinearOpMode {
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
-            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, -60, LEFT);
 
@@ -97,9 +97,11 @@ public final class MainAuton extends LinearOpMode {
         }
         mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
         mTelemetry.update();
+
         isRight = isRight == isRed;
 
-        TrajectorySequence[] sequences = new TrajectorySequence[3];
+        TrajectorySequence[] spikeSequences = new TrajectorySequence[3];
+        TrajectorySequence[] scoringSequences = new TrajectorySequence[3];
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -114,55 +116,50 @@ public final class MainAuton extends LinearOpMode {
                 else if (rand == PropDetectPipeline.Randomization.LEFT) spikePos = PropDetectPipeline.Randomization.RIGHT;
             }
 
+            EditablePose rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
             Pose2d spike = (
                     spikePos == PropDetectPipeline.Randomization.LEFT ? leftSpike :
                             spikePos == PropDetectPipeline.Randomization.RIGHT ? rightSpike :
                                     centerSpike).byBoth().toPose2d();
 
-            Pose2d afterSpike = new EditablePose(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT).byAlliance().toPose2d();
+            Pose2d afterSpike = new EditablePose(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().toPose2d();
 
-            sequences[rand.ordinal()] = spikePos == PropDetectPipeline.Randomization.LEFT || spikePos == PropDetectPipeline.Randomization.RIGHT ?
+            spikeSequences[rand.ordinal()] = spikePos == PropDetectPipeline.Randomization.LEFT || spikePos == PropDetectPipeline.Randomization.RIGHT ?
 
                     robot.drivetrain.trajectorySequenceBuilder(startPose)
-                    .setTangent(startPose.getHeading())
-                    .forward(17)
-                    .splineTo(spike.vec(), spike.getHeading())
-                    .back(5)
-//                    .setTangent(afterSpike.getHeading() + LEFT)
-//                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
-//                    .addTemporalMarker(() -> {
-//                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                        robot.intake.setRequiredIntakingAmount(2);
-//                    })
-//                    .lineToSplineHeading(placements.get(0).toPose2d())
-//                    .addTemporalMarker(() -> {
-//                        robot.deposit.paintbrush.dropPixels(2);
-//                        autonBackdrop.add(placements.get(0));
-//                    })
-//                    .waitSeconds(TIME_DROP_SECOND)
-//                    .lineTo(parking.byAlliance().toPose2d().vec())
-//                    .lineTo(parked.byAlliance().toPose2d().vec())
-                    .build() :
+                            .setTangent(startPose.getHeading())
+                            .forward(17)
+                            .splineTo(spike.vec(), spike.getHeading())
+                            .back(5)
+                            .setTangent(afterSpike.getHeading() + LEFT)
+                            .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+                            .build() :
                     robot.drivetrain.trajectorySequenceBuilder(startPose)
                             .setTangent(startPose.getHeading())
                             .splineTo(spike.vec(), spike.getHeading())
                             .back(5)
-//                    .setTangent(afterSpike.getHeading() + LEFT)
-//                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
-//                    .addTemporalMarker(() -> {
-//                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                        robot.intake.setRequiredIntakingAmount(2);
-//                    })
-//                    .lineToSplineHeading(placements.get(0).toPose2d())
-//                    .addTemporalMarker(() -> {
-//                        robot.deposit.paintbrush.dropPixels(2);
-//                        autonBackdrop.add(placements.get(0));
-//                    })
-//                    .waitSeconds(TIME_DROP_SECOND)
-//                    .lineTo(parking.byAlliance().toPose2d().vec())
-//                    .lineTo(parked.byAlliance().toPose2d().vec())
-                    .build()
+                            .setTangent(afterSpike.getHeading() + LEFT)
+                            .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+                            .build()
             ;
+
+            if (isRight) {
+                scoringSequences[rand.ordinal()] = robot.drivetrain.trajectorySequenceBuilder(spikeSequences[rand.ordinal()].end())
+                        .addTemporalMarker(() -> {
+                            robot.deposit.lift.setTargetRow(placements.get(0).y);
+                            robot.intake.setRequiredIntakingAmount(2);
+                        })
+                        .lineToSplineHeading(placements.get(0).toPose2d())
+                        .addTemporalMarker(() -> {
+                            robot.deposit.paintbrush.dropPixels(2);
+                            autonBackdrop.add(placements.get(0));
+                        })
+                        .waitSeconds(TIME_DROP_SECOND)
+                        .lineTo(parking.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
+                        .build()
+                ;
+            }
         }
 
         robot.preload();
@@ -175,6 +172,8 @@ public final class MainAuton extends LinearOpMode {
                 telemetry
         );
 
+        boolean hasSpiked = false;
+
         while (opModeInInit()) {
             detector.run();
             location = detector.getLocation();
@@ -183,12 +182,17 @@ public final class MainAuton extends LinearOpMode {
         }
 
         detector.stop();
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
+        robot.drivetrain.followTrajectorySequenceAsync(spikeSequences[location.ordinal()]);
 
         // Control loop:
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
             robot.readSensors();
+
+            if (!hasSpiked && !robot.drivetrain.isBusy()) {
+                hasSpiked = true;
+                robot.drivetrain.followTrajectorySequenceAsync(scoringSequences[location.ordinal()]);
+            }
 
             robot.drivetrain.update();
             robot.run();
