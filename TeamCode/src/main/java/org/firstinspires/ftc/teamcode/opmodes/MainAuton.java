@@ -60,7 +60,9 @@ public final class MainAuton extends LinearOpMode {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_AFTER_SPIKE = 24;
+            X_AFTER_SPIKE = 24,
+            BACK_AFTER_SPIKE = 5,
+            FORWARD_BEFORE_SPIKE = 17;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -150,16 +152,17 @@ public final class MainAuton extends LinearOpMode {
             switch (spikePos) {
                 case LEFT:
                 case RIGHT:
-                    sequence.forward(17);
+                    sequence.forward(FORWARD_BEFORE_SPIKE);
             }
 
             sequence
                     .splineTo(spike.vec(), spike.getHeading())
-                    .back(5)
+                    .back(BACK_AFTER_SPIKE)
                     .setTangent(afterSpike.getHeading() + LEFT)
                     .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT);
 
             if (isRight) {
+
                 sequence
                         .addTemporalMarker(() -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
@@ -174,13 +177,16 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(parking.byAlliance().toPose2d().vec())
                         .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
+
             } else {
+
                 sequence
                         .addTemporalMarker(() -> {
                             robot.intake.setRequiredIntakingAmount(1);
                             robot.intake.setHeight(FIVE_STACK);
                         })
                 ;
+
             }
 
             sequences[rand.ordinal()] = sequence.build();
