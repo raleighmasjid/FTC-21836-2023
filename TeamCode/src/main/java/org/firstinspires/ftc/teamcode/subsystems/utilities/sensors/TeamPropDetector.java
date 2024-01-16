@@ -22,6 +22,8 @@ public class TeamPropDetector {
 
     private final PropDetectPipeline pipeline;
 
+    private volatile boolean isOpen = false;
+
     /**
      * @param hardwareMap     {@link HardwareMap} passed in from the opmode
      */
@@ -37,6 +39,7 @@ public class TeamPropDetector {
             @Override
             public void onOpened() {
                 camera.startStreaming(640, 480, UPRIGHT);
+                isOpen = true;
             }
 
             @Override
@@ -58,6 +61,7 @@ public class TeamPropDetector {
      * Closes the camera
      */
     public void stop() {
+        while (!isOpen) {}
         camera.stopStreaming();
         camera.closeCameraDevice();
     }
