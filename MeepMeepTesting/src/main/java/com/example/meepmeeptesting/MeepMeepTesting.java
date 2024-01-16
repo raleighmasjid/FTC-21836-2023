@@ -13,13 +13,8 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 public class MeepMeepTesting {
 
     static int rand = 0;
-    static boolean isRed = true, isRight = true;
+    static boolean isRed = true, backdropSide = false;
     static Backdrop backdrop = new Backdrop();
-
-    public static double
-            X_START_LEFT = -35,
-            X_START_RIGHT = 12,
-            X_AFTER_SPIKE = 24;
 
     public static final double
             LEFT = PI,
@@ -27,11 +22,19 @@ public class MeepMeepTesting {
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
 
+    public static double
+            X_START_LEFT = -35,
+            X_START_RIGHT = 12,
+            X_AFTER_SPIKE = 24,
+            BACK_AFTER_SPIKE = 5,
+            FORWARD_BEFORE_SPIKE = 17;
+
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -30, FORWARD),
-            leftSpike = new EditablePose(7, -40, toRadians(120)),
-            rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
+            centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
+            leftSpike = new EditablePose(2.5, -36, toRadians(150)),
+            parking = new EditablePose(Backdrop.X, -60, LEFT),
+            parked = new EditablePose(60, -60, LEFT);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -69,19 +72,34 @@ public class MeepMeepTesting {
                 new Pixel(6, 8, WHITE),
                 new Pixel(6, 9, WHITE),};
 
-        double alliance = isRed ? 1 : -1;
-        if (!isRed) {
-            if (rand == 2) rand = 0;
-            else if (rand == 0) rand = 2;
-        }
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
 
-        Pose2d spike = (
-                rand == 0 ? leftSpike :
-                        rand == 2 ? rightSpike :
-                                centerSpike).byBoth().toPose2d();
+        EditablePose rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
-        Pose2d afterSpike = new Pose2d(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT);
+        if (!isRed) {
+            switch (rand) {
+                case 0:
+                    rand = 2;
+                    break;
+                case 2:
+                    rand = 0;
+            }
+        }
+
+        Pose2d spike;
+        switch (rand) {
+            case 0:
+                spike = leftSpike.byBoth().toPose2d();
+                break;
+            case 2:
+                spike = rightSpike.byBoth().toPose2d();
+                break;
+            case 1:
+            default:
+                spike = centerSpike.byBoth().toPose2d();
+        }
+
+        Pose2d afterSpike = new EditablePose(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -89,11 +107,10 @@ public class MeepMeepTesting {
                 .setDimensions(16.42205, 17.39847)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .setTangent(FORWARD)
+                                .setTangent(startPose.getHeading())
+                                .forward(FORWARD_BEFORE_SPIKE)
                                 .splineTo(spike.vec(), spike.getHeading())
-                                .setTangent(RIGHT)
-                                .splineToLinearHeading(afterSpike, RIGHT)
-                                .lineToSplineHeading(placements[0].toPose2d())
+                                .back(BACK_AFTER_SPIKE)
                                 .build()
                 );
 
@@ -102,42 +119,5 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
                 .start();
-    }
-
-    private static class EditablePose {
-
-        public double x, y, heading;
-
-        private EditablePose(double x, double y, double heading) {
-            this.x = x;
-            this.y = y;
-            this.heading = heading;
-        }
-
-        private EditablePose byAlliance() {
-            if (!isRed) y *= -1;
-            if (!isRed) heading *= -1;
-            return this;
-        }
-
-        private EditablePose bySide() {
-            if (isRight != isRed) x += (X_START_LEFT - X_START_RIGHT);
-            return this;
-        }
-
-        private EditablePose byBoth() {
-            return byAlliance().bySide();
-        }
-
-        private EditablePose flipBySide() {
-            boolean isRight = MeepMeepTesting.isRight == isRed;
-            if (!isRight) heading = PI - heading;
-            if (!isRight) x = (X_START_LEFT + X_START_RIGHT) / 2 - x;
-            return this;
-        }
-
-        private Pose2d toPose2d() {
-            return new Pose2d(x, y, heading);
-        }
     }
 }

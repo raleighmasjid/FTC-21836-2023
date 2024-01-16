@@ -1,10 +1,7 @@
-package org.firstinspires.ftc.teamcode.control.motion
+package com.example.meepmeeptesting
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import org.firstinspires.ftc.teamcode.opmodes.MainAuton.X_START_LEFT
-import org.firstinspires.ftc.teamcode.opmodes.MainAuton.X_START_RIGHT
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.backdropSide
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed
+import com.example.meepmeeptesting.MeepMeepTesting.*
 
 data class EditablePose
 
@@ -22,7 +19,7 @@ constructor(
     }
 
     fun bySide(): EditablePose {
-        if (!backdropSide) x += X_START_LEFT - X_START_RIGHT
+        if (backdropSide != isRed) x += X_START_LEFT - X_START_RIGHT
         return this
     }
 

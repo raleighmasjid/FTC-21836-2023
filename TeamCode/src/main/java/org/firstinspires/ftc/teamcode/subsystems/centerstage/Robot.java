@@ -24,7 +24,7 @@ public final class Robot {
             maxVoltage = 13,
             TIME_TRAJECTORY_GEN = 0;
 
-    public static boolean isRed = true, isRight = true;
+    public static boolean isRed = true, backdropSide = true;
 
     public final AutoTurnMecanum drivetrain;
     public final Intake intake;

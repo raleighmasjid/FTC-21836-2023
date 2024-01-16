@@ -11,7 +11,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.R
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.backdropSide;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 import static java.util.Collections.swap;
@@ -89,20 +89,18 @@ public final class MainAuton extends LinearOpMode {
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, DPAD_RIGHT))  isRight = true;
-            if (keyPressed(1, DPAD_LEFT))   isRight = false;
+            if (keyPressed(1, DPAD_RIGHT))  backdropSide = true;
+            if (keyPressed(1, DPAD_LEFT))   backdropSide = false;
             if (keyPressed(1, B))           isRed = true;
             if (keyPressed(1, X))           isRed = false;
             if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
-            mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
-            mTelemetry.addLine("Your alliance partner will " + (partnerWillDoRand ? "not " : "") + "be placing a yellow pixel");
+            mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
+            mTelemetry.addLine("Your alliance partner WILL " + (partnerWillDoRand ? "NOT " : "") + "be placing a YELLOW pixel");
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
             mTelemetry.update();
         }
-        mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (isRight ? "RIGHT" : "LEFT"));
+        mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
         mTelemetry.update();
-
-        isRight = isRight == isRed;
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -117,7 +115,7 @@ public final class MainAuton extends LinearOpMode {
 
             ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
             if (partnerWillDoRand) placements.remove(0);
-            if (!isRight) swap(placements, 0, 1);
+            if (!backdropSide) swap(placements, 0, 1);
 
             PropDetectPipeline.Randomization spikePos = rand;
             if (!isRed) {
@@ -161,7 +159,7 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(afterSpike.getHeading() + LEFT)
                     .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT);
 
-            if (isRight) {
+            if (backdropSide) {
 
                 sequence
                         .addTemporalMarker(() -> {
