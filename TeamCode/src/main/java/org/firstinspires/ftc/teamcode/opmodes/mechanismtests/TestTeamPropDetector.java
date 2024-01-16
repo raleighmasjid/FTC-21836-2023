@@ -29,7 +29,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(group = "Single mechanism test")
 public final class TestTeamPropDetector extends LinearOpMode {
@@ -38,12 +37,7 @@ public final class TestTeamPropDetector extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         mTelemetry = new MultipleTelemetry(telemetry);
-        TeamPropDetector detector = new TeamPropDetector(
-                hardwareMap,
-                OpenCvCameraRotation.UPRIGHT,
-                "camera front",
-                telemetry
-        );
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
             detector.run();

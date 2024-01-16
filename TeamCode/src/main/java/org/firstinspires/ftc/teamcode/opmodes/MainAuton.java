@@ -168,14 +168,7 @@ public final class MainAuton extends LinearOpMode {
         robot.preload();
 
         PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
-        TeamPropDetector detector = new TeamPropDetector(
-                hardwareMap,
-                OpenCvCameraRotation.UPRIGHT,
-                "camera front",
-                telemetry
-        );
-
-        boolean hasSpiked = false;
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
             detector.run();
