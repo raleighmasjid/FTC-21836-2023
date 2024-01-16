@@ -102,11 +102,13 @@ public final class MainAuton extends LinearOpMode {
 
         isRight = isRight == isRed;
 
-        TrajectorySequence[] sequences = new TrajectorySequence[3];
-
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
 
+        PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+
+        TrajectorySequence[] sequences = new TrajectorySequence[3];
         EditablePose rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
@@ -183,11 +185,6 @@ public final class MainAuton extends LinearOpMode {
 
             sequences[rand.ordinal()] = sequence.build();
         }
-
-        robot.preload();
-
-        PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
             mTelemetry.addData("Location", (location = detector.run()).name());
