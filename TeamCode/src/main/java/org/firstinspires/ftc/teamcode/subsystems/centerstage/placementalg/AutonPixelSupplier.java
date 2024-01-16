@@ -17,17 +17,10 @@ public final class AutonPixelSupplier {
      * @return An {@link ArrayList<Pixel>} of optimal placements for autonomous
      */
     public static ArrayList<Pixel> getPlacements(PropDetectPipeline.Randomization randomization, boolean partnerWillDoRandomization) {
-        return partnerWillDoRandomization ?
-                getWhitePixelPlacements(randomization.x1, randomization.x2) :
-                getWhitePixelPlacements(randomization.x1);
-    }
+        int[] yellowPixelXs = partnerWillDoRandomization ?
+                new int[]{randomization.x1, randomization.x2} :
+                new int[]{randomization.x1};
 
-    /**
-     * Calculates the optimal placements of white pixels during autonomous to achieve setline bonuses upon teleop start
-     * @param yellowPixelXs The x values on the backdrop where yellow pixels will be placed as part of randomization
-     * @return An {@link ArrayList<Pixel>} of optimal placements for autonomous
-     */
-    private static ArrayList<Pixel> getWhitePixelPlacements(int... yellowPixelXs) {
         PlacementCalculator.auton = true;
 
         ArrayList<Pixel> placements = new ArrayList<>();
