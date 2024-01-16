@@ -38,16 +38,14 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
     private Randomization location = RIGHT;
 
-    public static double
+    private final double
             X_LEFT_BOUND = 0,
             X_CENTER_BOUND = 240,
             X_RIGHT_BOUND = 640,
             Y_TOP = 0,
-            Y_BOTTOM = 480,
-            RED_MIN = 5,
-            BLUE_MIN = 3;
+            Y_BOTTOM = 480;
 
-    public static Scalar
+    private final Scalar
             minBlue = new Scalar(
                     90,
                     95,
@@ -111,7 +109,7 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
         int max = max(leftInt, middleInt);
 
-        location = max < (isRed ? RED_MIN : BLUE_MIN) ? RIGHT : (max == leftInt ? LEFT : max == middleInt ? CENTER : RIGHT);
+        location = max < (isRed ? 5 : 3) ? RIGHT : max == leftInt ? LEFT : CENTER;
         telemetry.addData("Prop Location", location.toString());
         telemetry.update();
 
