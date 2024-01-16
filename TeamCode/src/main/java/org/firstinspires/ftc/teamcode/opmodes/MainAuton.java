@@ -92,10 +92,9 @@ public final class MainAuton extends LinearOpMode {
             gamepadEx1.readButtons();
             if (keyPressed(1, B))           isRed = true;
             if (keyPressed(1, X))           isRed = false;
-            if (keyPressed(1, DPAD_RIGHT))  isRight = true;
-            if (keyPressed(1, DPAD_LEFT))   isRight = false;
+            if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
+            if (keyPressed(1, DPAD_LEFT))   backdropSide = !isRed;
             if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
-            backdropSide = isRight == isRed;
             mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
             mTelemetry.addLine("Your alliance partner WILL " + (partnerWillDoRand ? "NOT " : "") + "be placing a YELLOW pixel");
             mTelemetry.addLine("Press both shoulder buttons to confirm!");
