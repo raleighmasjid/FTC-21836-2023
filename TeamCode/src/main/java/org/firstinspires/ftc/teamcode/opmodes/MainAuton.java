@@ -159,6 +159,11 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(parked.byAlliance().toPose2d().vec())
                         .build()
                 ;
+            } else {
+                Pixel yellow = placements.get(0);
+                Pixel firstWhite = placements.get(1);
+                placements.set(0, firstWhite);
+                placements.set(1, yellow);
             }
         }
 
