@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRight;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
+import static java.util.Collections.swap;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -160,10 +161,7 @@ public final class MainAuton extends LinearOpMode {
                         .build()
                 ;
             } else {
-                Pixel yellow = placements.get(0);
-                Pixel firstWhite = placements.get(1);
-                placements.set(0, firstWhite);
-                placements.set(1, yellow);
+                swap(placements, 0, 1);
             }
         }
 
