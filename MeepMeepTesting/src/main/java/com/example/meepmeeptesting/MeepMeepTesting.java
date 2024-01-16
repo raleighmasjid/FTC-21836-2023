@@ -25,9 +25,10 @@ public class MeepMeepTesting {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_AFTER_SPIKE = 24,
+            X_SHIFT_AFTER_SPIKE = 24,
             BACK_AFTER_SPIKE = 5,
-            FORWARD_BEFORE_SPIKE = 17;
+            FORWARD_BEFORE_SPIKE = 17,
+            X_TILE = 24;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -74,7 +75,7 @@ public class MeepMeepTesting {
 
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
 
-        EditablePose rightSpike = new EditablePose(24 - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
+        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
         if (!isRed) {
             switch (rand) {
@@ -99,7 +100,7 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = new EditablePose(spike.getX() + X_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
+        Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
