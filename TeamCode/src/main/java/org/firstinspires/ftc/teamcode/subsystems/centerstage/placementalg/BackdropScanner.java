@@ -93,6 +93,11 @@ public final class BackdropScanner {
                 latestScan.clear();
             }
             calculateColorsNeeded();
+
+            if (trajectoryReady) {
+                trajectoryReady = false;
+                trajectoryReady = generateTrajectory();
+            }
         }
 
         if (pixelsJustTransferred) {
