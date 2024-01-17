@@ -89,8 +89,8 @@ public final class BackdropScanner {
         // Save colors to corresponding locations in newScan
 
         if (justScored || clearingScan || !latestScan.equals(lastScan)) {
-            justScored = false;
             timeSinceUpdate.reset();
+            if (justScored) justScored = false;
             if (clearingScan) {
                 clearingScan = false;
                 latestScan.clear();
@@ -100,6 +100,7 @@ public final class BackdropScanner {
             if (trajectoryReady) {
                 trajectoryReady = false;
                 trajectoryReady = generateTrajectory();
+                pixelsJustTransferred = false;
             }
         }
 
