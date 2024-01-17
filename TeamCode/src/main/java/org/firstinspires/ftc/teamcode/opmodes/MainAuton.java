@@ -118,25 +118,13 @@ public final class MainAuton extends LinearOpMode {
             if (partnerWillDoRand) placements.remove(0);
             if (!backdropSide) swap(placements, 0, 1);
 
-            PropDetectPipeline.Randomization spikePos = rand;
-            if (!isRed) {
-                switch (rand) {
-                    case RIGHT:
-                        spikePos = PropDetectPipeline.Randomization.LEFT;
-                        break;
-                    case LEFT:
-                        spikePos = PropDetectPipeline.Randomization.RIGHT;
-                        break;
-                }
-            }
-
             Pose2d spike;
-            switch (spikePos) {
+            switch (rand) {
                 case LEFT:
-                    spike = leftSpike.byBoth().toPose2d();
+                    spike = (isRed ? leftSpike : rightSpike).byBoth().toPose2d();
                     break;
                 case RIGHT:
-                    spike = rightSpike.byBoth().toPose2d();
+                    spike = (isRed ? rightSpike : leftSpike).byBoth().toPose2d();
                     break;
                 case CENTER:
                 default:
@@ -148,7 +136,7 @@ public final class MainAuton extends LinearOpMode {
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                                                 .setTangent(startPose.getHeading());
 
-            switch (spikePos) {
+            switch (rand) {
                 case LEFT:
                 case RIGHT:
                     sequence.forward(FORWARD_BEFORE_SPIKE);
