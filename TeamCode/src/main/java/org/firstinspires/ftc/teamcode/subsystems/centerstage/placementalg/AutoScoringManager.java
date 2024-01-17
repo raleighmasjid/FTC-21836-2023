@@ -26,6 +26,7 @@ public final class AutoScoringManager {
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
     private final Backdrop latestScan = autonBackdrop;
+    private Backdrop lastScan = new Backdrop();
     private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
@@ -34,7 +35,7 @@ public final class AutoScoringManager {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false, runThread = true;
+    private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, justScored = false, runThread = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public AutoScoringManager(Robot robot) {
@@ -59,7 +60,7 @@ public final class AutoScoringManager {
      */
     public void beginTrajectoryGeneration(Color[] depositColors) {
         this.depositColors = depositColors;
-        pixelsJustTransferred = true;
+        beginTrajectoryGeneration = true;
     }
 
     /**
@@ -76,7 +77,6 @@ public final class AutoScoringManager {
      * This method calls {@link #generateTrajectory()}
      */
     private void update() {
-        Backdrop lastScan = latestScan.clone();
 
         // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
 
@@ -90,22 +90,24 @@ public final class AutoScoringManager {
 
         if (justScored || clearingScan || !latestScan.equals(lastScan)) {
             timeSinceUpdate.reset();
-            if (justScored) justScored = false;
+
             if (clearingScan) {
                 clearingScan = false;
                 latestScan.clear();
             }
+            if (justScored) justScored = false;
+
+            lastScan = latestScan.clone();
             calculateColorsNeeded();
 
             if (trajectoryReady) {
+                beginTrajectoryGeneration = true;
                 trajectoryReady = false;
-                trajectoryReady = generateTrajectory();
-                pixelsJustTransferred = false;
             }
         }
 
-        if (pixelsJustTransferred) {
-            pixelsJustTransferred = false;
+        if (beginTrajectoryGeneration) {
+            beginTrajectoryGeneration = false;
             trajectoryReady = generateTrajectory();
         }
     }
