@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 import java.util.ArrayList;
 
-public final class BackdropScanner {
+public final class AutoScoringManager {
 
     public static EditablePose startPose = new EditablePose(24, -16, LEFT);
 
@@ -34,15 +34,15 @@ public final class BackdropScanner {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false, runScannerLoop = true;
+    private volatile boolean pixelsJustTransferred = false, clearingScan = false, justScored = false, runThread = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
-    public BackdropScanner(Robot robot) {
+    public AutoScoringManager(Robot robot) {
         this.robot = robot;
         calculateColorsNeeded();
 
         new Thread(() -> {
-            while (runScannerLoop) {
+            while (runThread) {
                 update();
                 Thread.yield();
             }
@@ -50,7 +50,7 @@ public final class BackdropScanner {
     }
 
     public void stop() {
-        runScannerLoop = false;
+        runThread = false;
     }
 
     /**

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.BackdropScanner;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -33,7 +33,7 @@ public final class Robot {
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
 
-    public BackdropScanner scanner = null;
+    public AutoScoringManager autoScoringManager = null;
 
     private boolean autoDriveStarted = true;
     private final ElapsedTime autoTimer = new ElapsedTime();
@@ -58,7 +58,7 @@ public final class Robot {
     }
 
     public void startAlgorithm() {
-        scanner = new BackdropScanner(this);
+        autoScoringManager = new AutoScoringManager(this);
     }
 
     public void readSensors() {
@@ -69,7 +69,7 @@ public final class Robot {
     }
 
     public void startAutoDrive() {
-        TrajectorySequence scoringTrajectory = scanner.getScoringTrajectory();
+        TrajectorySequence scoringTrajectory = autoScoringManager.getScoringTrajectory();
         if (scoringTrajectory == null) return;
         drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
         autoDriveStarted = false;
@@ -86,7 +86,7 @@ public final class Robot {
     public void run() {
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.getColors());
-            if (scanner != null) scanner.beginTrajectoryGeneration(deposit.paintbrush.getColors());
+            if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 
         deposit.run();
@@ -94,14 +94,14 @@ public final class Robot {
 
         for (LEDIndicator indicator : indicators) indicator.setState(
                 drivetrain.isBusy() ? RED :
-                scanner != null && scanner.trajectoryReady() ? GREEN :
+                autoScoringManager != null && autoScoringManager.trajectoryReady() ? GREEN :
                 OFF
         );
     }
 
     public void printTelemetry() {
-        if (scanner != null) {
-            scanner.printTelemetry();
+        if (autoScoringManager != null) {
+            autoScoringManager.printTelemetry();
             mTelemetry.addLine();
         }
         drivetrain.printTelemetry();
