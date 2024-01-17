@@ -163,8 +163,8 @@ public final class BackdropScanner {
                                 .addTemporalMarker(() -> {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
-                                    justScored = true;
                                     trajectoryReady = false;
+                                    justScored = true;
                                 })
                                 .build() :
                         robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
@@ -184,8 +184,8 @@ public final class BackdropScanner {
                                 .addTemporalMarker(() -> {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
-                                    justScored = true;
                                     trajectoryReady = false;
+                                    justScored = true;
                                 })
                                 .build()
         ;
