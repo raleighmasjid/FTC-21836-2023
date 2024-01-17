@@ -64,9 +64,6 @@ public final class BackdropScanner {
      */
     public void reset() {
         clearingScan = true;
-        latestScan.clear();
-        calculateColorsNeeded();
-        clearingScan = false;
     }
 
     /**
@@ -88,10 +85,14 @@ public final class BackdropScanner {
 
         // Save colors to corresponding locations in newScan
 
-        if (justScored || !latestScan.equals(lastScan)) {
+        if (justScored || clearingScan || !latestScan.equals(lastScan)) {
             justScored = false;
             timeSinceUpdate.reset();
-            if (!clearingScan) calculateColorsNeeded();
+            if (clearingScan) {
+                clearingScan = false;
+                latestScan.clear();
+            }
+            calculateColorsNeeded();
         }
 
         if (pixelsJustTransferred) {
