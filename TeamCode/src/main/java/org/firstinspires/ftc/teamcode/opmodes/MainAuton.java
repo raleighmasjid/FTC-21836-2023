@@ -184,7 +184,6 @@ public final class MainAuton extends LinearOpMode {
             mTelemetry.update();
         }
 
-        detector.stop();
         robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
         // Control loop:
