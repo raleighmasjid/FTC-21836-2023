@@ -65,7 +65,7 @@ public final class Robot {
         bulkReader.bulkRead();
         intake.topSensor.update();
         intake.bottomSensor.update();
-        drivetrain.updatePoseEstimate();
+        drivetrain.update();
     }
 
     public void startAutoDrive() {
