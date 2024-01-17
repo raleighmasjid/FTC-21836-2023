@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
@@ -13,12 +13,15 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 import java.util.ArrayList;
 
 public final class BackdropScanner {
+
+    public static EditablePose startPose = new EditablePose(24, -16, LEFT);
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
@@ -148,13 +151,11 @@ public final class BackdropScanner {
         Pose2d scoringPos1 = placements[0].toPose2d();
         Pose2d scoringPos2 = placements[1].toPose2d();
 
-        Pose2d startPose = robot.drivetrain.getPoseEstimate();
-
         boolean sameScoringLocation = scoringPos1.epsilonEqualsHeading(scoringPos2);
 
         scoringTrajectory =
                 firstColor == EMPTY || sameScoringLocation ?
-                        robot.drivetrain.trajectorySequenceBuilder(startPose)
+                        robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
                                 .addTemporalMarker(() -> {
                                     robot.deposit.lift.setTargetRow(placements[1].y);
                                 })
@@ -163,13 +164,10 @@ public final class BackdropScanner {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     justScored = true;
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> {
                                     trajectoryReady = false;
                                 })
                                 .build() :
-                        robot.drivetrain.trajectorySequenceBuilder(startPose)
+                        robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
                                 .addTemporalMarker(() -> {
                                     robot.deposit.lift.setTargetRow(placements[0].y);
                                 })
@@ -187,9 +185,6 @@ public final class BackdropScanner {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     justScored = true;
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .addTemporalMarker(() -> {
                                     trajectoryReady = false;
                                 })
                                 .build()
