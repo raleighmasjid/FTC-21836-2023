@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
@@ -87,7 +89,7 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
-        boolean partnerWillDoRand = false;
+        boolean partnerWillDoRand = false, doCycles = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
@@ -95,10 +97,16 @@ public final class MainAuton extends LinearOpMode {
             if (keyPressed(1, X))           isRed = false;
             if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
             if (keyPressed(1, DPAD_LEFT))   backdropSide = !isRed;
+            if (keyPressed(1, DPAD_UP))     doCycles = true;
+            if (keyPressed(1, DPAD_DOWN))   doCycles = false;
             if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
-            mTelemetry.addLine("Selected " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
-            mTelemetry.addLine("Your alliance partner WILL " + (partnerWillDoRand ? "NOT " : "") + "be placing a YELLOW pixel");
-            mTelemetry.addLine("Press both shoulder buttons to confirm!");
+            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE ") + (backdropSide ? "BACKDROP " : "AUDIENCE ") + "side");
+            mTelemetry.addLine();
+            mTelemetry.addLine("Your alliance PARTNER WILL " + (partnerWillDoRand ? "" : "NOT ") + "PLACE YELLOW");
+            mTelemetry.addLine();
+            mTelemetry.addLine("You WILL " + (doCycles ? "CYCLE" : "PARK"));
+            mTelemetry.addLine();
+            mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
             mTelemetry.update();
         }
         mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
@@ -156,8 +164,6 @@ public final class MainAuton extends LinearOpMode {
                             autonBackdrop.add(placements.get(0));
                         })
                         .waitSeconds(TIME_DROP_SECOND)
-                        .lineTo(toParkInner.byAlliance().toPose2d().vec())
-                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
                 ;
 
             } else {
@@ -171,7 +177,12 @@ public final class MainAuton extends LinearOpMode {
 
             }
 
-            for (int i = 0; i < (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
+            if (!doCycles) {
+                sequence
+                        .lineTo(toParkInner.byAlliance().toPose2d().vec())
+                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                ;
+            } else for (int i = 0; i < (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
                 // TODO Add cycling pathing
             }
 
