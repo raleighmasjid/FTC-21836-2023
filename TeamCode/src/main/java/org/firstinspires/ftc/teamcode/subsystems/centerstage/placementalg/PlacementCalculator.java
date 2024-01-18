@@ -22,7 +22,7 @@ import java.util.Collections;
  */
 public final class PlacementCalculator {
     private static Backdrop backdrop;
-    private static final int[] colorsLeft = {5, 5, 5};
+    public static final int[] colorsLeft = {5, 5, 5};
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
