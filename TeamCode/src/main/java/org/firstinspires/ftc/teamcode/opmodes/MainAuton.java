@@ -134,19 +134,13 @@ public final class MainAuton extends LinearOpMode {
             Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
-                                                .setTangent(startPose.getHeading());
-
-            switch (rand) {
-                case LEFT:
-                case RIGHT:
-                    sequence.forward(FORWARD_BEFORE_SPIKE);
-            }
-
-            sequence
+                    .setTangent(startPose.getHeading())
+                    .forward(FORWARD_BEFORE_SPIKE)
                     .splineTo(spike.vec(), spike.getHeading())
                     .back(BACK_AFTER_SPIKE)
                     .setTangent(afterSpike.getHeading() + LEFT)
-                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT);
+                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+            ;
 
             if (backdropSide) {
 
