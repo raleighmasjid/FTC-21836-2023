@@ -8,10 +8,10 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.backdropSide;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 import static java.util.Collections.swap;
@@ -24,7 +24,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -202,4 +201,42 @@ public final class MainAuton extends LinearOpMode {
         }
     }
 
+    public static class EditablePose {
+
+        public double x, y, heading;
+
+        static boolean backdropSide = true;
+
+        public EditablePose(double x, double y, double heading) {
+            this.x = x;
+            this.y = y;
+            this.heading = heading;
+        }
+
+        public EditablePose byAlliance() {
+            double alliance = isRed ? 1 : -1;
+            y *= alliance;
+            heading *= alliance;
+            return this;
+        }
+
+        public EditablePose bySide() {
+            if (!backdropSide) x += X_START_LEFT - X_START_RIGHT;
+            return this;
+        }
+
+        public EditablePose byBoth() {
+            return byAlliance().bySide();
+        }
+
+        public Pose2d toPose2d() {
+            return new Pose2d(x, y, heading);
+        }
+
+        public EditablePose flipBySide() {
+            if (!backdropSide) heading = Math.PI - heading;
+            if (!backdropSide) x = (X_START_LEFT + X_START_RIGHT) - x;
+            return this;
+        }
+    }
 }

@@ -13,7 +13,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
+import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public final class AutoScoringManager {
 
-    public static EditablePose startPose = new EditablePose(24, -16, LEFT);
+    public static MainAuton.EditablePose startPose = new MainAuton.EditablePose(24, -16, LEFT);
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
