@@ -69,8 +69,8 @@ public final class MainAuton extends LinearOpMode {
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
-            parking = new EditablePose(Backdrop.X, -60, LEFT),
-            parked = new EditablePose(60, -60, LEFT);
+            toParkInner = new EditablePose(Backdrop.X, -60, LEFT),
+            parkedInner = new EditablePose(60, -60, LEFT);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -155,8 +155,8 @@ public final class MainAuton extends LinearOpMode {
                             autonBackdrop.add(placements.get(0));
                         })
                         .waitSeconds(TIME_DROP_SECOND)
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
+                        .lineTo(toParkInner.byAlliance().toPose2d().vec())
+                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
                 ;
 
             } else {
