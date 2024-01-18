@@ -26,7 +26,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegm
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class TrajectorySequenceBuilder {
@@ -502,6 +501,16 @@ public class TrajectorySequenceBuilder {
         );
 
         return new TrajectorySequence(projectGlobalMarkersToLocalSegments(globalMarkers, sequenceSegments));
+    }
+
+    public double duration() {
+        double total = 0.0;
+
+        for (SequenceSegment segment : sequenceSegments) {
+            total += segment.getDuration();
+        }
+
+        return total;
     }
 
     private List<TrajectoryMarker> convertMarkersToGlobal(
