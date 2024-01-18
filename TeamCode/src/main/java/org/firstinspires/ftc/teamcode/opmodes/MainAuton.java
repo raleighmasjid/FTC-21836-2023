@@ -63,7 +63,9 @@ public final class MainAuton extends LinearOpMode {
             X_SHIFT_AFTER_SPIKE = 24,
             BACK_AFTER_SPIKE = 5,
             FORWARD_BEFORE_SPIKE = 17,
-            X_TILE = 24;
+            X_TILE = 24,
+            CYCLES_BACKDROP_SIDE = 0,
+            CYCLES_AUDIENCE_SIDE = 0;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -168,6 +170,10 @@ public final class MainAuton extends LinearOpMode {
                         })
                 ;
 
+            }
+
+            for (int i = 0; i < (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
+                // TODO Add cycling pathing
             }
 
             sequences[rand.ordinal()] = sequence.build();
