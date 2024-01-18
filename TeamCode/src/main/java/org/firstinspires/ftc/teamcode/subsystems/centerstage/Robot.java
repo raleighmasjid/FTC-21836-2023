@@ -9,7 +9,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.S
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager;
@@ -34,9 +33,6 @@ public final class Robot {
     private final LEDIndicator[] indicators;
 
     public AutoScoringManager autoScoringManager = null;
-
-    private boolean autoDriveStarted = true;
-    private final ElapsedTime autoTimer = new ElapsedTime();
 
     public Robot(HardwareMap hardwareMap) {
         bulkReader = new BulkReader(hardwareMap);
@@ -68,19 +64,11 @@ public final class Robot {
         drivetrain.update();
     }
 
-    public void startAutoDrive() {
+    public boolean autoScore() {
         TrajectorySequence scoringTrajectory = autoScoringManager.getScoringTrajectory();
-        if (scoringTrajectory == null) return;
+        if (scoringTrajectory == null) return false;
         drivetrain.followTrajectorySequenceAsync(scoringTrajectory);
-        autoDriveStarted = false;
-        autoTimer.reset();
-    }
-
-    public boolean beginUpdatingRunner() {
-        if (!autoDriveStarted && autoTimer.seconds() >= TIME_TRAJECTORY_GEN) {
-            autoDriveStarted = true;
-            return true;
-        } else return false;
+        return true;
     }
 
     public void run() {

@@ -12,7 +12,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.colorsLeft;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -30,7 +29,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
         boolean autoScoring = false;
         teleOpInit(this);
-        int selectedColor = PURPLE.ordinal();
+        int selectedColor = 0;
 
         // Control loop:
         while (opModeIsActive()) {
@@ -44,12 +43,9 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 if (keyPressed(1, X)) robot.drivetrain.breakFollowing();
                 if (!robot.drivetrain.isBusy()) autoScoring = false;
 
-                robot.drivetrain.update();
-
             } else {
 
-                if (keyPressed(1, X)) robot.startAutoDrive();
-                if (robot.beginUpdatingRunner()) autoScoring = true;
+                if (keyPressed(1, X)) autoScoring = robot.autoScore();
 
                 if (gamepadEx2.isDown(LEFT_BUMPER)) {
                     if (gamepadEx2.isDown(RIGHT_BUMPER)) robot.autoScoringManager.reset();
