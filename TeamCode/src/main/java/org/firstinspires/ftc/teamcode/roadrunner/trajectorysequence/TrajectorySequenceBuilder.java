@@ -503,16 +503,6 @@ public class TrajectorySequenceBuilder {
         return new TrajectorySequence(projectGlobalMarkersToLocalSegments(globalMarkers, sequenceSegments));
     }
 
-    public double duration() {
-        double total = 0.0;
-
-        for (SequenceSegment segment : sequenceSegments) {
-            total += segment.getDuration();
-        }
-
-        return total;
-    }
-
     private List<TrajectoryMarker> convertMarkersToGlobal(
             List<SequenceSegment> sequenceSegments,
             List<TemporalMarker> temporalMarkers,
