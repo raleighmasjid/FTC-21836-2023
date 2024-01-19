@@ -1,20 +1,24 @@
 package com.example.meepmeeptesting;
 
+import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
+import static java.util.Arrays.asList;
+import static java.util.Collections.swap;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+import java.util.ArrayList;
+
 public class MeepMeepTesting {
 
-    static int rand = 0;
     static boolean isRed = true, backdropSide = false;
-    static Backdrop backdrop = new Backdrop();
+    static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
             LEFT = PI,
@@ -28,19 +32,25 @@ public class MeepMeepTesting {
             X_SHIFT_AFTER_SPIKE = 24,
             BACK_AFTER_SPIKE = 5,
             FORWARD_BEFORE_SPIKE = 17,
-            X_TILE = 24;
+            X_TILE = 24,
+            CYCLES_BACKDROP_SIDE = 0,
+            CYCLES_AUDIENCE_SIDE = 0;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
-            parking = new EditablePose(Backdrop.X, -60, LEFT),
-            parked = new EditablePose(60, -60, LEFT);
+            toParkInner = new EditablePose(Backdrop.X, -60, LEFT),
+            parkedInner = new EditablePose(60, -60, LEFT);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        Pixel[] placements = {
+        Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
+
+        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
+
+        ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(1, 0, YELLOW),
                 new Pixel(6, 0, WHITE),
                 new Pixel(5, 0, WHITE),
@@ -71,29 +81,20 @@ public class MeepMeepTesting {
                 new Pixel(6, 7, WHITE),
                 new Pixel(5, 7, WHITE),
                 new Pixel(6, 8, WHITE),
-                new Pixel(6, 9, WHITE),};
-
-        Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
-
-        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
-
-        if (!isRed) {
-            switch (rand) {
-                case 0:
-                    rand = 2;
-                    break;
-                case 2:
-                    rand = 0;
-            }
-        }
+                new Pixel(6, 9, WHITE)
+        ));
+        boolean partnerWillDoRand = false;
+        int rand = 0;
+        if (partnerWillDoRand) placements.remove(0);
+        if (!backdropSide) swap(placements, 0, 1);
 
         Pose2d spike;
         switch (rand) {
             case 0:
-                spike = leftSpike.byBoth().toPose2d();
+                spike = (isRed ? leftSpike : rightSpike).byBoth().toPose2d();
                 break;
             case 2:
-                spike = rightSpike.byBoth().toPose2d();
+                spike = (isRed ? rightSpike : leftSpike).byBoth().toPose2d();
                 break;
             case 1:
             default:
@@ -112,6 +113,20 @@ public class MeepMeepTesting {
                                 .forward(FORWARD_BEFORE_SPIKE)
                                 .splineTo(spike.vec(), spike.getHeading())
                                 .back(BACK_AFTER_SPIKE)
+                                .setTangent(afterSpike.getHeading() + LEFT)
+                                .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                                    robot.intake.setRequiredIntakingAmount(2);
+                                })
+                                .lineToSplineHeading(placements.get(0).toPose2d())
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.paintbrush.dropPixels(2);
+                                    autonBackdrop.add(placements.get(0));
+                                })
+                                .waitSeconds(TIME_DROP_SECOND)
+                                .lineTo(toParkInner.byAlliance().toPose2d().vec())
+                                .lineTo(parkedInner.byAlliance().toPose2d().vec())
                                 .build()
                 );
 
