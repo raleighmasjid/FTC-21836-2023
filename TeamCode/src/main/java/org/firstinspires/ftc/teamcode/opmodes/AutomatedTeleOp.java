@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
@@ -50,8 +52,9 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 if (gamepadEx2.isDown(LEFT_BUMPER)) {
                     if (gamepadEx2.isDown(RIGHT_BUMPER)) robot.autoScoringManager.reset();
                     if (keyPressed(2, DPAD_RIGHT)) selectedColor = (selectedColor + 1) % 3;
+                    if (keyPressed(2, DPAD_LEFT)) selectedColor = (selectedColor - 1) % 3;
                     if (keyPressed(2, DPAD_UP)) colorsLeft[selectedColor]++;
-                    if (keyPressed(2, DPAD_UP)) colorsLeft[selectedColor]--;
+                    if (keyPressed(2, DPAD_DOWN)) colorsLeft[selectedColor]--;
                 }
                 teleOpControls();
             }
