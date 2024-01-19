@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true, backdropSide = false;
+    static boolean isRed = true, backdropSide = true;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -84,7 +84,7 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE)
         ));
         boolean partnerWillDoRand = false;
-        int rand = 0;
+        int rand = 1;
         if (partnerWillDoRand) placements.remove(0);
         if (!backdropSide) swap(placements, 0, 1);
 
@@ -101,8 +101,6 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
-
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(50, 50, toRadians(250), toRadians(250), 13.95)
@@ -112,14 +110,12 @@ public class MeepMeepTesting {
                                 .setTangent(startPose.getHeading())
                                 .forward(FORWARD_BEFORE_SPIKE)
                                 .splineTo(spike.vec(), spike.getHeading())
-                                .back(BACK_AFTER_SPIKE)
-                                .setTangent(afterSpike.getHeading() + LEFT)
-                                .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+                                .setTangent(spike.getHeading() + LEFT)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
 //                                    robot.intake.setRequiredIntakingAmount(2);
                                 })
-                                .lineToSplineHeading(placements.get(0).toPose2d())
+                                .splineToSplineHeading(placements.get(0).toPose2d(), RIGHT)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixels(2);
                                     autonBackdrop.add(placements.get(0));
