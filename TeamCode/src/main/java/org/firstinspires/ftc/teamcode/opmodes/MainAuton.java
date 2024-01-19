@@ -201,8 +201,6 @@ public final class MainAuton extends LinearOpMode {
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
             robot.readSensors();
-
-            robot.drivetrain.update();
             robot.run();
 
             autonEndPose = robot.drivetrain.getPoseEstimate();
