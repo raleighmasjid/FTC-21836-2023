@@ -181,7 +181,7 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(toParkInner.byAlliance().toPose2d().vec())
                         .lineTo(parkedInner.byAlliance().toPose2d().vec())
                 ;
-            } else for (int i = 0; i < (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
+            } else for (int i = 1; i <= (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
                 // TODO Add cycling pathing
             }
 
