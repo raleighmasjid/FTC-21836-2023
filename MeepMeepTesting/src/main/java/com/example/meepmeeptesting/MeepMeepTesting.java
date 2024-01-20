@@ -1,6 +1,5 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.PI;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true, backdropSide = true;
+    static boolean isRed = true, backdropSide = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -100,7 +99,8 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
+        double side = backdropSide ? 1 : -1;
+        Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE * side, spike.getY(), backdropSide ? LEFT : RIGHT);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -114,18 +114,6 @@ public class MeepMeepTesting {
                                 .splineTo(spike.vec(), spike.getHeading())
                                 .setTangent(afterSpike.getHeading())
                                 .lineToSplineHeading(afterSpike)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                                    robot.intake.setRequiredIntakingAmount(2);
-                                })
-                                .splineToSplineHeading(placements.get(0).toPose2d(), RIGHT)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(2);
-                                    autonBackdrop.add(placements.get(0));
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                                .lineTo(parking.byAlliance().toPose2d().vec())
-                                .lineTo(parked.byAlliance().toPose2d().vec())
                                 .build()
                 );
 
