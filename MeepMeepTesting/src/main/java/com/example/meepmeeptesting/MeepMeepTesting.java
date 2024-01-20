@@ -30,7 +30,6 @@ public class MeepMeepTesting {
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
             X_SHIFT_AFTER_SPIKE = 5,
-            BACK_AFTER_SPIKE = 5,
             FORWARD_BEFORE_SPIKE = 17,
             X_TILE = 24,
             CYCLES_BACKDROP_SIDE = 0,
