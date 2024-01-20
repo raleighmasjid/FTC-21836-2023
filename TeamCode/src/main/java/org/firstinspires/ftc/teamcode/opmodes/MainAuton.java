@@ -146,9 +146,8 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
                     .forward(FORWARD_BEFORE_SPIKE)
                     .splineTo(spike.vec(), spike.getHeading())
-                    .back(BACK_AFTER_SPIKE)
-                    .setTangent(afterSpike.getHeading() + LEFT)
-                    .splineToLinearHeading(afterSpike, afterSpike.getHeading() + LEFT)
+                    .setTangent(afterSpike.getHeading())
+                    .lineToSplineHeading(afterSpike)
             ;
 
             if (backdropSide) {
@@ -158,7 +157,7 @@ public final class MainAuton extends LinearOpMode {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                             robot.intake.setRequiredIntakingAmount(2);
                         })
-                        .lineToSplineHeading(placements.get(0).toPose2d())
+                        .splineToSplineHeading(placements.get(0).toPose2d(), RIGHT)
                         .addTemporalMarker(() -> {
                             robot.deposit.paintbrush.dropPixels(2);
                             autonBackdrop.add(placements.get(0));
