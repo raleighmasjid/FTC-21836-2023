@@ -19,6 +19,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPiv
 import static java.lang.Math.asin;
 import static java.lang.Math.cos;
 import static java.lang.Math.max;
+import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -51,9 +52,7 @@ public final class Intake {
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             r = 9.5019488189,
-            theta0 = -0.496183876745,
-            y0 = -4.523622,
-            x0 = 8.35606811024;
+            theta0 = -0.496183876745;
 
     private final MotorEx motor;
 
@@ -108,9 +107,9 @@ public final class Intake {
 
             double deltaY = ordinal() * 0.5 - 0.1;
 
-            double theta1 = asin((y0 + deltaY) / r);
+            double theta1 = asin((r * sin(theta0) + deltaY) / r);
             deltaTheta = toDegrees(theta1 - theta0);
-            deltaX = r * cos(theta1) - x0;
+            deltaX = r * cos(theta1) - r * cos(theta0);
         }
     }
 
