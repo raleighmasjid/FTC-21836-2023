@@ -139,19 +139,19 @@ public final class MainAuton extends LinearOpMode {
                     spike = centerSpike.byBoth().toPose2d();
             }
 
-            Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
+            Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT);
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
                     .forward(FORWARD_BEFORE_SPIKE)
                     .splineTo(spike.vec(), spike.getHeading())
-                    .setTangent(afterSpike.getHeading())
-                    .lineToSplineHeading(afterSpike)
             ;
 
             if (backdropSide) {
 
                 sequence
+                        .setTangent(afterSpike.getHeading())
+                        .lineToSplineHeading(afterSpike)
                         .addTemporalMarker(() -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                             robot.intake.setRequiredIntakingAmount(2);
