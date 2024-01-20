@@ -101,8 +101,8 @@ public final class Deposit {
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
-        private final State currentState = new State(), targetState = new State();
-        private int targetRow = -1;
+        private State currentState, targetState;
+        private int targetRow;
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
@@ -118,10 +118,15 @@ public final class Deposit {
                     new MotorEx(hardwareMap, "lift left", RPM_1150)
             };
             motors[1].setInverted(true);
-            for (MotorEx motor : motors) {
-                motor.setZeroPowerBehavior(FLOAT);
-                motor.encoder.reset();
-            }
+            for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+            reset();
+        }
+
+        public void reset() {
+            targetRow = -1;
+            controller.reset();
+            for (MotorEx motor : motors) motor.encoder.reset();
+            targetState = currentState = new State();
         }
 
         public boolean isExtended() {
@@ -130,7 +135,7 @@ public final class Deposit {
 
         public void setTargetRow(int targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState.x = this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT);
+            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT));
             controller.setTarget(targetState);
         }
 
@@ -139,7 +144,6 @@ public final class Deposit {
         }
 
         public void setLiftPower(double manualLiftPower) {
-            lastManualLiftPower = this.manualLiftPower;
             this.manualLiftPower = manualLiftPower;
         }
 
@@ -158,7 +162,7 @@ public final class Deposit {
             kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
 
-            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
+            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
