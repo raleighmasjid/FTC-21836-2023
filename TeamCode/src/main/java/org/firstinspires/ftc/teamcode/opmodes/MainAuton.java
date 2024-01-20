@@ -42,7 +42,8 @@ import java.util.ArrayList;
 public final class MainAuton extends LinearOpMode {
 
     public static final double
-            LEFT = PI,
+            REVERSE = PI,
+            LEFT = REVERSE,
             FORWARD = 1.5707963267948966,
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
@@ -139,8 +140,6 @@ public final class MainAuton extends LinearOpMode {
                     spike = centerSpike.byBoth().toPose2d();
             }
 
-            Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT);
-
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
                     .forward(FORWARD_BEFORE_SPIKE)
@@ -148,6 +147,8 @@ public final class MainAuton extends LinearOpMode {
             ;
 
             if (backdropSide) {
+
+                Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT);
 
                 sequence
                         .setTangent(afterSpike.getHeading())

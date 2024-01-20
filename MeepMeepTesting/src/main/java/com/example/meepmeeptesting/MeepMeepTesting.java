@@ -16,11 +16,12 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true, backdropSide = true;
+    static boolean isRed = true, backdropSide = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
-            LEFT = PI,
+            REVERSE = PI,
+            LEFT = REVERSE,
             FORWARD = 1.5707963267948966,
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
@@ -46,7 +47,7 @@ public class MeepMeepTesting {
 
         Pose2d startPose = MeepMeepTesting.startPose.byBoth().toPose2d();
 
-        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
+        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, REVERSE - leftSpike.heading);
 
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(1, 0, YELLOW),
@@ -99,7 +100,7 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), backdropSide ? LEFT : RIGHT);
+        Pose2d afterSpike = new EditablePose(MeepMeepTesting.startPose.x, MeepMeepTesting.startPose.y + FORWARD_BEFORE_SPIKE, FORWARD).byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -109,8 +110,12 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
                                 .setTangent(startPose.getHeading())
-                                .forward(FORWARD_BEFORE_SPIKE)
+                                .splineTo(afterSpike.vec(), startPose.getHeading())
                                 .splineTo(spike.vec(), spike.getHeading())
+
+                                .setTangent(spike.getHeading() + REVERSE)
+                                .splineTo(afterSpike.vec(), afterSpike.getHeading() + REVERSE)
+
                                 .build()
                 );
 
@@ -119,5 +124,42 @@ public class MeepMeepTesting {
                 .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
                 .start();
+    }
+
+    static class EditablePose {
+
+        public double x, y, heading;
+
+        public EditablePose(double x, double y, double heading) {
+            this.x = x;
+            this.y = y;
+            this.heading = heading;
+        }
+
+        public EditablePose byAlliance() {
+            double alliance = isRed ? 1 : -1;
+            y *= alliance;
+            heading *= alliance;
+            return this;
+        }
+
+        public EditablePose bySide() {
+            if (!backdropSide) x += X_START_LEFT - X_START_RIGHT;
+            return this;
+        }
+
+        public EditablePose byBoth() {
+            return byAlliance().bySide();
+        }
+
+        public Pose2d toPose2d() {
+            return new Pose2d(x, y, heading);
+        }
+
+        public EditablePose flipBySide() {
+            if (!backdropSide) heading = Math.PI - heading;
+            if (!backdropSide) x = (X_START_LEFT + X_START_RIGHT) - x;
+            return this;
+        }
     }
 }
