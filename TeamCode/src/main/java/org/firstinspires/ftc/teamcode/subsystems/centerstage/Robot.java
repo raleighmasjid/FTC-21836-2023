@@ -73,7 +73,7 @@ public final class Robot {
 
     public void run() {
         if (intake.pixelsTransferred()) {
-            deposit.paintbrush.lockPixels(intake.getColors());
+            deposit.paintbrush.lockPixels(intake.colors);
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 

@@ -68,7 +68,7 @@ public final class Intake {
     private Intake.Height height = FLOOR;
 
     private final ElapsedTime timer = new ElapsedTime();
-    private final Pixel.Color[] colors = {EMPTY, EMPTY};
+    public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false, climbing = false;
     private int requiredIntakingAmount = 2;
@@ -230,10 +230,6 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
-    }
-
-    Pixel.Color[] getColors() {
-        return colors;
     }
 
     boolean pixelsTransferred() {
