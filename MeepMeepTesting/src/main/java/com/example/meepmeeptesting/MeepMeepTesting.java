@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true, backdropSide = false;
+    static boolean isRed = false, backdropSide = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -37,7 +37,8 @@ public class MeepMeepTesting {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
+            afterSpike = new EditablePose(startPose.x, startPose.y + FORWARD_BEFORE_SPIKE, startPose.heading),
+            centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT);
@@ -100,7 +101,7 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = new EditablePose(MeepMeepTesting.startPose.x, MeepMeepTesting.startPose.y + FORWARD_BEFORE_SPIKE, FORWARD).byAlliance().toPose2d();
+        Pose2d afterSpike = MeepMeepTesting.afterSpike.byBoth().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
