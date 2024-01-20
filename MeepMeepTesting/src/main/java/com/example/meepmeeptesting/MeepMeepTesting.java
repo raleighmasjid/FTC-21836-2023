@@ -29,7 +29,7 @@ public class MeepMeepTesting {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_AFTER_SPIKE = 24,
+            X_SHIFT_AFTER_SPIKE = 5,
             BACK_AFTER_SPIKE = 5,
             FORWARD_BEFORE_SPIKE = 17,
             X_TILE = 24,
@@ -40,8 +40,8 @@ public class MeepMeepTesting {
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
-            toParkInner = new EditablePose(Backdrop.X, -60, LEFT),
-            parkedInner = new EditablePose(60, -60, LEFT);
+            parking = new EditablePose(Backdrop.X, -60, LEFT),
+            parked = new EditablePose(60, parking.y, LEFT);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -84,22 +84,24 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE)
         ));
         boolean partnerWillDoRand = false;
-        int rand = 1;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
         if (partnerWillDoRand) placements.remove(0);
         if (!backdropSide) swap(placements, 0, 1);
 
         Pose2d spike;
         switch (rand) {
-            case 0:
+            case LEFT:
                 spike = (isRed ? leftSpike : rightSpike).byBoth().toPose2d();
                 break;
-            case 2:
+            case RIGHT:
                 spike = (isRed ? rightSpike : leftSpike).byBoth().toPose2d();
                 break;
-            case 1:
+            case CENTER:
             default:
                 spike = centerSpike.byBoth().toPose2d();
         }
+
+        Pose2d afterSpike = new EditablePose(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT).flipBySide().byAlliance().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -110,7 +112,8 @@ public class MeepMeepTesting {
                                 .setTangent(startPose.getHeading())
                                 .forward(FORWARD_BEFORE_SPIKE)
                                 .splineTo(spike.vec(), spike.getHeading())
-                                .setTangent(spike.getHeading() + LEFT)
+                                .setTangent(afterSpike.getHeading())
+                                .lineToSplineHeading(afterSpike)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
 //                                    robot.intake.setRequiredIntakingAmount(2);
@@ -121,8 +124,8 @@ public class MeepMeepTesting {
                                     autonBackdrop.add(placements.get(0));
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
-                                .lineTo(toParkInner.byAlliance().toPose2d().vec())
-                                .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                                .lineTo(parking.byAlliance().toPose2d().vec())
+                                .lineTo(parked.byAlliance().toPose2d().vec())
                                 .build()
                 );
 
