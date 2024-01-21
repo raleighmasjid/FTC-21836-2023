@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.back
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
@@ -93,18 +94,23 @@ public final class MainAuton extends LinearOpMode {
         return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
+    private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
+        sequence
+                .addTemporalMarker(() -> {
+                    robot.intake.setHeight(height);
+                })
+                .setTangent(MainAuton.startPose.byAlliance().heading)
+                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .splineTo(stackPos(1, height).vec(), LEFT)
+        ;
+    }
+
     private static void intake2From1Stack(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
         Intake.Height height2 = height.getLess(1);
         sequence
                 .addTemporalMarker(() -> {
-                        robot.intake.setHeight(height);
-                })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                .splineTo(stackPos(stack, height).vec(), LEFT)
-                .addTemporalMarker(() -> {
                         robot.intake.setMotorPower(1);
-                        while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+                        while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
                         robot.intake.setMotorPower(0);
                 })
                 .back(X_SHIFT_INTAKING)
@@ -114,13 +120,15 @@ public final class MainAuton extends LinearOpMode {
                 .lineTo(stackPos(stack, height2).vec())
                 .addTemporalMarker(() -> {
                         robot.intake.setMotorPower(1);
-                        while (robot.intake.colors[1] == Pixel.Color.EMPTY) {}
+                        while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
                         robot.intake.setMotorPower(0);
                 })
         ;
     }
 
-    private static void score(TrajectorySequenceBuilder sequence, Pixel first, Pixel second) {
+    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
+        Pixel first = placements.get(index);
+        Pixel second = placements.get(index + 1);
         sequence
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
 
@@ -287,29 +295,8 @@ public final class MainAuton extends LinearOpMode {
                             while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
                             robot.intake.setMotorPower(0);
                         })
-                        .lineTo(enteringBackstage.vec())
-
-                        .addTemporalMarker(() -> {
-                            robot.intake.setRequiredIntakingAmount(2);
-                            robot.deposit.lift.setTargetRow(placements.get(0).y);
-                        })
-                        .splineToConstantHeading(placements.get(0).toPose2d().vec(), startPose.getHeading() + REVERSE)
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(1);
-                            autonBackdrop.add(placements.get(0));
-                        })
-                        .waitSeconds(TIME_DROP_FIRST)
-
-                        .addTemporalMarker(() -> {
-                            robot.deposit.lift.setTargetRow(placements.get(1).y);
-                        })
-                        .lineToConstantHeading(placements.get(1).toPose2d().vec())
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(2);
-                            autonBackdrop.add(placements.get(1));
-                        })
-                        .waitSeconds(TIME_DROP_SECOND)
                 ;
+                score(sequence, placements, 0);
 
             }
 
@@ -319,7 +306,21 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
             } else {
-                // TODO Add cycling pathing
+                if (backdropSide) {
+
+                    // CYCLE 1
+                    driveToStack1(sequence, FIVE_STACK);
+                    intake2From1Stack(sequence, 1, FIVE_STACK);
+                    score(sequence, placements, 1);
+
+                } else {
+
+                    // CYCLE 1
+                    driveToStack1(sequence, FOUR_STACK);
+                    intake2From1Stack(sequence, 1, FOUR_STACK);
+                    score(sequence, placements, 2);
+
+                }
             }
 
             sequences[rand.ordinal()] = sequence.build();

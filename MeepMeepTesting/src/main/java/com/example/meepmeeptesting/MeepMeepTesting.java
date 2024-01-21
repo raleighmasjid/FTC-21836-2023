@@ -2,6 +2,7 @@ package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.MeepMeepTesting.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -57,8 +58,8 @@ public class MeepMeepTesting {
             turnToStackPos = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT);
 
-    public static Pose2d stackPos(int stack) {
-        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+    private static Pose2d stackPos(int stack, Intake.Height height) {
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     public static void main(String[] args) {
@@ -147,40 +148,30 @@ public class MeepMeepTesting {
                                 .splineTo(preSpike.vec(), preSpike.getHeading())
                                 .splineTo(spike.vec(), spike.getHeading())
 
-                                // BACKING UP
                                 .setTangent(spike.getHeading() + REVERSE)
-
-                                // LEFT/RIGHT
                                 .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
                                 .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
-                                // CENTER
-//                                .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
-//                                .setTangent(FORWARD)
-//                                .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-//                                .lineToSplineHeading(turnToStackPos)
-//                                .setTangent(LEFT)
 
                                 // INTAKING
-                                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                                .UNSTABLE_addTemporalMarkerOffset(TIME_FLIP_BEFORE_STACK, () -> {
 //                                    robot.intake.setHeight(FIVE_STACK);
 //                                    robot.intake.setRequiredIntakingAmount(1);
                                 })
 
-                                .splineTo(stackPos(1).vec(), LEFT)
+                                .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
                                 .addTemporalMarker(() -> {
 //                                    robot.intake.setMotorPower(1);
 //                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
 //                                    robot.intake.setMotorPower(0);
                                 })
-                                .lineTo(enteringBackstage.vec())
 
-                                // SCORING
+                                .lineTo(MeepMeepTesting.enteringBackstage.byAlliance().toPose2d().vec())
+
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                                    robot.intake.setRequiredIntakingAmount(2);
                                 })
-                                .splineToConstantHeading(placements.get(0).toPose2d().vec(), startPose.getHeading() + REVERSE)
+                                .splineToConstantHeading(placements.get(0).toPose2d().vec(), MeepMeepTesting.startPose.byAlliance().heading + REVERSE)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixels(1);
                                     autonBackdrop.add(placements.get(0));
@@ -194,53 +185,6 @@ public class MeepMeepTesting {
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixels(2);
                                     autonBackdrop.add(placements.get(1));
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-
-                                // CYCLE 1
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setHeight(FOUR_STACK);
-                                })
-                                .setTangent(startPose.getHeading())
-                                .splineToConstantHeading(enteringBackstage.vec(), LEFT)
-                                .splineTo(stackPos(1).vec(), LEFT)
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setMotorPower(1);
-//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
-//                                    robot.intake.setMotorPower(0);
-                                })
-                                .back(X_SHIFT_INTAKING)
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setHeight(THREE_STACK);
-                                })
-                                .lineTo(stackPos(1).vec())
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setMotorPower(1);
-//                                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {}
-//                                    robot.intake.setMotorPower(0);
-                                })
-
-                                // COMING BACK
-                                .lineTo(enteringBackstage.vec())
-
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(2).y);
-                                })
-                                .splineToConstantHeading(placements.get(2).toPose2d().vec(), MeepMeepTesting.startPose.byAlliance().heading + REVERSE)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(1);
-                                    autonBackdrop.add(placements.get(2));
-                                })
-                                .waitSeconds(TIME_DROP_FIRST)
-
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(3).y);
-                                })
-                                .lineToConstantHeading(placements.get(3).toPose2d().vec())
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(2);
-                                    autonBackdrop.add(placements.get(3));
-                                    autonBackdrop.print();
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
 
