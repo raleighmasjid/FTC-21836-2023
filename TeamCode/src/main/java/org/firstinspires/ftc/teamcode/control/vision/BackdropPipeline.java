@@ -144,12 +144,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        AprilTagDetection detection = null;
-        int id = 0;
-        if (!detections.isEmpty()) {
-            detection = detections.get(0);
-            id = detection.id;
-            switch (id) {
+        AprilTagDetection tag = null;
+        for (AprilTagDetection detection : detections) {
+            switch (detection.id) {
                 case 1: case 2: case 3:
                     isDetecting = !isRed;
                     break;
@@ -161,12 +158,12 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
         }
 
-        if (warp && isDetecting && detection != null) {
+        if (warp && isDetecting && tag != null) {
 
-            Point bl = detection.corners[0];
-            Point br = detection.corners[1];
-            Point tr = detection.corners[2];
-            Point tl = detection.corners[3];
+            Point bl = tag.corners[0];
+            Point br = tag.corners[1];
+            Point tr = tag.corners[2];
+            Point tl = tag.corners[3];
 
             MatOfPoint2f srcTag = new MatOfPoint2f(
                     bl,
@@ -175,7 +172,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tl
             );
 
-            int id2 = detection.id - (detection.id > 3 ? 3 : 0);
+            int id2 = tag.id - (tag.id > 3 ? 3 : 0);
             double topLeftX =
                     id2 == 3 ? X_TOP_LEFT_R_TAG :
                     id2 == 2 ? X_TOP_LEFT_C_TAG :
