@@ -154,10 +154,10 @@ public final class Deposit {
                 controller.setTarget(targetState);
             }
 
-            if (lastKp != pidGains.kP) {
-                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
-                lastKp = pidGains.kP;
-            }
+//            if (lastKp != pidGains.kP) {
+//                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
+//                lastKp = pidGains.kP;
+//            }
 
             kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
