@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public boolean warp = true, isDetecting = false, isRed = true;
+    public boolean warp = true, backdropVisible = false, isRed = true;
 
     public double
             X_TOP_LEFT_L_TAG = 450,
@@ -145,20 +145,26 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
 
         AprilTagDetection tag = null;
+        allTags:
         for (AprilTagDetection detection : detections) {
-            switch (detection.id) {
-                case 1: case 2: case 3:
-                    isDetecting = !isRed;
-                    break;
-                case 4: case 5: case 6:
-                    isDetecting = isRed;
-                    break;
-                default:
-                    isDetecting = false;
+            if (isRed) {
+                switch (detection.id) {
+                    case 4: case 5: case 6:
+                        tag = detection;
+                        break allTags;
+                }
+            } else {
+                switch (detection.id) {
+                    case 1: case 2: case 3:
+                        tag = detection;
+                        break allTags;
+                }
             }
         }
 
-        if (warp && isDetecting && tag != null) {
+        backdropVisible = tag != null;
+
+        if (warp && backdropVisible) {
 
             Point bl = tag.corners[0];
             Point br = tag.corners[1];
