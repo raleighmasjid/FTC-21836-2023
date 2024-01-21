@@ -118,7 +118,7 @@ public final class MainAuton extends LinearOpMode {
         ;
     }
 
-    private static void intake2From1Stack(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
+    private static void intake2Pixels(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
         Intake.Height height2 = height.minus(1);
         sequence
                 .addTemporalMarker(() -> {
@@ -324,13 +324,15 @@ public final class MainAuton extends LinearOpMode {
 
                 // CYCLE 1
                 driveToStack1(sequence, height);
-                intake2From1Stack(sequence, 1, height);
+                intake2Pixels(sequence, 1, height);
                 score(sequence, placements, placement);
 
                 // CYCLE 2
-                driveToStack1(sequence, height.minus(2));
-                intake2From1Stack(sequence, 1, height.minus(2));
-                score(sequence, placements, placement + 2);
+                if (backdropSide) {
+                    driveToStack1(sequence, height.minus(2));
+                    intake2Pixels(sequence, 1, height.minus(2));
+                    score(sequence, placements, placement + 2);
+                }
 
                 // CYCLE 3
 //                driveToStack2(sequence, FIVE_STACK);
