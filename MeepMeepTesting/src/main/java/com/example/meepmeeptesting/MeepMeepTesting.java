@@ -3,6 +3,7 @@ package com.example.meepmeeptesting;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
+import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
 import static com.example.meepmeeptesting.MeepMeepTesting.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -40,8 +41,6 @@ public class MeepMeepTesting {
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -16,
             X_TILE = 24,
             X_INTAKING = -56,
-            Y_INTAKING_1 = -12,
-            Y_INTAKING_2 = -24,
             Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
@@ -55,11 +54,12 @@ public class MeepMeepTesting {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            turnToStackPos = new EditablePose(-52, -12, LEFT),
-            enteringBackstage = new EditablePose(12, -12, LEFT);
+            turnToStack1 = new EditablePose(-52, -12, LEFT),
+            enteringBackstage = new EditablePose(12, -12, LEFT),
+            movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : turnToStack1.y, LEFT).byAlliance().toPose2d();
     }
 
     public static void main(String[] args) {
@@ -132,7 +132,7 @@ public class MeepMeepTesting {
                 MeepMeepTesting.startPose.heading
         ).byBoth().toPose2d();
 
-        Pose2d turnToStackPos = MeepMeepTesting.turnToStackPos.byAlliance().toPose2d();
+        Pose2d turnToStackPos = MeepMeepTesting.turnToStack1.byAlliance().toPose2d();
         Pose2d enteringBackstage = MeepMeepTesting.enteringBackstage.byAlliance().toPose2d();
 
         Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
@@ -187,6 +187,13 @@ public class MeepMeepTesting {
                                     autonBackdrop.add(placements.get(1));
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
+
+                                .addTemporalMarker(() -> {
+//                                    robot.intake.setHeight(height);
+                                })
+                                .setTangent(MeepMeepTesting.startPose.byAlliance().heading)
+                                .splineToConstantHeading(MeepMeepTesting.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                                .splineTo(stackPos(1, FOUR_STACK).vec(), LEFT)
 
                                 .build()
                 );
