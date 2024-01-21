@@ -29,6 +29,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
@@ -74,6 +75,10 @@ public final class MainAuton extends LinearOpMode {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             toParkInner = new EditablePose(Backdrop.X, -60, LEFT),
             parkedInner = new EditablePose(60, -60, LEFT);
+
+    private static void cycle(TrajectorySequenceBuilder sequence, int placement, int stack, Intake.Height height) {
+
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -189,7 +194,7 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(toParkInner.byAlliance().toPose2d().vec())
                         .lineTo(parkedInner.byAlliance().toPose2d().vec())
                 ;
-            } else for (int i = 1; i <= (backdropSide ? CYCLES_BACKDROP_SIDE : CYCLES_AUDIENCE_SIDE); i++) {
+            } else {
                 // TODO Add cycling pathing
             }
 
