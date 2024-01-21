@@ -64,18 +64,20 @@ public final class MainAuton extends LinearOpMode {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_AFTER_SPIKE = 5,
+            X_SHIFT_BACKDROP_AFTER_SPIKE = 12,
             Y_SHIFT_BEFORE_SPIKE = 17,
-            X_SHIFT_AUDIENCE_AFTER_SPIKE = 22,
-            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 33,
+            Y_SHIFT_AFTER_SPIKE = 26,
+            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
+            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -16,
             X_TILE = 24,
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
-            Y_INTAKING_2 = -23,
-            Y_INTAKING_3 = -35,
+            Y_INTAKING_2 = -24,
+            Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
-            TIME_SPIKE_TO_INTAKE_FLIP = 0.5;
+            TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
+            TIME_FLIP_BEFORE_STACK = 0.3;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -83,7 +85,7 @@ public final class MainAuton extends LinearOpMode {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            turnToStackPos = new EditablePose(-48, startPose.y + Y_SHIFT_BEFORE_SPIKE + Y_SHIFT_AUDIENCE_AFTER_SPIKE, LEFT),
+            turnToStackPos = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT);
 
     public static Pose2d stackPos(int stack) {
@@ -165,6 +167,13 @@ public final class MainAuton extends LinearOpMode {
                     MainAuton.startPose.heading
             ).byBoth().toPose2d();
 
+            Pose2d postSpike = new EditablePose(
+                    MainAuton.startPose.x,
+                    MainAuton.startPose.y + Y_SHIFT_AFTER_SPIKE,
+                    MainAuton.startPose.heading
+            ).byBoth().toPose2d();
+
+            Pose2d turnToStackPos = MainAuton.turnToStackPos.byAlliance().toPose2d();
             Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
@@ -175,7 +184,7 @@ public final class MainAuton extends LinearOpMode {
 
             if (backdropSide) {
 
-                Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_AFTER_SPIKE, spike.getY(), LEFT);
+                Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
 
                 sequence
                         .setTangent(afterSpike.getHeading())
@@ -194,26 +203,44 @@ public final class MainAuton extends LinearOpMode {
 
             } else {
 
+                sequence.setTangent(spike.getHeading() + REVERSE);
+
+                switch (rand) {
+                    case LEFT:
+                    case RIGHT:
+                        sequence
+                                .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
+                                .setTangent(FORWARD)
+                                .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
+                        ;
+                        break;
+                    case CENTER:
+                        sequence
+                                .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
+                                .setTangent(FORWARD)
+                                .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
+                                .lineToSplineHeading(turnToStackPos)
+                                .setTangent(LEFT)
+                        ;
+                }
+
                 sequence
-                        .setTangent(spike.getHeading() + REVERSE)
-                        .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
-                        .strafeLeft((isRed ? 1 : -1) * X_SHIFT_AUDIENCE_AFTER_SPIKE)
-                        .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
-                        .lineToSplineHeading(turnToStackPos.byAlliance().toPose2d())
-                        .addTemporalMarker(() -> {
+                        // INTAKING
+                        .UNSTABLE_addTemporalMarkerOffset(TIME_FLIP_BEFORE_STACK, () -> {
                             robot.intake.setHeight(FIVE_STACK);
                             robot.intake.setRequiredIntakingAmount(1);
                         })
-                        .lineTo(stackPos(1).vec())
+
+                        .splineTo(stackPos(1).vec(), LEFT)
                         .addTemporalMarker(() -> {
                             robot.intake.setMotorPower(1);
                             while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
                             robot.intake.setMotorPower(0);
-                            robot.intake.setRequiredIntakingAmount(2);
                         })
                         .lineTo(enteringBackstage.vec())
 
                         .addTemporalMarker(() -> {
+                            robot.intake.setRequiredIntakingAmount(2);
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
                         .splineToConstantHeading(placements.get(0).toPose2d().vec(), startPose.getHeading() + REVERSE)

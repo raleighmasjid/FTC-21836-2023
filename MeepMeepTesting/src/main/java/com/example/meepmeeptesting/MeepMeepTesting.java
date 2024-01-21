@@ -32,15 +32,16 @@ public class MeepMeepTesting {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_AFTER_SPIKE = 5,
+            X_SHIFT_BACKDROP_AFTER_SPIKE = 12,
             Y_SHIFT_BEFORE_SPIKE = 17,
-            X_SHIFT_AUDIENCE_AFTER_SPIKE = 22,
-            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 33,
+            Y_SHIFT_AFTER_SPIKE = 26,
+            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
+            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -16,
             X_TILE = 24,
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
-            Y_INTAKING_2 = -23,
-            Y_INTAKING_3 = -35,
+            Y_INTAKING_2 = -24,
+            Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5;
@@ -51,7 +52,7 @@ public class MeepMeepTesting {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            turnToStackPos = new EditablePose(-48, startPose.y + Y_SHIFT_BEFORE_SPIKE + Y_SHIFT_AUDIENCE_AFTER_SPIKE, LEFT),
+            turnToStackPos = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT);
 
     public static Pose2d stackPos(int stack) {
@@ -99,7 +100,7 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE)
         ));
         boolean partnerWillDoRand = false;
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         if (partnerWillDoRand) placements.remove(0);
         if (!backdropSide) swap(placements, 0, 1);
 
@@ -122,8 +123,16 @@ public class MeepMeepTesting {
                 MeepMeepTesting.startPose.heading
         ).byBoth().toPose2d();
 
+        Pose2d postSpike = new EditablePose(
+                MeepMeepTesting.startPose.x,
+                MeepMeepTesting.startPose.y + Y_SHIFT_AFTER_SPIKE,
+                MeepMeepTesting.startPose.heading
+        ).byBoth().toPose2d();
+
         Pose2d turnToStackPos = MeepMeepTesting.turnToStackPos.byAlliance().toPose2d();
         Pose2d enteringBackstage = MeepMeepTesting.enteringBackstage.byAlliance().toPose2d();
+
+        Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -136,21 +145,35 @@ public class MeepMeepTesting {
                                 .splineTo(preSpike.vec(), preSpike.getHeading())
                                 .splineTo(spike.vec(), spike.getHeading())
 
+                                // BACKING UP
                                 .setTangent(spike.getHeading() + REVERSE)
+
+                                // LEFT/RIGHT
                                 .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
-                                .strafeLeft((isRed ? 1 : -1) * X_SHIFT_AUDIENCE_AFTER_SPIKE)
+                                .setTangent(FORWARD)
                                 .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
-                                .lineToSplineHeading(turnToStackPos)
-                                .addTemporalMarker(() -> {
+                                // CENTER
+//                                .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
+//                                .setTangent(FORWARD)
+//                                .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
+//                                .lineToSplineHeading(turnToStackPos)
+//                                .setTangent(LEFT)
+
+                                // INTAKING
+                                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
 //                                    robot.intake.setHeight(FIVE_STACK);
 //                                    robot.intake.setRequiredIntakingAmount(1);
                                 })
-                                .lineTo(stackPos(1).vec())
+
+                                .splineTo(stackPos(1).vec(), LEFT)
                                 .addTemporalMarker(() -> {
-//
+//                                    robot.intake.setMotorPower(1);
+//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+//                                    robot.intake.setMotorPower(0);
                                 })
                                 .lineTo(enteringBackstage.vec())
 
+                                // SCORING
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
 //                                    robot.intake.setRequiredIntakingAmount(2);
