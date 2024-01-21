@@ -195,6 +195,53 @@ public class MeepMeepTesting {
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
 
+                                // CYCLE 1
+                                .addTemporalMarker(() -> {
+//                                    robot.intake.setHeight(FOUR_STACK);
+                                })
+                                .setTangent(startPose.getHeading())
+                                .splineToConstantHeading(enteringBackstage.vec(), LEFT)
+                                .splineTo(stackPos(1).vec(), LEFT)
+                                .addTemporalMarker(() -> {
+//                                    robot.intake.setMotorPower(1);
+//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+//                                    robot.intake.setMotorPower(0);
+                                })
+                                .back(5)
+                                .addTemporalMarker(() -> {
+//                                    robot.intake.setHeight(THREE_STACK);
+                                })
+                                .forward(5)
+                                .addTemporalMarker(() -> {
+//                                    robot.intake.setMotorPower(1);
+//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+//                                    robot.intake.setMotorPower(0);
+                                })
+
+                                // COMING BACK
+                                .lineTo(enteringBackstage.vec())
+
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.lift.setTargetRow(placements.get(2).y);
+                                })
+                                .splineToConstantHeading(placements.get(2).toPose2d().vec(), startPose.getHeading() + REVERSE)
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.paintbrush.dropPixels(1);
+                                    autonBackdrop.add(placements.get(2));
+                                })
+                                .waitSeconds(TIME_DROP_FIRST)
+
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.lift.setTargetRow(placements.get(3).y);
+                                })
+                                .lineToConstantHeading(placements.get(3).toPose2d().vec())
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.paintbrush.dropPixels(2);
+                                    autonBackdrop.add(placements.get(3));
+                                    autonBackdrop.print();
+                                })
+                                .waitSeconds(TIME_DROP_SECOND)
+
                                 .build()
                 );
 
