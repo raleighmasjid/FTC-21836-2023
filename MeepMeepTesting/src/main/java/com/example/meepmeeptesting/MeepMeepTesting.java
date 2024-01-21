@@ -44,7 +44,9 @@ public class MeepMeepTesting {
             Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
-            TIME_SPIKE_TO_INTAKE_FLIP = 0.5;
+            TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
+            X_SHIFT_INTAKING = 5,
+            TIME_FLIP_BEFORE_STACK = 0.3;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -207,14 +209,14 @@ public class MeepMeepTesting {
 //                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
 //                                    robot.intake.setMotorPower(0);
                                 })
-                                .back(5)
+                                .back(X_SHIFT_INTAKING)
                                 .addTemporalMarker(() -> {
 //                                    robot.intake.setHeight(THREE_STACK);
                                 })
-                                .forward(5)
+                                .lineTo(stackPos(1).vec())
                                 .addTemporalMarker(() -> {
 //                                    robot.intake.setMotorPower(1);
-//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+//                                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {}
 //                                    robot.intake.setMotorPower(0);
                                 })
 
@@ -224,7 +226,7 @@ public class MeepMeepTesting {
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(2).y);
                                 })
-                                .splineToConstantHeading(placements.get(2).toPose2d().vec(), startPose.getHeading() + REVERSE)
+                                .splineToConstantHeading(placements.get(2).toPose2d().vec(), MeepMeepTesting.startPose.byAlliance().heading + REVERSE)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixels(1);
                                     autonBackdrop.add(placements.get(2));

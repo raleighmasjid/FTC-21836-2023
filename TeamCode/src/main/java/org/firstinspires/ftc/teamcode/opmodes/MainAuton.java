@@ -77,6 +77,7 @@ public final class MainAuton extends LinearOpMode {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
+            X_SHIFT_INTAKING = 5,
             TIME_FLIP_BEFORE_STACK = 0.3;
 
     public static EditablePose
@@ -88,12 +89,61 @@ public final class MainAuton extends LinearOpMode {
             turnToStackPos = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT);
 
-    public static Pose2d stackPos(int stack) {
-        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+    private static Pose2d stackPos(int stack, Intake.Height height) {
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
-    private static void cycle(TrajectorySequenceBuilder sequence, int placement, int stack, Intake.Height height) {
+    private static void intake2From1Stack(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
+        Intake.Height height2 = height.getLess(1);
+        sequence
+                .addTemporalMarker(() -> {
+                        robot.intake.setHeight(height);
+                })
+                .setTangent(MainAuton.startPose.byAlliance().heading)
+                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .splineTo(stackPos(stack, height).vec(), LEFT)
+                .addTemporalMarker(() -> {
+                        robot.intake.setMotorPower(1);
+                        while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+                        robot.intake.setMotorPower(0);
+                })
+                .back(X_SHIFT_INTAKING)
+                .addTemporalMarker(() -> {
+                        robot.intake.setHeight(height2);
+                })
+                .lineTo(stackPos(stack, height2).vec())
+                .addTemporalMarker(() -> {
+                        robot.intake.setMotorPower(1);
+                        while (robot.intake.colors[1] == Pixel.Color.EMPTY) {}
+                        robot.intake.setMotorPower(0);
+                })
+        ;
+    }
 
+    private static void score(TrajectorySequenceBuilder sequence, Pixel first, Pixel second) {
+        sequence
+                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+
+                .addTemporalMarker(() -> {
+                    robot.deposit.lift.setTargetRow(first.y);
+                })
+                .splineToConstantHeading(first.toPose2d().vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
+                .addTemporalMarker(() -> {
+                    robot.deposit.paintbrush.dropPixels(1);
+                    autonBackdrop.add(first);
+                })
+                .waitSeconds(TIME_DROP_FIRST)
+
+                .addTemporalMarker(() -> {
+                    robot.deposit.lift.setTargetRow(second.y);
+                })
+                .lineToConstantHeading(second.toPose2d().vec())
+                .addTemporalMarker(() -> {
+                    robot.deposit.paintbrush.dropPixels(2);
+                    autonBackdrop.add(second);
+                })
+                .waitSeconds(TIME_DROP_SECOND)
+        ;
     }
 
     @Override
@@ -231,7 +281,7 @@ public final class MainAuton extends LinearOpMode {
                             robot.intake.setRequiredIntakingAmount(1);
                         })
 
-                        .splineTo(stackPos(1).vec(), LEFT)
+                        .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
                         .addTemporalMarker(() -> {
                             robot.intake.setMotorPower(1);
                             while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}

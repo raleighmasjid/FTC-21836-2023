@@ -90,12 +90,16 @@ public final class Intake {
         FOUR_STACK,
         FIVE_STACK;
 
-        private final double deltaX, deltaTheta;
+        public final double deltaX, deltaTheta;
 
         private static final Intake.Height[] values = values();
 
-        private static Intake.Height get(int ordinal) {
+        public static Intake.Height get(int ordinal) {
             return values[ordinal];
+        }
+
+        public Intake.Height getLess(int less) {
+            return values[max(ordinal() - 1, 0)];
         }
 
         Height() {
@@ -236,15 +240,11 @@ public final class Intake {
     }
 
     private void decrementHeight() {
-        setHeight(Intake.Height.get(max(height.ordinal() - 1, 0)));
+        setHeight(height.getLess(1));
     }
 
     public void setHeight(Intake.Height height) {
         this.height = height;
-    }
-
-    public double getStackXOffset() {
-        return height.deltaX;
     }
 
     public void setMotorPower(double motorPower) {
