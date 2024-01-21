@@ -3,7 +3,6 @@ package com.example.meepmeeptesting;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
-import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
 import static com.example.meepmeeptesting.MeepMeepTesting.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -38,9 +37,11 @@ public class MeepMeepTesting {
             Y_SHIFT_BEFORE_SPIKE = 17,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
-            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -16,
+            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
+            X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_TILE = 24,
             X_INTAKING = -56,
+            Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
@@ -54,12 +55,11 @@ public class MeepMeepTesting {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            turnToStack1 = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : turnToStack1.y, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     public static void main(String[] args) {
@@ -103,7 +103,7 @@ public class MeepMeepTesting {
                 new Pixel(6, 9, WHITE)
         ));
         boolean partnerWillDoRand = false;
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.CENTER;
         if (partnerWillDoRand) placements.remove(0);
         if (!backdropSide) swap(placements, 0, 1);
 
@@ -132,7 +132,7 @@ public class MeepMeepTesting {
                 MeepMeepTesting.startPose.heading
         ).byBoth().toPose2d();
 
-        Pose2d turnToStackPos = MeepMeepTesting.turnToStack1.byAlliance().toPose2d();
+        Pose2d turnToStackPos = new EditablePose(MeepMeepTesting.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
         Pose2d enteringBackstage = MeepMeepTesting.enteringBackstage.byAlliance().toPose2d();
 
         Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
@@ -149,9 +149,11 @@ public class MeepMeepTesting {
                                 .splineTo(spike.vec(), spike.getHeading())
 
                                 .setTangent(spike.getHeading() + REVERSE)
-                                .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
+                                .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
-                                .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
+                                .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
+                                .lineToSplineHeading(turnToStackPos)
+                                .setTangent(LEFT)
 
                                 // INTAKING
                                 .UNSTABLE_addTemporalMarkerOffset(TIME_FLIP_BEFORE_STACK, () -> {
@@ -193,7 +195,7 @@ public class MeepMeepTesting {
                                 })
                                 .setTangent(MeepMeepTesting.startPose.byAlliance().heading)
                                 .splineToConstantHeading(MeepMeepTesting.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                                .splineTo(stackPos(1, FOUR_STACK).vec(), LEFT)
+                                .splineTo(turnToStackPos.vec(), LEFT)
 
                                 .build()
                 );

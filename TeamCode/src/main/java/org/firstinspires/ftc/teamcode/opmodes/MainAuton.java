@@ -69,9 +69,11 @@ public final class MainAuton extends LinearOpMode {
             Y_SHIFT_BEFORE_SPIKE = 17,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
-            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -16,
+            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
+            X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_TILE = 24,
             X_INTAKING = -56,
+            Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
@@ -85,12 +87,11 @@ public final class MainAuton extends LinearOpMode {
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            turnToStack1 = new EditablePose(-52, -12, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : turnToStack1.y, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
@@ -230,8 +231,7 @@ public final class MainAuton extends LinearOpMode {
                     MainAuton.startPose.heading
             ).byBoth().toPose2d();
 
-            Pose2d turnToStackPos = MainAuton.turnToStack1.byAlliance().toPose2d();
-            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
+            Pose2d turnToStackPos = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
@@ -276,7 +276,8 @@ public final class MainAuton extends LinearOpMode {
                                 .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
                                 .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-                                .lineToSplineHeading(turnToStackPos)
+                                .turn(startPose.getHeading())
+                                .lineTo(turnToStackPos.vec())
                                 .setTangent(LEFT)
                         ;
                 }
