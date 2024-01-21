@@ -103,9 +103,23 @@ public final class MainAuton extends LinearOpMode {
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
     }
+    
+    private static void driveToStack2(TrajectorySequenceBuilder sequence, Intake.Height height) {
+        Pose2d turnToStack1 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+        sequence
+                .addTemporalMarker(() -> {
+                        robot.intake.setHeight(height);
+                })
+                .setTangent(MainAuton.startPose.byAlliance().heading)
+                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .splineTo(turnToStack1.vec(), LEFT)
+                .lineTo(movingToStack2.byAlliance().toPose2d().vec())
+                .lineTo(stackPos(2, height).vec())
+        ;
+    }
 
     private static void intake2From1Stack(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
-        Intake.Height height2 = height.getLess(1);
+        Intake.Height height2 = height.minus(1);
         sequence
                 .addTemporalMarker(() -> {
                         robot.intake.setMotorPower(1);
@@ -230,7 +244,7 @@ public final class MainAuton extends LinearOpMode {
                     MainAuton.startPose.heading
             ).byBoth().toPose2d();
 
-            Pose2d turnToStackPos = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
+            Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
@@ -275,7 +289,7 @@ public final class MainAuton extends LinearOpMode {
                                 .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
                                 .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-                                .lineToSplineHeading(turnToStackPos)
+                                .lineToSplineHeading(turnToStack1)
                                 .setTangent(LEFT)
                         ;
                 }
@@ -304,21 +318,24 @@ public final class MainAuton extends LinearOpMode {
                         .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
             } else {
-                if (backdropSide) {
 
-                    // CYCLE 1
-                    driveToStack1(sequence, FIVE_STACK);
-                    intake2From1Stack(sequence, 1, FIVE_STACK);
-                    score(sequence, placements, 1);
+                Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
+                int placement = backdropSide ? 1 : 2;
 
-                } else {
+                // CYCLE 1
+                driveToStack1(sequence, height);
+                intake2From1Stack(sequence, 1, height);
+                score(sequence, placements, placement);
 
-                    // CYCLE 1
-                    driveToStack1(sequence, FOUR_STACK);
-                    intake2From1Stack(sequence, 1, FOUR_STACK);
-                    score(sequence, placements, 2);
+                // CYCLE 2
+                driveToStack1(sequence, height.minus(2));
+                intake2From1Stack(sequence, 1, height.minus(2));
+                score(sequence, placements, placement + 2);
 
-                }
+                // CYCLE 3
+                driveToStack2(sequence, FIVE_STACK);
+                intake2From1Stack(sequence, 2, FIVE_STACK);
+                score(sequence, placements, placement + 4);
             }
 
             sequences[rand.ordinal()] = sequence.build();

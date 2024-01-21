@@ -98,7 +98,7 @@ public final class Intake {
             return values[ordinal];
         }
 
-        public Intake.Height getLess(int less) {
+        public Intake.Height minus(int less) {
             return values[max(ordinal() - 1, 0)];
         }
 
@@ -240,7 +240,7 @@ public final class Intake {
     }
 
     private void decrementHeight() {
-        setHeight(height.getLess(1));
+        setHeight(height.minus(1));
     }
 
     public void setHeight(Intake.Height height) {

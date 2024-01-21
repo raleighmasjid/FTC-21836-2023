@@ -1,8 +1,5 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
-import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.MeepMeepTesting.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -20,7 +17,7 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = true;
+    static boolean isRed = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -55,7 +52,7 @@ public class MeepMeepTesting {
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
-            movingToStack2 = new EditablePose(-45, -24, LEFT);
+            movingToStack2 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
         return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
@@ -131,8 +128,7 @@ public class MeepMeepTesting {
                 MeepMeepTesting.startPose.heading
         ).byBoth().toPose2d();
 
-        Pose2d turnToStackPos = new EditablePose(MeepMeepTesting.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
-        Pose2d enteringBackstage = MeepMeepTesting.enteringBackstage.byAlliance().toPose2d();
+        Pose2d turnToStack1 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byAlliance().toPose2d();
 
         Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
 
@@ -143,58 +139,7 @@ public class MeepMeepTesting {
                 .setDimensions(16.42205, 17.39847)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .setTangent(startPose.getHeading())
-                                .splineTo(preSpike.vec(), preSpike.getHeading())
-                                .splineTo(spike.vec(), spike.getHeading())
 
-                                .setTangent(spike.getHeading() + REVERSE)
-                                .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
-                                .setTangent(FORWARD)
-                                .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-                                .lineToSplineHeading(turnToStackPos)
-                                .setTangent(LEFT)
-
-                                // INTAKING
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setHeight(FIVE_STACK);
-//                                    robot.intake.setRequiredIntakingAmount(1);
-                                })
-
-                                .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setMotorPower(1);
-//                                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
-//                                    robot.intake.setMotorPower(0);
-                                })
-
-                                .lineTo(MeepMeepTesting.enteringBackstage.byAlliance().toPose2d().vec())
-
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
-                                })
-                                .splineToConstantHeading(placements.get(0).toPose2d().vec(), MeepMeepTesting.startPose.byAlliance().heading + REVERSE)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(1);
-                                    autonBackdrop.add(placements.get(0));
-                                })
-                                .waitSeconds(TIME_DROP_FIRST)
-
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(1).y);
-                                })
-                                .lineToConstantHeading(placements.get(1).toPose2d().vec())
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(2);
-                                    autonBackdrop.add(placements.get(1));
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-
-                                .addTemporalMarker(() -> {
-//                                    robot.intake.setHeight(height);
-                                })
-                                .setTangent(MeepMeepTesting.startPose.byAlliance().heading)
-                                .splineToConstantHeading(MeepMeepTesting.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                                .splineTo(turnToStackPos.vec(), LEFT)
 
                                 .build()
                 );
@@ -210,7 +155,7 @@ public class MeepMeepTesting {
 
         public double x, y, heading;
 
-        static boolean backdropSide = false;
+        static boolean backdropSide = true;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
