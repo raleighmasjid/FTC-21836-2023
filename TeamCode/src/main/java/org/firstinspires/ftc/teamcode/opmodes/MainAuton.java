@@ -78,8 +78,7 @@ public final class MainAuton extends LinearOpMode {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            X_SHIFT_INTAKING = 5,
-            TIME_FLIP_BEFORE_STACK = 0.3;
+            X_SHIFT_INTAKING = 5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -276,15 +275,14 @@ public final class MainAuton extends LinearOpMode {
                                 .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
                                 .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-                                .turn(startPose.getHeading())
-                                .lineTo(turnToStackPos.vec())
+                                .lineToSplineHeading(turnToStackPos)
                                 .setTangent(LEFT)
                         ;
                 }
 
                 sequence
                         // INTAKING
-                        .UNSTABLE_addTemporalMarkerOffset(TIME_FLIP_BEFORE_STACK, () -> {
+                        .addTemporalMarker(() -> {
                             robot.intake.setHeight(FIVE_STACK);
                             robot.intake.setRequiredIntakingAmount(1);
                         })
