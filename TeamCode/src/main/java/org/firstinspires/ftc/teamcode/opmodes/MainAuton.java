@@ -140,9 +140,15 @@ public final class MainAuton extends LinearOpMode {
                     spike = centerSpike.byBoth().toPose2d();
             }
 
+            Pose2d preSpike = new EditablePose(
+                    MainAuton.startPose.x,
+                    MainAuton.startPose.y + FORWARD_BEFORE_SPIKE,
+                    MainAuton.startPose.heading
+            ).byBoth().toPose2d();
+
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
-                    .forward(FORWARD_BEFORE_SPIKE)
+                    .splineTo(preSpike.vec(), preSpike.getHeading())
                     .splineTo(spike.vec(), spike.getHeading())
             ;
 
@@ -168,9 +174,11 @@ public final class MainAuton extends LinearOpMode {
             } else {
 
                 sequence
+                        .setTangent(spike.getHeading() + REVERSE)
+                        .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
                         .addTemporalMarker(() -> {
-                            robot.intake.setRequiredIntakingAmount(1);
                             robot.intake.setHeight(FIVE_STACK);
+                            robot.intake.setRequiredIntakingAmount(1);
                         })
                 ;
 
@@ -223,14 +231,27 @@ public final class MainAuton extends LinearOpMode {
 
         public EditablePose byAlliance() {
             double alliance = isRed ? 1 : -1;
-            y *= alliance;
-            heading *= alliance;
-            return this;
+            return new EditablePose(
+                    x,
+                    y * alliance,
+                    heading * alliance
+            );
         }
 
         public EditablePose bySide() {
-            if (!backdropSide) x += X_START_LEFT - X_START_RIGHT;
-            return this;
+            return new EditablePose(
+                    x + (backdropSide ? 0 : X_START_LEFT - X_START_RIGHT),
+                    y,
+                    heading
+            );
+        }
+
+        public EditablePose flipBySide() {
+            return new EditablePose(
+                    backdropSide ? x : (X_START_LEFT + X_START_RIGHT) - x,
+                    y,
+                    backdropSide ? heading : Math.PI - heading
+            );
         }
 
         public EditablePose byBoth() {
@@ -239,12 +260,6 @@ public final class MainAuton extends LinearOpMode {
 
         public Pose2d toPose2d() {
             return new Pose2d(x, y, heading);
-        }
-
-        public EditablePose flipBySide() {
-            if (!backdropSide) heading = Math.PI - heading;
-            if (!backdropSide) x = (X_START_LEFT + X_START_RIGHT) - x;
-            return this;
         }
     }
 }

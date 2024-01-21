@@ -1,5 +1,6 @@
 package com.example.meepmeeptesting;
 
+import static com.example.meepmeeptesting.MeepMeepTesting.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.PI;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 
 public class MeepMeepTesting {
 
-    static boolean isRed = false, backdropSide = false;
+    static boolean isRed = true;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -101,7 +102,11 @@ public class MeepMeepTesting {
                 spike = centerSpike.byBoth().toPose2d();
         }
 
-        Pose2d afterSpike = MeepMeepTesting.afterSpike.byBoth().toPose2d();
+        Pose2d preSpike = new EditablePose(
+                MeepMeepTesting.startPose.x,
+                MeepMeepTesting.startPose.y + FORWARD_BEFORE_SPIKE,
+                MeepMeepTesting.startPose.heading
+        ).byBoth().toPose2d();
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -111,11 +116,11 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
                                 .setTangent(startPose.getHeading())
-                                .splineTo(afterSpike.vec(), startPose.getHeading())
+                                .splineTo(preSpike.vec(), preSpike.getHeading())
                                 .splineTo(spike.vec(), spike.getHeading())
 
                                 .setTangent(spike.getHeading() + REVERSE)
-                                .splineTo(afterSpike.vec(), afterSpike.getHeading() + REVERSE)
+                                .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
 
                                 .build()
                 );
@@ -127,9 +132,11 @@ public class MeepMeepTesting {
                 .start();
     }
 
-    static class EditablePose {
+    public static class EditablePose {
 
         public double x, y, heading;
+
+        static boolean backdropSide = false;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
@@ -139,14 +146,27 @@ public class MeepMeepTesting {
 
         public EditablePose byAlliance() {
             double alliance = isRed ? 1 : -1;
-            y *= alliance;
-            heading *= alliance;
-            return this;
+            return new EditablePose(
+                    x,
+                    y * alliance,
+                    heading * alliance
+            );
         }
 
         public EditablePose bySide() {
-            if (!backdropSide) x += X_START_LEFT - X_START_RIGHT;
-            return this;
+            return new EditablePose(
+                    x + (backdropSide ? 0 : X_START_LEFT - X_START_RIGHT),
+                    y,
+                    heading
+            );
+        }
+
+        public EditablePose flipBySide() {
+            return new EditablePose(
+                    backdropSide ? x : (X_START_LEFT + X_START_RIGHT) - x,
+                    y,
+                    backdropSide ? heading : Math.PI - heading
+            );
         }
 
         public EditablePose byBoth() {
@@ -155,12 +175,6 @@ public class MeepMeepTesting {
 
         public Pose2d toPose2d() {
             return new Pose2d(x, y, heading);
-        }
-
-        public EditablePose flipBySide() {
-            if (!backdropSide) heading = Math.PI - heading;
-            if (!backdropSide) x = (X_START_LEFT + X_START_RIGHT) - x;
-            return this;
         }
     }
 }
