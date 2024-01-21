@@ -34,7 +34,6 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
-import org.openftc.apriltag.AprilTagPose;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -145,53 +144,43 @@ public class BackdropPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        if (!detections.isEmpty()) {
+        if (!detections.isEmpty() && warp) {
             AprilTagDetection detection = detections.get(0);
-            AprilTagPose pose = detection.pose;
-            telemetry.addData("id", detection.id);
-            telemetry.addData("x", pose.x);
-            telemetry.addData("y", pose.y);
-            telemetry.addData("z", pose.z);
-            telemetry.update();
+            Point bl = detection.corners[0];
+            Point br = detection.corners[1];
+            Point tr = detection.corners[2];
+            Point tl = detection.corners[3];
 
-            if (warp) {
-                Imgproc.drawMarker(input, detection.corners[2], new Scalar(255, 0, 0));
-                Point bl = detection.corners[0];
-                Point br = detection.corners[1];
-                Point tr = detection.corners[2];
-                Point tl = detection.corners[3];
+            MatOfPoint2f srcTag = new MatOfPoint2f(
+                    bl,
+                    br,
+                    tr,
+                    tl
+            );
 
-                MatOfPoint2f srcTag = new MatOfPoint2f(
-                        bl,
-                        br,
-                        tr,
-                        tl
-                );
+            int id = detection.id - (detection.id > 3 ? 3 : 0);
+            double topLeft =
+                    id == 3 ? X_TOP_LEFT_R_TAG :
+                    id == 2 ? X_TOP_LEFT_C_TAG :
+                    X_TOP_LEFT_L_TAG
+            ;
 
-                int id = detection.id - (detection.id > 3 ? 3 : 0);
-                double topLeft =
-                        id == 3 ? X_TOP_LEFT_R_TAG :
-                        id == 2 ? X_TOP_LEFT_C_TAG :
-                        X_TOP_LEFT_L_TAG
-                ;
+            Point
+                    rightTagTR = new Point(topLeft + size, Y_TOP_LEFT),
+                    rightTagBL = new Point(topLeft, Y_TOP_LEFT + size),
+                    rightTagTL = new Point(topLeft, Y_TOP_LEFT),
+                    rightTagBR = new Point(topLeft + size, Y_TOP_LEFT + size);
 
-                Point
-                        rightTagTR = new Point(topLeft + size, Y_TOP_LEFT),
-                        rightTagBL = new Point(topLeft, Y_TOP_LEFT + size),
-                        rightTagTL = new Point(topLeft, Y_TOP_LEFT),
-                        rightTagBR = new Point(topLeft + size, Y_TOP_LEFT + size);
+            MatOfPoint2f dstTag = new MatOfPoint2f(
+                    rightTagBL,
+                    rightTagBR,
+                    rightTagTR,
+                    rightTagTL
+            );
 
-                MatOfPoint2f dstTag = new MatOfPoint2f(
-                        rightTagBL,
-                        rightTagBR,
-                        rightTagTR,
-                        rightTagTL
-                );
+            Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
 
-                Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
-
-                Imgproc.warpPerspective(input, input, transformMatrix, input.size());
-            }
+            Imgproc.warpPerspective(input, input, transformMatrix, input.size());
         }
 
         return input;
