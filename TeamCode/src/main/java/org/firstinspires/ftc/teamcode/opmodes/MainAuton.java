@@ -11,6 +11,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
@@ -64,17 +65,30 @@ public final class MainAuton extends LinearOpMode {
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
             X_SHIFT_AFTER_SPIKE = 5,
-            FORWARD_BEFORE_SPIKE = 17,
+            Y_SHIFT_BEFORE_SPIKE = 17,
+            X_SHIFT_AUDIENCE_AFTER_SPIKE = 22,
+            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 33,
             X_TILE = 24,
+            X_INTAKING = -56,
+            Y_INTAKING_1 = -12,
+            Y_INTAKING_2 = -23,
+            Y_INTAKING_3 = -35,
             CYCLES_BACKDROP_SIDE = 0,
-            CYCLES_AUDIENCE_SIDE = 0;
+            CYCLES_AUDIENCE_SIDE = 0,
+            TIME_SPIKE_TO_INTAKE_FLIP = 0.5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -26, FORWARD),
+            centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
             leftSpike = new EditablePose(2.5, -36, toRadians(150)),
-            toParkInner = new EditablePose(Backdrop.X, -60, LEFT),
-            parkedInner = new EditablePose(60, -60, LEFT);
+            parking = new EditablePose(Backdrop.X, -60, LEFT),
+            parked = new EditablePose(60, parking.y, LEFT),
+            turnToStackPos = new EditablePose(-48, startPose.y + Y_SHIFT_BEFORE_SPIKE + Y_SHIFT_AUDIENCE_AFTER_SPIKE, LEFT),
+            enteringBackstage = new EditablePose(12, -12, LEFT);
+
+    public static Pose2d stackPos(int stack) {
+        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+    }
 
     private static void cycle(TrajectorySequenceBuilder sequence, int placement, int stack, Intake.Height height) {
 
@@ -147,9 +161,11 @@ public final class MainAuton extends LinearOpMode {
 
             Pose2d preSpike = new EditablePose(
                     MainAuton.startPose.x,
-                    MainAuton.startPose.y + FORWARD_BEFORE_SPIKE,
+                    MainAuton.startPose.y + Y_SHIFT_BEFORE_SPIKE,
                     MainAuton.startPose.heading
             ).byBoth().toPose2d();
+
+            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
@@ -164,13 +180,13 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .setTangent(afterSpike.getHeading())
                         .lineToSplineHeading(afterSpike)
-                        .addTemporalMarker(() -> {
-                            robot.deposit.lift.setTargetRow(placements.get(0).y);
+                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
                             robot.intake.setRequiredIntakingAmount(2);
+                            robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
                         .splineToSplineHeading(placements.get(0).toPose2d(), RIGHT)
                         .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(2);
+                            robot.deposit.paintbrush.dropPixels(1);
                             autonBackdrop.add(placements.get(0));
                         })
                         .waitSeconds(TIME_DROP_SECOND)
@@ -181,18 +197,49 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .setTangent(spike.getHeading() + REVERSE)
                         .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
+                        .strafeLeft((isRed ? 1 : -1) * X_SHIFT_AUDIENCE_AFTER_SPIKE)
+                        .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
+                        .lineToSplineHeading(turnToStackPos.byAlliance().toPose2d())
                         .addTemporalMarker(() -> {
                             robot.intake.setHeight(FIVE_STACK);
                             robot.intake.setRequiredIntakingAmount(1);
                         })
+                        .lineTo(stackPos(1).vec())
+                        .addTemporalMarker(() -> {
+                            robot.intake.setMotorPower(1);
+                            while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+                            robot.intake.setMotorPower(0);
+                            robot.intake.setRequiredIntakingAmount(2);
+                        })
+                        .lineTo(enteringBackstage.vec())
+
+                        .addTemporalMarker(() -> {
+                            robot.deposit.lift.setTargetRow(placements.get(0).y);
+                        })
+                        .splineToConstantHeading(placements.get(0).toPose2d().vec(), startPose.getHeading() + REVERSE)
+                        .addTemporalMarker(() -> {
+                            robot.deposit.paintbrush.dropPixels(1);
+                            autonBackdrop.add(placements.get(0));
+                        })
+                        .waitSeconds(TIME_DROP_FIRST)
+
+                        .addTemporalMarker(() -> {
+                            robot.deposit.lift.setTargetRow(placements.get(1).y);
+                        })
+                        .lineToConstantHeading(placements.get(1).toPose2d().vec())
+                        .addTemporalMarker(() -> {
+                            robot.deposit.paintbrush.dropPixels(2);
+                            autonBackdrop.add(placements.get(1));
+                        })
+                        .waitSeconds(TIME_DROP_SECOND)
                 ;
 
             }
 
             if (!doCycles) {
                 sequence
-                        .lineTo(toParkInner.byAlliance().toPose2d().vec())
-                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                        .lineTo(parking.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
             } else {
                 // TODO Add cycling pathing
