@@ -43,8 +43,6 @@ public class BackdropPipeline extends OpenCvPipeline {
     public boolean warp = true, backdropVisible = false, isRed = true;
 
     public double
-            X_TOP_LEFT_L_TAG = 450,
-            X_TOP_LEFT_C_TAG = 550,
             X_TOP_LEFT_R_TAG = 650,
             Y_TOP_LEFT = 1300,
             size = 85;
@@ -165,6 +163,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         backdropVisible = tag != null;
 
         if (warp && backdropVisible) {
+            telemetry.addData("ID", tag.id);
 
             Point bl = tag.corners[0];
             Point br = tag.corners[1];
@@ -179,11 +178,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             );
 
             int id2 = tag.id - (tag.id > 3 ? 3 : 0);
-            double topLeftX =
-                    id2 == 3 ? X_TOP_LEFT_R_TAG :
-                    id2 == 2 ? X_TOP_LEFT_C_TAG :
-                    X_TOP_LEFT_L_TAG
-            ;
+            double topLeftX = X_TOP_LEFT_R_TAG - ((3 - id2) * (6 * (size / 2.0)));
 
             Point
                     rightTagTR = new Point(topLeftX + size, Y_TOP_LEFT),
@@ -202,6 +197,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
         }
+        telemetry.update();
 
         return input;
     }
