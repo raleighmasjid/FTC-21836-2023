@@ -144,7 +144,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        if (!detections.isEmpty() && warp) {
+        if (warp && !detections.isEmpty()) {
             AprilTagDetection detection = detections.get(0);
             Point bl = detection.corners[0];
             Point br = detection.corners[1];
