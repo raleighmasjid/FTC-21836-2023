@@ -333,9 +333,9 @@ public final class MainAuton extends LinearOpMode {
                 score(sequence, placements, placement + 2);
 
                 // CYCLE 3
-                driveToStack2(sequence, FIVE_STACK);
-                intake2From1Stack(sequence, 2, FIVE_STACK);
-                score(sequence, placements, placement + 4);
+//                driveToStack2(sequence, FIVE_STACK);
+//                intake2From1Stack(sequence, 2, FIVE_STACK);
+//                score(sequence, placements, placement + 4);
             }
 
             sequences[rand.ordinal()] = sequence.build();

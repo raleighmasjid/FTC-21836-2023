@@ -1,6 +1,6 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.MeepMeepTesting.isRed;
+import static com.example.meepmeeptesting.MainAuton.isRed;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;

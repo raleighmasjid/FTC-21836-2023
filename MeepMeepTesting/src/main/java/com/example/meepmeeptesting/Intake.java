@@ -51,7 +51,7 @@ public final class Intake {
             return values[ordinal];
         }
 
-        public Height getLess(int less) {
+        public Height minus(int less) {
             return values[max(ordinal() - 1, 0)];
         }
 

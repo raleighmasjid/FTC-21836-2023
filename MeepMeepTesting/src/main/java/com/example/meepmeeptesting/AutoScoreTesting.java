@@ -20,8 +20,8 @@ public class AutoScoreTesting {
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
 
-    public static MeepMeepTesting.EditablePose
-            startPose = new MeepMeepTesting.EditablePose(24, -16, LEFT);
+    public static MainAuton.EditablePose
+            startPose = new MainAuton.EditablePose(24, -16, LEFT);
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
