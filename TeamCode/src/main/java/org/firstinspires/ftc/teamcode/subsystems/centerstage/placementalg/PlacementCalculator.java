@@ -421,14 +421,14 @@ public final class PlacementCalculator {
     private static void sortPixelsToPlace() {
         for (Pixel pixel : optimalPlacements) {
             if (!noColor) {
-                if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
+//                if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
                     if (pixel.isIn(mosaicSPixels)) {
                         pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
                     }
                 }
-                if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x);
+                if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x) / 3.0;
             }
 
             if (pixel.isIn(setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
