@@ -244,7 +244,7 @@ public final class MainAuton extends LinearOpMode {
                     MainAuton.startPose.heading
             ).byBoth().toPose2d();
 
-            Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();            Pose2d enteringBackstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
+            Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
@@ -304,7 +304,7 @@ public final class MainAuton extends LinearOpMode {
                         .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
                         .addTemporalMarker(() -> {
                             robot.intake.setMotorPower(1);
-                            while (robot.intake.colors[0] == Pixel.Color.EMPTY) {}
+                            while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
                             robot.intake.setMotorPower(0);
                         })
                 ;
