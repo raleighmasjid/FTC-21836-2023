@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public boolean warp = true;
+    public boolean warp = true, isDetecting = false, isRed = true;
 
     public double
             X_TOP_LEFT_L_TAG = 450,
@@ -144,8 +144,25 @@ public class BackdropPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        if (warp && !detections.isEmpty()) {
-            AprilTagDetection detection = detections.get(0);
+        AprilTagDetection detection = null;
+        int id = 0;
+        if (!detections.isEmpty()) {
+            detection = detections.get(0);
+            id = detection.id;
+            switch (id) {
+                case 1: case 2: case 3:
+                    isDetecting = !isRed;
+                    break;
+                case 4: case 5: case 6:
+                    isDetecting = isRed;
+                    break;
+                default:
+                    isDetecting = false;
+            }
+        }
+
+        if (warp && isDetecting && detection != null) {
+
             Point bl = detection.corners[0];
             Point br = detection.corners[1];
             Point tr = detection.corners[2];
@@ -158,18 +175,18 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tl
             );
 
-            int id = detection.id - (detection.id > 3 ? 3 : 0);
-            double topLeft =
-                    id == 3 ? X_TOP_LEFT_R_TAG :
-                    id == 2 ? X_TOP_LEFT_C_TAG :
+            int id2 = detection.id - (detection.id > 3 ? 3 : 0);
+            double topLeftX =
+                    id2 == 3 ? X_TOP_LEFT_R_TAG :
+                    id2 == 2 ? X_TOP_LEFT_C_TAG :
                     X_TOP_LEFT_L_TAG
             ;
 
             Point
-                    rightTagTR = new Point(topLeft + size, Y_TOP_LEFT),
-                    rightTagBL = new Point(topLeft, Y_TOP_LEFT + size),
-                    rightTagTL = new Point(topLeft, Y_TOP_LEFT),
-                    rightTagBR = new Point(topLeft + size, Y_TOP_LEFT + size);
+                    rightTagTR = new Point(topLeftX + size, Y_TOP_LEFT),
+                    rightTagBL = new Point(topLeftX, Y_TOP_LEFT + size),
+                    rightTagTL = new Point(topLeftX, Y_TOP_LEFT),
+                    rightTagBR = new Point(topLeftX + size, Y_TOP_LEFT + size);
 
             MatOfPoint2f dstTag = new MatOfPoint2f(
                     rightTagBL,
