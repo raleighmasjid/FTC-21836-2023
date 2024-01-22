@@ -64,7 +64,7 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.1,
+                0.4,
                 0.1,
                 0,
                 0.5
