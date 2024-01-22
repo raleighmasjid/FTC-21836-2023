@@ -25,6 +25,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPip
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -32,13 +33,13 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
-import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
@@ -46,15 +47,18 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     public double
             X_TOP_LEFT_R_TAG = 670,
-            Y_TOP_LEFT = 1200,
-            TARGET_SIZE = 75;
+            Y_TOP_LEFT = 1100,
+            TARGET_SIZE = 75,
+            X_SHIFT_L_TAG_TO_L_PIXEL = -115,
+            Y_SHIFT_TAG_TO_PIXEL = -105,
+            X_SHIFT_PIXEL_POINTS = 80;
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
     private long nativeApriltagPtr;
     private final Mat grey = new Mat(), cameraMatrix;
 
-    public final Scalar[][] backdrop = new Scalar[11][7];
+    public final int[][] slots = new int[11][7];
 
     private final double
             fx = 1430,
@@ -64,6 +68,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             tagSize = 0.0508;
 
     public BackdropPipeline(Telemetry telemetry) {
+
+        for (int[] row : slots) Arrays.fill(row, 4);
 
         //     Construct the camera matrix.
         //
@@ -158,8 +164,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tl
             );
 
-            double leftX = getLeftX(tags.get(minInd));
-            double rightX = getLeftX(tags.get(maxInd)) + TARGET_SIZE;
+            double leftX = getLeftX(tags.get(minInd).id);
+            double rightX = getLeftX(tags.get(maxInd).id) + TARGET_SIZE;
 
             Point
                     tagTR = new Point(rightX, Y_TOP_LEFT),
@@ -182,6 +188,14 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (warp) {
                 Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
                 Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+
+                for (int y = 0; y < slots.length; y++) {
+                    for (int x = 0; x < slots[y].length; x++) {
+                        if (x == 0 && y % 2 == 0) continue;
+                        Imgproc.drawMarker(input, pixelLeft(x, y), y % 2 == 0 ? red : blue, 1, 2, 10);
+//                        Imgproc.drawMarker(input, pixelRight(x, y), blue, 1, 2, 10);
+                    }
+                }
             }
 
             Imgproc.line(input, tagTL, tagTR, yellow, 5);
@@ -198,7 +212,20 @@ public class BackdropPipeline extends OpenCvPipeline {
         return input;
     }
 
-    private double getLeftX(AprilTagDetection tag) {
-        return X_TOP_LEFT_R_TAG - ((3 - (tag.id - (tag.id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
+    private double getLeftX(int id) {
+        return X_TOP_LEFT_R_TAG - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
+    }
+
+    private Point pixelLeft(int x, int y) {
+        double width = 2.985 * (TARGET_SIZE / 2.0);
+        return new Point(
+                getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.5 * (TARGET_SIZE / 2.0))
+        );
+    }
+
+    private Point pixelRight(int x, int y) {
+        Point left = pixelLeft(x, y);
+        return new Point(left.x + X_SHIFT_PIXEL_POINTS, left.y);
     }
 }
