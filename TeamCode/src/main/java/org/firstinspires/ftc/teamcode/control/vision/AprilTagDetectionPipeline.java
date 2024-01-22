@@ -47,10 +47,12 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
 
     Mat cameraMatrix;
 
-    private final static Scalar blue = new Scalar(7, 197, 235, 255);
-    private final static Scalar red = new Scalar(255, 0, 0, 255);
-    private final static Scalar green = new Scalar(0, 255, 0, 255);
-    private final static Scalar white = new Scalar(255, 255, 255, 255);
+    final static Scalar aqua = new Scalar(7, 197, 235, 255);
+    final static Scalar blue = new Scalar(0, 0, 255, 255);
+    final static Scalar red = new Scalar(255, 0, 0, 255);
+    final static Scalar green = new Scalar(0, 255, 0, 255);
+    final static Scalar yellow = new Scalar(255, 255, 0, 255);
+    final static Scalar white = new Scalar(255, 255, 255, 255);
 
     double fx;
     double fy;
@@ -194,7 +196,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
         // Draw the marker!
         Imgproc.line(buf, projectedPoints[0], projectedPoints[1], red, thickness);
         Imgproc.line(buf, projectedPoints[0], projectedPoints[2], green, thickness);
-        Imgproc.line(buf, projectedPoints[0], projectedPoints[3], blue, thickness);
+        Imgproc.line(buf, projectedPoints[0], projectedPoints[3], aqua, thickness);
 
         Imgproc.circle(buf, projectedPoints[0], thickness, white, -1);
     }
@@ -222,7 +224,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
 
         // Pillars
         for (int i = 0; i < 4; i++) {
-            Imgproc.line(buf, projectedPoints[i], projectedPoints[i + 4], blue, thickness);
+            Imgproc.line(buf, projectedPoints[i], projectedPoints[i + 4], aqua, thickness);
         }
 
         // Base lines

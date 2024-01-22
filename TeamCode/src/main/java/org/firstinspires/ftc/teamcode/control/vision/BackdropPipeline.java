@@ -21,9 +21,11 @@
 
 package org.firstinspires.ftc.teamcode.control.vision;
 
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.CvType;
@@ -46,6 +48,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 650,
             Y_TOP_LEFT = 1300,
             TARGET_SIZE = 85;
+
+    private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
     private long nativeApriltagPtr;
     private final Mat grey = new Mat(), cameraMatrix;
@@ -119,30 +123,33 @@ public class BackdropPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        AprilTagDetection tag = null;
-        allTags:
+        tags.clear();
+
+        int left = !isRed ? 1 : 4;
+        int center = !isRed ? 2 : 5;
+        int right = !isRed ? 3 : 6;
+
         for (AprilTagDetection detection : detections) {
-            if (isRed) {
-                switch (detection.id) {
-                    case 4: case 5: case 6:
-                        tag = detection;
-                        break allTags;
-                }
-            } else {
-                switch (detection.id) {
-                    case 1: case 2: case 3:
-                        tag = detection;
-                        break allTags;
-                }
+            int id = detection.id;
+            if (id == left || id == center || id == right) {
+                tags.add(detection);
             }
         }
 
-        if ((backdropVisible = tag != null) && warp) {
+        backdropVisible = !tags.isEmpty();
 
-            Point bl = tag.corners[0];
-            Point br = tag.corners[1];
-            Point tr = tag.corners[2];
-            Point tl = tag.corners[3];
+        if (backdropVisible) {
+
+            int minInd = 0, maxInd = 0;
+            for (int i = 0; i < tags.size(); i++) {
+                if (tags.get(i).id < tags.get(minInd).id) minInd = i;
+                if (tags.get(i).id > tags.get(maxInd).id) maxInd = i;
+            }
+
+            Point bl = tags.get(minInd).corners[0];
+            Point tl = tags.get(minInd).corners[3];
+            Point br = tags.get(maxInd).corners[1];
+            Point tr = tags.get(maxInd).corners[2];
 
             MatOfPoint2f srcTag = new MatOfPoint2f(
                     bl,
@@ -151,29 +158,47 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tl
             );
 
-            int id2 = tag.id - (tag.id > 3 ? 3 : 0);
-            double topLeftX = X_TOP_LEFT_R_TAG - ((3 - id2) * (6 * (TARGET_SIZE / 2.0)));
+            double leftX = getLeftX(tags.get(minInd));
+            double rightX = getLeftX(tags.get(maxInd)) + TARGET_SIZE;
 
             Point
-                    rightTagTR = new Point(topLeftX + TARGET_SIZE, Y_TOP_LEFT),
-                    rightTagBL = new Point(topLeftX, Y_TOP_LEFT + TARGET_SIZE),
-                    rightTagTL = new Point(topLeftX, Y_TOP_LEFT),
-                    rightTagBR = new Point(topLeftX + TARGET_SIZE, Y_TOP_LEFT + TARGET_SIZE);
+                    tagTR = new Point(rightX, Y_TOP_LEFT),
+                    tagBL = new Point(leftX, Y_TOP_LEFT + TARGET_SIZE),
+                    tagTL = new Point(leftX, Y_TOP_LEFT),
+                    tagBR = new Point(rightX, Y_TOP_LEFT + TARGET_SIZE);
 
             MatOfPoint2f dstTag = new MatOfPoint2f(
-                    rightTagBL,
-                    rightTagBR,
-                    rightTagTR,
-                    rightTagTL
+                    tagBL,
+                    tagBR,
+                    tagTR,
+                    tagTL
             );
 
-            Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
+            Imgproc.line(input, tl, tr, blue, 5);
+            Imgproc.line(input, bl, br, blue, 5);
+            Imgproc.line(input, tl, bl, blue, 5);
+            Imgproc.line(input, tr, br, blue, 5);
 
-            Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+            if (warp) {
+                Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
+                Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+            }
+
+            Imgproc.line(input, tagTL, tagTR, yellow, 5);
+            Imgproc.line(input, tagBL, tagBR, yellow, 5);
+            Imgproc.line(input, tagTL, tagBL, yellow, 5);
+            Imgproc.line(input, tagTR, tagBR, yellow, 5);
         }
-        if (backdropVisible) telemetry.addData("ID", tag.id);
+
+        String tagIds = "";
+        for (AprilTagDetection tag : tags) tagIds += tag.id + " ";
+        telemetry.addData("Detected tag", tagIds);
         telemetry.update();
 
         return input;
+    }
+
+    private double getLeftX(AprilTagDetection tag) {
+        return X_TOP_LEFT_R_TAG - ((3 - (tag.id - (tag.id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 }
