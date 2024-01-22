@@ -137,10 +137,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
         }
 
-        backdropVisible = tag != null;
-
-        if (warp && backdropVisible) {
-            telemetry.addData("ID", tag.id);
+        if ((backdropVisible = tag != null) && warp) {
 
             Point bl = tag.corners[0];
             Point br = tag.corners[1];
@@ -174,6 +171,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
         }
+        if (backdropVisible) telemetry.addData("ID", tag.id);
         telemetry.update();
 
         return input;
