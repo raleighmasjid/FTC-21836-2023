@@ -209,9 +209,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             Imgproc.line(input, tagTR, tagBR, yellow, 5);
         }
 
-        String tagIds = "";
-        for (AprilTagDetection tag : tags) tagIds += tag.id + " ";
-        telemetry.addData("Detected tags", tagIds);
+        StringBuilder tagIds = new StringBuilder();
+        for (AprilTagDetection tag : tags) tagIds.append(tag.id).append(" ");
+        telemetry.addData("Detected tags", tagIds.toString());
         telemetry.update();
 
         return input;
