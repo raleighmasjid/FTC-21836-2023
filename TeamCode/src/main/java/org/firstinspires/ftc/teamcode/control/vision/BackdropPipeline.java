@@ -25,7 +25,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPip
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -50,7 +49,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_TOP_LEFT = 1100,
             TARGET_SIZE = 75,
             X_SHIFT_L_TAG_TO_L_PIXEL = -115,
-            Y_SHIFT_TAG_TO_PIXEL = -105,
+            Y_SHIFT_TAG_TO_PIXEL = -100,
             X_SHIFT_PIXEL_POINTS = 80;
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
@@ -59,6 +58,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix;
 
     public final int[][] slots = new int[11][7];
+    private final Point[][][] points = new Point[11][7][2];
 
     private final double
             fx = 1430,
@@ -70,6 +70,14 @@ public class BackdropPipeline extends OpenCvPipeline {
     public BackdropPipeline(Telemetry telemetry) {
 
         for (int[] row : slots) Arrays.fill(row, 4);
+
+        for (int y = 0; y < points.length; y++) {
+            for (int x = 0; x < points[y].length; x++) {
+                if (x == 0 && y % 2 == 0) continue;
+                points[y][x][0] = pixelLeft(x, y);
+                points[y][x][1] = pixelRight(x, y);
+            }
+        }
 
         //     Construct the camera matrix.
         //
@@ -189,12 +197,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
                 Imgproc.warpPerspective(input, input, transformMatrix, input.size());
 
-                for (int y = 0; y < slots.length; y++) {
-                    for (int x = 0; x < slots[y].length; x++) {
-                        if (x == 0 && y % 2 == 0) continue;
-                        Imgproc.drawMarker(input, pixelLeft(x, y), y % 2 == 0 ? red : blue, 1, 2, 10);
-//                        Imgproc.drawMarker(input, pixelRight(x, y), blue, 1, 2, 10);
-                    }
+                for (Point[][] row : points) for (Point[] pair : row) for (Point point : pair) {
+                    if (point != null) Imgproc.drawMarker(input, point, blue, 1, 2, 7);
                 }
             }
 
@@ -220,7 +224,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         double width = 2.985 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.5 * (TARGET_SIZE / 2.0))
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.53 * (TARGET_SIZE / 2.0))
         );
     }
 
