@@ -45,9 +45,9 @@ public class BackdropPipeline extends OpenCvPipeline {
     public boolean warp = true, backdropVisible = false, isRed = true;
 
     public double
-            X_TOP_LEFT_R_TAG = 650,
-            Y_TOP_LEFT = 1300,
-            TARGET_SIZE = 85;
+            X_TOP_LEFT_R_TAG = 670,
+            Y_TOP_LEFT = 1200,
+            TARGET_SIZE = 75;
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -192,7 +192,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         String tagIds = "";
         for (AprilTagDetection tag : tags) tagIds += tag.id + " ";
-        telemetry.addData("Detected tag", tagIds);
+        telemetry.addData("Detected tags", tagIds);
         telemetry.update();
 
         return input;
