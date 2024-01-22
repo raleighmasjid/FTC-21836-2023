@@ -42,7 +42,7 @@ import java.util.Arrays;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public boolean warp = true, backdropVisible = false, isRed = true;
+    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false;
 
     public double
             X_TOP_LEFT_R_TAG = 670,
@@ -70,13 +70,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         for (int[] row : slots) Arrays.fill(row, 4);
 
-        for (int y = 0; y < points.length; y++) {
-            for (int x = 0; x < points[y].length; x++) {
-                if (x == 0 && y % 2 == 0) continue;
-                points[y][x][0] = pixelLeft(x, y);
-                points[y][x][1] = pixelRight(x, y);
-            }
-        }
+        generatePoints();
 
         //     Construct the camera matrix.
         //
@@ -198,6 +192,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
                 Imgproc.warpPerspective(input, input, transformMatrix, input.size());
 
+                if (editPoints) generatePoints();
+
                 for (Point[][] row : points) for (Point[] pair : row) for (Point point : pair) {
                     if (point != null) Imgproc.drawMarker(input, point, blue, 1, 2, 7);
                 }
@@ -217,12 +213,22 @@ public class BackdropPipeline extends OpenCvPipeline {
         return input;
     }
 
+    private void generatePoints() {
+        for (int y = 0; y < points.length; y++) {
+            for (int x = 0; x < points[y].length; x++) {
+                if (x == 0 && y % 2 == 0) continue;
+                points[y][x][0] = pixelLeft(x, y);
+                points[y][x][1] = pixelRight(x, y);
+            }
+        }
+    }
+
     private double getLeftX(int id) {
         return X_TOP_LEFT_R_TAG - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 
     private Point pixelLeft(int x, int y) {
-        double width = 2.985 * (TARGET_SIZE / 2.0);
+        double width = 2.98 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
                 Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.51 * (TARGET_SIZE / 2.0))
