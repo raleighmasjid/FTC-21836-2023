@@ -224,7 +224,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         double width = 2.985 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.53 * (TARGET_SIZE / 2.0))
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.51 * (TARGET_SIZE / 2.0))
         );
     }
 
