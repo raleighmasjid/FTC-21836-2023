@@ -50,7 +50,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             TARGET_SIZE = 75,
             X_SHIFT_L_TAG_TO_L_PIXEL = -115,
             Y_SHIFT_TAG_TO_PIXEL = -100,
-            X_SHIFT_PIXEL_POINTS = 80;
+            X_SHIFT_PIXEL_POINTS = 80,
+            PIXEL_WIDTH = 2.985,
+            PIXEL_HEIGHT = 2.51;
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -222,10 +224,11 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private Point pixelLeft(int x, int y) {
-        double width = 2.985 * (TARGET_SIZE / 2.0);
+        double PPI = TARGET_SIZE / 2.0;
+        double width = PIXEL_WIDTH * PPI;
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.51 * (TARGET_SIZE / 2.0))
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (PIXEL_HEIGHT * PPI)
         );
     }
 
