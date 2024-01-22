@@ -230,6 +230,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private Point pixelRight(int x, int y) {
         Point left = pixelLeft(x, y);
-        return new Point(left.x + X_SHIFT_PIXEL_POINTS, left.y);
+        left.x += X_SHIFT_PIXEL_POINTS;
+        return left;
     }
 }
