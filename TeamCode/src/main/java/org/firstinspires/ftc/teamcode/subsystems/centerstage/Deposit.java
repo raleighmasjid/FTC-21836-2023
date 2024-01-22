@@ -65,8 +65,8 @@ public final class Deposit {
 
         public static PIDGains pidGains = new PIDGains(
                 0.1,
-                0.2,
-                0.004330951894845302,
+                0.1,
+                0,
                 0.5
         );
 
@@ -93,8 +93,8 @@ public final class Deposit {
         );
 
         public static double
-                kG = 0.25,
-                INCHES_PER_TICK = 0.0322835,
+                kG = 0.15,
+                INCHES_PER_TICK = 0.0088581424,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
