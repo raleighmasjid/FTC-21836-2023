@@ -64,8 +64,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             fx = 1430,
             fy = 1430,
             cx = 480,
-            cy = 620,
-            tagSize = 0.0508;
+            cy = 620;
 
     public BackdropPipeline(Telemetry telemetry) {
 
@@ -125,6 +124,8 @@ public class BackdropPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         // Convert to greyscale
         Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
+
+        double tagSize = 0.0508;
 
         // Run AprilTag
         ArrayList<AprilTagDetection> detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagSize, fx, fy, cx, cy);
