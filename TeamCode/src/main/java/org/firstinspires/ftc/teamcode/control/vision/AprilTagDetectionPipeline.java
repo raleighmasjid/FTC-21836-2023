@@ -47,10 +47,10 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
 
     Mat cameraMatrix;
 
-    Scalar blue = new Scalar(7, 197, 235, 255);
-    Scalar red = new Scalar(255, 0, 0, 255);
-    Scalar green = new Scalar(0, 255, 0, 255);
-    Scalar white = new Scalar(255, 255, 255, 255);
+    private final static Scalar blue = new Scalar(7, 197, 235, 255);
+    private final static Scalar red = new Scalar(255, 0, 0, 255);
+    private final static Scalar green = new Scalar(0, 255, 0, 255);
+    private final static Scalar white = new Scalar(255, 255, 255, 255);
 
     double fx;
     double fy;
@@ -176,7 +176,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
      * @param tvec         the translation vector of the detection
      * @param cameraMatrix the camera matrix used when finding the detection
      */
-    void drawAxisMarker(Mat buf, double length, int thickness, Mat rvec, Mat tvec, Mat cameraMatrix) {
+    static void drawAxisMarker(Mat buf, double length, int thickness, Mat rvec, Mat tvec, Mat cameraMatrix) {
         // The points in 3D space we wish to project onto the 2D image plane.
         // The origin of the coordinate space is assumed to be in the center of the detection.
         MatOfPoint3f axis = new MatOfPoint3f(
@@ -199,7 +199,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
         Imgproc.circle(buf, projectedPoints[0], thickness, white, -1);
     }
 
-    void draw3dCubeMarker(Mat buf, double length, double tagWidth, double tagHeight, int thickness, Mat rvec, Mat tvec, Mat cameraMatrix) {
+    static void draw3dCubeMarker(Mat buf, double length, double tagWidth, double tagHeight, int thickness, Mat rvec, Mat tvec, Mat cameraMatrix) {
         //axis = np.float32([[0,0,0], [0,3,0], [3,3,0], [3,0,0],
         //       [0,0,-3],[0,3,-3],[3,3,-3],[3,0,-3] ])
 
@@ -248,7 +248,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
      * @param tagsizeY     the original height of the tag
      * @return the 6DOF pose of the camera relative to the tag
      */
-    Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX, double tagsizeY) {
+    static Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX, double tagsizeY) {
         // The actual 2d points of the tag detected in the image
         MatOfPoint2f points2d = new MatOfPoint2f(points);
 
@@ -271,7 +271,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
      * A simple container to hold both rotation and translation
      * vectors, which together form a 6DOF pose.
      */
-    class Pose {
+    static class Pose {
         Mat rvec;
         Mat tvec;
 
