@@ -45,12 +45,12 @@ public class BackdropPipeline extends OpenCvPipeline {
     public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false;
 
     public double
-            X_TOP_LEFT_R_TAG = 670,
+            X_TOP_LEFT_R_TAG = 660,
             Y_TOP_LEFT = 1100,
-            TARGET_SIZE = 75,
-            X_SHIFT_L_TAG_TO_L_PIXEL = -115,
-            Y_SHIFT_TAG_TO_PIXEL = -100,
-            X_SHIFT_PIXEL_POINTS = 80;
+            TARGET_SIZE = 70,
+            X_SHIFT_L_TAG_TO_L_PIXEL = -103,
+            Y_SHIFT_TAG_TO_PIXEL = -90,
+            X_SHIFT_PIXEL_POINTS = 66;
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -228,10 +228,10 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private Point pixelLeft(int x, int y) {
-        double width = 2.98 * (TARGET_SIZE / 2.0);
+        double width = 2.976 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.51 * (TARGET_SIZE / 2.0))
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.50 * (TARGET_SIZE / 2.0))
         );
     }
 
