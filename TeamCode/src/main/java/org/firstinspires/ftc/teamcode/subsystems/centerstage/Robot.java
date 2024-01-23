@@ -24,7 +24,7 @@ public final class Robot {
     public static double
             maxVoltage = 13,
             TIME_TRAJECTORY_GEN = 0,
-            ANGLE_DRONE_INITIAL = 10,
+            ANGLE_DRONE_INITIAL = 50,
             ANGLE_DRONE_LAUNCHED = 0;
 
     public static boolean isRed = true;
