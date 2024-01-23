@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -71,6 +72,16 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
     private float decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
+
+    public AprilTagDetectionPipeline(Telemetry telemetry) {
+        this(
+                0.0508,
+                1430,
+                1430,
+                480,
+                620
+        );
+    }
 
     public AprilTagDetectionPipeline(double tagsize, double fx, double fy, double cx, double cy) {
         this.tagsize = tagsize;

@@ -73,7 +73,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_TOP_LEFT = 32.42857142857142,
             TARGET_SIZE = 65,
             X_SHIFT_L_TAG_TO_L_PIXEL = -2.9,
-            Y_SHIFT_TAG_TO_PIXEL = -2.65,
+            Y_SHIFT_TAG_TO_PIXEL = -2.6,
             X_SHIFT_PIXEL_POINTS_R = 1.8857142857142857,
             Y_SHIFT_PIXEL_POINTS_T = -1.1428571428571428,
             Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
@@ -86,17 +86,17 @@ public class BackdropPipeline extends OpenCvPipeline {
             minPurple = {140, .15, .3},
             maxPurple = {320, 1, 1},
 
-            minYellow = {20, .51, .65},
+            minYellow = {20, .51, .5},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {85, .4, .25},
+            minGreen =  {70, .4, .25},
             maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0, 0.55},
+            minWhite =  {0, 0, 0.54},
             maxWhite =  {360, 0.25, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 1, 0.55};
+            maxBlack =  {360, 1, 0.54};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -267,7 +267,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             double valBoost = 1.0 / (whiteVal - blackVal);
 
             // TODO remove for robot version
-//                for (int[] row : slots) Arrays.fill(row, 4);
+            for (int[] row : slots) Arrays.fill(row, 4);
 
             for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
@@ -352,6 +352,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private static int hsvToColorInt(double[] hsv) {
         return
+                hsv[2] == 0 ? -1 :
                 inRange(hsv, minPurple, maxPurple) ? 0 :
                 inRange(hsv, minYellow, maxYellow) ? 1 :
                 inRange(hsv, minGreen, maxGreen)   ? 2 :
@@ -411,7 +412,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         double width = 2.976 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + (X_SHIFT_L_TAG_TO_L_PIXEL * TARGET_SIZE / 2.0) + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_TAG_TO_PIXEL * TARGET_SIZE / 2.0) - y * (2.48 * (TARGET_SIZE / 2.0))
+                (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_TAG_TO_PIXEL * TARGET_SIZE / 2.0) - y * (2.625 * (TARGET_SIZE / 2.0))
         );
     }
 
