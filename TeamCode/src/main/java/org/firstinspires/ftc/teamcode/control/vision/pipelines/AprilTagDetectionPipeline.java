@@ -54,7 +54,7 @@ public class AprilTagDetectionPipeline extends OpenCvPipeline {
             green = new Scalar(0, 255, 0, 255),
             yellow = new Scalar(255, 255, 0, 255),
             white = new Scalar(255, 255, 255, 255),
-            lavender = new Scalar(206, 132, 255),
+            lavender = new Scalar(236, 140, 255),
             black = new Scalar(0, 0, 0),
             gray = new Scalar(40, 40, 40);
 

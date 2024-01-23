@@ -92,8 +92,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             minGreen =  {85, .4, .25},
             maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0, 0.7},
-            maxWhite =  {360, 0.2, 1},
+            minWhite =  {0, 0, 0.55},
+            maxWhite =  {360, 0.25, 1},
 
             minBlack =  {0, 0, 0},
             maxBlack =  {360, 1, 0.3};
@@ -303,16 +303,20 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Imgproc.drawMarker(input, whiteSample, green, 2, 3);
                 Imgproc.drawMarker(input, blackSample, green, 2, 3);
 
-                if (graphic && background) Imgproc.fillConvexPoly(
-                        input,
-                        new MatOfPoint(
-                                CORNER_TL,
-                                CORNER_TR,
-                                CORNER_BR,
-                                CORNER_BL
-                        ),
-                        gray
-                );
+                if (graphic && background) {
+                    MatOfPoint background = new MatOfPoint(
+                            CORNER_TL,
+                            CORNER_TR,
+                            CORNER_BR,
+                            CORNER_BL
+                    );
+                    Imgproc.fillConvexPoly(
+                            input,
+                            background,
+                            gray
+                    );
+                    background.release();
+                }
 
                 for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
@@ -325,6 +329,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 }
 
             }
+            srcTag.release();
+            dstTag.release();
 
             Imgproc.line(input, tagTL, tagTR, yellow, 5);
             Imgproc.line(input, tagBL, tagBR, yellow, 5);
