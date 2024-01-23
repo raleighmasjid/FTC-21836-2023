@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.control.vision.detectors;
+package org.firstinspires.ftc.teamcode.subsystems.utilities.sensors;
 
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.RIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
