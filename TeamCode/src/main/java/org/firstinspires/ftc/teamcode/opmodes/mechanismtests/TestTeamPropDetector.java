@@ -41,9 +41,8 @@ public final class TestTeamPropDetector extends LinearOpMode {
 
         while (opModeInInit()) {
             mTelemetry.addData("Location", detector.run().name());
+            detector.printNumericalTelemetry();
             mTelemetry.update();
         }
-
-        detector.stop();
     }
 }
