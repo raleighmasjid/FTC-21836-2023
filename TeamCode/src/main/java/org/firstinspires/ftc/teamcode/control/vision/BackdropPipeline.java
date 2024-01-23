@@ -48,7 +48,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 660,
             Y_TOP_LEFT = 1100,
             TARGET_SIZE = 70,
-            X_SHIFT_L_TAG_TO_L_PIXEL = -103,
+            X_SHIFT_L_TAG_TO_L_PIXEL = -100,
             Y_SHIFT_TAG_TO_PIXEL = -90,
             X_SHIFT_PIXEL_POINTS = 66;
 
