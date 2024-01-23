@@ -267,7 +267,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 double valBoost = 1.0 / (whiteVal - blackVal);
 
                 // TODO remove for robot version
-                for (int[] row : slots) Arrays.fill(row, 4);
+//                for (int[] row : slots) Arrays.fill(row, 4);
 
                 for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
