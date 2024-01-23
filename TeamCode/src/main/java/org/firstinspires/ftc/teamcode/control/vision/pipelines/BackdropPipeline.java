@@ -96,7 +96,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             maxWhite =  {360, 0.25, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 1, 0.3};
+            maxBlack =  {360, 1, 0.55};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -177,6 +177,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             drawAxisMarker(input, tagSize / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
+        grey.release();
 
         tags.clear();
 
