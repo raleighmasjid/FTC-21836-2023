@@ -28,7 +28,7 @@ public final class AutoScoringManager {
     private final BackdropDetector backdropDetector;
 
     private final Backdrop latestScan = autonBackdrop;
-    private Backdrop lastScan = new Backdrop();
+    private volatile Backdrop lastScan = latestScan;
     private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
