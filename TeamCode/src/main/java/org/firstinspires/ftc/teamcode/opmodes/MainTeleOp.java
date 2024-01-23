@@ -9,6 +9,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
@@ -101,6 +102,7 @@ public final class MainTeleOp extends LinearOpMode {
 
         robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
         if (keyPressed(2, LEFT_STICK_BUTTON)) robot.deposit.lift.reset();
+        if (keyPressed(2, RIGHT_STICK_BUTTON)) robot.drone.toggle();
 
         if (gamepadEx2.isDown(LEFT_BUMPER)) {
             if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);

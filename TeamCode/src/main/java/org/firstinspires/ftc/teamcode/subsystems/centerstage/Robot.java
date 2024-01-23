@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,19 +16,23 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoSc
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @Config
 public final class Robot {
 
     public static double
             maxVoltage = 13,
-            TIME_TRAJECTORY_GEN = 0;
+            TIME_TRAJECTORY_GEN = 0,
+            ANGLE_DRONE_INITIAL = 10,
+            ANGLE_DRONE_LAUNCHED = 0;
 
     public static boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
     public final Intake intake;
     public final Deposit deposit;
+    public final SimpleServoPivot drone;
 
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
@@ -41,6 +46,11 @@ public final class Robot {
         drivetrain.update();
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
+        drone = new SimpleServoPivot(
+                ANGLE_DRONE_INITIAL,
+                ANGLE_DRONE_LAUNCHED,
+                getGoBildaServo(hardwareMap, "drone")
+        );
 
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
@@ -72,6 +82,8 @@ public final class Robot {
     }
 
     public void run() {
+        drone.updateAngles(ANGLE_DRONE_INITIAL, ANGLE_DRONE_LAUNCHED);
+
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.colors);
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
@@ -79,6 +91,7 @@ public final class Robot {
 
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
+        drone.run();
 
         for (LEDIndicator indicator : indicators) indicator.setState(
                 drivetrain.isBusy() ? RED :
