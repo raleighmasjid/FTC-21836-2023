@@ -64,7 +64,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             warp = true,
             backdropVisible = false,
             isRed = true,
-            editPoints = false,
+            editPoints = true,
             graphic = true,
             background = false;
 
@@ -177,7 +177,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             drawAxisMarker(input, tagSize / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
-        grey.release();
 
         tags.clear();
 
