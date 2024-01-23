@@ -72,15 +72,15 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 660,
             Y_TOP_LEFT = 1100,
             TARGET_SIZE = 70,
-            X_SHIFT_L_TAG_TO_L_PIXEL = -100,
-            Y_SHIFT_TAG_TO_PIXEL = -90,
-            X_SHIFT_PIXEL_POINTS_R = 66,
-            Y_SHIFT_PIXEL_POINTS_T = -40,
-            Y_SHIFT_PIXEL_POINTS_B = 26,
-            X_SHIFT_WHITE = 3,
-            Y_SHIFT_WHITE = 85,
-            X_SHIFT_BLACK = 200,
-            Y_SHIFT_BLACK = 0;
+            X_SHIFT_L_TAG_TO_L_PIXEL = -2.857142857142857,
+            Y_SHIFT_TAG_TO_PIXEL = -2.5714285714285716,
+            X_SHIFT_PIXEL_POINTS_R = 1.8857142857142857,
+            Y_SHIFT_PIXEL_POINTS_T = -1.1428571428571428,
+            Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
+            X_SHIFT_WHITE = 0.08571428571428572,
+            Y_SHIFT_WHITE = 2.4285714285714284,
+            X_SHIFT_BLACK = 5.714285714285714,
+            Y_SHIFT_BLACK = 0.0;
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -254,8 +254,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                     );
                 }
 
-                Point whiteSample = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_WHITE, Y_TOP_LEFT + Y_SHIFT_WHITE);
-                Point blackSample = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_BLACK, Y_TOP_LEFT + Y_SHIFT_BLACK);
+                Point whiteSample = new Point(X_TOP_LEFT_R_TAG + (X_SHIFT_WHITE * TARGET_SIZE / 2.0), Y_TOP_LEFT + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0));
+                Point blackSample = new Point(X_TOP_LEFT_R_TAG + (X_SHIFT_BLACK * TARGET_SIZE / 2.0), Y_TOP_LEFT + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0));
 
                 Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
@@ -407,28 +407,28 @@ public class BackdropPipeline extends OpenCvPipeline {
     private Point pixelLeft(int x, int y) {
         double width = 2.976 * (TARGET_SIZE / 2.0);
         return new Point(
-                getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.48 * (TARGET_SIZE / 2.0))
+                getLeftX(1) + (X_SHIFT_L_TAG_TO_L_PIXEL * TARGET_SIZE / 2.0) + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
+                Y_TOP_LEFT + (Y_SHIFT_TAG_TO_PIXEL * TARGET_SIZE / 2.0) - y * (2.48 * (TARGET_SIZE / 2.0))
         );
     }
 
     private Point pixelRight(int x, int y) {
         Point point = pixelLeft(x, y);
-        point.x += X_SHIFT_PIXEL_POINTS_R;
+        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0);
         return point;
     }
 
     private Point pixelTop(int x, int y) {
         Point point = pixelLeft(x, y);
-        point.x += X_SHIFT_PIXEL_POINTS_R / 2.0;
-        point.y += Y_SHIFT_PIXEL_POINTS_T;
+        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0) / 2.0;
+        point.y += (Y_SHIFT_PIXEL_POINTS_T * TARGET_SIZE / 2.0);
         return point;
     }
 
     private Point pixelBottom(int x, int y) {
         Point point = pixelLeft(x, y);
-        point.x += X_SHIFT_PIXEL_POINTS_R / 2.0;
-        point.y += Y_SHIFT_PIXEL_POINTS_B;
+        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0) / 2.0;
+        point.y += (Y_SHIFT_PIXEL_POINTS_B * TARGET_SIZE / 2.0);
         return point;
     }
 }

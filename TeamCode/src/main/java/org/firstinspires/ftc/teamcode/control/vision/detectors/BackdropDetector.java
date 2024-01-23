@@ -26,7 +26,7 @@ public class BackdropDetector {
      */
     public BackdropDetector(HardwareMap hardwareMap) {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
-                hardwareMap.get(WebcamName.class, "camera front"),
+                hardwareMap.get(WebcamName.class, "camera back"),
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
         );
         pipeline = new BackdropPipeline(mTelemetry);
@@ -35,7 +35,7 @@ public class BackdropDetector {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(960, 1280, SIDEWAYS_RIGHT);
+                camera.startStreaming(720, 1280, SIDEWAYS_RIGHT);
                 isOpen = true;
             }
 
