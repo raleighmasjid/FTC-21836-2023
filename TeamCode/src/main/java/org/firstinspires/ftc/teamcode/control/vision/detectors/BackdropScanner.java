@@ -13,7 +13,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
 @Config
-public class BackdropDetector {
+public class BackdropScanner {
 
     private final OpenCvCamera camera;
 
@@ -24,7 +24,7 @@ public class BackdropDetector {
     /**
      * @param hardwareMap     {@link HardwareMap} passed in from the opmode
      */
-    public BackdropDetector(HardwareMap hardwareMap) {
+    public BackdropScanner(HardwareMap hardwareMap) {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "camera back"),
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())

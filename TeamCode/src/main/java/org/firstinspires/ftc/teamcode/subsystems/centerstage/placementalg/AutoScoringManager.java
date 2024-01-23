@@ -14,7 +14,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -27,7 +27,7 @@ public final class AutoScoringManager {
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
-    private final BackdropDetector backdropDetector;
+    private final BackdropScanner backdropScanner;
 
     private final Backdrop latestScan = autonBackdrop;
     private volatile Backdrop lastScan = latestScan;
@@ -44,7 +44,7 @@ public final class AutoScoringManager {
 
     public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
-        backdropDetector = new BackdropDetector(hardwareMap);
+        backdropScanner = new BackdropScanner(hardwareMap);
         calculateColorsNeeded();
 
         new Thread(() -> {
@@ -83,8 +83,8 @@ public final class AutoScoringManager {
      */
     private void update() {
 
-        if (backdropDetector.pipeline.backdropVisible) {
-            int[][] slots = backdropDetector.pipeline.slots;
+        if (backdropScanner.pipeline.backdropVisible) {
+            int[][] slots = backdropScanner.pipeline.slots;
             for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
                 if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
                 latestScan.add(new Pixel(x, y, Color.get(slots[y][x])));

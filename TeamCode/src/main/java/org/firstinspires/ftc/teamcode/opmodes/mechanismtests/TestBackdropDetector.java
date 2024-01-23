@@ -34,7 +34,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
 
 @TeleOp(group = "Single mechanism test")
 public final class TestBackdropDetector extends LinearOpMode {
@@ -43,7 +43,7 @@ public final class TestBackdropDetector extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         mTelemetry = new MultipleTelemetry(telemetry);
-        BackdropDetector detector = new BackdropDetector(hardwareMap);
+        BackdropScanner detector = new BackdropScanner(hardwareMap);
         gamepadEx1 = new GamepadEx(gamepad1);
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
