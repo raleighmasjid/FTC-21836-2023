@@ -237,6 +237,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (warp) {
                 Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
                 Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+                transformMatrix.release();
 
                 if (editPoints) generatePoints();
 
