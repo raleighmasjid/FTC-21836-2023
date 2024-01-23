@@ -37,7 +37,7 @@ public final class AutoScoringManager {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, justScored = false, runThread = true;
+    private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, runThread = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
     public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
@@ -91,14 +91,13 @@ public final class AutoScoringManager {
 
         // Save colors to corresponding locations in newScan
 
-        if (justScored || clearingScan || !latestScan.equals(lastScan)) {
+        if (!robot.drivetrain.isBusy() && (clearingScan || !latestScan.equals(lastScan))) {
             timeSinceUpdate.reset();
 
             if (clearingScan) {
                 clearingScan = false;
                 latestScan.clear();
             }
-            if (justScored) justScored = false;
 
             lastScan = latestScan.clone();
             calculateColorsNeeded();
@@ -170,7 +169,6 @@ public final class AutoScoringManager {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
-                                    justScored = true;
                                 })
                                 .build() :
                         robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
@@ -191,7 +189,6 @@ public final class AutoScoringManager {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
-                                    justScored = true;
                                 })
                                 .build()
         ;
