@@ -58,22 +58,22 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_WHITE = 85,
             X_SHIFT_BLACK = 200,
             Y_SHIFT_BLACK = 0;
-    
+
     private static final double[]
-            minPurple = {250, .5, .7},
+            minPurple = {250, .5, .5},
             maxPurple = {290, 1, 1},
 
-            minYellow = {35, .5, .7},
+            minYellow = {35, .5, .5},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {85, .5, .7},
-            maxGreen =  {100, 1, 1},
+            minGreen =  {85, .5, .5},
+            maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0.6, 0.5},
-            maxWhite =  {360, 1, 1},
+            minWhite =  {0, 0, 0.6},
+            maxWhite =  {360, 0.6, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 0.6, 0.5};
+            maxBlack =  {360, 0.6, 0.6};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -244,20 +244,23 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                 for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
+
                     Point pointL = points[y][x][0];
                     Point pointR = points[y][x][1];
+
                     double[] colorL = input.get((int) pointL.y, (int) pointL.x);
                     double[] colorR = input.get((int) pointR.y, (int) pointR.x);
+
                     double[] color = {
                             colorL[0] + colorR[0], // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
                             round(0.5 * (colorL[1] + colorR[1]) / 255.0 * 1000) / 1000.0,
-                            min(round(0.5 * (colorL[2] + colorR[2]) / 255.0 * 1000) / 1000.0 * valBoost, 1.0)
+                            min(round(0.5 * (colorL[2] + colorR[2]) / 255.0 * valBoost * 1000) / 1000.0, 1.0)
                     };
 
                     int colorInt = hsvToColorInt(color);
                     if (colorInt >- 1) slots[y][x] = colorInt;
 
-                    telemetry.addLine("(" + x + ", " + y + "), " + colorInt + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+                    telemetry.addLine("(" + x + ", " + y + "), " + colorIntToString(slots[y][x]) + ": " + color[0] + ", " + color[1] + ", " + color[2]);
                 }
 
                 Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
@@ -290,6 +293,16 @@ public class BackdropPipeline extends OpenCvPipeline {
                 inRange(hsv, minBlack, maxBlack)   ? 4 :
                 -1
         ;
+    }
+
+    private static String colorIntToString(int colorInt) {
+        switch (colorInt) {
+            case 0: return "PURPLE";
+            case 1: return "YELLOW";
+            case 2: return "GREEN";
+            case 3: return "WHITE";
+            case 4: default: return "EMPTY";
+        }
     }
 
     private static boolean inRange(double[] val, double[] lower, double[] upper) {
