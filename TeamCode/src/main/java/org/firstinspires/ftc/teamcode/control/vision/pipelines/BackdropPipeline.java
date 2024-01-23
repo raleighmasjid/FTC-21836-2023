@@ -346,7 +346,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             case 1: return "YELLOW";
             case 2: return "GREEN";
             case 3: return "WHITE";
-            case 4: default: return "EMPTY";
+            case 4: return "EMPTY";
+            default: return "UNKNOWN";
         }
     }
 
