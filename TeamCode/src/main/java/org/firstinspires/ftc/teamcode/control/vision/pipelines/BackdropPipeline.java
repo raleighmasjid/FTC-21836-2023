@@ -287,28 +287,25 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Imgproc.drawMarker(input, whiteSample, green, 2, 3);
                 Imgproc.drawMarker(input, blackSample, green, 2, 3);
 
-                if (graphic) {
-                    if (background) Imgproc.fillConvexPoly(
-                            input,
-                            new MatOfPoint(
-                                    CORNER_TL,
-                                    CORNER_TR,
-                                    CORNER_BR,
-                                    CORNER_BL
-                            ),
-                            gray
-                    );
+                if (graphic && background) Imgproc.fillConvexPoly(
+                        input,
+                        new MatOfPoint(
+                                CORNER_TL,
+                                CORNER_TR,
+                                CORNER_BR,
+                                CORNER_BL
+                        ),
+                        gray
+                );
 
-                    for (int y = 0; y < points.length; y++)
-                        for (int x = 0; x < points[y].length; x++) {
-                            if (x == 0 && y % 2 == 0) continue;
-                            Point center = new Point(
-                                    0.5 * (points[y][x][0].x + points[y][x][1].x),
-                                    0.5 * (points[y][x][0].y + points[y][x][1].y)
-                            );
-                            Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
-                            Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
-                        }
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+                    Point center = new Point(
+                            0.5 * (points[y][x][0].x + points[y][x][1].x),
+                            0.5 * (points[y][x][0].y + points[y][x][1].y)
+                    );
+                    if (graphic) Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
+                    Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
                 }
 
             }
