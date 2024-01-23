@@ -21,11 +21,14 @@
 
 package org.firstinspires.ftc.teamcode.control.vision;
 
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.green;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -33,8 +36,10 @@ import static java.lang.Math.round;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -45,7 +50,15 @@ import java.util.Arrays;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false;
+    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 960, BACKGROUND = 40;
+
+    public static final Point
+            CORNER_TL = new Point(0, 0),
+            CORNER_TR = new Point(SCREEN_WIDTH, 0),
+            CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
+            CORNER_BL = new Point(0, SCREEN_HEIGHT);
+
+    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false, graphic = true;
 
     public double
             X_TOP_LEFT_R_TAG = 660,
@@ -158,12 +171,12 @@ public class BackdropPipeline extends OpenCvPipeline {
         tags.clear();
 
         int left = !isRed ? 1 : 4;
-        int center = !isRed ? 2 : 5;
+        int middle = !isRed ? 2 : 5;
         int right = !isRed ? 3 : 6;
 
         for (AprilTagDetection detection : detections) {
             int id = detection.id;
-            if (id == left || id == center || id == right) {
+            if (id == left || id == middle || id == right) {
                 tags.add(detection);
             }
         }
@@ -229,15 +242,15 @@ public class BackdropPipeline extends OpenCvPipeline {
                     );
                 }
 
-                Point white = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_WHITE, Y_TOP_LEFT + Y_SHIFT_WHITE);
-                Point black = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_BLACK, Y_TOP_LEFT + Y_SHIFT_BLACK);
+                Point whiteSample = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_WHITE, Y_TOP_LEFT + Y_SHIFT_WHITE);
+                Point blackSample = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_BLACK, Y_TOP_LEFT + Y_SHIFT_BLACK);
 
                 Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
-                double blackVal = round(input.get((int) black.y, (int) black.x)[2] / 255.0 * 1000) / 1000.0;
+                double blackVal = round(input.get((int) blackSample.y, (int) blackSample.x)[2] / 255.0 * 1000) / 1000.0;
                 telemetry.addLine("Black value: " + blackVal);
 
-                double whiteVal = round(input.get((int) white.y, (int) white.x)[2] / 255.0 * 1000) / 1000.0;
+                double whiteVal = round(input.get((int) whiteSample.y, (int) whiteSample.x)[2] / 255.0 * 1000) / 1000.0;
                 telemetry.addLine("White value: " + whiteVal);
 
                 double valBoost = 1.0 / (whiteVal - blackVal);
@@ -265,8 +278,31 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                 Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
 
-                Imgproc.drawMarker(input, white, green, 2, 3);
-                Imgproc.drawMarker(input, black, green, 2, 3);
+                Imgproc.drawMarker(input, whiteSample, green, 2, 3);
+                Imgproc.drawMarker(input, blackSample, green, 2, 3);
+
+                if (graphic) {
+                    Imgproc.fillConvexPoly(
+                            input,
+                            new MatOfPoint(
+                                    CORNER_TL,
+                                    CORNER_TR,
+                                    CORNER_BR,
+                                    CORNER_BL
+                            ),
+                            new Scalar(BACKGROUND, BACKGROUND, BACKGROUND)
+                    );
+
+                    for (int y = 0; y < points.length; y++)
+                        for (int x = 0; x < points[y].length; x++) {
+                            if (x == 0 && y % 2 == 0) continue;
+                            Point center = new Point(
+                                    0.5 * (points[y][x][0].x + points[y][x][1].x),
+                                    0.5 * (points[y][x][0].y + points[y][x][1].y)
+                            );
+                            Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
+                        }
+                }
 
             }
 
@@ -302,6 +338,17 @@ public class BackdropPipeline extends OpenCvPipeline {
             case 2: return "GREEN";
             case 3: return "WHITE";
             case 4: default: return "EMPTY";
+        }
+    }
+
+    private static Scalar colorIntToScalar(int colorInt) {
+        switch (colorInt) {
+            case 0: return lavender;
+            case 1: return yellow;
+            case 2: return green;
+            case 3: return white;
+            case 4: return black;
+            default: return new Scalar(BACKGROUND, BACKGROUND, BACKGROUND);
         }
     }
 
