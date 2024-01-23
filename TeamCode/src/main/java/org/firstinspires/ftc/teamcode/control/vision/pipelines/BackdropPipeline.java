@@ -60,7 +60,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
             CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
-    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false, graphic = true, background = true;
+    public boolean
+            warp = true,
+            backdropVisible = false,
+            isRed = true,
+            editPoints = false,
+            graphic = true,
+            background = true;
 
     public double
             X_TOP_LEFT_R_TAG = 660,
