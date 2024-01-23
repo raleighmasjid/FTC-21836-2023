@@ -66,7 +66,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             isRed = true,
             editPoints = false,
             graphic = true,
-            background = true;
+            background = false;
 
     public double
             X_TOP_LEFT_R_TAG = 660,
