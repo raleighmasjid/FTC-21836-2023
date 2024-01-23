@@ -25,6 +25,8 @@ public final class AutoScoringManager {
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
+    private final BackdropDetector backdropDetector;
+
     private final Backdrop latestScan = autonBackdrop;
     private Backdrop lastScan = new Backdrop();
     private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
@@ -38,8 +40,9 @@ public final class AutoScoringManager {
     private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, justScored = false, runThread = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
-    public AutoScoringManager(Robot robot) {
+    public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
+        backdropDetector = new BackdropDetector(hardwareMap);
         calculateColorsNeeded();
 
         new Thread(() -> {
