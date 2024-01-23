@@ -15,9 +15,7 @@ import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipelin
 @Config
 public class TeamPropDetector {
 
-    public static double
-            MAX_LEFT_DISTANCE = 50,
-            MAX_RIGHT_DISTANCE = 50;
+    public static double MAX_DISTANCE = 50;
 
     private PropDetectPipeline.Randomization location = CENTER;
 
@@ -34,11 +32,9 @@ public class TeamPropDetector {
     }
 
     public PropDetectPipeline.Randomization run() {
-        leftDistance = leftSensor.getDistance(INCH);
-        rightDistance = rightSensor.getDistance(INCH);
         return location = (
-                leftDistance <= MAX_LEFT_DISTANCE ? LEFT :
-                rightDistance <= MAX_RIGHT_DISTANCE ? RIGHT :
+                (leftDistance = leftSensor.getDistance(INCH)) <= MAX_DISTANCE ? LEFT :
+                (rightDistance = rightSensor.getDistance(INCH)) <= MAX_DISTANCE ? RIGHT :
                 CENTER
         );
     }
