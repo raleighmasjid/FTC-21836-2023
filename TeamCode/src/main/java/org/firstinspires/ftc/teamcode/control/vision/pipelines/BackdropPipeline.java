@@ -29,12 +29,16 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
+import static java.lang.Double.min;
+import static java.lang.Math.round;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -250,80 +254,80 @@ public class BackdropPipeline extends OpenCvPipeline {
                     );
                 }
 
-//                Point whiteSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0));
-//                Point blackSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0));
-//
-//                Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
-//
-//                double blackVal = round(input.get((int) blackSample.y, (int) blackSample.x)[2] / 255.0 * 1000) / 1000.0;
-//                telemetry.addLine("Black value: " + blackVal);
-//
-//                double whiteVal = round(input.get((int) whiteSample.y, (int) whiteSample.x)[2] / 255.0 * 1000) / 1000.0;
-//                telemetry.addLine("White value: " + whiteVal);
-//
-//                double valBoost = 1.0 / (whiteVal - blackVal);
-//
-//                // TODO remove for robot version
-////                for (int[] row : slots) Arrays.fill(row, 4);
-//
-//                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
-//                    if (x == 0 && y % 2 == 0) continue;
-//
-//                    Point pointL = points[y][x][0];
-//                    Point pointR = points[y][x][1];
-//                    Point pointT = points[y][x][2];
-//                    Point pointB = points[y][x][3];
-//
-//                    double[] colorL = input.get((int) pointL.y, (int) pointL.x);
-//                    double[] colorR = input.get((int) pointR.y, (int) pointR.x);
-//                    double[] colorT = input.get((int) pointT.y, (int) pointT.x);
-//                    double[] colorB = input.get((int) pointB.y, (int) pointB.x);
-//
-//                    double avgHue = (colorL[0] + colorR[0] + colorT[0] + colorB[0]) / 2.0;
-//                    double avgSat = (colorL[1] + colorR[1] + colorT[1] + colorB[1]) / 4.0 / 255.0;
-//                    double avgVal = (colorL[2] + colorR[2] + colorT[2] + colorB[2]) / 4.0 / 255.0;
-//
-//                    double[] color = {
-//                            avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
-//                            round(avgSat * 1000) / 1000.0,
-//                            min(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 1.0)
-//                    };
-//
-//                    int colorInt = hsvToColorInt(color);
-//                    if (colorInt >- 1) slots[y][x] = colorInt;
-//
-//                    telemetry.addLine("(" + x + ", " + y + "), " + colorIntToString(slots[y][x]) + ": " + color[0] + ", " + color[1] + ", " + color[2]);
-//                }
-//
-//                Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
-//
-//                Imgproc.drawMarker(input, whiteSample, green, 2, 3);
-//                Imgproc.drawMarker(input, blackSample, green, 2, 3);
-//
-//                if (graphic && background) {
-//                    MatOfPoint background = new MatOfPoint(
-//                            CORNER_TL,
-//                            CORNER_TR,
-//                            CORNER_BR,
-//                            CORNER_BL
-//                    );
-//                    Imgproc.fillConvexPoly(
-//                            input,
-//                            background,
-//                            gray
-//                    );
-//                    background.release();
-//                }
-//
-//                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
-//                    if (x == 0 && y % 2 == 0) continue;
-//                    Point center = new Point(
-//                            0.5 * (points[y][x][0].x + points[y][x][1].x),
-//                            0.5 * (points[y][x][0].y + points[y][x][1].y)
-//                    );
-//                    if (graphic) Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
-//                    Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
-//                }
+                Point whiteSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0));
+                Point blackSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0));
+
+                Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+
+                double blackVal = round(input.get((int) blackSample.y, (int) blackSample.x)[2] / 255.0 * 1000) / 1000.0;
+                telemetry.addLine("Black value: " + blackVal);
+
+                double whiteVal = round(input.get((int) whiteSample.y, (int) whiteSample.x)[2] / 255.0 * 1000) / 1000.0;
+                telemetry.addLine("White value: " + whiteVal);
+
+                double valBoost = 1.0 / (whiteVal - blackVal);
+
+                // TODO remove for robot version
+//                for (int[] row : slots) Arrays.fill(row, 4);
+
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+
+                    Point pointL = points[y][x][0];
+                    Point pointR = points[y][x][1];
+                    Point pointT = points[y][x][2];
+                    Point pointB = points[y][x][3];
+
+                    double[] colorL = input.get((int) pointL.y, (int) pointL.x);
+                    double[] colorR = input.get((int) pointR.y, (int) pointR.x);
+                    double[] colorT = input.get((int) pointT.y, (int) pointT.x);
+                    double[] colorB = input.get((int) pointB.y, (int) pointB.x);
+
+                    double avgHue = (colorL[0] + colorR[0] + colorT[0] + colorB[0]) / 2.0;
+                    double avgSat = (colorL[1] + colorR[1] + colorT[1] + colorB[1]) / 4.0 / 255.0;
+                    double avgVal = (colorL[2] + colorR[2] + colorT[2] + colorB[2]) / 4.0 / 255.0;
+
+                    double[] color = {
+                            avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+                            round(avgSat * 1000) / 1000.0,
+                            min(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 1.0)
+                    };
+
+                    int colorInt = hsvToColorInt(color);
+                    if (colorInt >- 1) slots[y][x] = colorInt;
+
+                    telemetry.addLine("(" + x + ", " + y + "), " + colorIntToString(slots[y][x]) + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+                }
+
+                Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+
+                Imgproc.drawMarker(input, whiteSample, green, 2, 3);
+                Imgproc.drawMarker(input, blackSample, green, 2, 3);
+
+                if (graphic && background) {
+                    MatOfPoint background = new MatOfPoint(
+                            CORNER_TL,
+                            CORNER_TR,
+                            CORNER_BR,
+                            CORNER_BL
+                    );
+                    Imgproc.fillConvexPoly(
+                            input,
+                            background,
+                            gray
+                    );
+                    background.release();
+                }
+
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+                    Point center = new Point(
+                            0.5 * (points[y][x][0].x + points[y][x][1].x),
+                            0.5 * (points[y][x][0].y + points[y][x][1].y)
+                    );
+                    if (graphic) Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
+                    Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
+                }
 
             }
             srcTag.release();
