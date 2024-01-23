@@ -57,6 +57,7 @@ public final class TestBackdropScanner extends LinearOpMode {
             mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE "));
             mTelemetry.update();
         }
+        backdropScanner.pipeline.isRed = isRed;
 
         while (opModeIsActive()) {
 

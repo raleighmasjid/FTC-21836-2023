@@ -93,6 +93,7 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.update();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
+        if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
     }
 
     static void teleOpControls() {

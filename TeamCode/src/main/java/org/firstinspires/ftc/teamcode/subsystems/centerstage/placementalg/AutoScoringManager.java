@@ -27,7 +27,7 @@ public final class AutoScoringManager {
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
-    private final BackdropScanner backdropScanner;
+    public final BackdropScanner backdropScanner;
 
     private final Backdrop latestScan = autonBackdrop;
     private volatile Backdrop lastScan = latestScan;
