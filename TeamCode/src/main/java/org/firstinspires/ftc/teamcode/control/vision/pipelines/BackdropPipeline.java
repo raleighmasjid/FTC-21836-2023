@@ -114,7 +114,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     public BackdropPipeline(Telemetry telemetry) {
 
-        for (int[] row : slots) Arrays.fill(row, 4);
+        for (int[] row : slots) Arrays.fill(row, -1);
 
         generatePoints();
 
