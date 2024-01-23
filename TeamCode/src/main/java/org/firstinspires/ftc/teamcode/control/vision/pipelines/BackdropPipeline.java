@@ -74,7 +74,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             TARGET_SIZE = 70,
             X_SHIFT_L_TAG_TO_L_PIXEL = -100,
             Y_SHIFT_TAG_TO_PIXEL = -90,
-            X_SHIFT_PIXEL_POINTS = 66,
+            X_SHIFT_PIXEL_POINTS_R = 66,
+            Y_SHIFT_PIXEL_POINTS_T = -40,
+            Y_SHIFT_PIXEL_POINTS_B = 26,
             X_SHIFT_WHITE = 3,
             Y_SHIFT_WHITE = 85,
             X_SHIFT_BLACK = 200,
@@ -102,7 +104,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix;
 
     public final int[][] slots = new int[11][7];
-    private final Point[][][] points = new Point[11][7][2];
+    private final Point[][][] points = new Point[11][7][4];
 
     private final double
             fx = 1430,
@@ -271,14 +273,22 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                     Point pointL = points[y][x][0];
                     Point pointR = points[y][x][1];
+                    Point pointT = points[y][x][2];
+                    Point pointB = points[y][x][3];
 
                     double[] colorL = input.get((int) pointL.y, (int) pointL.x);
                     double[] colorR = input.get((int) pointR.y, (int) pointR.x);
+                    double[] colorT = input.get((int) pointT.y, (int) pointT.x);
+                    double[] colorB = input.get((int) pointB.y, (int) pointB.x);
+
+                    double avgHue = (colorL[0] + colorR[0] + colorT[0] + colorB[0]) / 2.0;
+                    double avgSat = (colorL[1] + colorR[1] + colorT[1] + colorB[1]) / 4.0 / 255.0;
+                    double avgVal = (colorL[2] + colorR[2] + colorT[2] + colorB[2]) / 4.0 / 255.0;
 
                     double[] color = {
-                            colorL[0] + colorR[0], // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
-                            round(0.5 * (colorL[1] + colorR[1]) / 255.0 * 1000) / 1000.0,
-                            min(round((0.5 * (colorL[2] + colorR[2]) / 255.0 - blackVal) * valBoost * 1000) / 1000.0, 1.0)
+                            avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+                            round(avgSat * 1000) / 1000.0,
+                            min(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 1.0)
                     };
 
                     int colorInt = hsvToColorInt(color);
@@ -376,6 +386,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 if (x == 0 && y % 2 == 0) continue;
                 points[y][x][0] = pixelLeft(x, y);
                 points[y][x][1] = pixelRight(x, y);
+                points[y][x][2] = pixelTop(x, y);
+                points[y][x][3] = pixelBottom(x, y);
             }
         }
     }
@@ -388,13 +400,27 @@ public class BackdropPipeline extends OpenCvPipeline {
         double width = 2.976 * (TARGET_SIZE / 2.0);
         return new Point(
                 getLeftX(1) + X_SHIFT_L_TAG_TO_L_PIXEL + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.50 * (TARGET_SIZE / 2.0))
+                Y_TOP_LEFT + Y_SHIFT_TAG_TO_PIXEL - y * (2.48 * (TARGET_SIZE / 2.0))
         );
     }
 
     private Point pixelRight(int x, int y) {
-        Point left = pixelLeft(x, y);
-        left.x += X_SHIFT_PIXEL_POINTS;
-        return left;
+        Point point = pixelLeft(x, y);
+        point.x += X_SHIFT_PIXEL_POINTS_R;
+        return point;
+    }
+
+    private Point pixelTop(int x, int y) {
+        Point point = pixelLeft(x, y);
+        point.x += X_SHIFT_PIXEL_POINTS_R / 2.0;
+        point.y += Y_SHIFT_PIXEL_POINTS_T;
+        return point;
+    }
+
+    private Point pixelBottom(int x, int y) {
+        Point point = pixelLeft(x, y);
+        point.x += X_SHIFT_PIXEL_POINTS_R / 2.0;
+        point.y += Y_SHIFT_PIXEL_POINTS_B;
+        return point;
     }
 }
