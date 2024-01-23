@@ -25,9 +25,11 @@ import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPip
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.gray;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
 import static java.lang.Math.min;
@@ -50,7 +52,7 @@ import java.util.Arrays;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 960, BACKGROUND = 40;
+    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 960;
 
     public static final Point
             CORNER_TL = new Point(0, 0),
@@ -58,7 +60,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
             CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
-    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false, graphic = true;
+    public boolean warp = true, backdropVisible = false, isRed = true, editPoints = false, graphic = true, background = true;
 
     public double
             X_TOP_LEFT_R_TAG = 660,
@@ -73,13 +75,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 0;
 
     private static final double[]
-            minPurple = {250, .5, .4},
-            maxPurple = {290, 1, 1},
+            minPurple = {250, .15, .4},
+            maxPurple = {320, 1, 1},
 
-            minYellow = {35, .5, .4},
+            minYellow = {35, .51, .4},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {85, .5, .4},
+            minGreen =  {85, .4, .4},
             maxGreen =  {110, 1, 1},
 
             minWhite =  {0, 0, 0.6},
@@ -282,7 +284,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Imgproc.drawMarker(input, blackSample, green, 2, 3);
 
                 if (graphic) {
-                    Imgproc.fillConvexPoly(
+                    if (background) Imgproc.fillConvexPoly(
                             input,
                             new MatOfPoint(
                                     CORNER_TL,
@@ -290,7 +292,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                                     CORNER_BR,
                                     CORNER_BL
                             ),
-                            new Scalar(BACKGROUND, BACKGROUND, BACKGROUND)
+                            gray
                     );
 
                     for (int y = 0; y < points.length; y++)
@@ -301,6 +303,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                                     0.5 * (points[y][x][0].y + points[y][x][1].y)
                             );
                             Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
+                            Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
                         }
                 }
 
@@ -348,7 +351,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             case 2: return green;
             case 3: return white;
             case 4: return black;
-            default: return new Scalar(BACKGROUND, BACKGROUND, BACKGROUND);
+            default: return gray;
         }
     }
 
