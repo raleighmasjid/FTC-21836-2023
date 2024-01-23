@@ -183,10 +183,10 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tagTL
             );
 
-            Imgproc.line(input, tl, tr, blue, 5);
-            Imgproc.line(input, bl, br, blue, 5);
-            Imgproc.line(input, tl, bl, blue, 5);
-            Imgproc.line(input, tr, br, blue, 5);
+            Imgproc.line(input, tl, tr, blue, 3);
+            Imgproc.line(input, bl, br, blue, 3);
+            Imgproc.line(input, tl, bl, blue, 3);
+            Imgproc.line(input, tr, br, blue, 3);
 
             if (warp) {
                 Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
