@@ -63,8 +63,8 @@ public final class Robot {
         deposit.paintbrush.lockPixels(YELLOW, EMPTY);
     }
 
-    public void startAlgorithm() {
-        autoScoringManager = new AutoScoringManager(this);
+    public void startAlgorithm(HardwareMap hardwareMap) {
+        autoScoringManager = new AutoScoringManager(hardwareMap, this);
     }
 
     public void readSensors() {

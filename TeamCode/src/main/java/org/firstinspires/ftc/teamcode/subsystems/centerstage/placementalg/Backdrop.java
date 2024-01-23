@@ -144,7 +144,7 @@ public final class Backdrop {
     /**
      * Output the result of {@link #toString()} to telemetry
      */
-    void toTelemetry() {
+    public void toTelemetry() {
         printInColor = false;
         String[] rows = toString().split("\n");
         for (String row : rows) mTelemetry.addLine(row);

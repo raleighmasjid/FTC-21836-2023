@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 
-import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 
 import java.util.ArrayList;
 

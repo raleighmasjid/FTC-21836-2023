@@ -47,7 +47,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
             } else {
 
-                if (keyPressed(1, X)) autoScoring = robot.autoScore();
+//                if (keyPressed(1, X)) autoScoring = robot.autoScore();
 
                 if (gamepadEx2.isDown(LEFT_BUMPER)) {
                     if (gamepadEx2.isDown(RIGHT_BUMPER)) robot.autoScoringManager.reset();

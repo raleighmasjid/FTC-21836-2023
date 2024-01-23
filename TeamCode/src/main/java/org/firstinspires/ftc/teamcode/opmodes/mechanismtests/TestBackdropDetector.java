@@ -22,40 +22,43 @@
 package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.control.vision.detectors.AprilTagDetector;
-import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropDetector;
 
 @TeleOp(group = "Single mechanism test")
-public final class TestAprilTagDetector extends LinearOpMode {
+public final class TestBackdropDetector extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         mTelemetry = new MultipleTelemetry(telemetry);
-        AprilTagDetector camera = new AprilTagDetector(
-                hardwareMap,
-                OpenCvCameraRotation.UPRIGHT,
-                "camera back",
-                0.166,
-                1, 2, 3
-        );
+        BackdropDetector detector = new BackdropDetector(hardwareMap);
+        gamepadEx1 = new GamepadEx(gamepad1);
 
+        // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit()) {
-            camera.run();
-            camera.printTagIsVisible();
-            camera.printDetectedTag();
+            gamepadEx1.readButtons();
+            if (keyPressed(1, B)) isRed = true;
+            if (keyPressed(1, X)) isRed = false;
+            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE "));
             mTelemetry.update();
         }
 
-        //START IS HERE//
-
-        camera.stop();
-        mTelemetry.update();
+        while (opModeIsActive()) {
+            detector.run().toTelemetry();
+            telemetry.update();
+        }
+        detector.stop();
     }
 }

@@ -11,8 +11,10 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacementsWithExtraWhites;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropDetector;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -25,8 +27,10 @@ public final class AutoScoringManager {
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 
+    private final BackdropDetector backdropDetector;
+
     private final Backdrop latestScan = autonBackdrop;
-    private Backdrop lastScan = new Backdrop();
+    private volatile Backdrop lastScan = latestScan;
     private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
@@ -35,11 +39,12 @@ public final class AutoScoringManager {
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
-    private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, justScored = false, runThread = true;
+    private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, runThread = true;
     private volatile Color[] depositColors = {EMPTY, EMPTY};
 
-    public AutoScoringManager(Robot robot) {
+    public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
+        backdropDetector = new BackdropDetector(hardwareMap);
         calculateColorsNeeded();
 
         new Thread(() -> {
@@ -78,24 +83,21 @@ public final class AutoScoringManager {
      */
     private void update() {
 
-        // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
+        if (backdropDetector.pipeline.backdropVisible) {
+            int[][] slots = backdropDetector.pipeline.slots;
+            for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+                if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
+                latestScan.add(new Pixel(x, y, Color.get(slots[y][x])));
+            }
+        }
 
-        // Skew image to fit april tag to square proportions
-
-        // Shift image to some "standard configuration"
-
-        // Check specific screen pixel coordinates to get colors
-
-        // Save colors to corresponding locations in newScan
-
-        if (justScored || clearingScan || !latestScan.equals(lastScan)) {
+        if (!robot.drivetrain.isBusy() && (clearingScan || !latestScan.equals(lastScan))) {
             timeSinceUpdate.reset();
 
             if (clearingScan) {
                 clearingScan = false;
                 latestScan.clear();
             }
-            if (justScored) justScored = false;
 
             lastScan = latestScan.clone();
             calculateColorsNeeded();
@@ -167,7 +169,6 @@ public final class AutoScoringManager {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
-                                    justScored = true;
                                 })
                                 .build() :
                         robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
@@ -188,7 +189,6 @@ public final class AutoScoringManager {
                                     robot.deposit.paintbrush.dropPixels(2);
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
-                                    justScored = true;
                                 })
                                 .build()
         ;
@@ -232,8 +232,8 @@ public final class AutoScoringManager {
         mTelemetry.addLine("Second: " + colorsNeeded[1].name());
         mTelemetry.addLine();
         mTelemetry.addLine("Place on backdrop:");
-        mTelemetry.addLine("First: (" + placements[0].x + ", " + placements[0].y + ")");
-        mTelemetry.addLine("Second: (" + placements[1].x + ", " + placements[1].y + ")");
+        mTelemetry.addLine("First: " + placements[0].userFriendlyString());
+        mTelemetry.addLine("Second: " + placements[1].userFriendlyString());
         mTelemetry.addLine();
         mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
         latestScan.toTelemetry();
