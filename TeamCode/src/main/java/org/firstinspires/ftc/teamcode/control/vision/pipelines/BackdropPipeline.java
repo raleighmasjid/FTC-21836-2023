@@ -97,7 +97,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     public final int[][] slots = new int[11][7];
     private final Point[][][] points = new Point[11][7][2];
-    private final double[][][] ogValues = new double[11][7][3];
 
     private final double
             fx = 1430,
