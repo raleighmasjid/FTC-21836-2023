@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.control.vision;
+package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.CENTER;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.LEFT;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.RIGHT;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.LEFT;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.RIGHT;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 

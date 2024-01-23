@@ -9,7 +9,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -28,7 +28,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
@@ -36,7 +36,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
-import org.firstinspires.ftc.teamcode.control.vision.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.TeamPropDetector;
 
 import java.util.ArrayList;
 

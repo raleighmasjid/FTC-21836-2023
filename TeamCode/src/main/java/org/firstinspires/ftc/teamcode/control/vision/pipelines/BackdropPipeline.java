@@ -19,19 +19,19 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.control.vision;
+package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.black;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.blue;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.gray;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.green;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.lavender;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.red;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.white;
-import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.drawAxisMarker;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.gray;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.green;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.lavender;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 
