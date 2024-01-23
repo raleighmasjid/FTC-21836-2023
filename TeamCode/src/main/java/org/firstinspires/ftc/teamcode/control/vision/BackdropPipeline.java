@@ -60,13 +60,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 0;
 
     private static final double[]
-            minPurple = {250, .5, .5},
+            minPurple = {250, .5, .4},
             maxPurple = {290, 1, 1},
 
-            minYellow = {35, .5, .5},
+            minYellow = {35, .5, .4},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {85, .5, .5},
+            minGreen =  {85, .5, .4},
             maxGreen =  {110, 1, 1},
 
             minWhite =  {0, 0, 0.6},
