@@ -232,8 +232,8 @@ public final class AutoScoringManager {
         mTelemetry.addLine("Second: " + colorsNeeded[1].name());
         mTelemetry.addLine();
         mTelemetry.addLine("Place on backdrop:");
-        mTelemetry.addLine("First: (" + placements[0].x + ", " + placements[0].y + ")");
-        mTelemetry.addLine("Second: (" + placements[1].x + ", " + placements[1].y + ")");
+        mTelemetry.addLine("First: " + placements[0].userFriendlyString());
+        mTelemetry.addLine("Second: " + placements[1].userFriendlyString());
         mTelemetry.addLine();
         mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
         latestScan.toTelemetry();

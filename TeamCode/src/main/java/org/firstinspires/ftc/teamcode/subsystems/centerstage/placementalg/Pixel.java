@@ -102,6 +102,26 @@ public final class Pixel implements Comparable<Pixel> {
     }
 
     /**
+     * Prints this scoring location to telemetry in an easily user-readable form
+     */
+    public String userFriendlyString() {
+        return userFriendlyX() + ", " + color.name();
+    }
+
+    private String userFriendlyX() {
+        switch (x) {
+            case 0: return y % 2 == 0 ? "UNKNOWN" : "FAR LEFT";
+            case 1: return y % 2 == 0 ? "FAR LEFT" : "ALMOST FAR LEFT";
+            case 2: return y % 2 == 0 ? "ALMOST FAR LEFT" : "LEFT OF CENTER";
+            case 3: return y % 2 == 0 ? "CENTER LEFT" : "DEAD CENTER";
+            case 4: return y % 2 == 0 ? "CENTER RIGHT" : "RIGHT OF CENTER";
+            case 5: return "ALMOST FAR RIGHT";
+            case 6: return "FAR RIGHT";
+            default: return "UNKNOWN";
+        }
+    }
+
+    /**
      * Outputs the result of {@link #toString()} to the main text output stream
      */
     void print() {
