@@ -53,6 +53,7 @@ public class BackdropDetector {
 
         int[][] slots = pipeline.slots;
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
             backdrop.add(new Pixel(x, y, Pixel.Color.get(slots[y][x])));
         }
 
