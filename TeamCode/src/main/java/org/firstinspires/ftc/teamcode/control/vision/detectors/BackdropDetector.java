@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.BackdropPipeline;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
@@ -19,9 +17,7 @@ public class BackdropDetector {
 
     private final OpenCvCamera camera;
 
-    private final BackdropPipeline pipeline;
-
-    public final Backdrop backdrop = new Backdrop();
+    public final BackdropPipeline pipeline;
 
     private volatile boolean isOpen = false;
 
@@ -48,17 +44,6 @@ public class BackdropDetector {
 
             }
         });
-    }
-
-    public Backdrop run() {
-
-        int[][] slots = pipeline.slots;
-        for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
-            if (x == 0 && y % 2 == 0) continue;
-            backdrop.add(new Pixel(x, y, Pixel.Color.get(slots[y][x])));
-        }
-
-        return backdrop;
     }
 
     /**

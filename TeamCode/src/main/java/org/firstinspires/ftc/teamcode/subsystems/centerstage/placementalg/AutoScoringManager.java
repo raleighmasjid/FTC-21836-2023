@@ -11,8 +11,10 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacementsWithExtraWhites;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropDetector;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -81,15 +83,13 @@ public final class AutoScoringManager {
      */
     private void update() {
 
-        // Detect (one of three) april tags on the (alliance-specific) backdrop (specified during pre-match config)
-
-        // Skew image to fit april tag to square proportions
-
-        // Shift image to some "standard configuration"
-
-        // Check specific screen pixel coordinates to get colors
-
-        // Save colors to corresponding locations in newScan
+        if (backdropDetector.pipeline.backdropVisible) {
+            int[][] slots = backdropDetector.pipeline.slots;
+            for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+                if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
+                latestScan.add(new Pixel(x, y, Color.get(slots[y][x])));
+            }
+        }
 
         if (!robot.drivetrain.isBusy() && (clearingScan || !latestScan.equals(lastScan))) {
             timeSinceUpdate.reset();
