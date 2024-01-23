@@ -75,20 +75,20 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 0;
 
     private static final double[]
-            minPurple = {250, .15, .4},
+            minPurple = {140, .15, .3},
             maxPurple = {320, 1, 1},
 
-            minYellow = {35, .51, .4},
+            minYellow = {20, .51, .65},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {85, .4, .4},
+            minGreen =  {85, .4, .25},
             maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0, 0.6},
-            maxWhite =  {360, 0.6, 1},
+            minWhite =  {0, 0, 0.7},
+            maxWhite =  {360, 0.2, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 0.6, 0.2};
+            maxBlack =  {360, 1, 0.3};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -97,6 +97,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     public final int[][] slots = new int[11][7];
     private final Point[][][] points = new Point[11][7][2];
+    private final double[][][] ogValues = new double[11][7][3];
 
     private final double
             fx = 1430,
@@ -256,6 +257,9 @@ public class BackdropPipeline extends OpenCvPipeline {
                 telemetry.addLine("White value: " + whiteVal);
 
                 double valBoost = 1.0 / (whiteVal - blackVal);
+
+                // TODO remove for robot version
+                for (int[] row : slots) Arrays.fill(row, 4);
 
                 for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
