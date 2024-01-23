@@ -36,7 +36,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.TeamPropDetector;
 
 import java.util.ArrayList;
 
