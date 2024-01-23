@@ -24,8 +24,11 @@ package org.firstinspires.ftc.teamcode.control.vision;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.draw3dCubeMarker;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.drawAxisMarker;
+import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.poseFromTrapezoid;
 import static org.firstinspires.ftc.teamcode.control.vision.AprilTagDetectionPipeline.yellow;
+import static java.lang.Math.min;
+import static java.lang.Math.round;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.CvType;
@@ -50,7 +53,27 @@ public class BackdropPipeline extends OpenCvPipeline {
             TARGET_SIZE = 70,
             X_SHIFT_L_TAG_TO_L_PIXEL = -100,
             Y_SHIFT_TAG_TO_PIXEL = -90,
-            X_SHIFT_PIXEL_POINTS = 66;
+            X_SHIFT_PIXEL_POINTS = 66,
+            X_SHIFT_WHITE = 3,
+            Y_SHIFT_WHITE = 85,
+            X_SHIFT_BLACK = 200,
+            Y_SHIFT_BLACK = 0;
+    
+    private static final double[]
+            minPurple = {250, .5, .7},
+            maxPurple = {290, 1, 1},
+
+            minYellow = {35, .5, .7},
+            maxYellow = {50, 1, 1},
+
+            minGreen =  {85, .5, .7},
+            maxGreen =  {100, 1, 1},
+
+            minWhite =  {0, 0.6, 0.5},
+            maxWhite =  {360, 1, 1},
+
+            minBlack =  {0, 0, 0},
+            maxBlack =  {360, 0.6, 0.5};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -194,9 +217,54 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                 if (editPoints) generatePoints();
 
+                double size = 5;
                 for (Point[][] row : points) for (Point[] pair : row) for (Point point : pair) {
-                    if (point != null) Imgproc.drawMarker(input, point, blue, 1, 2, 7);
+                    if (point == null) continue;
+                    Imgproc.rectangle(
+                            input,
+                            new Point(point.x - size, point.y - size),
+                            new Point(point.x + size, point.y + size),
+                            blue,
+                            2
+                    );
                 }
+
+                Point white = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_WHITE, Y_TOP_LEFT + Y_SHIFT_WHITE);
+                Point black = new Point(X_TOP_LEFT_R_TAG + X_SHIFT_BLACK, Y_TOP_LEFT + Y_SHIFT_BLACK);
+
+                Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+
+                double blackVal = round(input.get((int) black.y, (int) black.x)[2] / 255.0 * 1000) / 1000.0;
+                telemetry.addLine("Black value: " + blackVal);
+
+                double whiteVal = round(input.get((int) white.y, (int) white.x)[2] / 255.0 * 1000) / 1000.0;
+                telemetry.addLine("White value: " + whiteVal);
+
+                double valBoost = 1.0 / (whiteVal - blackVal);
+
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+                    Point pointL = points[y][x][0];
+                    Point pointR = points[y][x][1];
+                    double[] colorL = input.get((int) pointL.y, (int) pointL.x);
+                    double[] colorR = input.get((int) pointR.y, (int) pointR.x);
+                    double[] color = {
+                            colorL[0] + colorR[0], // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+                            round(0.5 * (colorL[1] + colorR[1]) / 255.0 * 1000) / 1000.0,
+                            min(round(0.5 * (colorL[2] + colorR[2]) / 255.0 * 1000) / 1000.0 * valBoost, 1.0)
+                    };
+
+                    int colorInt = hsvToColorInt(color);
+                    if (colorInt >- 1) slots[y][x] = colorInt;
+
+                    telemetry.addLine("(" + x + ", " + y + "), " + colorInt + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+                }
+
+                Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+
+                Imgproc.drawMarker(input, white, green, 2, 3);
+                Imgproc.drawMarker(input, black, green, 2, 3);
+
             }
 
             Imgproc.line(input, tagTL, tagTR, yellow, 5);
@@ -211,6 +279,25 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.update();
 
         return input;
+    }
+
+    private static int hsvToColorInt(double[] hsv) {
+        return
+                inRange(hsv, minPurple, maxPurple) ? 0 :
+                inRange(hsv, minYellow, maxYellow) ? 1 :
+                inRange(hsv, minGreen, maxGreen)   ? 2 :
+                inRange(hsv, minWhite, maxWhite)   ? 3 :
+                inRange(hsv, minBlack, maxBlack)   ? 4 :
+                -1
+        ;
+    }
+
+    private static boolean inRange(double[] val, double[] lower, double[] upper) {
+        return
+                (val[0] >= lower[0] && val[0] <= upper[0]) &&
+                (val[1] >= lower[1] && val[1] <= upper[1]) &&
+                (val[2] >= lower[2] && val[2] <= upper[2])
+        ;
     }
 
     private void generatePoints() {
