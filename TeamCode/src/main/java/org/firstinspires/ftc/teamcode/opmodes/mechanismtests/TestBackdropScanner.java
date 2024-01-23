@@ -35,16 +35,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 
 @TeleOp(group = "Single mechanism test")
-public final class TestBackdropDetector extends LinearOpMode {
+public final class TestBackdropScanner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         mTelemetry = new MultipleTelemetry(telemetry);
-        BackdropScanner detector = new BackdropScanner(hardwareMap);
+        BackdropScanner backdropScanner = new BackdropScanner(hardwareMap);
         gamepadEx1 = new GamepadEx(gamepad1);
+        Backdrop latestScan = new Backdrop();
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit()) {
@@ -56,9 +59,17 @@ public final class TestBackdropDetector extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
-            detector.run().toTelemetry();
+
+            if (backdropScanner.pipeline.backdropVisible) {
+                int[][] slots = backdropScanner.pipeline.slots;
+                for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
+                    if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
+                    latestScan.add(new Pixel(x, y, Pixel.Color.get(slots[y][x])));
+                }
+            }
+            latestScan.toTelemetry();
             telemetry.update();
         }
-        detector.stop();
+        backdropScanner.stop();
     }
 }
