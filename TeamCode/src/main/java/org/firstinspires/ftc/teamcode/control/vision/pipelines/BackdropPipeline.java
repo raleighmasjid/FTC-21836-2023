@@ -88,7 +88,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             maxWhite =  {360, 0.6, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 0.6, 0.6};
+            maxBlack =  {360, 0.6, 0.2};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -269,7 +269,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                     double[] color = {
                             colorL[0] + colorR[0], // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
                             round(0.5 * (colorL[1] + colorR[1]) / 255.0 * 1000) / 1000.0,
-                            min(round(0.5 * (colorL[2] + colorR[2]) / 255.0 * valBoost * 1000) / 1000.0, 1.0)
+                            min(round((0.5 * (colorL[2] + colorR[2]) / 255.0 - blackVal) * valBoost * 1000) / 1000.0, 1.0)
                     };
 
                     int colorInt = hsvToColorInt(color);
