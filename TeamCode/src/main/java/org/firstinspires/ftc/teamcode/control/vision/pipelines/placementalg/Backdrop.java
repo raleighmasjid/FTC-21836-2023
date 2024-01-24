@@ -23,7 +23,7 @@ public final class Backdrop {
     final static int ROWS = 11, COLUMNS = 7;
     public boolean printRectangular = false;
 
-    final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
+    public final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
     public int mosaicCount = 0;
 

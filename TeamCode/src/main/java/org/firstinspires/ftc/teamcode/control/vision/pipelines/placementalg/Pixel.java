@@ -26,7 +26,7 @@ public final class Pixel implements Comparable<Pixel> {
     public final int y;
     public final Color color;
     double scoreValue = 0;
-    Pixel mosaic = null;
+    public Pixel mosaic = null;
 
     public Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
@@ -53,7 +53,7 @@ public final class Pixel implements Comparable<Pixel> {
     /**
      * @return Whether this {@link Pixel} is part of a valid mosaic
      */
-    boolean inMosaic() {
+    public boolean inMosaic() {
         return mosaic != null && mosaic.color != INVALID;
     }
 

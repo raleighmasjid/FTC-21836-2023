@@ -44,6 +44,7 @@ import static java.lang.Math.round;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -344,14 +345,51 @@ public class BackdropPipeline extends OpenCvPipeline {
                 background.release();
             }
 
-            for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
-                if (x == 0 && y % 2 == 0) continue;
-                Point center = new Point(
-                        0.5 * (points[y][x][0].x + points[y][x][1].x),
-                        0.5 * (points[y][x][0].y + points[y][x][1].y)
-                );
-                if (graphic) Imgproc.circle(input, center, 40, colorToScalar(backdrop.get(x, y).color), 8);
-                Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
+            if (graphic) {
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+                    Point center = new Point(
+                            0.5 * (points[y][x][0].x + points[y][x][1].x),
+                            0.5 * (points[y][x][0].y + points[y][x][1].y)
+                    );
+                    Pixel pixel = backdrop.get(x, y);
+                    Imgproc.circle(input, center, 40, colorToScalar(pixel.color), 8);
+                    Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
+                }
+
+                PlacementCalculator.getOptimalPlacements(backdrop);
+                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                    if (x == 0 && y % 2 == 0) continue;
+                    Pixel pixel = backdrop.get(x, y);
+                    if (pixel.inMosaic()) {
+                        Pixel[] mPixels = new Pixel[3];
+                        mPixels[0] = pixel;
+                        int i = 1;
+                        for (Pixel[] row : backdrop.slots) for (Pixel p : row) {
+                            if (pixel.mosaic == p.mosaic) {
+                                mPixels[i++] = p;
+                                if (i > 1) break;
+                            }
+                        }
+                        Point center = new Point(
+                                0.5 * (points[y][x][0].x + points[y][x][1].x),
+                                0.5 * (points[y][x][0].y + points[y][x][1].y)
+                        );
+                        Point center2 = new Point(
+                                0.5 * (points[mPixels[1].y][mPixels[1].x][0].x + points[mPixels[1].y][mPixels[1].x][1].x),
+                                0.5 * (points[mPixels[1].y][mPixels[1].x][0].y + points[mPixels[1].y][mPixels[1].x][1].y)
+                        );
+                        Point center3 = new Point(
+                                0.5 * (points[mPixels[2].y][mPixels[2].x][0].x + points[mPixels[2].y][mPixels[2].x][1].x),
+                                0.5 * (points[mPixels[2].y][mPixels[2].x][0].y + points[mPixels[2].y][mPixels[2].x][1].y)
+                        );
+
+                        Imgproc.line(input, center, center2, blue, 5);
+                        Imgproc.line(input, center2, center3, blue, 5);
+                        Imgproc.line(input, center3, center, blue, 5);
+
+                    }
+                }
             }
 
             if (!warp) {
