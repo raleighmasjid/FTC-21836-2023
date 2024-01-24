@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
+import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -32,7 +33,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -61,12 +61,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
     public boolean
-            warp = true,
+            warp = false,
             backdropVisible = false,
             isRed = true,
             editPoints = true,
             graphic = true,
-            background = false;
+            background = false,
+            refresh = true;
 
     public double
             X_TOP_LEFT_R_TAG = 16.5,
@@ -78,9 +79,11 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_PIXEL_POINTS_T = -1.1428571428571428,
             Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
             X_SHIFT_WHITE = 0.08,
-            Y_SHIFT_WHITE = 2,
+            Y_SHIFT_WHITE = 2.5,
             X_SHIFT_BLACK = 5,
-            Y_SHIFT_BLACK = -3.0;
+            Y_SHIFT_BLACK = -3.0,
+            X_SHIFT_U = 5.2,
+            Y_SHIFT_U = -30.5;
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -93,10 +96,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             maxGreen =  {110, 1, 1},
 
             minWhite =  {0, 0, 0.54},
-            maxWhite =  {360, 0.249, 1},
-
-            minBlack =  {0, 0, 0},
-            maxBlack =  {360, 1, 0.585};
+            maxWhite =  {360, 0.249, 1};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -257,8 +257,19 @@ public class BackdropPipeline extends OpenCvPipeline {
                 );
             }
 
-            Point whiteSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0));
-            Point blackSample = new Point((X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0), (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0));
+            Point whiteSample = new Point(
+                    getLeftX(tags.get(0).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
+                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
+            );
+            telemetry.addData("first tag id", getLeftX(tags.get(0).id));
+            Point blackSample = new Point(
+                    (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0),
+                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0)
+            );
+            Point outSample = new Point((
+                    X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_U * TARGET_SIZE / 2.0),
+                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_U * TARGET_SIZE / 2.0)
+            );
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
@@ -268,10 +279,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             double whiteVal = round(input.get((int) whiteSample.y, (int) whiteSample.x)[2] / 255.0 * 1000) / 1000.0;
             telemetry.addLine("White value: " + whiteVal);
 
+            double[] out = input.get((int) outSample.y, (int) outSample.x);
+            telemetry.addLine(out[0] + ", " + out[1] + ", " + out[2]);
+
             double valBoost = 1.0 / (whiteVal - blackVal);
 
             // TODO remove for robot version
-//            for (int[] row : slots) Arrays.fill(row, 4);
+            if (refresh) for (int[] row : slots) Arrays.fill(row, -1);
 
             for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
@@ -293,7 +307,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 double[] color = {
                         avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
                         round(avgSat * 1000) / 1000.0,
-                        min(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 1.0)
+                        clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
                 };
 
                 int colorInt = hsvToColorInt(color);
@@ -306,6 +320,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             Imgproc.drawMarker(input, whiteSample, green, 2, 3);
             Imgproc.drawMarker(input, blackSample, green, 2, 3);
+            Imgproc.drawMarker(input, outSample, green, 2, 3);
 
             if (graphic && background) {
                 MatOfPoint background = new MatOfPoint(
@@ -356,13 +371,12 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private static int hsvToColorInt(double[] hsv) {
         return
-                hsv[2] == 0 ? -1 :
+                (hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0) ? -1 :
                 inRange(hsv, minPurple, maxPurple) ? 0 :
                 inRange(hsv, minYellow, maxYellow) ? 1 :
                 inRange(hsv, minGreen, maxGreen)   ? 2 :
                 inRange(hsv, minWhite, maxWhite)   ? 3 :
-                inRange(hsv, minBlack, maxBlack)   ? 4 :
-                -1
+                4
         ;
     }
 
