@@ -69,10 +69,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
     public boolean
-            warp = false,
             backdropVisible = false,
             isRed = true,
-            editPoints = true,
             graphic = true,
             background = false,
             showWarpPath = true;
@@ -252,7 +250,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
             transformMatrix.release();
 
-            if (editPoints) generatePoints();
+            generatePoints();
 
             double size = 5;
             for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
@@ -378,18 +376,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                     }
                 }
-            }
-
-            if (!warp) {
-                Mat inverseTransform = Imgproc.getPerspectiveTransform(dstTag, srcTag);
-                Imgproc.warpPerspective(input, input, inverseTransform, input.size());
-                inverseTransform.release();
-                 if (showWarpPath) {
-                     Imgproc.line(input, tr, tagTR, red, 3);
-                     Imgproc.line(input, br, tagBR, red, 3);
-                     Imgproc.line(input, bl, tagBL, red, 3);
-                     Imgproc.line(input, tl, tagTL, red, 3);
-                 }
             }
             srcTag.release();
             dstTag.release();
