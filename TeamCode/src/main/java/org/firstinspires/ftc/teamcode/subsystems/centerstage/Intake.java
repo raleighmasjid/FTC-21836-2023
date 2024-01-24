@@ -48,7 +48,7 @@ public final class Intake {
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
-            TIME_PIXEL_1_SETTLING = 0.5,
+            TIME_PIXEL_1_SETTLING = 0.25,
             TIME_PIXEL_2_SETTLING = 0,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 0,
