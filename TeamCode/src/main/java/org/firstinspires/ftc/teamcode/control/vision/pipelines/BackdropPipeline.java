@@ -81,10 +81,11 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 16.5,
             Y_TOP_LEFT = 32.42857142857142,
             TARGET_SIZE = 65,
-            X_SHIFT_L_TAG_TO_L_PIXEL = -2.9,
+            X_SHIFT_L_TAG_TO_C_PIXEL = -1.85,
             Y_SHIFT_TAG_TO_PIXEL = -2.6,
-            X_SHIFT_PIXEL_POINTS_R = 1.8857142857142857,
-            Y_SHIFT_PIXEL_POINTS_T = -1.1428571428571428,
+            X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714,
+            X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714,
+            Y_SHIFT_PIXEL_POINTS_T = -1.1,
             Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
             X_SHIFT_WHITE = 0.08,
             Y_SHIFT_WHITE = 2.5,
@@ -112,7 +113,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix;
 
     public final Backdrop backdrop = new Backdrop();
-    private final Point[][][] points = new Point[11][7][4];
+    private final Point[][][] points = new Point[11][7][5];
 
     private final double
             fx = 1430,
@@ -348,10 +349,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (graphic) {
                 for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
-                    Point center = new Point(
-                            0.5 * (points[y][x][0].x + points[y][x][1].x),
-                            0.5 * (points[y][x][0].y + points[y][x][1].y)
-                    );
+                    Point center = pixelCenter(x, y);
                     Pixel pixel = backdrop.get(x, y);
                     Imgproc.circle(input, center, 40, colorToScalar(pixel.color), 8);
                     Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
@@ -371,18 +369,9 @@ public class BackdropPipeline extends OpenCvPipeline {
                                 if (i > 1) break;
                             }
                         }
-                        Point center = new Point(
-                                0.5 * (points[y][x][0].x + points[y][x][1].x),
-                                0.5 * (points[y][x][0].y + points[y][x][1].y)
-                        );
-                        Point center2 = new Point(
-                                0.5 * (points[mPixels[1].y][mPixels[1].x][0].x + points[mPixels[1].y][mPixels[1].x][1].x),
-                                0.5 * (points[mPixels[1].y][mPixels[1].x][0].y + points[mPixels[1].y][mPixels[1].x][1].y)
-                        );
-                        Point center3 = new Point(
-                                0.5 * (points[mPixels[2].y][mPixels[2].x][0].x + points[mPixels[2].y][mPixels[2].x][1].x),
-                                0.5 * (points[mPixels[2].y][mPixels[2].x][0].y + points[mPixels[2].y][mPixels[2].x][1].y)
-                        );
+                        Point center = pixelCenter(mPixels[0].x, mPixels[0].y);
+                        Point center2 = pixelCenter(mPixels[1].x, mPixels[1].y);
+                        Point center3 = pixelCenter(mPixels[2].x, mPixels[2].y);
 
                         Imgproc.line(input, center, center2, blue, 5);
                         Imgproc.line(input, center2, center3, blue, 5);
@@ -452,6 +441,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 points[y][x][1] = pixelRight(x, y);
                 points[y][x][2] = pixelTop(x, y);
                 points[y][x][3] = pixelBottom(x, y);
+                points[y][x][4] = pixelCenter(x, y);
             }
         }
     }
@@ -460,30 +450,34 @@ public class BackdropPipeline extends OpenCvPipeline {
         return (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 
-    private Point pixelLeft(int x, int y) {
+    private Point pixelCenter(int x, int y) {
         double width = 2.976 * (TARGET_SIZE / 2.0);
         return new Point(
-                getLeftX(1) + (X_SHIFT_L_TAG_TO_L_PIXEL * TARGET_SIZE / 2.0) + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
+                getLeftX(1) + (X_SHIFT_L_TAG_TO_C_PIXEL * TARGET_SIZE / 2.0) + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
                 (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_TAG_TO_PIXEL * TARGET_SIZE / 2.0) - y * (2.625 * (TARGET_SIZE / 2.0))
         );
     }
 
+    private Point pixelLeft(int x, int y) {
+        Point point = pixelCenter(x, y);
+        point.x += (X_SHIFT_PIXEL_POINTS_L * TARGET_SIZE / 2.0);
+        return point;
+    }
+
     private Point pixelRight(int x, int y) {
-        Point point = pixelLeft(x, y);
+        Point point = pixelCenter(x, y);
         point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0);
         return point;
     }
 
     private Point pixelTop(int x, int y) {
-        Point point = pixelLeft(x, y);
-        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0) / 2.0;
+        Point point = pixelCenter(x, y);
         point.y += (Y_SHIFT_PIXEL_POINTS_T * TARGET_SIZE / 2.0);
         return point;
     }
 
     private Point pixelBottom(int x, int y) {
-        Point point = pixelLeft(x, y);
-        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0) / 2.0;
+        Point point = pixelCenter(x, y);
         point.y += (Y_SHIFT_PIXEL_POINTS_B * TARGET_SIZE / 2.0);
         return point;
     }
