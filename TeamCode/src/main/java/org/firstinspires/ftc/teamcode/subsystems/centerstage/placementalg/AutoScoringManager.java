@@ -87,7 +87,9 @@ public final class AutoScoringManager {
             int[][] slots = backdropScanner.pipeline.slots;
             for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
                 if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
-                latestScan.add(new Pixel(x, y, Color.get(slots[y][x])));
+                Color color = Color.get(slots[y][x]);
+                if (color == latestScan.get(x, y).color) continue;
+                latestScan.add(new Pixel(x, y, color));
             }
         }
 
