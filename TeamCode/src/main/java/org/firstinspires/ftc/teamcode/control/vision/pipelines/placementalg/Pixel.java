@@ -156,6 +156,16 @@ public final class Pixel implements Comparable<Pixel> {
             }
         }
 
+        public String humanInstruction() {
+            switch (this) {
+                case WHITE: return "0";
+                case PURPLE:
+                case YELLOW:
+                case GREEN: return "" + (ordinal() + 1);
+                default: return "";
+            }
+        }
+
         /**
          * @return The {@link Color} corresponding to a given {@link String}
          * representation of what is (likely) originally a {@link Color}

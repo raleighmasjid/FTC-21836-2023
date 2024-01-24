@@ -231,8 +231,8 @@ public final class AutoScoringManager {
 
     public void printTelemetry() {
         mTelemetry.addLine("Colors needed in wing:");
-        mTelemetry.addLine("First: " + colorsNeeded[0].name());
-        mTelemetry.addLine("Second: " + colorsNeeded[1].name());
+        mTelemetry.addLine("First: " + colorsNeeded[0].name() + ", " + colorsNeeded[0].humanInstruction());
+        mTelemetry.addLine("Second: " + colorsNeeded[1].name() + ", " + colorsNeeded[1].humanInstruction());
         mTelemetry.addLine();
         mTelemetry.addLine("Place on backdrop:");
         mTelemetry.addLine("First: " + placements[0].userFriendlyString());
