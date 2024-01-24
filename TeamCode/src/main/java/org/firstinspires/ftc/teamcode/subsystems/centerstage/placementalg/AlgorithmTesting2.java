@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANYCOLOR;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -55,7 +56,7 @@ final class AlgorithmTesting2 {
             }
             if (solve) {
                 Pixel placement = optimalPlacements.get(0);
-                backdrop.add(alwaysPlaceColored && placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
+                backdrop.add(alwaysPlaceColored && placement.color == Pixel.Color.ANY ? new Pixel(placement, Pixel.Color.ANYCOLOR) : placement);
             }
             optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
             if (!solve || printPerIteration) {

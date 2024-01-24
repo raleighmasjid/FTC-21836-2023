@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetect
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 
 import java.util.ArrayList;
 

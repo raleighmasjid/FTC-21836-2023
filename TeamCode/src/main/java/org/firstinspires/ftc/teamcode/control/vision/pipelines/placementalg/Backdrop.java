@@ -1,19 +1,17 @@
-package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
+package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.printInColor;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.INVALID;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.printInColor;
 import static java.lang.Math.random;
 import static java.lang.Math.round;
 
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.dashboard.config.Config;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Arrays;
 
-@Config
 public final class Backdrop {
 
     public static double
@@ -23,11 +21,11 @@ public final class Backdrop {
             Y_MAX_RED = -26.25;
 
     final static int ROWS = 11, COLUMNS = 7;
-    boolean printRectangular = false;
+    public boolean printRectangular = false;
 
     final Pixel[][] slots = new Pixel[ROWS][COLUMNS];
 
-    int mosaicCount = 0;
+    public int mosaicCount = 0;
 
     public Backdrop() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
@@ -36,7 +34,7 @@ public final class Backdrop {
     }
 
     @NonNull
-    protected Backdrop clone() {
+    public Backdrop clone() {
         Backdrop backdrop = new Backdrop();
         backdrop.mosaicCount = mosaicCount;
         backdrop.printRectangular = printRectangular;
@@ -57,7 +55,7 @@ public final class Backdrop {
      * Clears every slot in the backdrop, as if it were a new backdrop <br>
      * Also resets {@link #mosaicCount} to 0
      */
-    void clear() {
+    public void clear() {
         for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
             slots[y][x] = new Pixel(x, y, (y % 2 == 0 && x == 0) ? INVALID : EMPTY);
         }
@@ -89,7 +87,7 @@ public final class Backdrop {
     /**
      * @return The {@link Pixel} found at the provided x and y coordinates, if {@link #coordsInRange}
      */
-    Pixel get(int x, int y) {
+    public Pixel get(int x, int y) {
         return coordsInRange(x, y) ? slots[y][x] : new Pixel(x, y, INVALID);
     }
 
@@ -133,7 +131,7 @@ public final class Backdrop {
     /**
      * Output the result of {@link #toString()}, {@link #mosaicCount}, and points scored to the main text output stream
      */
-    void print() {
+    public void print() {
         System.out.println(this);
         System.out.println();
         System.out.println(mosaicCount + " mosaics");
@@ -144,7 +142,7 @@ public final class Backdrop {
     /**
      * Output the result of {@link #toString()} to telemetry
      */
-    public void toTelemetry() {
+    public void toTelemetry(Telemetry mTelemetry) {
         printInColor = false;
         String[] rows = toString().split("\n");
         for (String row : rows) mTelemetry.addLine(row);
@@ -203,7 +201,7 @@ public final class Backdrop {
     /**
      * @return Whether this {@link Backdrop} has any empty slots
      */
-    boolean notFull() {
+    public boolean notFull() {
         for (Pixel pixel : slots[10]) if (pixel.color == EMPTY) return true;
         return false;
     }

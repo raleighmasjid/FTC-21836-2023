@@ -5,16 +5,16 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacements;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.getOptimalPlacementsWithExtraWhites;
+import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -22,6 +22,17 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import java.util.ArrayList;
 
 public final class AutoScoringManager {
+
+    /**
+     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
+     */
+    public static Pose2d toPose2d(Pixel pixel) {
+        return new Pose2d(
+                Backdrop.X,
+                (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (pixel.x * Pixel.WIDTH) + (pixel.y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
+                PI
+        );
+    }
 
     public static MainAuton.EditablePose startPose = new MainAuton.EditablePose(24, -16, LEFT);
 
@@ -31,16 +42,16 @@ public final class AutoScoringManager {
 
     private final Backdrop latestScan = autonBackdrop;
     private volatile Backdrop lastScan = latestScan;
-    private volatile ArrayList<Pixel> optimalPlacements = getOptimalPlacements(latestScan);
+    private volatile ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(latestScan);
 
-    private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
-    private final Color[] colorsNeeded = {EMPTY, EMPTY};
+    private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, Pixel.Color.EMPTY), new Pixel(-2, 0, Pixel.Color.EMPTY)};
+    private final Pixel.Color[] colorsNeeded = {Pixel.Color.EMPTY, Pixel.Color.EMPTY};
     private volatile TrajectorySequence scoringTrajectory = null;
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
     private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, runThread = true;
-    private volatile Color[] depositColors = {EMPTY, EMPTY};
+    private volatile Pixel.Color[] depositColors = {Pixel.Color.EMPTY, Pixel.Color.EMPTY};
 
     public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
@@ -63,7 +74,7 @@ public final class AutoScoringManager {
      * Place a flag requesting for {@link #scoringTrajectory} to be generated
      * @param depositColors The colors present in the robot's {@link org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit} ready to be scored
      */
-    public void beginTrajectoryGeneration(Color[] depositColors) {
+    public void beginTrajectoryGeneration(Pixel.Color[] depositColors) {
         this.depositColors = depositColors;
         beginTrajectoryGeneration = true;
     }
@@ -82,16 +93,6 @@ public final class AutoScoringManager {
      * This method calls {@link #generateTrajectory()}
      */
     private void update() {
-
-        if (backdropScanner.pipeline.backdropVisible) {
-            int[][] slots = backdropScanner.pipeline.slots;
-            for (int y = 0; y < slots.length; y++) for (int x = 0; x < slots[y].length; x++) {
-                if ((x == 0 && y % 2 == 0) || (slots[y][x] == -1)) continue;
-                Color color = Color.get(slots[y][x]);
-                if (color == latestScan.get(x, y).color) continue;
-                latestScan.add(new Pixel(x, y, color));
-            }
-        }
 
         if (!robot.drivetrain.isBusy() && (clearingScan || !latestScan.equals(lastScan))) {
             timeSinceUpdate.reset();
@@ -128,17 +129,17 @@ public final class AutoScoringManager {
 
         ArrayList<Pixel> optimalPlacementsCopy = new ArrayList<>(optimalPlacements);
 
-        Color firstColor = depositColors[0], secondColor = depositColors[1];
+        Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-        if (firstColor == EMPTY && secondColor == EMPTY) return false;
+        if (firstColor == Pixel.Color.EMPTY && secondColor == Pixel.Color.EMPTY) return false;
 
-        placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-        placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+        placements[0] = new Pixel((isRed ? -2 : 9), 0, Pixel.Color.EMPTY);
+        placements[1] = new Pixel((isRed ? -2 : 9), 0, Pixel.Color.EMPTY);
 
-        if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+        if (firstColor != Pixel.Color.EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (firstColor.matches(pixel.color)) {
 
-                optimalPlacementsCopy = getOptimalPlacementsWithExtraWhites(
+                optimalPlacementsCopy = PlacementCalculator.getOptimalPlacementsWithExtraWhites(
                         latestScan.clone().add(
                                 placements[0] = new Pixel(pixel, firstColor)
                         )
@@ -147,7 +148,7 @@ public final class AutoScoringManager {
                 break;
             }
         }
-        if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+        if (secondColor != Pixel.Color.EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (secondColor.matches(pixel.color)) {
 
                 placements[1] = new Pixel(pixel, secondColor);
@@ -155,13 +156,13 @@ public final class AutoScoringManager {
             }
         }
 
-        Pose2d scoringPos1 = placements[0].toPose2d();
-        Pose2d scoringPos2 = placements[1].toPose2d();
+        Pose2d scoringPos1 = toPose2d(placements[0]);
+        Pose2d scoringPos2 = toPose2d(placements[1]);
 
         boolean sameScoringLocation = scoringPos1.epsilonEqualsHeading(scoringPos2);
 
         scoringTrajectory =
-                firstColor == EMPTY || sameScoringLocation ?
+                firstColor == Pixel.Color.EMPTY || sameScoringLocation ?
                         robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
                                 .addTemporalMarker(() -> {
                                     robot.deposit.lift.setTargetRow(placements[1].y);
@@ -201,16 +202,16 @@ public final class AutoScoringManager {
      * Saves the results of {@link PlacementCalculator} as applied to {@link #latestScan} to {@link #optimalPlacements}
      */
     private void calculateColorsNeeded() {
-        optimalPlacements = getOptimalPlacementsWithExtraWhites(latestScan);
+        optimalPlacements = PlacementCalculator.getOptimalPlacementsWithExtraWhites(latestScan);
 
-        colorsNeeded[0] = EMPTY;
-        colorsNeeded[1] = EMPTY;
+        colorsNeeded[0] = Pixel.Color.EMPTY;
+        colorsNeeded[1] = Pixel.Color.EMPTY;
         if (!optimalPlacements.isEmpty()) {
             Pixel optimalPlacement = optimalPlacements.get(0);
 
             colorsNeeded[0] = optimalPlacement.color;
 
-            ArrayList<Pixel> futureOptimalPlacements = getOptimalPlacements(latestScan.clone().add(optimalPlacement));
+            ArrayList<Pixel> futureOptimalPlacements = PlacementCalculator.getOptimalPlacements(latestScan.clone().add(optimalPlacement));
             if (!futureOptimalPlacements.isEmpty()) {
                 colorsNeeded[1] = futureOptimalPlacements.get(0).color;
             }
@@ -238,6 +239,6 @@ public final class AutoScoringManager {
         mTelemetry.addLine("Second: " + placements[1].userFriendlyString());
         mTelemetry.addLine();
         mTelemetry.addLine(timeSinceUpdate.seconds() <= 1 ? "Backdrop just changed!" : "No changes right now");
-        latestScan.toTelemetry();
+        latestScan.toTelemetry(mTelemetry);
     }
 }

@@ -16,6 +16,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Pain
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 import static java.util.Collections.swap;
@@ -28,14 +29,14 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
 
 import java.util.ArrayList;
@@ -148,7 +149,7 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .splineToConstantHeading(first.toPose2d().vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
+                .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixels(1);
                     autonBackdrop.add(first);
@@ -158,7 +159,7 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(second.y);
                 })
-                .lineToConstantHeading(second.toPose2d().vec())
+                .lineToConstantHeading(toPose2d(second).vec())
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixels(2);
                     autonBackdrop.add(second);
@@ -263,7 +264,7 @@ public final class MainAuton extends LinearOpMode {
                             robot.intake.setRequiredIntakingAmount(2);
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
-                        .splineToSplineHeading(placements.get(0).toPose2d(), RIGHT)
+                        .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
                         .addTemporalMarker(() -> {
                             robot.deposit.paintbrush.dropPixels(1);
                             autonBackdrop.add(placements.get(0));

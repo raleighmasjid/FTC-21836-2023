@@ -33,9 +33,17 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.GREEN;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.INVALID;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static java.lang.Math.round;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -48,7 +56,6 @@ import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
@@ -103,7 +110,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private final Mat grey = new Mat(), cameraMatrix;
 
-    public final int[][] slots = new int[11][7];
+    public final Backdrop backdrop = new Backdrop();
     private final Point[][][] points = new Point[11][7][4];
 
     private final double
@@ -113,8 +120,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             cy = 620;
 
     public BackdropPipeline(Telemetry telemetry) {
-
-        for (int[] row : slots) Arrays.fill(row, -1);
 
         generatePoints();
 
@@ -285,7 +290,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             double valBoost = 1.0 / (whiteVal - blackVal);
 
             // TODO remove for robot version
-            if (refresh) for (int[] row : slots) Arrays.fill(row, -1);
+//            if (refresh) for (int[] row : slots) Arrays.fill(row, -1);
 
             for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
@@ -310,10 +315,12 @@ public class BackdropPipeline extends OpenCvPipeline {
                         clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
                 };
 
-                int colorInt = hsvToColorInt(color);
-                if (colorInt >- 1) slots[y][x] = colorInt;
+                Pixel.Color c = hsvToColor(color);
+                if (c != INVALID && c != backdrop.get(x, y).color) {
+                    backdrop.add(new Pixel(x, y, c));
+                }
 
-                telemetry.addLine("(" + x + ", " + y + "), " + colorIntToString(slots[y][x]) + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+                telemetry.addLine("(" + x + ", " + y + "), " + backdrop.get(x, y).color.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             }
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
@@ -343,7 +350,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                         0.5 * (points[y][x][0].x + points[y][x][1].x),
                         0.5 * (points[y][x][0].y + points[y][x][1].y)
                 );
-                if (graphic) Imgproc.circle(input, center, 40, colorIntToScalar(slots[y][x]), 8);
+                if (graphic) Imgproc.circle(input, center, 40, colorToScalar(backdrop.get(x, y).color), 8);
                 Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
             }
 
@@ -369,37 +376,26 @@ public class BackdropPipeline extends OpenCvPipeline {
         return input;
     }
 
-    private static int hsvToColorInt(double[] hsv) {
+    private static Pixel.Color hsvToColor(double[] hsv) {
         return
-                (hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0) ? -1 :
-                inRange(hsv, minPurple, maxPurple) ? 0 :
-                inRange(hsv, minYellow, maxYellow) ? 1 :
-                inRange(hsv, minGreen, maxGreen)   ? 2 :
-                inRange(hsv, minWhite, maxWhite)   ? 3 :
-                4
+                (hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0) ? INVALID :
+                inRange(hsv, minPurple, maxPurple) ? PURPLE :
+                inRange(hsv, minYellow, maxYellow) ? YELLOW :
+                inRange(hsv, minGreen, maxGreen)   ? GREEN :
+                inRange(hsv, minWhite, maxWhite)   ? WHITE :
+                EMPTY
         ;
     }
 
-    private static String colorIntToString(int colorInt) {
-        switch (colorInt) {
-            case 0: return "PURPLE";
-            case 1: return "YELLOW";
-            case 2: return "GREEN";
-            case 3: return "WHITE";
-            case 4: return "EMPTY";
-            default: return "UNKNOWN";
-        }
-    }
-
-    private static Scalar colorIntToScalar(int colorInt) {
-        switch (colorInt) {
-            case 0: return lavender;
-            case 1: return yellow;
-            case 2: return green;
-            case 3: return white;
-            case 4: return black;
-            default: return gray;
-        }
+    private static Scalar colorToScalar(Pixel.Color color) {
+        return
+                color == PURPLE ? lavender :
+                color == YELLOW ? yellow :
+                color == GREEN ? green :
+                color == WHITE ? white :
+                color == EMPTY ? black :
+                gray
+        ;
     }
 
     private static boolean inRange(double[] val, double[] lower, double[] upper) {

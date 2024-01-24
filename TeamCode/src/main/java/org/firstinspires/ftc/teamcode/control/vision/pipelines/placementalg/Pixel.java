@@ -1,20 +1,12 @@
-package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
+package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.INVALID;
-import static java.lang.Math.PI;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.INVALID;
 
 import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-
-import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
 
 /**
  * Note: this class has a natural ordering that is not consistent with equals.
  */
-@Config
 public final class Pixel implements Comparable<Pixel> {
 
     public static double
@@ -30,9 +22,9 @@ public final class Pixel implements Comparable<Pixel> {
         return (int) (diff * 1000000000);
     }
 
-    final int x;
+    public final int x;
     public final int y;
-    final Color color;
+    public final Color color;
     double scoreValue = 0;
     Pixel mosaic = null;
 
@@ -45,7 +37,7 @@ public final class Pixel implements Comparable<Pixel> {
     /**
      * Instantiate a new {@link Pixel} object based on an existing {@link Pixel} but with a new {@link Color}
      */
-    Pixel(Pixel p, Pixel.Color color) {
+    public Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
@@ -63,17 +55,6 @@ public final class Pixel implements Comparable<Pixel> {
      */
     boolean inMosaic() {
         return mosaic != null && mosaic.color != INVALID;
-    }
-
-    /**
-     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
-     */
-    public Pose2d toPose2d() {
-        return new Pose2d(
-                Backdrop.X,
-                (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (x * Pixel.WIDTH) + (y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
-                PI
-        );
     }
 
     /**
@@ -124,54 +105,9 @@ public final class Pixel implements Comparable<Pixel> {
     /**
      * Outputs the result of {@link #toString()} to the main text output stream
      */
-    void print() {
+    public void print() {
         System.out.println(this);
     }
-
-    /**
-     * HSV value bound for intake pixel detection
-     */
-    public static HSV
-            minWhite = new HSV(
-            0,
-            0,
-            0.05
-            ),
-            maxWhite = new HSV(
-                    0,
-                    0.6,
-                    0.45
-            ),
-            minPurple = new HSV(
-                    205,
-                    0.55,
-                    0.02
-            ),
-            maxPurple = new HSV(
-                    225,
-                    1,
-                    0.35
-            ),
-            minYellow = new HSV(
-                    90,
-                    0.55,
-                    0.02
-            ),
-            maxYellow = new HSV(
-                    125,
-                    1,
-                    0.15
-            ),
-            minGreen = new HSV(
-                    130,
-                    0.5,
-                    0.01
-            ),
-            maxGreen = new HSV(
-                    160,
-                    1,
-                    0.2
-            );
 
     static boolean printInColor = true;
 
@@ -179,7 +115,6 @@ public final class Pixel implements Comparable<Pixel> {
      * An enum representing the color of a given {@link Pixel},
      * either a real, physical color, or a placeholder in a {@link Backdrop}
      */
-    @Config
     public enum Color {
         PURPLE,
         YELLOW,
@@ -225,7 +160,7 @@ public final class Pixel implements Comparable<Pixel> {
          * @return The {@link Color} corresponding to a given {@link String}
          * representation of what is (likely) originally a {@link Color}
          */
-        static Color fromString(String color) {
+        public static Color fromString(String color) {
             switch (color.toUpperCase()) {
                 case "W":
                     return WHITE;
@@ -249,20 +184,9 @@ public final class Pixel implements Comparable<Pixel> {
         }
 
         /**
-         * @return The {@link Color} corresponding to the provided {@link HSV} as per the tuned value bounds
-         */
-        public static Color fromHSV(HSV hsv) {
-            return hsv.between(minPurple, maxPurple) ? PURPLE :
-                    hsv.between(minGreen, maxGreen) ? GREEN :
-                    hsv.between(minYellow, maxYellow) ? YELLOW :
-                    new HSV(0, hsv.saturation, hsv.value).between(minWhite, maxWhite) ? WHITE :
-                    EMPTY;
-        }
-
-        /**
          * @return Whether this {@link Color} "matches" the provided {@link Color}, accounting for ambiguous and specific {@link Color}s
          */
-        boolean matches(Color other) {
+        public boolean matches(Color other) {
             return (this != INVALID && other != INVALID) && (
                     this == ANY ||
                             other == ANY ||

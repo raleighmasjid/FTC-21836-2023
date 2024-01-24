@@ -8,11 +8,15 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_1_PIXEL;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIVOTING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_2_SETTLING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.GREEN;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -29,7 +33,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
 
@@ -53,6 +57,51 @@ public final class Intake {
             SPEED_SLOW_REVERSING = -0.25,
             r = 9.5019488189,
             theta0 = -0.496183876745;
+
+    /**
+     * HSV value bound for intake pixel detection
+     */
+    public static HSV
+            minWhite = new HSV(
+                    0,
+                    0,
+                    0.05
+            ),
+            maxWhite = new HSV(
+                    0,
+                    0.6,
+                    0.45
+            ),
+            minPurple = new HSV(
+                    205,
+                    0.55,
+                    0.02
+            ),
+            maxPurple = new HSV(
+                    225,
+                    1,
+                    0.35
+            ),
+            minYellow = new HSV(
+                    90,
+                    0.55,
+                    0.02
+            ),
+            maxYellow = new HSV(
+                    125,
+                    1,
+                    0.15
+            ),
+            minGreen = new HSV(
+                    130,
+                    0.5,
+                    0.01
+            ),
+            maxGreen = new HSV(
+                    160,
+                    1,
+                    0.2
+            );
 
     private final MotorEx motor;
 
@@ -146,6 +195,18 @@ public final class Intake {
         timer.reset();
     }
 
+    /**
+     * @return The {@link Pixel.Color} corresponding to the provided {@link HSV} as per the tuned value bounds
+     */
+    public static Pixel.Color fromHSV(HSV hsv) {
+        return
+                hsv.between(minPurple, maxPurple) ? PURPLE :
+                hsv.between(minGreen, maxGreen) ? GREEN :
+                hsv.between(minYellow, maxYellow) ? YELLOW :
+                new HSV(0, hsv.saturation, hsv.value).between(minWhite, maxWhite) ? WHITE :
+                EMPTY;
+    }
+
     void run(int pixelsInDeposit, boolean depositRetracted) {
 
         if (pixelsTransferred) pixelsTransferred = false;
@@ -154,7 +215,7 @@ public final class Intake {
             case HAS_0_PIXELS:
 
                 bottomHSV = bottomSensor.getHSV();
-                colors[0] = Pixel.Color.fromHSV(bottomHSV);
+                colors[0] = fromHSV(bottomHSV);
                 boolean bottomFull = !(colors[0] == EMPTY);
                 if (bottomFull || requiredIntakingAmount == 0) {
                     if (bottomFull) decrementHeight();
@@ -171,7 +232,7 @@ public final class Intake {
             case HAS_1_PIXEL:
 
                 topHSV = topSensor.getHSV();
-                colors[1] = Pixel.Color.fromHSV(topHSV);
+                colors[1] = fromHSV(topHSV);
                 boolean topFull = !(colors[1] == EMPTY);
                 if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
@@ -204,8 +265,8 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (Pixel.Color.fromHSV(topSensor.getHSV()) == EMPTY &&
-                    Pixel.Color.fromHSV(bottomSensor.getHSV()) == EMPTY
+                if (fromHSV(topSensor.getHSV()) == EMPTY &&
+                    fromHSV(bottomSensor.getHSV()) == EMPTY
                 ) {
                     state = PIXELS_SETTLING;
                     timer.reset();

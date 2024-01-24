@@ -14,13 +14,13 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.PlacementCalculator.colorsLeft;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator.colorsLeft;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 
 @TeleOp
 @Disabled
