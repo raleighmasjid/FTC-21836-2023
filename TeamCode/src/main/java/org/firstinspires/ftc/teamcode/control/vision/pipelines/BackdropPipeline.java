@@ -113,7 +113,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix;
 
     public final Backdrop backdrop = new Backdrop();
-    private final Point[][][] points = new Point[11][7][5];
+    private final Point[][][] samplePoints = new Point[11][7][4];
 
     private final double
             fx = 1430,
@@ -253,7 +253,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (editPoints) generatePoints();
 
             double size = 5;
-            for (Point[][] row : points) for (Point[] pair : row) for (Point point : pair) {
+            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
                 if (point == null) continue;
                 Imgproc.rectangle(
                         input,
@@ -294,22 +294,22 @@ public class BackdropPipeline extends OpenCvPipeline {
             // TODO remove for robot version
 //            if (refresh) for (int[] row : slots) Arrays.fill(row, -1);
 
-            for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+            for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
 
-                Point pointL = points[y][x][0];
-                Point pointR = points[y][x][1];
-                Point pointT = points[y][x][2];
-                Point pointB = points[y][x][3];
+                double hueSum = 0, satSum = 0, valSum = 0;
 
-                double[] colorL = input.get((int) pointL.y, (int) pointL.x);
-                double[] colorR = input.get((int) pointR.y, (int) pointR.x);
-                double[] colorT = input.get((int) pointT.y, (int) pointT.x);
-                double[] colorB = input.get((int) pointB.y, (int) pointB.x);
+                for (int i = 0; i < samplePoints[y][x].length; i++) {
+                    Point samplePoint = samplePoints[y][x][i];
+                    double[] sampleColor = input.get((int) samplePoint.y, (int) samplePoint.x);
+                    hueSum += sampleColor[0];
+                    satSum += sampleColor[1];
+                    valSum += sampleColor[2];
+                }
 
-                double avgHue = (colorL[0] + colorR[0] + colorT[0] + colorB[0]) / 2.0;
-                double avgSat = (colorL[1] + colorR[1] + colorT[1] + colorB[1]) / 4.0 / 255.0;
-                double avgVal = (colorL[2] + colorR[2] + colorT[2] + colorB[2]) / 4.0 / 255.0;
+                double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0;
+                double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
+                double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
 
                 double[] color = {
                         avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
@@ -347,16 +347,16 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             if (graphic) {
-                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
                     Point center = pixelCenter(x, y);
                     Pixel pixel = backdrop.get(x, y);
                     Imgproc.circle(input, center, 40, colorToScalar(pixel.color), 8);
-                    Imgproc.putText(input, x + ", " + y, points[y][x][0], 2, 1, red);
+                    Imgproc.putText(input, x + ", " + y, samplePoints[y][x][0], 2, 1, red);
                 }
 
                 PlacementCalculator.getOptimalPlacements(backdrop);
-                for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
+                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
                     Pixel pixel = backdrop.get(x, y);
                     if (pixel.inMosaic()) {
@@ -434,14 +434,13 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generatePoints() {
-        for (int y = 0; y < points.length; y++) {
-            for (int x = 0; x < points[y].length; x++) {
+        for (int y = 0; y < samplePoints.length; y++) {
+            for (int x = 0; x < samplePoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
-                points[y][x][0] = pixelLeft(x, y);
-                points[y][x][1] = pixelRight(x, y);
-                points[y][x][2] = pixelTop(x, y);
-                points[y][x][3] = pixelBottom(x, y);
-                points[y][x][4] = pixelCenter(x, y);
+                samplePoints[y][x][0] = pixelLeft(x, y);
+                samplePoints[y][x][1] = pixelRight(x, y);
+                samplePoints[y][x][2] = pixelTop(x, y);
+                samplePoints[y][x][3] = pixelBottom(x, y);
             }
         }
     }
