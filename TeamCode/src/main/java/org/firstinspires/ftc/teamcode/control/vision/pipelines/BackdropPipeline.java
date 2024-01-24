@@ -79,8 +79,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
             X_SHIFT_WHITE = 0.08,
             Y_SHIFT_WHITE = 2,
-            X_SHIFT_BLACK = 4.5,
-            Y_SHIFT_BLACK = 0.0;
+            X_SHIFT_BLACK = 5,
+            Y_SHIFT_BLACK = -3.0;
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -89,14 +89,14 @@ public class BackdropPipeline extends OpenCvPipeline {
             minYellow = {20, .51, .5},
             maxYellow = {50, 1, 1},
 
-            minGreen =  {70, .4, .25},
+            minGreen =  {70, .4, .215},
             maxGreen =  {110, 1, 1},
 
             minWhite =  {0, 0, 0.54},
-            maxWhite =  {360, 0.25, 1},
+            maxWhite =  {360, 0.249, 1},
 
             minBlack =  {0, 0, 0},
-            maxBlack =  {360, 1, 0.54};
+            maxBlack =  {360, 1, 0.585};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
@@ -200,6 +200,10 @@ public class BackdropPipeline extends OpenCvPipeline {
             for (int i = 0; i < tags.size(); i++) {
                 if (tags.get(i).id < tags.get(minInd).id) minInd = i;
                 if (tags.get(i).id > tags.get(maxInd).id) maxInd = i;
+                if (tags.size() < 3 && tags.get(i).id % 3 == 2) {
+                    minInd = maxInd = i;
+                    break;
+                }
             }
 
             Point bl = tags.get(minInd).corners[0];
@@ -267,7 +271,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             double valBoost = 1.0 / (whiteVal - blackVal);
 
             // TODO remove for robot version
-            for (int[] row : slots) Arrays.fill(row, 4);
+//            for (int[] row : slots) Arrays.fill(row, 4);
 
             for (int y = 0; y < points.length; y++) for (int x = 0; x < points[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
