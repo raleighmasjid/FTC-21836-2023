@@ -75,7 +75,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             editPoints = true,
             graphic = true,
             background = false,
-            refresh = true;
+            showWarpPath = true;
 
     public double
             X_TOP_LEFT_R_TAG = 16.5,
@@ -241,10 +241,12 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tagTL
             );
 
-            Imgproc.line(input, tl, tr, blue, 3);
-            Imgproc.line(input, bl, br, blue, 3);
-            Imgproc.line(input, tl, bl, blue, 3);
-            Imgproc.line(input, tr, br, blue, 3);
+            if (showWarpPath) {
+                Imgproc.line(input, tl, tr, blue, 3);
+                Imgproc.line(input, bl, br, blue, 3);
+                Imgproc.line(input, tl, bl, blue, 3);
+                Imgproc.line(input, tr, br, blue, 3);
+            }
 
             Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
@@ -290,9 +292,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             telemetry.addLine(out[0] + ", " + out[1] + ", " + out[2]);
 
             double valBoost = 1.0 / (whiteVal - blackVal);
-
-            // TODO remove for robot version
-//            if (refresh) for (int[] row : slots) Arrays.fill(row, -1);
 
             for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
@@ -385,14 +384,22 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Mat inverseTransform = Imgproc.getPerspectiveTransform(dstTag, srcTag);
                 Imgproc.warpPerspective(input, input, inverseTransform, input.size());
                 inverseTransform.release();
+                 if (showWarpPath) {
+                     Imgproc.line(input, tr, tagTR, red, 3);
+                     Imgproc.line(input, br, tagBR, red, 3);
+                     Imgproc.line(input, bl, tagBL, red, 3);
+                     Imgproc.line(input, tl, tagTL, red, 3);
+                 }
             }
             srcTag.release();
             dstTag.release();
 
-            Imgproc.line(input, tagTL, tagTR, yellow, 5);
-            Imgproc.line(input, tagBL, tagBR, yellow, 5);
-            Imgproc.line(input, tagTL, tagBL, yellow, 5);
-            Imgproc.line(input, tagTR, tagBR, yellow, 5);
+            if (showWarpPath) {
+                Imgproc.line(input, tagTL, tagTR, yellow, 5);
+                Imgproc.line(input, tagBL, tagBR, yellow, 5);
+                Imgproc.line(input, tagTL, tagBL, yellow, 5);
+                Imgproc.line(input, tagTR, tagBR, yellow, 5);
+            }
         }
 
         StringBuilder tagIds = new StringBuilder();
