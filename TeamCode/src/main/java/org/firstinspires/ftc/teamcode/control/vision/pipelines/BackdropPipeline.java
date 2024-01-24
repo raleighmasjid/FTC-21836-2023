@@ -60,7 +60,7 @@ import java.util.ArrayList;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 960;
+    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 720;
 
     public static final Point
             CORNER_TL = new Point(0, 0),
