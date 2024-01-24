@@ -37,7 +37,7 @@ public class BackdropScanner {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(720, 1280, SIDEWAYS_RIGHT);
+                camera.startStreaming(1280, 720, SIDEWAYS_RIGHT);
                 isOpen = true;
             }
 

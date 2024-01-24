@@ -268,7 +268,6 @@ public class BackdropPipeline extends OpenCvPipeline {
                     getLeftX(tags.get(0).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
                     (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
             );
-            telemetry.addData("first tag id", getLeftX(tags.get(0).id));
             Point blackSample = new Point(
                     (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0),
                     (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0)
