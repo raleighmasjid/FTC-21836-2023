@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
+import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -29,6 +30,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
@@ -76,8 +78,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 16.5,
             Y_TOP_LEFT = 32.42857142857142,
             TARGET_SIZE = 65,
-            X_FIRST_PIXEL = 0.9,
-            Y_FIRST_PIXEL = 29.75,
+            X_FIRST_PIXEL = 29.25,
+            Y_FIRST_PIXEL = 966.875,
             X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714,
             X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714,
             Y_SHIFT_PIXEL_POINTS_T = -1.1,
@@ -246,44 +248,24 @@ public class BackdropPipeline extends OpenCvPipeline {
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
             transformMatrix.release();
 
+            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
             generateCenterPoints();
             generateSamplePoints();
 
             double size = 5;
 
-//            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-//                Point point = centerPoints[y][x];
-//                if (point == null) continue;
-//                Imgproc.rectangle(
-//                        input,
-//                        new Point(point.x - size, point.y - size),
-//                        new Point(point.x + size, point.y + size),
-//                        blue,
-//                        2
-//                );
-//                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
-//            }
-
-            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
-            int boxRadius = 45;
-            Mat firstRegion = warpedGray.submat(new Rect(
-                    new Point(centerPoints[0][1].x - boxRadius, centerPoints[0][1].y - boxRadius),
-                    new Point(centerPoints[0][4].x + boxRadius, centerPoints[0][4].y + boxRadius)
-            ));
-            double blur = 13;
-            Imgproc.blur(firstRegion, firstRegion, new Size(blur, blur));
-            Imgproc.adaptiveThreshold(firstRegion, firstRegion, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
-
-            Mat circles = new Mat();
-            Imgproc.HoughCircles(firstRegion, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
-            telemetry.addData("Circle count", circles.size());
-            for (int i = 0; i < circles.size().width; i++) {
-                double[] firstPoint = circles.get(0, i);
-                telemetry.addLine("Circle " + i + ": " + firstPoint[0] + ", " + firstPoint[1]);
-                Imgproc.circle(firstRegion, new Point(firstPoint[0], firstPoint[1]), 5, white, 3);
+            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+                Point point = centerPoints[y][x];
+                if (point == null) continue;
+                Imgproc.rectangle(
+                        input,
+                        new Point(point.x - size, point.y - size),
+                        new Point(point.x + size, point.y + size),
+                        blue,
+                        2
+                );
+                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
             }
-
-            firstRegion.release();
 
 //            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
 //                if (point == null) continue;
@@ -423,7 +405,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.addData("Detected tags", tagIds.toString());
         telemetry.update();
 
-        return warpedGray;
+        return input;
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
@@ -457,9 +439,10 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generateCenterPoints() {
-        double width = 3.01;
-        double height = 2.63;
+        double width = 3.01 * 32.5;
+        double height = 2.63 * 32.5;
         double ppi = TARGET_SIZE / 2.0;
+        int boxRadius = 45;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
@@ -470,24 +453,59 @@ public class BackdropPipeline extends OpenCvPipeline {
                 xCoord = X_FIRST_PIXEL + width;
                 yCoord = Y_FIRST_PIXEL;
             } else if (y == 0) {
-                xCoord = centerPoints[y][x-1].x / ppi + width;
+                xCoord = centerPoints[y][x-1].x + width;
                 yCoord = Y_FIRST_PIXEL;
             } else if (x == 1 && y % 2 == 0) {
-                xCoord = centerPoints[y-1][x].x / ppi - width / 2.0;
-                yCoord = centerPoints[y-1][x].y / ppi - height;
+                xCoord = centerPoints[y-1][x].x - width / 2.0;
+                yCoord = centerPoints[y-1][x].y - height;
             } else if (x == 0) {
-                xCoord = centerPoints[y-1][x+1].x / ppi - width / 2.0;
-                yCoord = centerPoints[y-1][x+1].y / ppi - height;
+                xCoord = centerPoints[y-1][x+1].x - width / 2.0;
+                yCoord = centerPoints[y-1][x+1].y - height;
             } else {
-                xCoord = centerPoints[y][x-1].x / ppi + width;
-                yCoord = centerPoints[y-1][x].y / ppi - height;
+                xCoord = centerPoints[y][x-1].x + width;
+                yCoord = centerPoints[y-1][x].y - height;
             }
 
+            Point estimate = new Point(xCoord, yCoord);
+            centerPoints[y][x] = estimate;
 
-            centerPoints[y][x] = new Point(
-                    ppi * xCoord,
-                    ppi * yCoord
+        }
+
+
+
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+            Point estimate = centerPoints[y][x];
+
+            Point topLeft = new Point(
+                    clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
+                    clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
             );
+            Mat region = warpedGray.submat(new Rect(
+                    topLeft,
+                    new Point(
+                            clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
+                            clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
+                    )
+            ));
+
+            double blur = 13;
+            Imgproc.blur(region, region, new Size(blur, blur));
+            Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
+
+            Mat circles = new Mat();
+            Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
+            region.release();
+
+            if (circles.size().width > 0 && circles.size().width <= 3 ) {
+                Point real = new Point(
+                        topLeft.x + circles.get(0, 0)[0],
+                        topLeft.y + circles.get(0, 0)[1]
+                );
+
+                centerPoints[y][x] = real;
+
+            }
         }
     }
 
