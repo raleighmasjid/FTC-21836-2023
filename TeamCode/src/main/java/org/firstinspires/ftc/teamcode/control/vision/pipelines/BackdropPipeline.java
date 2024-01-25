@@ -275,7 +275,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 //            }
 //
 //            Point whiteSample = new Point(
-//                    getLeftX(tags.get(0).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
+//                    getLeftX(tags.get(maxInd).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
 //                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
 //            );
 //            Point blackSample = new Point(
