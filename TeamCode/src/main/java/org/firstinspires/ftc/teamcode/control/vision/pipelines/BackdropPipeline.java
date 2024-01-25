@@ -29,7 +29,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.poseFromTrapezoid;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
@@ -252,36 +251,38 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             double size = 5;
 
-            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-                Point point = centerPoints[y][x];
-                if (point == null) continue;
-                Imgproc.rectangle(
-                        input,
-                        new Point(point.x - size, point.y - size),
-                        new Point(point.x + size, point.y + size),
-                        blue,
-                        2
-                );
-                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
-            }
-
-            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
-            int boxRadius = 60;
-            Mat firstPixel = warpedGray.submat(new Rect(
-                    new Point(0, 0),
-                    new Point(SCREEN_WIDTH, SCREEN_HEIGHT)
-            ));
-            double blur = 15;
-            Imgproc.GaussianBlur(firstPixel, firstPixel, new Size(blur, blur), 20);
-
-            Mat circles = new Mat();
-            Imgproc.HoughCircles(firstPixel, circles, Imgproc.HOUGH_GRADIENT, 1, 150, 400, 0.5, 5, -1);
-//            telemetry.addData("Circle count", circles.size());
-//            if (circles.size(0) > 0) {
-//                telemetry.addData("circle", circles.get(0, 1)[0]);
+//            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+//                Point point = centerPoints[y][x];
+//                if (point == null) continue;
+//                Imgproc.rectangle(
+//                        input,
+//                        new Point(point.x - size, point.y - size),
+//                        new Point(point.x + size, point.y + size),
+//                        blue,
+//                        2
+//                );
+//                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
 //            }
 
-            firstPixel.release();
+            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
+            int boxRadius = 45;
+            Mat firstRegion = warpedGray.submat(new Rect(
+                    new Point(centerPoints[0][1].x - boxRadius, centerPoints[0][1].y - boxRadius),
+                    new Point(centerPoints[0][4].x + boxRadius, centerPoints[0][4].y + boxRadius)
+            ));
+            double blur = 15;
+            Imgproc.blur(firstRegion, firstRegion, new Size(blur, blur));
+
+            Mat circles = new Mat();
+            Imgproc.HoughCircles(firstRegion, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
+            telemetry.addData("Circle count", circles.size());
+            for (int i = 0; i < circles.size().width; i++) {
+                double[] firstPoint = circles.get(0, i);
+                telemetry.addLine("Circle " + i + ": " + firstPoint[0] + ", " + firstPoint[1]);
+                Imgproc.circle(firstRegion, new Point(firstPoint[0], firstPoint[1]), 5, white, 3);
+            }
+
+            firstRegion.release();
 
 //            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
 //                if (point == null) continue;
