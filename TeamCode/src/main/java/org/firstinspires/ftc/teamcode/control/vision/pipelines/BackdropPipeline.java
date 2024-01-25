@@ -46,7 +46,9 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -104,7 +106,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
     private long nativeApriltagPtr;
-    private final Mat grey = new Mat(), cameraMatrix;
+    private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat();
 
     public final Backdrop backdrop = new Backdrop();
     private final Point[][] centerPoints = new Point[11][7];
@@ -263,6 +265,24 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
             }
 
+            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
+            int boxRadius = 60;
+            Mat firstPixel = warpedGray.submat(new Rect(
+                    new Point(0, 0),
+                    new Point(SCREEN_WIDTH, SCREEN_HEIGHT)
+            ));
+            double blur = 15;
+            Imgproc.GaussianBlur(firstPixel, firstPixel, new Size(blur, blur), 20);
+
+            Mat circles = new Mat();
+            Imgproc.HoughCircles(firstPixel, circles, Imgproc.HOUGH_GRADIENT, 1, 150, 400, 0.5, 5, -1);
+//            telemetry.addData("Circle count", circles.size());
+//            if (circles.size(0) > 0) {
+//                telemetry.addData("circle", circles.get(0, 1)[0]);
+//            }
+
+            firstPixel.release();
+
 //            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
 //                if (point == null) continue;
 //                Imgproc.rectangle(
@@ -401,7 +421,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.addData("Detected tags", tagIds.toString());
         telemetry.update();
 
-        return input;
+        return warpedGray;
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
