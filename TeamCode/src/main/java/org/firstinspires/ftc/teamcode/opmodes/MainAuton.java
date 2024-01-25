@@ -177,6 +177,7 @@ public final class MainAuton extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(hardwareMap);
         robot.preload();
+        robot.drone.run();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
@@ -347,6 +348,7 @@ public final class MainAuton extends LinearOpMode {
         while (opModeInInit()) {
             mTelemetry.addData("Location", (location = detector.run()).name());
             mTelemetry.update();
+            robot.drone.run();
         }
 
         robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);

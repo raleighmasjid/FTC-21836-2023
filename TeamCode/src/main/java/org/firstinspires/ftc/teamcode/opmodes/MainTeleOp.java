@@ -91,6 +91,7 @@ public final class MainTeleOp extends LinearOpMode {
             }
             mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
+            robot.drone.run();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
         if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
