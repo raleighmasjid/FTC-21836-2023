@@ -270,8 +270,9 @@ public class BackdropPipeline extends OpenCvPipeline {
                     new Point(centerPoints[0][1].x - boxRadius, centerPoints[0][1].y - boxRadius),
                     new Point(centerPoints[0][4].x + boxRadius, centerPoints[0][4].y + boxRadius)
             ));
-            double blur = 15;
+            double blur = 13;
             Imgproc.blur(firstRegion, firstRegion, new Size(blur, blur));
+            Imgproc.adaptiveThreshold(firstRegion, firstRegion, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
 
             Mat circles = new Mat();
             Imgproc.HoughCircles(firstRegion, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
