@@ -29,6 +29,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDe
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.green;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.lavender;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.poseFromTrapezoid;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.red;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.white;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.yellow;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
@@ -74,8 +75,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 16.5,
             Y_TOP_LEFT = 32.42857142857142,
             TARGET_SIZE = 65,
-            X_FIRST_PIXEL = 2.3285714285714287,
-            Y_FIRST_PIXEL = 29.828571428571422,
+            X_FIRST_PIXEL = 0.9,
+            Y_FIRST_PIXEL = 29.75,
             X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714,
             X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714,
             Y_SHIFT_PIXEL_POINTS_T = -1.1,
@@ -249,7 +250,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             double size = 5;
 
-            for (Point[] row : centerPoints) for (Point point : row) {
+            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+                Point point = centerPoints[y][x];
                 if (point == null) continue;
                 Imgproc.rectangle(
                         input,
@@ -258,6 +260,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                         blue,
                         2
                 );
+                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
             }
 
 //            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
@@ -432,13 +435,36 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generateCenterPoints() {
-        double width = 2.976 * (TARGET_SIZE / 2.0);
-        double height = 2.625 * (TARGET_SIZE / 2.0);
+        double width = 3.01;
+        double height = 2.63;
+        double ppi = TARGET_SIZE / 2.0;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
+
+            double xCoord, yCoord;
+
+            boolean firstPixel = x == 1 && y == 0;
+            if (firstPixel) {
+                xCoord = X_FIRST_PIXEL + width;
+                yCoord = Y_FIRST_PIXEL;
+            } else if (y == 0) {
+                xCoord = centerPoints[y][x-1].x / ppi + width;
+                yCoord = Y_FIRST_PIXEL;
+            } else if (x == 1 && y % 2 == 0) {
+                xCoord = centerPoints[y-1][x].x / ppi - width / 2.0;
+                yCoord = centerPoints[y-1][x].y / ppi - height;
+            } else if (x == 0) {
+                xCoord = centerPoints[y-1][x+1].x / ppi - width / 2.0;
+                yCoord = centerPoints[y-1][x+1].y / ppi - height;
+            } else {
+                xCoord = centerPoints[y][x-1].x / ppi + width;
+                yCoord = centerPoints[y-1][x].y / ppi - height;
+            }
+
+
             centerPoints[y][x] = new Point(
-                    (X_FIRST_PIXEL * TARGET_SIZE / 2.0) + (x * width) - (y % 2 == 0 ? 0.5 * width : 0),
-                    (Y_FIRST_PIXEL * TARGET_SIZE / 2.0) - (y * height)
+                    ppi * xCoord,
+                    ppi * yCoord
             );
         }
     }
