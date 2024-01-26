@@ -260,7 +260,6 @@ public class BackdropPipeline extends OpenCvPipeline {
                         blue,
                         2
                 );
-                Imgproc.putText(input, x + ", " + y, point, 2, 1, red);
             }
 
 //            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
