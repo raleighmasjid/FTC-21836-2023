@@ -199,7 +199,7 @@ public final class Deposit {
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
-                ANGLE_HOOK_CLOSED = 40,
+                ANGLE_HOOK_CLOSED = 45,
                 TIME_DROP_FIRST = 0.7,
                 TIME_DROP_SECOND = 1;
 
