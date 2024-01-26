@@ -439,31 +439,41 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generateCenterPoints() {
-        double width = 3.01 * 32.5;
-        double height = 2.63 * 32.5;
-        double ppi = TARGET_SIZE / 2.0;
+        double width = 97.825;
+        double height = -85.475;
         int boxRadius = 45;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-            if (x == 0 && y % 2 == 0) continue;
+            boolean evenRow = y % 2 == 0;
+            if (x == 0 && evenRow) continue;
 
             double xCoord, yCoord;
 
-            boolean firstPixel = x == 1 && y == 0;
-            if (firstPixel) {
-                xCoord = X_FIRST_PIXEL + width;
-                yCoord = Y_FIRST_PIXEL;
-            } else if (y == 0) {
-                xCoord = centerPoints[y][x-1].x + width;
-                yCoord = Y_FIRST_PIXEL;
-            } else if (x == 1 && y % 2 == 0) {
-                xCoord = centerPoints[y-1][x].x - width / 2.0;
-                yCoord = centerPoints[y-1][x].y - height;
-            } else if (x == 0) {
-                xCoord = centerPoints[y-1][x+1].x - width / 2.0;
-                yCoord = centerPoints[y-1][x+1].y - height;
+            if (y == 0) yCoord = Y_FIRST_PIXEL;
+            else if (y == 1) {
+                if (x == 0) yCoord = centerPoints[y-1][x+1].y + height;
+                else yCoord = centerPoints[y-1][x].y + height;
             } else {
-                xCoord = centerPoints[y][x-1].x + width;
-                yCoord = centerPoints[y-1][x].y - height;
+                if (x == 0) yCoord = centerPoints[y-1][1].y + (centerPoints[y-1][1].y - centerPoints[y-2][0].y);
+                else yCoord = centerPoints[y-1][x].y + (centerPoints[y-1][x].y - centerPoints[y-2][x].y);
+            }
+
+            if (evenRow) {
+                if (x == 1) {
+                    if (y == 0) xCoord = X_FIRST_PIXEL + width;
+                    else xCoord = centerPoints[y - 1][0].x + width / 2.0;
+                } else if (x == 2) {
+                    xCoord = centerPoints[y][1].x + width;
+                } else {
+                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
+                }
+            } else {
+                if (x == 0) {
+                    xCoord = centerPoints[y - 1][1].x - width / 2.0;
+                } else if (x == 1) {
+                    xCoord = centerPoints[y][0].x + width;
+                } else {
+                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
+                }
             }
 
             Point estimate = new Point(xCoord, yCoord);
@@ -473,40 +483,40 @@ public class BackdropPipeline extends OpenCvPipeline {
 
 
 
-        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-            if (x == 0 && y % 2 == 0) continue;
-            Point estimate = centerPoints[y][x];
-
-            Point topLeft = new Point(
-                    clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
-                    clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
-            );
-            Mat region = warpedGray.submat(new Rect(
-                    topLeft,
-                    new Point(
-                            clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
-                            clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
-                    )
-            ));
-
-            double blur = 13;
-            Imgproc.blur(region, region, new Size(blur, blur));
-            Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
-
-            Mat circles = new Mat();
-            Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
-            region.release();
-
-            if (circles.size().width > 0 && circles.size().width <= 3 ) {
-                Point real = new Point(
-                        topLeft.x + circles.get(0, 0)[0],
-                        topLeft.y + circles.get(0, 0)[1]
-                );
-
-                centerPoints[y][x] = real;
-
-            }
-        }
+//        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+//            if (x == 0 && y % 2 == 0) continue;
+//            Point estimate = centerPoints[y][x];
+//
+//            Point topLeft = new Point(
+//                    clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
+//                    clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
+//            );
+//            Mat region = warpedGray.submat(new Rect(
+//                    topLeft,
+//                    new Point(
+//                            clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
+//                            clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
+//                    )
+//            ));
+//
+//            double blur = 13;
+//            Imgproc.blur(region, region, new Size(blur, blur));
+//            Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
+//
+//            Mat circles = new Mat();
+//            Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
+//            region.release();
+//
+//            if (circles.size().width > 0 && circles.size().width <= 3 ) {
+//                Point real = new Point(
+//                        topLeft.x + circles.get(0, 0)[0],
+//                        topLeft.y + circles.get(0, 0)[1]
+//                );
+//
+//                centerPoints[y][x] = real;
+//
+//            }
+//        }
     }
 
     private void generateSamplePoints() {
