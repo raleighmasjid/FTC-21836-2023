@@ -21,7 +21,6 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
-import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -47,9 +46,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -441,7 +438,6 @@ public class BackdropPipeline extends OpenCvPipeline {
     private void generateCenterPoints() {
         double width = 97.825;
         double height = -85.475;
-        int boxRadius = 45;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             boolean evenRow = y % 2 == 0;
             if (x == 0 && evenRow) continue;
@@ -480,43 +476,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             centerPoints[y][x] = estimate;
 
         }
-
-
-
-//        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-//            if (x == 0 && y % 2 == 0) continue;
-//            Point estimate = centerPoints[y][x];
-//
-//            Point topLeft = new Point(
-//                    clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
-//                    clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
-//            );
-//            Mat region = warpedGray.submat(new Rect(
-//                    topLeft,
-//                    new Point(
-//                            clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
-//                            clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
-//                    )
-//            ));
-//
-//            double blur = 13;
-//            Imgproc.blur(region, region, new Size(blur, blur));
-//            Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
-//
-//            Mat circles = new Mat();
-//            Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1, 80, 85, .9, 5, -1);
-//            region.release();
-//
-//            if (circles.size().width > 0 && circles.size().width <= 3 ) {
-//                Point real = new Point(
-//                        topLeft.x + circles.get(0, 0)[0],
-//                        topLeft.y + circles.get(0, 0)[1]
-//                );
-//
-//                centerPoints[y][x] = real;
-//
-//            }
-//        }
     }
 
     private void generateSamplePoints() {
