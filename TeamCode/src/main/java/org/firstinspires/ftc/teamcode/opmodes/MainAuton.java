@@ -13,8 +13,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetect
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
 import static java.lang.Math.PI;
@@ -29,9 +27,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
-import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
@@ -261,16 +259,16 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .setTangent(afterSpike.getHeading())
                         .lineToSplineHeading(afterSpike)
-                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-                            robot.intake.setRequiredIntakingAmount(2);
-                            robot.deposit.lift.setTargetRow(placements.get(0).y);
-                        })
-                        .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(1);
-                            autonBackdrop.add(placements.get(0));
-                        })
-                        .waitSeconds(TIME_DROP_SECOND)
+//                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
+//                            robot.intake.setRequiredIntakingAmount(2);
+//                            robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                        })
+//                        .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
+//                        .addTemporalMarker(() -> {
+//                            robot.deposit.paintbrush.dropPixels(1);
+//                            autonBackdrop.add(placements.get(0));
+//                        })
+//                        .waitSeconds(TIME_DROP_SECOND)
                 ;
 
             } else {
@@ -296,51 +294,46 @@ public final class MainAuton extends LinearOpMode {
                         ;
                 }
 
-                sequence
-                        // INTAKING
-                        .addTemporalMarker(() -> {
-                            robot.intake.setHeight(FIVE_STACK);
-                            robot.intake.setRequiredIntakingAmount(1);
-                        })
-
-                        .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
-                        .addTemporalMarker(() -> {
-                            robot.intake.setMotorPower(1);
-                            while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
-                            robot.intake.setMotorPower(0);
-                        })
-                ;
-                score(sequence, placements, 0);
+//                sequence
+//                        // INTAKING
+//                        .addTemporalMarker(() -> {
+//                            robot.intake.setHeight(FIVE_STACK);
+//                            robot.intake.setRequiredIntakingAmount(1);
+//                        })
+//
+//                        .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
+//                        .addTemporalMarker(() -> {
+//                            robot.intake.setMotorPower(1);
+//                            while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+//                            robot.intake.setMotorPower(0);
+//                        })
+//                ;
+//                score(sequence, placements, 0);
 
             }
 
-            if (!doCycles) {
-                sequence
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
-                ;
-            } else {
-
-                Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
-                int placement = backdropSide ? 1 : 2;
-
-                // CYCLE 1
-                driveToStack1(sequence, height);
-                intake2Pixels(sequence, 1, height);
-                score(sequence, placements, placement);
-
-                // CYCLE 2
-                if (backdropSide) {
-                    driveToStack1(sequence, height.minus(2));
-                    intake2Pixels(sequence, 1, height.minus(2));
-                    score(sequence, placements, placement + 2);
-                }
-
-                // CYCLE 3
-//                driveToStack2(sequence, FIVE_STACK);
-//                intake2From1Stack(sequence, 2, FIVE_STACK);
-//                score(sequence, placements, placement + 4);
-            }
+//            if (!doCycles) {
+//                sequence
+//                        .lineTo(parking.byAlliance().toPose2d().vec())
+//                        .lineTo(parked.byAlliance().toPose2d().vec())
+//                ;
+//            } else {
+//
+//                Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
+//                int placement = backdropSide ? 1 : 2;
+//
+//                // CYCLE 1
+//                driveToStack1(sequence, height);
+//                intake2Pixels(sequence, 1, height);
+//                score(sequence, placements, placement);
+//
+//                // CYCLE 2
+//                if (backdropSide) {
+//                    driveToStack1(sequence, height.minus(2));
+//                    intake2Pixels(sequence, 1, height.minus(2));
+//                    score(sequence, placements, placement + 2);
+//                }
+//            }
 
             sequences[rand.ordinal()] = sequence.build();
         }
