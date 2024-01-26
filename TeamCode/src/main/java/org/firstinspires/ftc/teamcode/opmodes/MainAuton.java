@@ -64,8 +64,8 @@ public final class MainAuton extends LinearOpMode {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 12,
-            Y_SHIFT_BEFORE_SPIKE = 17,
+            X_SHIFT_BACKDROP_AFTER_SPIKE = 16,
+            Y_SHIFT_BEFORE_SPIKE = 16,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
