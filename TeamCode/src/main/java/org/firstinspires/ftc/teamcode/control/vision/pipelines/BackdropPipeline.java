@@ -39,7 +39,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
-
 import static java.lang.Math.round;
 
 import androidx.annotation.NonNull;
@@ -250,6 +249,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
             Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+            srcTag.release();
+            dstTag.release();
             transformMatrix.release();
 
             Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
@@ -319,26 +320,26 @@ public class BackdropPipeline extends OpenCvPipeline {
                 drawBlueSquare(input, point);
             }
 
-            Imgproc.drawMarker(input, whiteSample, green, 2, 3);
-            Imgproc.drawMarker(input, blackSample, green, 2, 3);
-            Imgproc.drawMarker(input, outSample, green, 2, 3);
-
-            if (graphic && background) {
-                MatOfPoint background = new MatOfPoint(
-                        CORNER_TL,
-                        CORNER_TR,
-                        CORNER_BR,
-                        CORNER_BL
-                );
-                Imgproc.fillConvexPoly(
-                        input,
-                        background,
-                        gray
-                );
-                background.release();
+            for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
+                Imgproc.drawMarker(input, point, green, 2, 3);
             }
 
             if (graphic) {
+                if (background) {
+                    MatOfPoint background = new MatOfPoint(
+                            CORNER_TL,
+                            CORNER_TR,
+                            CORNER_BR,
+                            CORNER_BL
+                    );
+                    Imgproc.fillConvexPoly(
+                            input,
+                            background,
+                            gray
+                    );
+                    background.release();
+                }
+
                 for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
                     Pixel pixel = backdrop.get(x, y);
@@ -371,8 +372,6 @@ public class BackdropPipeline extends OpenCvPipeline {
                     }
                 }
             }
-            srcTag.release();
-            dstTag.release();
 
             if (showWarpPath) {
                 Imgproc.line(input, tagTL, tagTR, yellow, 5);
