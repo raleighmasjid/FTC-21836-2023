@@ -42,6 +42,8 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 
 import static java.lang.Math.round;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
@@ -254,30 +256,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             generateCenterPoints();
             generateSamplePoints();
 
-            double size = 5;
-
-            for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
-                if (point == null) continue;
-                Imgproc.rectangle(
-                        input,
-                        new Point(point.x - size, point.y - size),
-                        new Point(point.x + size, point.y + size),
-                        blue,
-                        2
-                );
-            }
-
-            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
-                if (point == null) continue;
-                Imgproc.rectangle(
-                        input,
-                        new Point(point.x - size, point.y - size),
-                        new Point(point.x + size, point.y + size),
-                        blue,
-                        2
-                );
-            }
-
             Point whiteSample = new Point(
                     getLeftX(tags.get(maxInd).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
                     (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
@@ -304,28 +282,24 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             double valBoost = 1.0 / (whiteVal - blackVal);
 
+            int maxX = 0, maxY = 0;
+            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+                if (x == 0 && y % 2 == 0) continue;
+
+                Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+                switch (color) {
+                    case EMPTY: case INVALID: continue;
+                }
+
+                maxX = x;
+                maxY = y;
+            }
+            telemetry.addLine("(" + maxX + ", " + maxY + ")");
+
             for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
 
-                double hueSum = 0, satSum = 0, valSum = 0;
-
-                for (int i = 0; i < samplePoints[y][x].length; i++) {
-                    Point samplePoint = samplePoints[y][x][i];
-                    double[] sampleColor = input.get((int) samplePoint.y, (int) samplePoint.x);
-                    hueSum += sampleColor[0];
-                    satSum += sampleColor[1];
-                    valSum += sampleColor[2];
-                }
-
-                double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0;
-                double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
-                double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
-
-                double[] color = {
-                        avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
-                        round(avgSat * 1000) / 1000.0,
-                        clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
-                };
+                double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
 
                 Pixel.Color c = hsvToColor(color);
                 if (c != INVALID && c != backdrop.get(x, y).color) {
@@ -336,6 +310,14 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+
+            for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
+                drawBlueSquare(input, point);
+            }
+
+            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
+                drawBlueSquare(input, point);
+            }
 
             Imgproc.drawMarker(input, whiteSample, green, 2, 3);
             Imgproc.drawMarker(input, blackSample, green, 2, 3);
@@ -406,6 +388,41 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.update();
 
         return input;
+    }
+
+    private void drawBlueSquare(Mat input, Point point) {
+        if (point == null) return;
+        double size = 5;
+        Imgproc.rectangle(
+                input,
+                new Point(point.x - size, point.y - size),
+                new Point(point.x + size, point.y + size),
+                blue,
+                2
+        );
+    }
+
+    @NonNull
+    private double[] getColorOfPixel(Mat input, double blackVal, double valBoost, int y, int x) {
+        double hueSum = 0, satSum = 0, valSum = 0;
+
+        for (int i = 0; i < samplePoints[y][x].length; i++) {
+            Point samplePoint = samplePoints[y][x][i];
+            double[] sampleColor = input.get((int) samplePoint.y, (int) samplePoint.x);
+            hueSum += sampleColor[0];
+            satSum += sampleColor[1];
+            valSum += sampleColor[2];
+        }
+
+        double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0;
+        double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
+        double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
+
+        return new double[]{
+                avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+                round(avgSat * 1000) / 1000.0,
+                clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
+        };
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
