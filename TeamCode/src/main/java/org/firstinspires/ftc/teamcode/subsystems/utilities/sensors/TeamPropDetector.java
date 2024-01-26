@@ -32,9 +32,11 @@ public class TeamPropDetector {
     }
 
     public PropDetectPipeline.Randomization run() {
+        leftDistance = leftSensor.getDistance(INCH);
+        rightDistance = rightSensor.getDistance(INCH);
         return location = (
-                (leftDistance = leftSensor.getDistance(INCH)) <= MAX_DISTANCE ? LEFT :
-                (rightDistance = rightSensor.getDistance(INCH)) <= MAX_DISTANCE ? RIGHT :
+                leftDistance <= MAX_DISTANCE ? LEFT :
+                rightDistance <= MAX_DISTANCE ? RIGHT :
                 CENTER
         );
     }
