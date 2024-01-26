@@ -256,8 +256,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             double size = 5;
 
-            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-                Point point = centerPoints[y][x];
+            for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
                 if (point == null) continue;
                 Imgproc.rectangle(
                         input,
