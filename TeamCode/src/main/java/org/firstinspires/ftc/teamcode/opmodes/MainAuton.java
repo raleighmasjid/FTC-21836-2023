@@ -76,9 +76,10 @@ public final class MainAuton extends LinearOpMode {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
+            TIME_INTAKE_FLIP_TO_LIFT = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
-            BOTTOM_ROW_HEIGHT = 4,
+            BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 49.5,
             Y_MAX_BLUE = 44.25,
             Y_MAX_RED = -26.25,
@@ -279,6 +280,8 @@ public final class MainAuton extends LinearOpMode {
                         .lineToSplineHeading(afterSpike)
                         .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
                             robot.intake.setRequiredIntakingAmount(2);
+                        })
+                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
                         .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
