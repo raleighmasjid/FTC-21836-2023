@@ -81,7 +81,8 @@ public final class MainAuton extends LinearOpMode {
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
-            leftSpike = new EditablePose(2, -32, 2),
+            nearTrussSpike = new EditablePose(2, -32, 2),
+            awayTrussSpike = new EditablePose(22, -32, 1.1415926535897931),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
@@ -210,7 +211,6 @@ public final class MainAuton extends LinearOpMode {
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
-        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, LEFT - leftSpike.heading);
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
 
@@ -221,10 +221,10 @@ public final class MainAuton extends LinearOpMode {
             Pose2d spike;
             switch (rand) {
                 case LEFT:
-                    spike = (isRed ? leftSpike : rightSpike).byBoth().toPose2d();
+                    spike = (isRed ? nearTrussSpike : awayTrussSpike).byBoth().toPose2d();
                     break;
                 case RIGHT:
-                    spike = (isRed ? rightSpike : leftSpike).byBoth().toPose2d();
+                    spike = (isRed ? awayTrussSpike : nearTrussSpike).byBoth().toPose2d();
                     break;
                 case CENTER:
                 default:

@@ -53,7 +53,8 @@ public class MainAuton {
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
-            leftSpike = new EditablePose(2, -32, 2),
+            nearTrussSpike = new EditablePose(2, -32, 2),
+            awayTrussSpike = new EditablePose(22, -32, 1.1415926535897931),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
@@ -152,9 +153,7 @@ public class MainAuton {
         boolean partnerWillDoRand = false;
         boolean doCycles = true;
 
-        EditablePose rightSpike = new EditablePose(X_TILE - leftSpike.x, leftSpike.y, REVERSE - leftSpike.heading);
-
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.CENTER;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(3, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
@@ -189,10 +188,10 @@ public class MainAuton {
                         Pose2d spike;
                         switch (rand) {
                             case LEFT:
-                                spike = (isRed ? leftSpike : rightSpike).byBoth().toPose2d();
+                                spike = (isRed ? nearTrussSpike : awayTrussSpike).byBoth().toPose2d();
                                 break;
                             case RIGHT:
-                                spike = (isRed ? rightSpike : leftSpike).byBoth().toPose2d();
+                                spike = (isRed ? awayTrussSpike : nearTrussSpike).byBoth().toPose2d();
                                 break;
                             case CENTER:
                             default:
@@ -323,7 +322,7 @@ public class MainAuton {
 
         public double x, y, heading;
 
-        static boolean backdropSide = false;
+        static boolean backdropSide = true;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
