@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_BLUE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
@@ -27,8 +29,8 @@ public final class AutoScoringManager {
      */
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
-                Backdrop.X,
-                (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (pixel.x * Pixel.WIDTH) + (pixel.y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
+                MainAuton.X_BACKDROP,
+                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
                 PI
         );
     }

@@ -9,10 +9,6 @@ import androidx.annotation.NonNull;
  */
 public final class Pixel implements Comparable<Pixel> {
 
-    public static double
-            WIDTH = 3,
-            HEIGHT = 2.59945;
-
     /**
      * @return The difference in {@link #scoreValue} between this {@link Pixel} and the provided {@link Pixel}
      */
