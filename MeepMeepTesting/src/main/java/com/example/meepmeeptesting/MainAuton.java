@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = true;
+    static boolean isRed = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -153,7 +153,7 @@ public class MainAuton {
         boolean partnerWillDoRand = false;
         boolean doCycles = true;
 
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(3, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
@@ -315,7 +315,9 @@ public class MainAuton {
                             }
                         }
 
-                        return sequence.addTemporalMarker(() -> autonBackdrop.print()).build();
+                        sequence.addTemporalMarker(() -> autonBackdrop.print());
+
+                        return sequence.build();
                 });
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
@@ -329,7 +331,7 @@ public class MainAuton {
 
         public double x, y, heading;
 
-        static boolean backdropSide = false;
+        static boolean backdropSide = true;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
