@@ -219,19 +219,20 @@ public final class MainAuton extends LinearOpMode {
             if (!backdropSide) swap(placements, 0, 1);
 
             Pose2d spike;
+            EditablePose flippedSpike = new EditablePose(X_TILE - nearTrussSpike.x, nearTrussSpike.y, REVERSE - nearTrussSpike.heading);
             switch (rand) {
                 case LEFT:
-                    spike = (isRed ? nearTrussSpike : awayTrussSpike).byBoth().toPose2d();
+                    spike = (isRed ? nearTrussSpike : flippedSpike).byBoth().toPose2d();
                     break;
                 case RIGHT:
-                    spike = (isRed ? awayTrussSpike : nearTrussSpike).byBoth().toPose2d();
+                    spike = (isRed ? flippedSpike : nearTrussSpike).byBoth().toPose2d();
                     break;
                 case CENTER:
                 default:
                     spike = centerSpike.byBoth().toPose2d();
             }
 
-            Pose2d preSpike = new EditablePose(
+            Pose2d preSpikeNearTruss = new EditablePose(
                     MainAuton.startPose.x,
                     MainAuton.startPose.y + Y_SHIFT_BEFORE_SPIKE,
                     MainAuton.startPose.heading
@@ -249,14 +250,19 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
             ;
 
-            if (
-                    ((backdropSide == isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                    ((!backdropSide == isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
+            if (!backdropSide ||
+                    ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
+                    ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
             ) {
-                sequence.splineTo(preSpike.vec(), preSpike.getHeading());
+                sequence.splineTo(spike.vec(), spike.getHeading());
+            } else if (
+                    ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
+                            ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT))
+            ) {
+                sequence.lineToSplineHeading(awayTrussSpike.byAlliance().flipBySide().toPose2d());
+            } else {
+                sequence.splineTo(spike.vec(), spike.getHeading());
             }
-
-            sequence.splineTo(spike.vec(), spike.getHeading());
 
             if (backdropSide) {
 
@@ -285,7 +291,7 @@ public final class MainAuton extends LinearOpMode {
                     case LEFT:
                     case RIGHT:
                         sequence
-                                .splineTo(preSpike.vec(), preSpike.getHeading() + REVERSE)
+                                .splineTo(preSpikeNearTruss.vec(), preSpikeNearTruss.getHeading() + REVERSE)
                                 .setTangent(FORWARD)
                                 .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
                         ;
