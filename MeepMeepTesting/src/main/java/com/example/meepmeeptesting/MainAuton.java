@@ -46,7 +46,8 @@ public class MainAuton {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            X_SHIFT_INTAKING = 5;
+            X_SHIFT_INTAKING = 5,
+            SPEED_INTAKING = 0.5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -91,7 +92,7 @@ public class MainAuton {
         Intake.Height height2 = height.minus(1);
         sequence
                 .addTemporalMarker(() -> {
-//                    robot.intake.setMotorPower(1);
+//                    robot.intake.setMotorPower(SPEED_INTAKING);
 //                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
 //                    robot.intake.setMotorPower(0);
                 })
@@ -101,7 +102,7 @@ public class MainAuton {
                 })
                 .lineTo(stackPos(stack, height2).vec())
                 .addTemporalMarker(() -> {
-//                    robot.intake.setMotorPower(1);
+//                    robot.intake.setMotorPower(SPEED_INTAKING);
 //                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
 //                    robot.intake.setMotorPower(0);
                 })
