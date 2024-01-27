@@ -63,7 +63,7 @@ public final class MainAuton extends LinearOpMode {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 12,
+            X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
             Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
@@ -288,7 +288,7 @@ public final class MainAuton extends LinearOpMode {
                         })
                 ;
                 if (backdropSideOuterSpike) sequence.lineToSplineHeading(toPose2d(placements.get(0)));
-                else sequence.splineToSplineHeading(toPose2d(placements.get(0)), RIGHT);
+                else sequence.splineToConstantHeading(toPose2d(placements.get(0)).vec(), RIGHT);
                 sequence
                         .waitSeconds(TIME_PRE_YELLOW)
                         .addTemporalMarker(() -> {
