@@ -161,7 +161,7 @@ public class MainAuton {
 
         PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
-                new Pixel(1, 0, YELLOW),
+                new Pixel(rand.x1, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
                 new Pixel(2, 0, WHITE),
                 new Pixel(1, 1, WHITE),
