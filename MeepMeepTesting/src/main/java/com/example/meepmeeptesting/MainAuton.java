@@ -65,7 +65,7 @@ public class MainAuton {
             awayTrussSpike = new EditablePose(24, -32, 1.9),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(24, -6, LEFT),
+            enteringBackstage = new EditablePose(36, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
@@ -79,7 +79,8 @@ public class MainAuton {
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
-                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+                .setTangent(LEFT)
                 .addTemporalMarker(() -> {
 //                    robot.intake.toggleClimbing();
                 })
