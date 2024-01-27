@@ -55,6 +55,7 @@ public final class Intake {
             TIME_SETTLING = 0.2,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
+            HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
             theta0 = -0.496183876745;
 
@@ -158,7 +159,7 @@ public final class Intake {
                 return;
             }
 
-            double deltaY = ordinal() * 0.5 - 0.1;
+            double deltaY = ordinal() * 0.5 + HEIGHT_SHIFT;
 
             double theta1 = asin((r * sin(theta0) + deltaY) / r);
             deltaTheta = toDegrees(theta1 - theta0);
