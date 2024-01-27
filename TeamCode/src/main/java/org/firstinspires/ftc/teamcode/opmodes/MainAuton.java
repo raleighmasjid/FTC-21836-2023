@@ -260,14 +260,11 @@ public final class MainAuton extends LinearOpMode {
 
             boolean backdropSideOuterSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
                     ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT));
-            if (!backdropSide ||
-                    ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                    ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
-            ) {
+            boolean backdropSideInnerSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
+                    ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT));
+            if (!backdropSide || backdropSideInnerSpike) {
                 sequence.splineTo(spike.vec(), spike.getHeading());
-            } else if (
-                    backdropSideOuterSpike
-            ) {
+            } else if (backdropSideOuterSpike) {
                 sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
             } else {
                 sequence.splineTo(spike.vec(), spike.getHeading());
