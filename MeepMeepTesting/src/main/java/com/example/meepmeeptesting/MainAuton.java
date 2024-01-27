@@ -2,8 +2,6 @@ package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
-import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
-import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
 import static com.example.meepmeeptesting.MainAuton.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -226,7 +224,7 @@ public class MainAuton {
                                 ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
                                 ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT))
                         ) {
-                            sequence.lineToSplineHeading(awayTrussSpike.byAlliance().flipBySide().toPose2d());
+                            sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
                         } else {
                             sequence.splineTo(spike.vec(), spike.getHeading());
                         }
@@ -238,16 +236,16 @@ public class MainAuton {
                             sequence
                                     .setTangent(afterSpike.getHeading())
                                     .lineToSplineHeading(afterSpike)
-                                    .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-//                                        robot.intake.setRequiredIntakingAmount(2);
-//                                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-                                    })
-                                    .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
-                                    .addTemporalMarker(() -> {
-//                                        robot.deposit.paintbrush.dropPixels(1);
-                                        autonBackdrop.add(placements.get(0));
-                                    })
-                                    .waitSeconds(TIME_DROP_SECOND)
+//                                    .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
+////                                        robot.intake.setRequiredIntakingAmount(2);
+////                                        robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                                    })
+//                                    .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
+//                                    .addTemporalMarker(() -> {
+////                                        robot.deposit.paintbrush.dropPixels(1);
+//                                        autonBackdrop.add(placements.get(0));
+//                                    })
+//                                    .waitSeconds(TIME_DROP_SECOND)
                             ;
 
                         } else {
@@ -273,46 +271,46 @@ public class MainAuton {
                                     ;
                             }
 
-                            sequence
-                                    // INTAKING
-                                    .addTemporalMarker(() -> {
-//                                        robot.intake.setHeight(FIVE_STACK);
-//                                        robot.intake.setRequiredIntakingAmount(1);
-                                    })
-
-                                    .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
-                                    .addTemporalMarker(() -> {
-//                                        robot.intake.setMotorPower(1);
-//                                        while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
-//                                        robot.intake.setMotorPower(0);
-                                    })
-                            ;
-                            score(sequence, placements, 0);
+//                            sequence
+//                                    // INTAKING
+//                                    .addTemporalMarker(() -> {
+////                                        robot.intake.setHeight(FIVE_STACK);
+////                                        robot.intake.setRequiredIntakingAmount(1);
+//                                    })
+//
+//                                    .splineTo(stackPos(1, FIVE_STACK).vec(), LEFT)
+//                                    .addTemporalMarker(() -> {
+////                                        robot.intake.setMotorPower(1);
+////                                        while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+////                                        robot.intake.setMotorPower(0);
+//                                    })
+//                            ;
+//                            score(sequence, placements, 0);
 
                         }
 
-                        if (!doCycles) {
-                            sequence
-                                    .lineTo(parking.byAlliance().toPose2d().vec())
-                                    .lineTo(parked.byAlliance().toPose2d().vec())
-                            ;
-                        } else {
-
-                            Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
-                            int placement = backdropSide ? 1 : 2;
-
-                            // CYCLE 1
-                            driveToStack1(sequence, height);
-                            intake2Pixels(sequence, 1, height);
-                            score(sequence, placements, placement);
-
-                            // CYCLE 2
-                            if (backdropSide) {
-                                driveToStack1(sequence, height.minus(2));
-                                intake2Pixels(sequence, 1, height.minus(2));
-                                score(sequence, placements, placement + 2);
-                            }
-                        }
+//                        if (!doCycles) {
+//                            sequence
+//                                    .lineTo(parking.byAlliance().toPose2d().vec())
+//                                    .lineTo(parked.byAlliance().toPose2d().vec())
+//                            ;
+//                        } else {
+//
+//                            Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
+//                            int placement = backdropSide ? 1 : 2;
+//
+//                            // CYCLE 1
+//                            driveToStack1(sequence, height);
+//                            intake2Pixels(sequence, 1, height);
+//                            score(sequence, placements, placement);
+//
+//                            // CYCLE 2
+//                            if (backdropSide) {
+//                                driveToStack1(sequence, height.minus(2));
+//                                intake2Pixels(sequence, 1, height.minus(2));
+//                                score(sequence, placements, placement + 2);
+//                            }
+//                        }
 
                         sequence.addTemporalMarker(() -> autonBackdrop.print());
 

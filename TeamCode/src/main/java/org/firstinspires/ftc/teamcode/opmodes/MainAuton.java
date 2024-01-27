@@ -259,7 +259,7 @@ public final class MainAuton extends LinearOpMode {
                     ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
                             ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT))
             ) {
-                sequence.lineToSplineHeading(awayTrussSpike.byAlliance().flipBySide().toPose2d());
+                sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
             } else {
                 sequence.splineTo(spike.vec(), spike.getHeading());
             }
