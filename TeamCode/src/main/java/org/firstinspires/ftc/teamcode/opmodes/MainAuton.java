@@ -95,7 +95,7 @@ public final class MainAuton extends LinearOpMode {
             awayTrussSpike = new EditablePose(25, -32, 1.9),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(12, -12, LEFT),
+            enteringBackstage = new EditablePose(24, -6, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
