@@ -76,11 +76,11 @@ public final class MainAuton extends LinearOpMode {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            TIME_INTAKE_FLIP_TO_LIFT = 0.5,
+            TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 49.5,
+            X_BACKDROP = 53,
             Y_MAX_BLUE = 44.25,
             Y_MAX_RED = -26.25,
             WIDTH_PIXEL = 3;
