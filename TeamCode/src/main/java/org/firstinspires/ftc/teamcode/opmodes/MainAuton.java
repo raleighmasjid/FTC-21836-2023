@@ -105,10 +105,14 @@ public final class MainAuton extends LinearOpMode {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
+                    robot.intake.toggleClimbing();
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .addTemporalMarker(() -> {
+                    robot.intake.toggleClimbing();
+                })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
     }
@@ -338,18 +342,13 @@ public final class MainAuton extends LinearOpMode {
 
             }
 
-            if (!doCycles) {
-                sequence
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
-                ;
-            } else {
+            if (doCycles) {
 
                 Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                 int placement = backdropSide ? 1 : 2;
 
                 // CYCLE 1
-//                driveToStack1(sequence, height);
+                driveToStack1(sequence, height);
 //                intake2Pixels(sequence, 1, height);
 //                score(sequence, placements, placement);
 
@@ -359,6 +358,11 @@ public final class MainAuton extends LinearOpMode {
 //                    intake2Pixels(sequence, 1, height.minus(2));
 //                    score(sequence, placements, placement + 2);
 //                }
+            } else if (partnerWillDoRand) {
+                sequence
+                        .lineTo(parking.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
+                ;
             }
 
             sequences[rand.ordinal()] = sequence.build();

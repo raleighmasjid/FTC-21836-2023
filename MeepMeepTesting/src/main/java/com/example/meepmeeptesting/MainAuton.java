@@ -2,6 +2,8 @@ package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
+import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
 import static com.example.meepmeeptesting.MainAuton.EditablePose.backdropSide;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
@@ -73,10 +75,14 @@ public class MainAuton {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
+//                    robot.intake.toggleClimbing();
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .addTemporalMarker(() -> {
+//                    robot.intake.toggleClimbing();
+                })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
     }
@@ -225,14 +231,11 @@ public class MainAuton {
 
                     boolean backdropSideOuterSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
                             ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT));
-                    if (!backdropSide ||
-                            ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                            ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
-                    ) {
+                    boolean backdropSideInnerSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
+                            ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT));
+                    if (!backdropSide || backdropSideInnerSpike) {
                         sequence.splineTo(spike.vec(), spike.getHeading());
-                    } else if (
-                            backdropSideOuterSpike
-                    ) {
+                    } else if (backdropSideOuterSpike) {
                         sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
                     } else {
                         sequence.splineTo(spike.vec(), spike.getHeading());
@@ -304,28 +307,28 @@ public class MainAuton {
 
                     }
 
-//                        if (!doCycles) {
-//                            sequence
-//                                    .lineTo(parking.byAlliance().toPose2d().vec())
-//                                    .lineTo(parked.byAlliance().toPose2d().vec())
-//                            ;
-//                        } else {
-//
-//                            Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
-//                            int placement = backdropSide ? 1 : 2;
-//
-//                            // CYCLE 1
-//                            driveToStack1(sequence, height);
-//                            intake2Pixels(sequence, 1, height);
-//                            score(sequence, placements, placement);
-//
-//                            // CYCLE 2
-//                            if (backdropSide) {
-//                                driveToStack1(sequence, height.minus(2));
-//                                intake2Pixels(sequence, 1, height.minus(2));
-//                                score(sequence, placements, placement + 2);
-//                            }
-//                        }
+                    if (doCycles) {
+
+                        Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
+                        int placement = backdropSide ? 1 : 2;
+
+                        // CYCLE 1
+                        driveToStack1(sequence, height);
+//                intake2Pixels(sequence, 1, height);
+//                score(sequence, placements, placement);
+
+                        // CYCLE 2
+//                if (backdropSide) {
+//                    driveToStack1(sequence, height.minus(2));
+//                    intake2Pixels(sequence, 1, height.minus(2));
+//                    score(sequence, placements, placement + 2);
+//                }
+                    } else if (partnerWillDoRand) {
+                        sequence
+                                .lineTo(parking.byAlliance().toPose2d().vec())
+                                .lineTo(parked.byAlliance().toPose2d().vec())
+                        ;
+                    }
 
                         sequence.addTemporalMarker(() -> autonBackdrop.print());
 
