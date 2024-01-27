@@ -54,7 +54,7 @@ public class MainAuton {
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
             nearTrussSpike = new EditablePose(2, -32, 2),
-            awayTrussSpike = new EditablePose(20, -32, 1.9),
+            awayTrussSpike = new EditablePose(19, -32, 1.9),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
@@ -186,12 +186,13 @@ public class MainAuton {
                         if (!backdropSide) swap(placements, 0, 1);
 
                         Pose2d spike;
+                        EditablePose flippedSpike = new EditablePose(X_TILE - nearTrussSpike.x, nearTrussSpike.y, REVERSE - nearTrussSpike.heading);
                         switch (rand) {
                             case LEFT:
-                                spike = (isRed ? nearTrussSpike : awayTrussSpike).byBoth().toPose2d();
+                                spike = (isRed ? nearTrussSpike : flippedSpike).byBoth().toPose2d();
                                 break;
                             case RIGHT:
-                                spike = (isRed ? awayTrussSpike : nearTrussSpike).byBoth().toPose2d();
+                                spike = (isRed ? flippedSpike : nearTrussSpike).byBoth().toPose2d();
                                 break;
                             case CENTER:
                             default:
@@ -328,7 +329,7 @@ public class MainAuton {
 
         public double x, y, heading;
 
-        static boolean backdropSide = true;
+        static boolean backdropSide = false;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
