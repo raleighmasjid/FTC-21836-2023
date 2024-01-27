@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.vision.detectors;
 
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.openftc.easyopencv.OpenCvCameraRotation.SIDEWAYS_RIGHT;
@@ -33,6 +34,7 @@ public class BackdropScanner {
         pipeline.isRed = isRed;
         pipeline.showWarpPath = false;
         pipeline.graphic = false;
+        pipeline.backdrop = autonBackdrop;
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override

@@ -112,7 +112,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat();
 
-    public final Backdrop backdrop = new Backdrop();
+    public Backdrop backdrop = new Backdrop();
     private final Point[][] centerPoints = new Point[11][7];
     private final Point[][][] samplePoints = new Point[11][7][4];
 

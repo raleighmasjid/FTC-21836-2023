@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
@@ -40,9 +39,9 @@ public final class AutoScoringManager {
 
     public final BackdropScanner backdropScanner;
 
-    private final Backdrop latestScan = autonBackdrop;
-    private volatile Backdrop lastScan = latestScan;
-    private volatile ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(latestScan);
+    private final Backdrop latestScan;
+    private volatile Backdrop lastScan;
+    private volatile ArrayList<Pixel> optimalPlacements;
 
     private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, Pixel.Color.EMPTY), new Pixel(-2, 0, Pixel.Color.EMPTY)};
     private final Pixel.Color[] colorsNeeded = {Pixel.Color.EMPTY, Pixel.Color.EMPTY};
@@ -56,6 +55,9 @@ public final class AutoScoringManager {
     public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
         backdropScanner = new BackdropScanner(hardwareMap);
+        latestScan = backdropScanner.pipeline.backdrop;
+        lastScan = latestScan;
+        optimalPlacements = PlacementCalculator.getOptimalPlacements(latestScan);
         calculateColorsNeeded();
 
         new Thread(() -> {
