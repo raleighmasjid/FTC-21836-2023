@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = false;
+    static boolean isRed = true;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -53,8 +53,8 @@ public class MainAuton {
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
-            nearTrussSpike = new EditablePose(2, -32, 2),
-            awayTrussSpike = new EditablePose(19, -32, 1.9),
+            nearTrussSpike = new EditablePose(1.5, -35, 2.7),
+            awayTrussSpike = new EditablePose(17, -32, 1.9),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
@@ -153,7 +153,7 @@ public class MainAuton {
         boolean partnerWillDoRand = false;
         boolean doCycles = true;
 
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(3, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
@@ -221,7 +221,6 @@ public class MainAuton {
                                 ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
                                 ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
                         ) {
-                            sequence.splineTo(preSpikeNearTruss.vec(), preSpikeNearTruss.getHeading());
                             sequence.splineTo(spike.vec(), spike.getHeading());
                         } else if (
                                 ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
