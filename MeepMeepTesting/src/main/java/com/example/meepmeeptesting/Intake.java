@@ -52,7 +52,7 @@ public final class Intake {
         }
 
         public Height minus(int less) {
-            return values[max(ordinal() - 1, 0)];
+            return values[max(ordinal() - less, 0)];
         }
 
         Height() {
