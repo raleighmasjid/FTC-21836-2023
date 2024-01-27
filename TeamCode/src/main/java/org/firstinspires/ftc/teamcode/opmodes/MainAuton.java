@@ -272,16 +272,16 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .setTangent(afterSpike.getHeading())
                         .lineToSplineHeading(afterSpike)
-//                                    .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-////                                        robot.intake.setRequiredIntakingAmount(2);
-////                                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                                    })
-//                                    .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
-//                                    .addTemporalMarker(() -> {
-////                                        robot.deposit.paintbrush.dropPixels(1);
-//                                        autonBackdrop.add(placements.get(0));
-//                                    })
-//                                    .waitSeconds(TIME_DROP_SECOND)
+                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
+                            robot.intake.setRequiredIntakingAmount(2);
+                            robot.deposit.lift.setTargetRow(placements.get(0).y);
+                        })
+                        .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
+                        .addTemporalMarker(() -> {
+                            robot.deposit.paintbrush.dropPixels(1);
+                            autonBackdrop.add(placements.get(0));
+                        })
+                        .waitSeconds(TIME_DROP_SECOND)
                 ;
 
             } else {
