@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = true;
+    static boolean isRed = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -46,15 +46,22 @@ public class MainAuton {
             CYCLES_BACKDROP_SIDE = 0,
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
+            TIME_INTAKE_FLIP_TO_LIFT = 0.25,
+            TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
-            SPEED_INTAKING = 0.5;
+            SPEED_INTAKING = 0.5,
+            BOTTOM_ROW_HEIGHT = 2,
+            X_BACKDROP = 53,
+            Y_MAX_BLUE = 44.25,
+            Y_MAX_RED = -26.25,
+            WIDTH_PIXEL = 3;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
-            nearTrussSpike = new EditablePose(1.5, -35, 2.7),
-            awayTrussSpike = new EditablePose(17, -32, 1.9),
-            parking = new EditablePose(Backdrop.X, -60, LEFT),
+            centerSpike = new EditablePose(X_START_RIGHT, -25.5, startPose.heading),
+            nearTrussSpike = new EditablePose(3.4, -35, 2.7),
+            awayTrussSpike = new EditablePose(24, -32, 1.9),
+            parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
@@ -152,9 +159,9 @@ public class MainAuton {
         boolean partnerWillDoRand = false;
         boolean doCycles = true;
 
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
-                new Pixel(3, 0, YELLOW),
+                new Pixel(1, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
                 new Pixel(2, 0, WHITE),
                 new Pixel(1, 1, WHITE),
@@ -181,96 +188,103 @@ public class MainAuton {
                 .setDimensions(16.42205, 17.39847)
                 .followTrajectorySequence(robotdrivetrain -> {
 
-                        if (partnerWillDoRand) placements.remove(0);
-                        if (!backdropSide) swap(placements, 0, 1);
+                    if (partnerWillDoRand) placements.remove(0);
+                    if (!backdropSide) swap(placements, 0, 1);
 
-                        Pose2d spike;
-                        EditablePose flippedSpike = new EditablePose(X_TILE - nearTrussSpike.x, nearTrussSpike.y, REVERSE - nearTrussSpike.heading);
-                        switch (rand) {
-                            case LEFT:
-                                spike = (isRed ? nearTrussSpike : flippedSpike).byBoth().toPose2d();
-                                break;
-                            case RIGHT:
-                                spike = (isRed ? flippedSpike : nearTrussSpike).byBoth().toPose2d();
-                                break;
-                            case CENTER:
-                            default:
-                                spike = centerSpike.byBoth().toPose2d();
-                        }
+                    Pose2d spike;
+                    EditablePose flippedSpike = new EditablePose(X_TILE - nearTrussSpike.x, nearTrussSpike.y, REVERSE - nearTrussSpike.heading);
+                    switch (rand) {
+                        case LEFT:
+                            spike = (isRed ? nearTrussSpike : flippedSpike).byBoth().toPose2d();
+                            break;
+                        case RIGHT:
+                            spike = (isRed ? flippedSpike : nearTrussSpike).byBoth().toPose2d();
+                            break;
+                        case CENTER:
+                        default:
+                            spike = centerSpike.byBoth().toPose2d();
+                    }
 
-                        Pose2d preSpikeNearTruss = new EditablePose(
-                                MainAuton.startPose.x,
-                                MainAuton.startPose.y + Y_SHIFT_BEFORE_SPIKE,
-                                MainAuton.startPose.heading
-                        ).byBoth().toPose2d();
+                    Pose2d preSpikeNearTruss = new EditablePose(
+                            MainAuton.startPose.x,
+                            MainAuton.startPose.y + Y_SHIFT_BEFORE_SPIKE,
+                            MainAuton.startPose.heading
+                    ).byBoth().toPose2d();
 
-                        Pose2d postSpike = new EditablePose(
-                                MainAuton.startPose.x,
-                                MainAuton.startPose.y + Y_SHIFT_AFTER_SPIKE,
-                                MainAuton.startPose.heading
-                        ).byBoth().toPose2d();
+                    Pose2d postSpike = new EditablePose(
+                            MainAuton.startPose.x,
+                            MainAuton.startPose.y + Y_SHIFT_AFTER_SPIKE,
+                            MainAuton.startPose.heading
+                    ).byBoth().toPose2d();
 
-                        Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
+                    Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
 
-                        TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
-                                .setTangent(startPose.getHeading())
-                                ;
-
-                        if (!backdropSide ||
-                                ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                                ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
-                        ) {
-                            sequence.splineTo(spike.vec(), spike.getHeading());
-                        } else if (
-                                ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                                ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT))
-                        ) {
-                            sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
-                        } else {
-                            sequence.splineTo(spike.vec(), spike.getHeading());
-                        }
-
-                        if (backdropSide) {
-
-                            Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
-
-                            sequence
-                                    .setTangent(afterSpike.getHeading())
-                                    .lineToSplineHeading(afterSpike)
-//                                    .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-////                                        robot.intake.setRequiredIntakingAmount(2);
-////                                        robot.deposit.lift.setTargetRow(placements.get(0).y);
-//                                    })
-//                                    .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
-//                                    .addTemporalMarker(() -> {
-////                                        robot.deposit.paintbrush.dropPixels(1);
-//                                        autonBackdrop.add(placements.get(0));
-//                                    })
-//                                    .waitSeconds(TIME_DROP_SECOND)
+                    TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
+                            .setTangent(startPose.getHeading())
                             ;
 
-                        } else {
+                    boolean backdropSideOuterSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
+                            ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT));
+                    if (!backdropSide ||
+                            ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
+                            ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
+                    ) {
+                        sequence.splineTo(spike.vec(), spike.getHeading());
+                    } else if (
+                            backdropSideOuterSpike
+                    ) {
+                        sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
+                    } else {
+                        sequence.splineTo(spike.vec(), spike.getHeading());
+                    }
 
-                            sequence.setTangent(spike.getHeading() + REVERSE);
+                    if (backdropSide) {
 
-                            switch (rand) {
-                                case LEFT:
-                                case RIGHT:
-                                    sequence
-                                            .splineTo(preSpikeNearTruss.vec(), preSpikeNearTruss.getHeading() + REVERSE)
-                                            .setTangent(FORWARD)
-                                            .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
-                                    ;
-                                    break;
-                                case CENTER:
-                                    sequence
-                                            .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
-                                            .setTangent(FORWARD)
-                                            .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
-                                            .lineToSplineHeading(turnToStack1)
-                                            .setTangent(LEFT)
-                                    ;
-                            }
+                        Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
+
+                        sequence
+                                .setTangent(afterSpike.getHeading())
+                                .lineToSplineHeading(afterSpike)
+                                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
+//                                    robot.intake.setRequiredIntakingAmount(2);
+                                })
+                                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
+//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
+                                })
+                        ;
+                        if (backdropSideOuterSpike) sequence.lineToSplineHeading(toPose2d(placements.get(0)));
+                        else sequence.splineToSplineHeading(toPose2d(placements.get(0)), RIGHT);
+                        sequence
+                                .waitSeconds(TIME_PRE_YELLOW)
+                                .addTemporalMarker(() -> {
+//                                    robot.deposit.paintbrush.dropPixels(1);
+                                    autonBackdrop.add(placements.get(0));
+                                })
+                                .waitSeconds(TIME_DROP_SECOND)
+                        ;
+
+                    } else {
+
+                        sequence.setTangent(spike.getHeading() + REVERSE);
+
+                        switch (rand) {
+                            case LEFT:
+                            case RIGHT:
+                                sequence
+                                        .splineTo(preSpikeNearTruss.vec(), preSpikeNearTruss.getHeading() + REVERSE)
+                                        .setTangent(FORWARD)
+                                        .forward(Y_SHIFT_AUDIENCE_AFTER_SPIKE)
+                                ;
+                                break;
+                            case CENTER:
+                                sequence
+                                        .splineTo(postSpike.vec(), postSpike.getHeading() + REVERSE)
+                                        .setTangent(FORWARD)
+                                        .strafeRight((isRed ? 1 : -1) * X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE)
+                                        .lineToSplineHeading(turnToStack1)
+                                        .setTangent(LEFT)
+                                ;
+                        }
 
 //                            sequence
 //                                    // INTAKING
@@ -288,7 +302,7 @@ public class MainAuton {
 //                            ;
 //                            score(sequence, placements, 0);
 
-                        }
+                    }
 
 //                        if (!doCycles) {
 //                            sequence

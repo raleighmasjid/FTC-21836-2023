@@ -77,6 +77,7 @@ public final class MainAuton extends LinearOpMode {
             CYCLES_AUDIENCE_SIDE = 0,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_INTAKE_FLIP_TO_LIFT = 0.25,
+            TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
@@ -87,7 +88,7 @@ public final class MainAuton extends LinearOpMode {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
+            centerSpike = new EditablePose(X_START_RIGHT, -25.5, startPose.heading),
             nearTrussSpike = new EditablePose(3.4, -35, 2.7),
             awayTrussSpike = new EditablePose(24, -32, 1.9),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
@@ -257,14 +258,15 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
                     ;
 
+            boolean backdropSideOuterSpike = ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
+                    ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT));
             if (!backdropSide ||
                     ((isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
                     ((!isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
             ) {
                 sequence.splineTo(spike.vec(), spike.getHeading());
             } else if (
-                    ((isRed) && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                            ((!isRed) && (rand == PropDetectPipeline.Randomization.LEFT))
+                    backdropSideOuterSpike
             ) {
                 sequence.lineToSplineHeading(spike = awayTrussSpike.byAlliance().flipBySide().toPose2d());
             } else {
@@ -284,7 +286,11 @@ public final class MainAuton extends LinearOpMode {
                         .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
-                        .splineToSplineHeading(toPose2d(placements.get(0)), RIGHT)
+                ;
+                if (backdropSideOuterSpike) sequence.lineToSplineHeading(toPose2d(placements.get(0)));
+                else sequence.splineToSplineHeading(toPose2d(placements.get(0)), RIGHT);
+                sequence
+                        .waitSeconds(TIME_PRE_YELLOW)
                         .addTemporalMarker(() -> {
                             robot.deposit.paintbrush.dropPixels(1);
                             autonBackdrop.add(placements.get(0));
