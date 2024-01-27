@@ -82,9 +82,9 @@ public final class MainAuton extends LinearOpMode {
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 53,
-            Y_MAX_BLUE = 45.75,
+            Y_MAX_BLUE = 45.8,
             Y_MAX_RED = -26.25,
-            WIDTH_PIXEL = 3.4;
+            WIDTH_PIXEL = 3.6;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
