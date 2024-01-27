@@ -178,7 +178,7 @@ public class MainAuton {
                 .setConstraints(50, 50, toRadians(250), toRadians(250), 13.95)
 //                .setConstraints(70, 90, toRadians(295), toRadians(295), 13.95)
                 .setDimensions(16.42205, 17.39847)
-                .followTrajectorySequence(drive -> {
+                .followTrajectorySequence(robotdrivetrain -> {
 
                         if (partnerWillDoRand) placements.remove(0);
                         if (!backdropSide) swap(placements, 0, 1);
@@ -211,7 +211,7 @@ public class MainAuton {
 
                         Pose2d turnToStack1 = new EditablePose(MainAuton.startPose.x + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byBoth().toPose2d();
 
-                        TrajectorySequenceBuilder sequence = drive.trajectorySequenceBuilder(startPose)
+                        TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
                                 .setTangent(startPose.getHeading())
                                 ;
 
