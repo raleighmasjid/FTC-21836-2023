@@ -16,7 +16,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Pain
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
 import static java.lang.Math.PI;
-import static java.lang.Math.toRadians;
 import static java.util.Collections.swap;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -64,8 +63,8 @@ public final class MainAuton extends LinearOpMode {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 16,
-            Y_SHIFT_BEFORE_SPIKE = 16,
+            X_SHIFT_BACKDROP_AFTER_SPIKE = 12,
+            Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
@@ -82,7 +81,7 @@ public final class MainAuton extends LinearOpMode {
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(X_START_RIGHT, -26, startPose.heading),
-            leftSpike = new EditablePose(2.5, -36, toRadians(150)),
+            leftSpike = new EditablePose(2, -32, 2),
             parking = new EditablePose(Backdrop.X, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(12, -12, LEFT),
@@ -248,9 +247,16 @@ public final class MainAuton extends LinearOpMode {
 
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
-                    .splineTo(preSpike.vec(), preSpike.getHeading())
-                    .splineTo(spike.vec(), spike.getHeading())
             ;
+
+            if (
+                    ((backdropSide == isRed) && (rand == PropDetectPipeline.Randomization.LEFT)) ||
+                    ((!backdropSide == isRed) && (rand == PropDetectPipeline.Randomization.RIGHT))
+            ) {
+                sequence.splineTo(preSpike.vec(), preSpike.getHeading());
+            }
+
+            sequence.splineTo(spike.vec(), spike.getHeading());
 
             if (backdropSide) {
 
