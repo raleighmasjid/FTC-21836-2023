@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -25,8 +26,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.State;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Backdrop;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @Config
@@ -64,9 +64,9 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
+                0.4,
                 0.1,
-                0.2,
-                0.004330951894845302,
+                0,
                 0.5
         );
 
@@ -93,20 +93,21 @@ public final class Deposit {
         );
 
         public static double
-                kG = 0.25,
-                INCHES_PER_TICK = 0.0322835,
+                kG = 0.15,
+                INCHES_PER_TICK = 0.0088581424,
+                HEIGHT_PIXEL = 2.59945,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
-        private final State currentState = new State(), targetState = new State();
-        private int targetRow = -1;
+        private State currentState, targetState;
+        private int targetRow;
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
-        private double lastKp = pidGains.kP, manualLiftPower = 0, lastManualLiftPower = manualLiftPower;
+        private double lastKp = pidGains.kP, manualLiftPower = 0;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -118,10 +119,15 @@ public final class Deposit {
                     new MotorEx(hardwareMap, "lift left", RPM_1150)
             };
             motors[1].setInverted(true);
-            for (MotorEx motor : motors) {
-                motor.setZeroPowerBehavior(FLOAT);
-                motor.encoder.reset();
-            }
+            for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+            reset();
+        }
+
+        public void reset() {
+            targetRow = -1;
+            controller.reset();
+            for (MotorEx motor : motors) motor.encoder.reset();
+            targetState = currentState = new State();
         }
 
         public boolean isExtended() {
@@ -130,7 +136,7 @@ public final class Deposit {
 
         public void setTargetRow(int targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState.x = this.targetRow == -1 ? 0 : (this.targetRow * Pixel.HEIGHT + Backdrop.BOTTOM_ROW_HEIGHT);
+            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT));
             controller.setTarget(targetState);
         }
 
@@ -139,26 +145,25 @@ public final class Deposit {
         }
 
         public void setLiftPower(double manualLiftPower) {
-            lastManualLiftPower = this.manualLiftPower;
             this.manualLiftPower = manualLiftPower;
         }
 
         private void run() {
 
-            if (lastManualLiftPower != 0 && manualLiftPower == 0) {
-                targetState.x = currentState.x;
+            if (manualLiftPower != 0) {
+                targetState = currentState;
                 controller.setTarget(targetState);
             }
 
-            if (lastKp != pidGains.kP) {
-                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
-                lastKp = pidGains.kP;
-            }
+//            if (lastKp != pidGains.kP) {
+//                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
+//                lastKp = pidGains.kP;
+//            }
 
             kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
 
-            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
+            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
@@ -192,10 +197,10 @@ public final class Deposit {
 
         public static double
                 ANGLE_PIVOT_OFFSET = 5,
-                ANGLE_CLAW_OPEN = 20,
+                ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
-                ANGLE_HOOK_CLOSED = 40,
+                ANGLE_HOOK_CLOSED = 45,
                 TIME_DROP_FIRST = 0.7,
                 TIME_DROP_SECOND = 1;
 

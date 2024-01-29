@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
 
@@ -37,8 +37,8 @@ public final class TuningIntakeColors extends LinearOpMode {
 
             HSV top = topSensor.getHSV(), bottom = bottomSensor.getHSV();
 
-            mTelemetry.addData("Top color", Pixel.Color.fromHSV(top).name());
-            mTelemetry.addData("Bottom color", Pixel.Color.fromHSV(bottom).name());
+            mTelemetry.addData("Top color", Intake.fromHSV(top).name());
+            mTelemetry.addData("Bottom color", Intake.fromHSV(bottom).name());
             mTelemetry.addLine();
             top.toTelemetry("Top HSV");
             mTelemetry.addLine();

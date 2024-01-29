@@ -84,8 +84,10 @@ public final class TuningLiftKvKa extends LinearOpMode {
             controller.setGains(feedforwardGains);
             profiler.setConstraints(profileConstraints);
 
-            currentState.x = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition());
-            currentState.v = INCHES_PER_TICK * 0.5 * (motors[0].encoder.getCorrectedVelocity() + motors[1].encoder.getCorrectedVelocity());
+            currentState = new State(
+                    INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()),
+                    INCHES_PER_TICK * 0.5 * (motors[0].encoder.getCorrectedVelocity() + motors[1].encoder.getCorrectedVelocity())
+            );
 
             if (keyPressed(1, DPAD_DOWN)) profiler.generateProfile(currentState, new State(POS_1));
             if (keyPressed(1, DPAD_UP)) profiler.generateProfile(currentState, new State(POS_2));

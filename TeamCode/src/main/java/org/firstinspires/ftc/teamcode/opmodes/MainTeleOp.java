@@ -7,7 +7,9 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
@@ -71,7 +73,7 @@ public final class MainTeleOp extends LinearOpMode {
         robot = new Robot(opMode.hardwareMap);
         robot.drivetrain.setPoseEstimate(autonEndPose);
         robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
-        if (isAutomated) robot.startAlgorithm();
+        if (isAutomated) robot.startAlgorithm(opMode.hardwareMap);
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
@@ -89,8 +91,10 @@ public final class MainTeleOp extends LinearOpMode {
             }
             mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
+            robot.drone.run();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
+        if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
     }
 
     static void teleOpControls() {
@@ -99,11 +103,14 @@ public final class MainTeleOp extends LinearOpMode {
         );
 
         robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
+        if (keyPressed(2, LEFT_STICK_BUTTON)) robot.deposit.lift.reset();
+        if (keyPressed(2, RIGHT_STICK_BUTTON)) robot.drone.toggle();
 
         if (gamepadEx2.isDown(LEFT_BUMPER)) {
             if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
             if (keyPressed(2, X))               robot.intake.setRequiredIntakingAmount(1);
             if (keyPressed(2, A))               robot.intake.setRequiredIntakingAmount(0);
+            if (keyPressed(2, B))               robot.intake.toggleClimbing();
         } else {
             if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
             if (keyPressed(2, DPAD_UP))         robot.deposit.lift.changeRow(1);

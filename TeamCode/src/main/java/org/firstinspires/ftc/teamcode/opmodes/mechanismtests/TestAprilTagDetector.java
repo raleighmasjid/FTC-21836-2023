@@ -28,7 +28,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.AprilTagDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(group = "Single mechanism test")

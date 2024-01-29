@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.LEFT;
-import static org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.CENTER;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 
-import org.firstinspires.ftc.teamcode.control.vision.PropDetectPipeline;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 
 import java.util.ArrayList;
 
@@ -27,7 +29,7 @@ public final class AutonPlacementVisualizer {
     static class Bah {
         public static void main(String... args) {
 //            Backdrop backdrop = new Backdrop();
-            for (Pixel placement : AutonPixelSupplier.getPlacements(LEFT, false)) {
+            for (Pixel placement : AutonPixelSupplier.getPlacements(CENTER, false)) {
                 System.out.println(placement.x + ", " + placement.y + ", " + placement.color.name());
 //                backdrop.add(placement).print();
             }

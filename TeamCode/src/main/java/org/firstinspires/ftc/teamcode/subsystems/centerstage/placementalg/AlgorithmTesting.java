@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANY;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.Pixel.Color.ANYCOLOR;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANYCOLOR;
+
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
 
 import java.util.ArrayList;
 import java.util.Scanner;

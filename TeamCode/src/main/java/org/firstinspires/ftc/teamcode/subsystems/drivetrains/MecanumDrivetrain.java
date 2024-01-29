@@ -63,7 +63,7 @@ public class MecanumDrivetrain extends MecanumDrive {
                 0.1
             ),
             HEADING_PID = new PIDCoefficients(
-                10,
+                8,
                 0,
                     0
             );
@@ -72,15 +72,15 @@ public class MecanumDrivetrain extends MecanumDrive {
             lastHeadingKp = HEADING_PID.kP;
 
     public static double
-            LATERAL_MULTIPLIER = 1,
+            LATERAL_MULTIPLIER = 1.75,
             VX_WEIGHT = 1,
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
-    private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(DriveConstants.MAX_ACCEL);
+    private final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
+    private final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(DriveConstants.MAX_ACCEL);
 
     private final DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private final List<DcMotorEx> motors;

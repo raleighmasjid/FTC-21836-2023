@@ -22,27 +22,47 @@
 package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
+import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 
 @TeleOp(group = "Single mechanism test")
-public final class TestTeamPropDetector extends LinearOpMode {
+public final class TestBackdropScanner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         mTelemetry = new MultipleTelemetry(telemetry);
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        BackdropScanner backdropScanner = new BackdropScanner(hardwareMap);
+        gamepadEx1 = new GamepadEx(gamepad1);
+        Backdrop latestScan = backdropScanner.pipeline.backdrop;
 
+        // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit()) {
-            mTelemetry.addData("Location", detector.run().name());
-            detector.printNumericalTelemetry();
+            gamepadEx1.readButtons();
+            if (keyPressed(1, B)) isRed = true;
+            if (keyPressed(1, X)) isRed = false;
+            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE "));
             mTelemetry.update();
         }
+        backdropScanner.pipeline.isRed = isRed;
+
+        while (opModeIsActive()) {
+
+            latestScan.toTelemetry(mTelemetry);
+            telemetry.update();
+        }
+        backdropScanner.stop();
     }
 }
