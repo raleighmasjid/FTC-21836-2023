@@ -298,7 +298,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
             telemetry.addLine("(" + maxX + ", " + maxY + ")");
 
-            for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
+            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
 
                 double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
@@ -341,13 +341,13 @@ public class BackdropPipeline extends OpenCvPipeline {
                     background.release();
                 }
 
-                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
+                for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
                     drawPixelIcon(input, y, x);
                 }
 
                 PlacementCalculator.getOptimalPlacements(backdrop);
-                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
+                for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
                     Pixel pixel = backdrop.get(x, y);
                     if (pixel.inMosaic()) {
