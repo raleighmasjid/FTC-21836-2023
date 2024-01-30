@@ -32,7 +32,6 @@ public class BackdropScanner {
         );
         pipeline = new BackdropPipeline(mTelemetry);
         pipeline.isRed = isRed;
-        pipeline.showWarpPath = false;
         pipeline.graphic = false;
         pipeline.backdrop = autonBackdrop;
         camera.setPipeline(pipeline);

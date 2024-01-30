@@ -75,8 +75,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             backdropVisible = false,
             isRed = true,
             graphic = true,
-            background = false,
-            showWarpPath = true;
+            background = false;
 
     public double
             X_TOP_LEFT_R_TAG = 16.5 * 65 / 2.0,
@@ -180,7 +179,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-        if (showWarpPath) for (AprilTagDetection detection : detections) {
+        if (graphic) for (AprilTagDetection detection : detections) {
             AprilTagDetectionPipeline.Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagSize, tagSize);
             drawAxisMarker(input, tagSize / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
@@ -241,7 +240,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tagTL
             );
 
-            if (showWarpPath) {
+            if (graphic) {
                 Imgproc.line(input, tl, tr, blue, 3);
                 Imgproc.line(input, bl, br, blue, 3);
                 Imgproc.line(input, tl, bl, blue, 3);
@@ -372,7 +371,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 }
             }
 
-            if (showWarpPath) {
+            if (graphic) {
                 Imgproc.line(input, tagTL, tagTR, yellow, 5);
                 Imgproc.line(input, tagBL, tagBR, yellow, 5);
                 Imgproc.line(input, tagTL, tagBL, yellow, 5);
