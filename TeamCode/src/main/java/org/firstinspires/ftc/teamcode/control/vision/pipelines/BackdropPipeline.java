@@ -81,7 +81,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 16.5 * 65 / 2.0,
             Y_TOP_LEFT = 32.42857142857142 * 65 / 2.0,
             TARGET_SIZE = 65,
-            X_FIRST_PIXEL = 29.25,
+            X_FIRST_PIXEL = 80,
             Y_FIRST_PIXEL = 966.875,
             X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714 * 65 / 2.0,
             X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714 * 65 / 2.0,
@@ -464,39 +464,10 @@ public class BackdropPipeline extends OpenCvPipeline {
             boolean evenRow = y % 2 == 0;
             if (x == 0 && evenRow) continue;
 
-            double xCoord, yCoord;
-
-            if (y == 0) yCoord = Y_FIRST_PIXEL;
-            else if (y == 1) {
-                if (x == 0) yCoord = centerPoints[y-1][x+1].y + height;
-                else yCoord = centerPoints[y-1][x].y + height;
-            } else {
-                if (x == 0) yCoord = centerPoints[y-1][1].y + (centerPoints[y-1][1].y - centerPoints[y-2][0].y);
-                else yCoord = centerPoints[y-1][x].y + (centerPoints[y-1][x].y - centerPoints[y-2][x].y);
-            }
-
-            if (evenRow) {
-                if (x == 1) {
-                    if (y == 0) xCoord = X_FIRST_PIXEL + width;
-                    else xCoord = centerPoints[y - 1][0].x + width / 2.0;
-                } else if (x == 2) {
-                    xCoord = centerPoints[y][1].x + width;
-                } else {
-                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
-                }
-            } else {
-                if (x == 0) {
-                    xCoord = centerPoints[y - 1][1].x - width / 2.0;
-                } else if (x == 1) {
-                    xCoord = centerPoints[y][0].x + width;
-                } else {
-                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
-                }
-            }
-
-            Point estimate = new Point(xCoord, yCoord);
-            centerPoints[y][x] = estimate;
-
+            centerPoints[y][x] = new Point(
+                    X_FIRST_PIXEL + (x * width) - (evenRow ? 0.5 * width : 0),
+                    Y_FIRST_PIXEL + (y * height)
+            );
         }
     }
 
