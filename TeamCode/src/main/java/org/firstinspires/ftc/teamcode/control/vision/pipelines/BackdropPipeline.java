@@ -328,6 +328,11 @@ public class BackdropPipeline extends OpenCvPipeline {
                 for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
                     Imgproc.drawMarker(input, point, green, 2, 3);
                 }
+
+                Imgproc.line(input, tagTL, tagTR, yellow, 5);
+                Imgproc.line(input, tagBL, tagBR, yellow, 5);
+                Imgproc.line(input, tagTL, tagBL, yellow, 5);
+                Imgproc.line(input, tagTR, tagBR, yellow, 5);
             }
 
             if (showGraphics) {
@@ -375,13 +380,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                     }
                 }
-            }
-
-            if (showSamples) {
-                Imgproc.line(input, tagTL, tagTR, yellow, 5);
-                Imgproc.line(input, tagBL, tagBR, yellow, 5);
-                Imgproc.line(input, tagTL, tagBL, yellow, 5);
-                Imgproc.line(input, tagTR, tagBR, yellow, 5);
             }
         }
 
