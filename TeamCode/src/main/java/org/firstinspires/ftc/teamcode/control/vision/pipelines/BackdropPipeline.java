@@ -78,21 +78,21 @@ public class BackdropPipeline extends OpenCvPipeline {
             showWarpPath = true;
 
     public double
-            X_TOP_LEFT_R_TAG = 16.5,
-            Y_TOP_LEFT = 32.42857142857142,
+            X_TOP_LEFT_R_TAG = 16.5 * 65 / 2.0,
+            Y_TOP_LEFT = 32.42857142857142 * 65 / 2.0,
             TARGET_SIZE = 65,
             X_FIRST_PIXEL = 29.25,
             Y_FIRST_PIXEL = 966.875,
-            X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714,
-            X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714,
-            Y_SHIFT_PIXEL_POINTS_T = -1.1,
-            Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
-            X_SHIFT_WHITE = 0.08,
-            Y_SHIFT_WHITE = 2.5,
-            X_SHIFT_BLACK = 5,
-            Y_SHIFT_BLACK = -3.0,
-            X_SHIFT_U = 5.2,
-            Y_SHIFT_U = -30.5;
+            X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714 * 65 / 2.0,
+            X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714 * 65 / 2.0,
+            Y_SHIFT_PIXEL_POINTS_T = -1.1 * 65 / 2.0,
+            Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429 * 65 / 2.0,
+            X_SHIFT_WHITE = 0.08 * 65 / 2.0,
+            Y_SHIFT_WHITE = 2.5 * 65 / 2.0,
+            X_SHIFT_BLACK = 5 * 65 / 2.0,
+            Y_SHIFT_BLACK = -3.0 * 65 / 2.0,
+            X_SHIFT_U = 5.2 * 65 / 2.0,
+            Y_SHIFT_U = -30.5 * 65 / 2.0;
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -228,10 +228,10 @@ public class BackdropPipeline extends OpenCvPipeline {
             double rightX = getLeftX(tags.get(maxInd).id) + TARGET_SIZE;
 
             Point
-                    tagTR = new Point(rightX, (Y_TOP_LEFT * TARGET_SIZE / 2.0)),
-                    tagBL = new Point(leftX, (Y_TOP_LEFT * TARGET_SIZE / 2.0) + TARGET_SIZE),
-                    tagTL = new Point(leftX, (Y_TOP_LEFT * TARGET_SIZE / 2.0)),
-                    tagBR = new Point(rightX, (Y_TOP_LEFT * TARGET_SIZE / 2.0) + TARGET_SIZE);
+                    tagTR = new Point(rightX, (Y_TOP_LEFT)),
+                    tagBL = new Point(leftX, (Y_TOP_LEFT) + TARGET_SIZE),
+                    tagTL = new Point(leftX, (Y_TOP_LEFT)),
+                    tagBR = new Point(rightX, (Y_TOP_LEFT) + TARGET_SIZE);
 
             MatOfPoint2f dstTag = new MatOfPoint2f(
                     tagBL,
@@ -258,16 +258,16 @@ public class BackdropPipeline extends OpenCvPipeline {
             generateSamplePoints();
 
             Point whiteSample = new Point(
-                    getLeftX(tags.get(maxInd).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
+                    getLeftX(tags.get(maxInd).id) + X_SHIFT_WHITE,
+                    Y_TOP_LEFT + Y_SHIFT_WHITE
             );
             Point blackSample = new Point(
-                    (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0)
+                    X_TOP_LEFT_R_TAG + X_SHIFT_BLACK,
+                    Y_TOP_LEFT + Y_SHIFT_BLACK
             );
-            Point outSample = new Point((
-                    X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_U * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_U * TARGET_SIZE / 2.0)
+            Point outSample = new Point(
+                    X_TOP_LEFT_R_TAG + X_SHIFT_U,
+                    Y_TOP_LEFT + Y_SHIFT_U
             );
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
@@ -342,9 +342,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
                 for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
                     if (x == 0 && y % 2 == 0) continue;
-                    Pixel pixel = backdrop.get(x, y);
-                    Imgproc.circle(input, centerPoints[y][x], 40, colorToScalar(pixel.color), 8);
-                    Imgproc.putText(input, x + ", " + y, samplePoints[y][x][0], 2, 1, red);
+                    drawPixelIcon(input, y, x);
                 }
 
                 PlacementCalculator.getOptimalPlacements(backdrop);
@@ -387,6 +385,11 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.update();
 
         return input;
+    }
+
+    private void drawPixelIcon(Mat input, int y, int x) {
+        Imgproc.circle(input, centerPoints[y][x], 40, colorToScalar(backdrop.get(x, y).color), 8);
+        Imgproc.putText(input, x + ", " + y, samplePoints[y][x][0], 2, 1, red);
     }
 
     private void drawBlueSquare(Mat input, Point point) {
@@ -508,30 +511,30 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private double getLeftX(int id) {
-        return (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
+        return (X_TOP_LEFT_R_TAG) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 
     private Point pixelLeft(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_L * TARGET_SIZE / 2.0);
+        point.x += (X_SHIFT_PIXEL_POINTS_L);
         return point;
     }
 
     private Point pixelRight(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0);
+        point.x += (X_SHIFT_PIXEL_POINTS_R);
         return point;
     }
 
     private Point pixelTop(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_T * TARGET_SIZE / 2.0);
+        point.y += (Y_SHIFT_PIXEL_POINTS_T);
         return point;
     }
 
     private Point pixelBottom(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_B * TARGET_SIZE / 2.0);
+        point.y += (Y_SHIFT_PIXEL_POINTS_B);
         return point;
     }
 }
