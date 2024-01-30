@@ -40,6 +40,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static java.lang.Math.round;
+import static java.lang.Math.sqrt;
 
 import androidx.annotation.NonNull;
 
@@ -388,8 +389,42 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawPixelIcon(Mat input, int y, int x) {
-        Imgproc.circle(input, centerPoints[y][x], 40, colorToScalar(backdrop.get(x, y).color), 8);
-        Imgproc.putText(input, x + ", " + y, samplePoints[y][x][0], 2, 1, red);
+        int size = 80;
+        double sideLength = size / sqrt(3);
+        int thickness = 8;
+        Scalar color = colorToScalar(backdrop.get(x, y).color);
+
+        Point
+                p1 = centerPoints[y][x].clone(),
+                p2 = centerPoints[y][x].clone(),
+                p3 = centerPoints[y][x].clone(),
+                p4 = centerPoints[y][x].clone(),
+                p5 = centerPoints[y][x].clone(),
+                p6 = centerPoints[y][x].clone();
+
+        p2.x += 0.5 * size;
+        p2.y += 0.5 * sideLength;
+
+        p3.x += 0.5 * size;
+        p3.y -= 0.5 * sideLength;
+
+        p5.x -= 0.5 * size;
+        p5.y -= 0.5 * sideLength;
+
+        p6.x -= 0.5 * size;
+        p6.y += 0.5 * sideLength;
+
+        p1.y += sideLength;
+        p4.y -= sideLength;
+
+        Imgproc.line(input, p1, p2, color, thickness);
+        Imgproc.line(input, p2, p3, color, thickness);
+        Imgproc.line(input, p3, p4, color, thickness);
+        Imgproc.line(input, p4, p5, color, thickness);
+        Imgproc.line(input, p5, p6, color, thickness);
+        Imgproc.line(input, p6, p1, color, thickness);
+
+        Imgproc.putText(input, x + ", " + y, p6, 2, 1, red);
     }
 
     private void drawBlueSquare(Mat input, Point point) {
