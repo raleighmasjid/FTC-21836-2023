@@ -74,25 +74,26 @@ public class BackdropPipeline extends OpenCvPipeline {
     public boolean
             backdropVisible = false,
             isRed = true,
-            graphic = true,
+            showGraphics = true,
+            showSamples = false,
             background = false;
 
     public double
-            X_TOP_LEFT_R_TAG = 16.5 * 65 / 2.0,
-            Y_TOP_LEFT = 32.42857142857142 * 65 / 2.0,
+            X_TOP_LEFT_R_TAG = 536.25,
+            Y_TOP_LEFT = 1053.9285714285713,
             TARGET_SIZE = 65,
             X_FIRST_PIXEL = 80,
             Y_FIRST_PIXEL = 966.875,
-            X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714 * 65 / 2.0,
-            X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714 * 65 / 2.0,
-            Y_SHIFT_PIXEL_POINTS_T = -1.1 * 65 / 2.0,
-            Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429 * 65 / 2.0,
-            X_SHIFT_WHITE = 0.08 * 65 / 2.0,
-            Y_SHIFT_WHITE = 2.5 * 65 / 2.0,
-            X_SHIFT_BLACK = 5 * 65 / 2.0,
-            Y_SHIFT_BLACK = -3.0 * 65 / 2.0,
-            X_SHIFT_U = 5.2 * 65 / 2.0,
-            Y_SHIFT_U = -30.5 * 65 / 2.0;
+            X_SHIFT_PIXEL_POINTS_L = -28.321428571428573,
+            X_SHIFT_PIXEL_POINTS_R = 28.321428571428573,
+            Y_SHIFT_PIXEL_POINTS_T = -35.75,
+            Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142,
+            X_SHIFT_WHITE = 2.6,
+            Y_SHIFT_WHITE = 81.25,
+            X_SHIFT_BLACK = 6,
+            Y_SHIFT_BLACK = 10,
+            X_SHIFT_U = 169.0,
+            Y_SHIFT_U = -991.25;
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -179,7 +180,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-        if (graphic) for (AprilTagDetection detection : detections) {
+        if (showSamples) for (AprilTagDetection detection : detections) {
             AprilTagDetectionPipeline.Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagSize, tagSize);
             drawAxisMarker(input, tagSize / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
@@ -240,7 +241,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                     tagTL
             );
 
-            if (graphic) {
+            if (showSamples) {
                 Imgproc.line(input, tl, tr, blue, 3);
                 Imgproc.line(input, bl, br, blue, 3);
                 Imgproc.line(input, tl, bl, blue, 3);
@@ -312,19 +313,24 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
 
-            for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
-                drawBlueSquare(input, point);
+            if (showSamples) {
+                for (Point[] centerPoint : centerPoints)
+                    for (Point point : centerPoint) {
+                        drawBlueSquare(input, point);
+                    }
+
+                for (Point[][] row : samplePoints)
+                    for (Point[] pair : row)
+                        for (Point point : pair) {
+                            drawBlueSquare(input, point);
+                        }
+
+                for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
+                    Imgproc.drawMarker(input, point, green, 2, 3);
+                }
             }
 
-            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
-                drawBlueSquare(input, point);
-            }
-
-            for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
-                Imgproc.drawMarker(input, point, green, 2, 3);
-            }
-
-            if (graphic) {
+            if (showGraphics) {
                 if (background) {
                     MatOfPoint background = new MatOfPoint(
                             CORNER_TL,
@@ -371,7 +377,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 }
             }
 
-            if (graphic) {
+            if (showSamples) {
                 Imgproc.line(input, tagTL, tagTR, yellow, 5);
                 Imgproc.line(input, tagBL, tagBR, yellow, 5);
                 Imgproc.line(input, tagTL, tagBL, yellow, 5);

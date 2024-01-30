@@ -32,7 +32,7 @@ public class BackdropScanner {
         );
         pipeline = new BackdropPipeline(mTelemetry);
         pipeline.isRed = isRed;
-        pipeline.graphic = false;
+        pipeline.showGraphics = false;
         pipeline.backdrop = autonBackdrop;
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
