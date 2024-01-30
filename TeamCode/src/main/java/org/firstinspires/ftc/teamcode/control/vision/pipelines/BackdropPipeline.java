@@ -353,21 +353,21 @@ public class BackdropPipeline extends OpenCvPipeline {
                     Pixel pixel = backdrop.get(x, y);
                     if (pixel.inMosaic()) {
                         Pixel[] mPixels = new Pixel[3];
-                        mPixels[0] = pixel;
-                        int i = 1;
+                        int i = 0;
+                        pixels:
                         for (Pixel[] row : backdrop.slots) for (Pixel p : row) {
                             if (pixel.mosaic == p.mosaic) {
-                                mPixels[i++] = p;
-                                if (i > 1) break;
+                                if (i > 2) break pixels;
+                                else mPixels[i++] = p;
                             }
                         }
-                        Point center = centerPoints[mPixels[0].y][mPixels[0].x];
+                        Point center1 = centerPoints[mPixels[0].y][mPixels[0].x];
                         Point center2 = centerPoints[mPixels[1].y][mPixels[1].x];
                         Point center3 = centerPoints[mPixels[2].y][mPixels[2].x];
 
-                        Imgproc.line(input, center, center2, blue, 5);
+                        Imgproc.line(input, center1, center2, blue, 5);
                         Imgproc.line(input, center2, center3, blue, 5);
-                        Imgproc.line(input, center3, center, blue, 5);
+                        Imgproc.line(input, center3, center1, blue, 5);
 
                     }
                 }
