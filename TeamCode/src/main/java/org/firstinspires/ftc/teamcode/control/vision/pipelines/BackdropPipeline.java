@@ -71,8 +71,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             isRed = true,
             showGraphics = true,
             showSamples = false,
-            showBackground = false,
-            blur = false;
+            showBackground = false;
 
     private static final double
             SCREEN_HEIGHT = 1280,
@@ -92,7 +91,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 10,
             X_SHIFT_U = 169.0,
             Y_SHIFT_U = -991.25,
-            BLUR = 10,
             fx = 1430,
             fy = 1430,
             cx = 480,
@@ -378,21 +376,15 @@ public class BackdropPipeline extends OpenCvPipeline {
     private void saveBackdropColors(Mat input, double blackVal, double valBoost) {
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
-        if (blur) {
-            Imgproc.blur(input, input, new Size(BLUR, BLUR));
-        }
-
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
             double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
 
             Pixel.Color c = hsvToColor(color);
-            if (c != INVALID && c != backdrop.get(x, y).color) {
-                backdrop.add(new Pixel(x, y, c));
-            }
-
-            telemetry.addLine("(" + x + ", " + y + "), " + backdrop.get(x, y).color.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+            telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+            if (c == INVALID || c == backdrop.get(x, y).color) continue;
+            backdrop.add(new Pixel(x, y, c));
         }
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
