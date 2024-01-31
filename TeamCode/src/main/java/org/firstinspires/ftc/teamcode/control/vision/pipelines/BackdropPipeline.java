@@ -78,7 +78,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             isRed = true,
             showGraphics = true,
             showSamples = false,
-            background = false;
+            showBackground = false,
+            blur = false;
 
     public double
             X_TOP_LEFT_R_TAG = 536.25,
@@ -287,6 +288,11 @@ public class BackdropPipeline extends OpenCvPipeline {
             double valBoost = 1.0 / (whiteVal - blackVal);
 
             warpToFitGrid(input, blackVal, valBoost);
+            
+            if (blur) {
+                double blur = 25;
+                Imgproc.blur(input, input, new Size(blur, blur));
+            }
 
             for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
                 if (x == 0 && y % 2 == 0) continue;
@@ -326,7 +332,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             if (showGraphics) {
-                if (background) {
+                if (showBackground) {
                     MatOfPoint background = new MatOfPoint(
                             CORNER_TL,
                             CORNER_TR,
