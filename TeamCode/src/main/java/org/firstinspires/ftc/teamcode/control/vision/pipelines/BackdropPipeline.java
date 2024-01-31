@@ -162,6 +162,9 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         this.telemetry = telemetry;
         this.backdrop = backdrop;
+
+        generateCenterPoints();
+        generateSamplePoints();
     }
 
     public BackdropPipeline(Telemetry telemetry) {
@@ -225,9 +228,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             warpImageToStraightenBackdrop(input, minInd, maxInd);
-
-            generateCenterPoints();
-            generateSamplePoints();
 
             Point whiteSample = new Point(
                     getLeftX(tags.get(maxInd).id) + X_SHIFT_WHITE,
