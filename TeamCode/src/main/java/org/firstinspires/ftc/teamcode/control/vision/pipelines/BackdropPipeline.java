@@ -65,14 +65,6 @@ import java.util.ArrayList;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 720;
-
-    public static final Point
-            CORNER_TL = new Point(0, 0),
-            CORNER_TR = new Point(SCREEN_WIDTH, 0),
-            CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
-            CORNER_BL = new Point(0, SCREEN_HEIGHT);
-
     public boolean
             backdropVisible = false,
             isRed = true,
@@ -81,7 +73,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             showBackground = false,
             blur = false;
 
-    public double
+    private static final double
+            SCREEN_HEIGHT = 1280,
+            SCREEN_WIDTH = 720,
             X_TOP_LEFT_R_TAG = 536.25,
             Y_TOP_LEFT = 1053.9285714285713,
             TARGET_SIZE = 65,
@@ -97,6 +91,12 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 10,
             X_SHIFT_U = 169.0,
             Y_SHIFT_U = -991.25;
+
+    private static final Point
+            CORNER_TL = new Point(0, 0),
+            CORNER_TR = new Point(SCREEN_WIDTH, 0),
+            CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
+            CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -470,13 +470,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                 targetPixels[2]
         );
 
-//        Imgproc.line(input, source[0], source[1], blue, 3);
-//        Imgproc.line(input, source[1], source[2], blue, 3);
-//        Imgproc.line(input, source[2], source[0], blue, 3);
-//
-//        Imgproc.line(input, targetPixels[0], targetPixels[1], blue, 3);
-//        Imgproc.line(input, targetPixels[1], targetPixels[2], blue, 3);
-//        Imgproc.line(input, targetPixels[2], targetPixels[0], blue, 3);
+//        Imgproc.line(input, source[0], targetPixels[0], blue, 3);
 
         Mat transformMatrix = Imgproc.getAffineTransform(src, dst);
         src.release();
