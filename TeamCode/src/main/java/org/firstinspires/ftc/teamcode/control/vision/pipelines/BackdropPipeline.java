@@ -92,6 +92,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_BLACK = 10,
             X_SHIFT_U = 169.0,
             Y_SHIFT_U = -991.25,
+            BLUR = 10,
             fx = 1430,
             fy = 1430,
             cx = 480,
@@ -246,14 +247,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
             double blackVal = getValue(input, blackSample);
-            telemetry.addLine("Black value: " + blackVal);
-
             double whiteVal = getValue(input, whiteSample);
-            telemetry.addLine("White value: " + whiteVal);
-
-            double[] out = getHSV(input, outSample);
-            telemetry.addLine(out[0] + ", " + out[1] + ", " + out[2]);
-
             double valBoost = 1.0 / (whiteVal - blackVal);
             if (isNaN(valBoost)) valBoost = 1;
 
@@ -263,18 +257,12 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             saveBackdropColors(input, blackVal, valBoost);
 
-            if (showSamples) {
-                drawSamplingMarkers(
-                        input,
-                        tagTR,
-                        tagBL,
-                        tagTL,
-                        tagBR,
-                        whiteSample,
-                        blackSample,
-                        outSample
-                );
-            }
+            if (showSamples) drawSamplingMarkers(
+                    input,
+                    whiteSample,
+                    blackSample,
+                    outSample
+            );
 
             if (showGraphics) drawGraphics(input);
         }
@@ -368,7 +356,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
     }
 
-    private void drawSamplingMarkers(Mat input, Point tagTR, Point tagBL, Point tagTL, Point tagBR, Point whiteSample, Point blackSample, Point outSample) {
+    private void drawSamplingMarkers(Mat input, Point... pointSamples) {
         for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
             drawBlueSquare(input, point);
         }
@@ -377,7 +365,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             for (Point point : pair) drawBlueSquare(input, point);
         }
 
-        for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
+        for (Point point : pointSamples) {
             Imgproc.drawMarker(input, point, green, 2, 3);
         }
 
@@ -391,8 +379,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
         if (blur) {
-            double blur = 25;
-            Imgproc.blur(input, input, new Size(blur, blur));
+            Imgproc.blur(input, input, new Size(BLUR, BLUR));
         }
 
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
