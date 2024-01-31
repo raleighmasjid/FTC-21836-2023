@@ -470,7 +470,9 @@ public class BackdropPipeline extends OpenCvPipeline {
                 targetPixels[2]
         );
 
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
 //        Imgproc.line(input, source[0], targetPixels[0], blue, 3);
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
         Mat transformMatrix = Imgproc.getAffineTransform(src, dst);
         src.release();
