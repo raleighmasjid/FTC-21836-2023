@@ -383,7 +383,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private void warpToFitGrid(Mat input, double blackVal, double valBoost) {
         Point[] target = {
-                new Point(), // tr =
                 new Point(), // tl =
                 new Point(), // br =
                 new Point()  // bl =
@@ -401,20 +400,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             target[0].y = y;
         }
 
-        for (int y = 0; y < centerPoints.length; y++) for (int x = centerPoints[y].length - 1; x >= 0; x--) {
-            if (x == 0 && y % 2 == 0) continue;
-
-            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
-            switch (color) {
-                case EMPTY: case INVALID: continue;
-            }
-
-            if (x == target[0].x && y == target[0].y) continue;
-
-            target[1].x = x;
-            target[1].y = y;
-        }
-
         a:
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
@@ -424,8 +409,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 case EMPTY: case INVALID: continue;
             }
 
-            target[3].x = x;
-            target[3].y = y;
+            target[2].x = x;
+            target[2].y = y;
             break a;
         }
 
@@ -438,32 +423,27 @@ public class BackdropPipeline extends OpenCvPipeline {
                 case EMPTY: case INVALID: continue;
             }
 
-            if (x == target[3].x && y == target[3].y) continue;
+            if (x == target[2].x && y == target[2].y) continue;
 
-            target[2].x = x;
-            target[2].y = y;
+            target[1].x = x;
+            target[1].y = y;
             break b;
         }
 
-        for (Point p : new Point[]{target[0], target[1], target[2], target[3]}) {
+        for (Point p : new Point[]{target[0], target[1], target[2]}) {
             telemetry.addLine("(" + p.x + ", " + p.y + ")");
         }
         boolean valid = !(
                 target[1].equals(target[0]) ||
                 target[1].equals(target[2]) ||
-                target[1].equals(target[3]) ||
-
-                target[0].equals(target[2]) ||
-                target[0].equals(target[3]) ||
-
-                target[2].equals(target[3])
+                target[0].equals(target[2])
         );
         telemetry.addLine("Valid: " + valid);
 
         Point[] source = {
-                findCenter(target[1]),
-                coordToPoint(target[2]),
-                coordToPoint(target[3])
+                findCenter(target[0]),
+                coordToPoint(target[1]),
+                coordToPoint(target[2])
         };
 
         MatOfPoint2f src = new MatOfPoint2f(
@@ -473,9 +453,9 @@ public class BackdropPipeline extends OpenCvPipeline {
         );
 
         Point[] targetPixels = {
+                coordToPoint(target[0]),
                 coordToPoint(target[1]),
-                coordToPoint(target[2]),
-                coordToPoint(target[3])
+                coordToPoint(target[2])
         };
 
         MatOfPoint2f dst = new MatOfPoint2f(
@@ -487,7 +467,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 //        Imgproc.line(input, source[0], source[1], blue, 3);
 //        Imgproc.line(input, source[1], source[2], blue, 3);
 //        Imgproc.line(input, source[2], source[0], blue, 3);
-
+//
 //        Imgproc.line(input, targetPixels[0], targetPixels[1], blue, 3);
 //        Imgproc.line(input, targetPixels[1], targetPixels[2], blue, 3);
 //        Imgproc.line(input, targetPixels[2], targetPixels[0], blue, 3);
@@ -519,7 +499,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
 
         Mat circles = new Mat();
-        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 2, 500, 1, .5, 5, -1);
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500, 1, .6, 5, -1);
         region.release();
 
         if (circles.size().width > 0) {
