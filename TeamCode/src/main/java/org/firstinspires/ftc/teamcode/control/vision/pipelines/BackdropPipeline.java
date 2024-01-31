@@ -470,9 +470,19 @@ public class BackdropPipeline extends OpenCvPipeline {
                 targetPixels[2]
         );
 
-//        Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
-//        Imgproc.line(input, source[0], targetPixels[0], blue, 3);
-//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+        boolean warp = true;
+
+        if (!warp) {
+            Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+            Imgproc.line(input, source[0], source[1], blue, 3);
+            Imgproc.line(input, source[1], source[2], blue, 3);
+            Imgproc.line(input, source[2], source[0], blue, 3);
+            Imgproc.line(input, targetPixels[0], targetPixels[1], blue, 3);
+            Imgproc.line(input, targetPixels[1], targetPixels[2], blue, 3);
+            Imgproc.line(input, targetPixels[2], targetPixels[0], blue, 3);
+            Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+            return;
+        }
 
         Mat transformMatrix = Imgproc.getAffineTransform(src, dst);
         src.release();
