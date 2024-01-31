@@ -30,10 +30,9 @@ public class BackdropScanner {
                 hardwareMap.get(WebcamName.class, "camera back"),
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
         );
-        pipeline = new BackdropPipeline(mTelemetry);
+        pipeline = new BackdropPipeline(mTelemetry, autonBackdrop);
         pipeline.isRed = isRed;
         pipeline.showGraphics = false;
-        pipeline.backdrop = autonBackdrop;
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
