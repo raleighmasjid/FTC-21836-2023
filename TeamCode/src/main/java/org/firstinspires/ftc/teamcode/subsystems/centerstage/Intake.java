@@ -119,7 +119,7 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
-    private boolean pixelsTransferred = false, climbing = false;
+    private boolean pixelsTransferred = false, vertical = false;
     private int requiredIntakingAmount = 2;
     private double motorPower = 0;
 
@@ -283,7 +283,7 @@ public final class Intake {
         }
 
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET + (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) + height.deltaTheta + (climbing ? ANGLE_PIVOT_CLIMBING : 0),
+                ANGLE_PIVOT_OFFSET + (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) + height.deltaTheta + (vertical ? ANGLE_PIVOT_CLIMBING : 0),
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
         latch.updateAngles(
@@ -317,8 +317,12 @@ public final class Intake {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
     }
 
-    public void toggleClimbing() {
-        climbing = !climbing;
+    public void toggleVertical() {
+        setVertical(!vertical);
+    }
+
+    public void setVertical(boolean vertical) {
+        this.vertical = vertical;
     }
 
     void printTelemetry() {

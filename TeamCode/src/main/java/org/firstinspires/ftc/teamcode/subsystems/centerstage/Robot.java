@@ -89,6 +89,8 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 
+        intake.setVertical(deposit.lift.isExtended());
+
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
         drone.run();

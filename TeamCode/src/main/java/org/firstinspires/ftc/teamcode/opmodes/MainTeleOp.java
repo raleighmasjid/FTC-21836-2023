@@ -110,7 +110,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
             if (keyPressed(2, X))               robot.intake.setRequiredIntakingAmount(1);
             if (keyPressed(2, A))               robot.intake.setRequiredIntakingAmount(0);
-            if (keyPressed(2, B))               robot.intake.toggleClimbing();
+            if (keyPressed(2, B))               robot.intake.toggleVertical();
         } else {
             if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
             else if (keyPressed(2, DPAD_UP))    robot.deposit.lift.changeRow(1);
