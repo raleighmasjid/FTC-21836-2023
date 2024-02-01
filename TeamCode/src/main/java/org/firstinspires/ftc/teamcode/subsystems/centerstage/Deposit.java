@@ -97,7 +97,7 @@ public final class Deposit {
                 kG = 0.15,
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
-                HEIGHT_CLIMBING = 7,
+                HEIGHT_CLIMBING = 6.25,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
