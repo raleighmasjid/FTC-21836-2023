@@ -255,8 +255,8 @@ public final class Deposit {
             pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
-        public void dropPixels(int numToDrop) {
-            pixelsLocked = clip(pixelsLocked - numToDrop, 0, 2);
+        public void dropPixel() {
+            pixelsLocked = clip(pixelsLocked - 1, 0, 2);
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;

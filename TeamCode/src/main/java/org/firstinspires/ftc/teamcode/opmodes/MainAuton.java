@@ -162,7 +162,7 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
                 .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixels(1);
+                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
                 })
                 .waitSeconds(TIME_DROP_FIRST)
@@ -172,7 +172,7 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .lineToConstantHeading(toPose2d(second).vec())
                 .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixels(2);
+                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(second);
                 })
                 .waitSeconds(TIME_DROP_SECOND)
@@ -292,7 +292,7 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .waitSeconds(TIME_PRE_YELLOW)
                         .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(1);
+                            robot.deposit.paintbrush.dropPixel();
                             autonBackdrop.add(placements.get(0));
                         })
                         .waitSeconds(TIME_DROP_SECOND)

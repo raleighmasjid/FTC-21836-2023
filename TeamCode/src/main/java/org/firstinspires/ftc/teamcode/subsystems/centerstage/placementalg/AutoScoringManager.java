@@ -174,7 +174,7 @@ public final class AutoScoringManager {
                                 })
                                 .lineToSplineHeading(scoringPos2)
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
                                 })
@@ -185,7 +185,7 @@ public final class AutoScoringManager {
                                 })
                                 .lineToSplineHeading(scoringPos1)
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(1);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[0]);
                                 })
                                 .waitSeconds(TIME_DROP_FIRST)
@@ -194,7 +194,7 @@ public final class AutoScoringManager {
                                 })
                                 .lineToConstantHeading(scoringPos2.vec())
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
                                 })
