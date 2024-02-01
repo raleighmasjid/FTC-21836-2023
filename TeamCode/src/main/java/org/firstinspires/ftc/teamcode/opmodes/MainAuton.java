@@ -103,14 +103,14 @@ public final class MainAuton extends LinearOpMode {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-                    robot.intake.toggleVertical();
+                    robot.intake.setVertical(true);
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-                    robot.intake.toggleVertical();
+                    robot.intake.setVertical(false);
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
