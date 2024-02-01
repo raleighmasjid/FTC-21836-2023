@@ -103,11 +103,10 @@ public final class Deposit {
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
         private State currentState, targetState;
-        private int targetRow;
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
-        private double lastKp = pidGains.kP, manualLiftPower = 0;
+        private double lastKp = pidGains.kP, manualLiftPower, targetRow;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -134,7 +133,7 @@ public final class Deposit {
             return targetRow > -1;
         }
 
-        public void setTargetRow(int targetRow) {
+        public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
             targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT));
             controller.setTarget(targetState);
