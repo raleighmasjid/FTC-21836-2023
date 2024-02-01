@@ -6,6 +6,7 @@ import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -47,7 +48,7 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        if (paintbrush.pivot.isActivated() != lift.isExtended()) {
+        if (lift.targetRow != HEIGHT_CLIMBING) {
             paintbrush.pivot.setActivated(lift.isExtended());
         }
 
