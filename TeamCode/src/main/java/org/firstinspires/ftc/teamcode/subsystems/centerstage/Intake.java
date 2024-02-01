@@ -44,7 +44,7 @@ public final class Intake {
             ANGLE_PIVOT_OFFSET = 11,
             ANGLE_PIVOT_FLOOR_CLEARANCE = 5,
             ANGLE_PIVOT_TRANSFERRING = 196.1,
-            ANGLE_PIVOT_CLIMBING = 50,
+            ANGLE_PIVOT_VERTICAL = 50,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
@@ -286,7 +286,7 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET +
                         (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) +
                         height.deltaTheta +
-                        ((vertical && fromHSV(bottomSensor.getHSV()) == EMPTY) ? ANGLE_PIVOT_CLIMBING : 0),
+                        ((vertical && fromHSV(bottomSensor.getHSV()) == EMPTY) ? ANGLE_PIVOT_VERTICAL : 0),
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
         latch.updateAngles(
