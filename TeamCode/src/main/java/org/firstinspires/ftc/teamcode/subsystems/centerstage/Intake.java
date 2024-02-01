@@ -320,7 +320,7 @@ public final class Intake {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
     }
 
-    public void setVertical(boolean vertical) {
+    void setVertical(boolean vertical) {
         this.vertical = vertical;
     }
 
