@@ -77,6 +77,7 @@ public final class MainAuton extends LinearOpMode {
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
+            TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             TIME_PRE_YELLOW = 0.5,
@@ -282,7 +283,10 @@ public final class MainAuton extends LinearOpMode {
                 sequence.splineTo(spike.vec(), spike.getHeading());
             }
 
-            sequence.addTemporalMarker(spikeServo::toggle);
+            sequence
+                    .addTemporalMarker(spikeServo::toggle)
+                    .waitSeconds(TIME_SPIKE)
+            ;
 
             if (backdropSide) {
 
