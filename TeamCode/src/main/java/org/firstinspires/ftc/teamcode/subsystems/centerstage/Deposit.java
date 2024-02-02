@@ -48,12 +48,8 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        if (lift.targetRow != HEIGHT_CLIMBING) {
-            paintbrush.pivot.setActivated(lift.isExtended());
-        }
-
         lift.run();
-
+        paintbrush.pivot.setActivated(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING);
         paintbrush.run();
     }
 
