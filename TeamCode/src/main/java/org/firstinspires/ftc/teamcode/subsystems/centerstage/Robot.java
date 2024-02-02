@@ -86,7 +86,7 @@ public final class Robot {
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.colors);
-            if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
+            if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.colors);
         }
 
         intake.setVertical(deposit.lift.isExtended());

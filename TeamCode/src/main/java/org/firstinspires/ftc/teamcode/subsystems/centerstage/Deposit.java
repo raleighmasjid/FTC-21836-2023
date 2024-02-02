@@ -207,7 +207,7 @@ public final class Deposit {
         private final ElapsedTime timer = new ElapsedTime();
         private boolean droppedPixel = true;
         private int pixelsLocked = 0;
-        private final Pixel.Color[] colors = {EMPTY, EMPTY};
+        final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
@@ -232,10 +232,6 @@ public final class Deposit {
 
         int getPixelsLocked() {
             return pixelsLocked;
-        }
-
-        Pixel.Color[] getColors() {
-            return colors;
         }
 
         void lockPixels(Pixel.Color... colors) {
