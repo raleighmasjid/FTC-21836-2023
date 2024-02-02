@@ -87,7 +87,7 @@ public final class Pixel implements Comparable<Pixel> {
 
     private String userFriendlyX() {
         switch (x) {
-            case 0: return y % 2 == 0 ? "UNKNOWN" : "FAR LEFT";
+            case 0: return "FAR LEFT";
             case 1: return y % 2 == 0 ? "FAR LEFT" : "ALMOST FAR LEFT";
             case 2: return y % 2 == 0 ? "ALMOST FAR LEFT" : "LEFT OF CENTER";
             case 3: return y % 2 == 0 ? "CENTER LEFT" : "DEAD CENTER";
