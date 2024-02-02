@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_BLUE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_RED;
@@ -45,14 +46,14 @@ public final class AutoScoringManager {
     private volatile Backdrop lastScan;
     private volatile ArrayList<Pixel> optimalPlacements;
 
-    private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, Pixel.Color.EMPTY), new Pixel(-2, 0, Pixel.Color.EMPTY)};
-    private final Pixel.Color[] colorsNeeded = {Pixel.Color.EMPTY, Pixel.Color.EMPTY};
+    private final Pixel[] placements = new Pixel[]{new Pixel(-2, 0, EMPTY), new Pixel(-2, 0, EMPTY)};
+    private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
     private volatile TrajectorySequence scoringTrajectory = null;
     private volatile boolean trajectoryReady = false;
 
     private final Robot robot;
     private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, runThread = true;
-    private volatile Pixel.Color[] depositColors = {Pixel.Color.EMPTY, Pixel.Color.EMPTY};
+    private volatile Pixel.Color[] depositColors = {EMPTY, EMPTY};
 
     public AutoScoringManager(HardwareMap hardwareMap, Robot robot) {
         this.robot = robot;
@@ -135,12 +136,12 @@ public final class AutoScoringManager {
 
         Pixel.Color firstColor = depositColors[0], secondColor = depositColors[1];
 
-        if (firstColor == Pixel.Color.EMPTY && secondColor == Pixel.Color.EMPTY) return false;
+        if (firstColor == EMPTY && secondColor == EMPTY) return false;
 
-        placements[0] = new Pixel((isRed ? -2 : 9), 0, Pixel.Color.EMPTY);
-        placements[1] = new Pixel((isRed ? -2 : 9), 0, Pixel.Color.EMPTY);
+        placements[0] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
+        placements[1] = new Pixel((isRed ? -2 : 9), 0, EMPTY);
 
-        if (firstColor != Pixel.Color.EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+        if (firstColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (firstColor.matches(pixel.color)) {
 
                 optimalPlacementsCopy = PlacementCalculator.getOptimalPlacementsWithExtraWhites(
@@ -152,7 +153,7 @@ public final class AutoScoringManager {
                 break;
             }
         }
-        if (secondColor != Pixel.Color.EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
+        if (secondColor != EMPTY) for (Pixel pixel : optimalPlacementsCopy) {
             if (secondColor.matches(pixel.color)) {
 
                 placements[1] = new Pixel(pixel, secondColor);
@@ -166,14 +167,14 @@ public final class AutoScoringManager {
         boolean sameScoringLocation = scoringPos1.epsilonEqualsHeading(scoringPos2);
 
         scoringTrajectory =
-                firstColor == Pixel.Color.EMPTY || sameScoringLocation ?
+                firstColor == EMPTY || sameScoringLocation ?
                         robot.drivetrain.trajectorySequenceBuilder(startPose.byAlliance().toPose2d())
                                 .addTemporalMarker(() -> {
                                     robot.deposit.lift.setTargetRow(placements[1].y);
                                 })
                                 .lineToSplineHeading(scoringPos2)
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
                                 })
@@ -184,7 +185,7 @@ public final class AutoScoringManager {
                                 })
                                 .lineToSplineHeading(scoringPos1)
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(1);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[0]);
                                 })
                                 .waitSeconds(TIME_DROP_FIRST)
@@ -193,7 +194,7 @@ public final class AutoScoringManager {
                                 })
                                 .lineToConstantHeading(scoringPos2.vec())
                                 .addTemporalMarker(() -> {
-                                    robot.deposit.paintbrush.dropPixels(2);
+                                    robot.deposit.paintbrush.dropPixel();
                                     latestScan.add(placements[1]);
                                     trajectoryReady = false;
                                 })
@@ -208,8 +209,8 @@ public final class AutoScoringManager {
     private void calculateColorsNeeded() {
         optimalPlacements = PlacementCalculator.getOptimalPlacementsWithExtraWhites(latestScan);
 
-        colorsNeeded[0] = Pixel.Color.EMPTY;
-        colorsNeeded[1] = Pixel.Color.EMPTY;
+        colorsNeeded[0] = EMPTY;
+        colorsNeeded[1] = EMPTY;
         if (!optimalPlacements.isEmpty()) {
             Pixel optimalPlacement = optimalPlacements.get(0);
 

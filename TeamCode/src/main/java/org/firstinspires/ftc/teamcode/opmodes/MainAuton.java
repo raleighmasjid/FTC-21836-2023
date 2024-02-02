@@ -17,6 +17,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
+import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
@@ -36,6 +37,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
 
 import java.util.ArrayList;
@@ -75,6 +77,7 @@ public final class MainAuton extends LinearOpMode {
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
+            TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             TIME_PRE_YELLOW = 0.5,
@@ -84,7 +87,9 @@ public final class MainAuton extends LinearOpMode {
             X_BACKDROP = 52,
             Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
-            WIDTH_PIXEL = 3.7;
+            WIDTH_PIXEL = 3.7,
+            ANGLE_SPIKE_LOCKED = 90,
+            ANGLE_SPIKE_RELEASED = 0;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -103,14 +108,14 @@ public final class MainAuton extends LinearOpMode {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-                    robot.intake.toggleClimbing();
+                    robot.intake.setRequiredIntakingAmount(0);
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-                    robot.intake.toggleClimbing();
+                    robot.intake.setRequiredIntakingAmount(2);
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
@@ -162,7 +167,7 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
                 .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixels(1);
+                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
                 })
                 .waitSeconds(TIME_DROP_FIRST)
@@ -172,7 +177,7 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .lineToConstantHeading(toPose2d(second).vec())
                 .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixels(2);
+                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(second);
                 })
                 .waitSeconds(TIME_DROP_SECOND)
@@ -214,14 +219,17 @@ public final class MainAuton extends LinearOpMode {
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
             mTelemetry.update();
         }
-        mTelemetry.addLine("Confirmed " + (isRed ? "RED" : "BLUE") + " " + (backdropSide ? "BACKDROP" : "AUDIENCE") + " side");
-        mTelemetry.update();
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
 
         PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        SimpleServoPivot spikeServo = new SimpleServoPivot(
+                ANGLE_SPIKE_LOCKED,
+                ANGLE_SPIKE_RELEASED,
+                getGoBildaServo(hardwareMap, "floor pixel")
+        );
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
@@ -275,6 +283,11 @@ public final class MainAuton extends LinearOpMode {
                 sequence.splineTo(spike.vec(), spike.getHeading());
             }
 
+            sequence
+                    .addTemporalMarker(spikeServo::toggle)
+                    .waitSeconds(TIME_SPIKE)
+            ;
+
             if (backdropSide) {
 
                 Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
@@ -294,7 +307,7 @@ public final class MainAuton extends LinearOpMode {
                 sequence
                         .waitSeconds(TIME_PRE_YELLOW)
                         .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixels(1);
+                            robot.deposit.paintbrush.dropPixel();
                             autonBackdrop.add(placements.get(0));
                         })
                         .waitSeconds(TIME_DROP_SECOND)
@@ -368,6 +381,9 @@ public final class MainAuton extends LinearOpMode {
         }
 
         while (opModeInInit()) {
+            spikeServo.updateAngles(ANGLE_SPIKE_LOCKED, ANGLE_SPIKE_RELEASED);
+            spikeServo.run();
+
             mTelemetry.addData("Location", (location = detector.run()).name());
             mTelemetry.update();
             robot.drone.run();
@@ -379,6 +395,7 @@ public final class MainAuton extends LinearOpMode {
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
             robot.readSensors();
+            spikeServo.run();
             robot.run();
 
             autonEndPose = robot.drivetrain.getPoseEstimate();

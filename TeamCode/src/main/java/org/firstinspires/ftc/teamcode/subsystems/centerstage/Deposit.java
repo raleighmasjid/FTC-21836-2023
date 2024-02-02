@@ -6,6 +6,7 @@ import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -47,7 +48,7 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        if (paintbrush.pivot.isActivated() != lift.isExtended()) {
+        if (lift.targetRow != HEIGHT_CLIMBING) {
             paintbrush.pivot.setActivated(lift.isExtended());
         }
 
@@ -96,6 +97,7 @@ public final class Deposit {
                 kG = 0.15,
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
+                HEIGHT_CLIMBING = 6.25,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
@@ -103,11 +105,10 @@ public final class Deposit {
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
         private State currentState, targetState;
-        private int targetRow;
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
-        private double lastKp = pidGains.kP, manualLiftPower = 0;
+        private double lastKp = pidGains.kP, manualLiftPower, targetRow;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -134,7 +135,7 @@ public final class Deposit {
             return targetRow > -1;
         }
 
-        public void setTargetRow(int targetRow) {
+        public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
             targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT));
             controller.setTarget(targetState);
@@ -255,8 +256,8 @@ public final class Deposit {
             pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
-        public void dropPixels(int numToDrop) {
-            pixelsLocked = clip(pixelsLocked - numToDrop, 0, 2);
+        public void dropPixel() {
+            pixelsLocked = clip(pixelsLocked - 1, 0, 2);
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;

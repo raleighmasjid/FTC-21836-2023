@@ -89,15 +89,18 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.getColors());
         }
 
+        intake.setVertical(deposit.lift.isExtended());
+
         deposit.run();
         intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
         drone.run();
 
-        for (LEDIndicator indicator : indicators) indicator.setState(
+        LEDIndicator.State ledColor =
                 drivetrain.isBusy() ? RED :
                 autoScoringManager != null && autoScoringManager.trajectoryReady() ? GREEN :
-                OFF
-        );
+                OFF;
+
+        for (LEDIndicator indicator : indicators) indicator.setState(ledColor);
     }
 
     public void printTelemetry() {
