@@ -226,16 +226,16 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_1_SETTLING || requiredIntakingAmount == 0)
+                if ((timer.seconds() >= TIME_PIXEL_1_SETTLING && fromHSV(topSensor.getHSV()) == EMPTY) || requiredIntakingAmount == 0) {
                     state = HAS_1_PIXEL;
-                else break;
+                } else break;
 
             case HAS_1_PIXEL:
 
                 topHSV = topSensor.getHSV();
                 colors[1] = fromHSV(topHSV);
                 boolean topFull = !(colors[1] == EMPTY);
-                if (topFull || requiredIntakingAmount <= 1) {
+                if (topFull || requiredIntakingAmount < 2) {
                     if (topFull) decrementHeight();
                     latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
