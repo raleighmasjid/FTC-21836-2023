@@ -141,15 +141,11 @@ public final class Pixel implements Comparable<Pixel> {
                 case GREEN:
                     if (printInColor) return "\u001B[32m" + "G" + RESET;
                 case WHITE:
-                case ANY:
-                    return "" + name().charAt(0);
-                case ANYCOLOR:
-                    return "C";
-                case INVALID:
-                    return " ";
+                case ANY: return "" + name().charAt(0);
+                case ANYCOLOR: return "C";
+                case INVALID: return " ";
                 case EMPTY:
-                default:
-                    return "_";
+                default: return "_";
             }
         }
 
@@ -169,24 +165,16 @@ public final class Pixel implements Comparable<Pixel> {
          */
         public static Color fromString(String color) {
             switch (color.toUpperCase()) {
-                case "W":
-                    return WHITE;
+                case "W": return WHITE;
                 case "#":
-                case "A":
-                    return ANY;
-                case "C":
-                    return ANYCOLOR;
-                case "P":
-                    return PURPLE;
-                case "Y":
-                    return YELLOW;
-                case "G":
-                    return GREEN;
-                case " ":
-                    return INVALID;
+                case "A": return ANY;
+                case "C": return ANYCOLOR;
+                case "P": return PURPLE;
+                case "Y": return YELLOW;
+                case "G": return GREEN;
+                case " ": return INVALID;
                 case "_":
-                default:
-                    return EMPTY;
+                default: return EMPTY;
             }
         }
 
