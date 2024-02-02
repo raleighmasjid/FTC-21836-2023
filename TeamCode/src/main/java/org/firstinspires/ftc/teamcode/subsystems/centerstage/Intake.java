@@ -237,7 +237,7 @@ public final class Intake {
                 boolean topFull = !(colors[1] == EMPTY);
                 if (topFull || requiredIntakingAmount <= 1) {
                     if (topFull) decrementHeight();
-                    if (requiredIntakingAmount > 0) latch.setActivated(true);
+                    latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
                     timer.reset();
                 } else break;
