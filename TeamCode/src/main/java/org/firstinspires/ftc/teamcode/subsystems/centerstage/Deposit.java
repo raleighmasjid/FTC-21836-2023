@@ -151,10 +151,7 @@ public final class Deposit {
 
         private void run() {
 
-            if (manualLiftPower != 0) {
-                targetState = currentState;
-                controller.setTarget(targetState);
-            }
+            if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
 
 //            if (lastKp != pidGains.kP) {
 //                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
