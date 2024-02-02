@@ -154,10 +154,10 @@ public final class Pixel implements Comparable<Pixel> {
 
         public String humanInstruction() {
             switch (this) {
-                case WHITE: return "0";
+                case WHITE:
                 case PURPLE:
                 case YELLOW:
-                case GREEN: return "" + (ordinal() + 1);
+                case GREEN: return "" + (ordinal() + 1) % 4;
                 default: return "";
             }
         }
