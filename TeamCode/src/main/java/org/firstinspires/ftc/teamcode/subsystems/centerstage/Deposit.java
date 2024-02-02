@@ -133,8 +133,12 @@ public final class Deposit {
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT));
+            targetState = new State(rowToInches(targetRow));
             controller.setTarget(targetState);
+        }
+
+        private static double rowToInches(double row) {
+            return row == -1 ? 0 : (row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT);
         }
 
         public void changeRow(int deltaRow) {
