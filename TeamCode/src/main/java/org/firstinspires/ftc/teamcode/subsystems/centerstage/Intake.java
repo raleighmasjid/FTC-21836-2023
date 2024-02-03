@@ -69,7 +69,7 @@ public final class Intake {
                     0.05
             ),
             maxWhite = new HSV(
-                    0,
+                    360,
                     0.6,
                     0.45
             ),
@@ -204,7 +204,7 @@ public final class Intake {
                 hsv.between(minPurple, maxPurple) ? PURPLE :
                 hsv.between(minGreen, maxGreen) ? GREEN :
                 hsv.between(minYellow, maxYellow) ? YELLOW :
-                new HSV(0, hsv.saturation, hsv.value).between(minWhite, maxWhite) ? WHITE :
+                hsv.between(minWhite, maxWhite) ? WHITE :
                 EMPTY;
     }
 
