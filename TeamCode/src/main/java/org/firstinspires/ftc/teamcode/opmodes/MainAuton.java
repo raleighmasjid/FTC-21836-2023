@@ -16,7 +16,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Pain
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
@@ -62,6 +61,17 @@ public final class MainAuton extends LinearOpMode {
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
+    }
+
+    /**
+     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
+     */
+    public static Pose2d toPose2d(Pixel pixel) {
+        return new Pose2d(
+                MainAuton.X_BACKDROP,
+                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                PI
+        );
     }
 
     public static double
