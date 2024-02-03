@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = true;
+    static boolean isRed = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -67,7 +67,8 @@ public class MainAuton {
             Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
             WIDTH_PIXEL = 3.7,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH = 5;
+            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
+            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -169,7 +170,7 @@ public class MainAuton {
         boolean partnerWillDoRand = false;
         boolean doCycles = false;
 
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(rand.x1, 0, YELLOW),
                 new Pixel(1, 0, WHITE),
@@ -213,6 +214,7 @@ public class MainAuton {
                         boolean outer =
                                 (isRed && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
                                 (!isRed && (rand == PropDetectPipeline.Randomization.LEFT));
+
                         boolean inner =
                                 (isRed && (rand == PropDetectPipeline.Randomization.LEFT)) ||
                                 (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
@@ -234,14 +236,17 @@ public class MainAuton {
                                 })
                                 .waitSeconds(TIME_SPIKE)
                                 .setTangent(RIGHT)
-//                                .back(X_SHIFT_BACKDROP_AFTER_SPIKE)
                                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
 //                                    robot.intake.setRequiredIntakingAmount(2);
                                 })
                                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
                                 })
-                                .splineToConstantHeading(toPose2d(placements.get(0)).vec(), outer ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH : RIGHT)
+                                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
+                                        outer ?
+                                                isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
+                                                RIGHT
+                                )
                                 .waitSeconds(TIME_PRE_YELLOW)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixel();
