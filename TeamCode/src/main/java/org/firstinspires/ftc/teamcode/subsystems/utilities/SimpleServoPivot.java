@@ -37,9 +37,9 @@ public class SimpleServoPivot {
         updateAngles(ANGLE_INITIAL, ANGLE_ACTIVATED);
     }
 
-    public void updateAngles(double ANGLE_A, double ANGLE_B) {
-        this.ANGLE_INITIAL = ANGLE_A;
-        this.ANGLE_ACTIVATED = ANGLE_B;
+    public void updateAngles(double ANGLE_INITIAL, double ANGLE_ACTIVATED) {
+        this.ANGLE_INITIAL = ANGLE_INITIAL;
+        this.ANGLE_ACTIVATED = ANGLE_ACTIVATED;
     }
 
     /**
