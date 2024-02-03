@@ -293,10 +293,15 @@ public final class Intake {
                         ((vertical && fromHSV(bottomSensor.getHSV()) == EMPTY) ? ANGLE_PIVOT_VERTICAL : 0),
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
-        latch.updateAngles(
-                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING && requiredIntakingAmount > 0 ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
-                ANGLE_LATCH_LOCKED
-        );
+
+        double ANGLE_LATCH_UNLOCKED = (
+                requiredIntakingAmount > 0 &&
+                state != PIVOTING &&
+                state != PIXELS_FALLING &&
+                state != PIXELS_SETTLING
+        ) ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING;
+
+        latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
         pivot.run();
         latch.run();
