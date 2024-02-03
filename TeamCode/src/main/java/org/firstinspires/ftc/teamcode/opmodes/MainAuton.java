@@ -217,10 +217,7 @@ public final class MainAuton extends LinearOpMode {
             mTelemetry.update();
         }
 
-        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
-        robot.drivetrain.setPoseEstimate(startPose);
-
-        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, doCycles, startPose);
+        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, doCycles);
 
         PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
@@ -248,7 +245,11 @@ public final class MainAuton extends LinearOpMode {
     }
 
     @NonNull
-    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean doCycles, Pose2d startPose) {
+    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean doCycles) {
+
+        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
+        robot.drivetrain.setPoseEstimate(startPose);
+
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
