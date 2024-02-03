@@ -20,6 +20,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -218,9 +220,35 @@ public final class MainAuton extends LinearOpMode {
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
 
+        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, doCycles, startPose);
+
         PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
+        while (opModeInInit()) {
+            robot.initRun();
+
+            mTelemetry.addData("Location", (location = detector.run()).name());
+            mTelemetry.update();
+        }
+
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
+
+        // Control loop:
+        while (opModeIsActive()) {
+            // Manually clear old sensor data from the last loop:
+            robot.readSensors();
+            robot.run();
+
+            autonEndPose = robot.drivetrain.getPoseEstimate();
+            // Push telemetry data
+            robot.printTelemetry();
+            mTelemetry.update();
+        }
+    }
+
+    @NonNull
+    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean doCycles, Pose2d startPose) {
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
@@ -369,27 +397,7 @@ public final class MainAuton extends LinearOpMode {
 
             sequences[rand.ordinal()] = sequence.build();
         }
-
-        while (opModeInInit()) {
-            robot.initRun();
-
-            mTelemetry.addData("Location", (location = detector.run()).name());
-            mTelemetry.update();
-        }
-
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
-
-        // Control loop:
-        while (opModeIsActive()) {
-            // Manually clear old sensor data from the last loop:
-            robot.readSensors();
-            robot.run();
-
-            autonEndPose = robot.drivetrain.getPoseEstimate();
-            // Push telemetry data
-            robot.printTelemetry();
-            mTelemetry.update();
-        }
+        return sequences;
     }
 
     public static class EditablePose {
