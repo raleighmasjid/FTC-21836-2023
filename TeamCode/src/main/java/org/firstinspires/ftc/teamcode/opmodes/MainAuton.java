@@ -381,12 +381,11 @@ public final class MainAuton extends LinearOpMode {
         }
 
         while (opModeInInit()) {
-            spikeServo.updateAngles(ANGLE_SPIKE_LOCKED, ANGLE_SPIKE_RELEASED);
             spikeServo.run();
+            robot.drone.run();
 
             mTelemetry.addData("Location", (location = detector.run()).name());
             mTelemetry.update();
-            robot.drone.run();
         }
 
         robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
