@@ -25,14 +25,16 @@ public final class Robot {
             maxVoltage = 13,
             TIME_TRAJECTORY_GEN = 0,
             ANGLE_DRONE_INITIAL = 50,
-            ANGLE_DRONE_LAUNCHED = 0;
+            ANGLE_DRONE_LAUNCHED = 0,
+            ANGLE_SPIKE_LOCKED = 90,
+            ANGLE_SPIKE_RELEASED = 0;
 
     public static boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
     public final Intake intake;
     public final Deposit deposit;
-    public final SimpleServoPivot drone;
+    public final SimpleServoPivot drone, spike;
 
     private final BulkReader bulkReader;
     private final LEDIndicator[] indicators;
@@ -51,16 +53,29 @@ public final class Robot {
                 ANGLE_DRONE_LAUNCHED,
                 getGoBildaServo(hardwareMap, "drone")
         );
+        spike = new SimpleServoPivot(
+                ANGLE_SPIKE_RELEASED,
+                ANGLE_SPIKE_LOCKED,
+                getGoBildaServo(hardwareMap, "floor pixel")
+        );
 
         indicators = new LEDIndicator[]{
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
         };
+
+        drone.run();
     }
 
     public void preload() {
         intake.setRequiredIntakingAmount(0);
         deposit.paintbrush.lockPixels(YELLOW, EMPTY);
+        spike.setActivated(true);
+    }
+
+    public void initRun() {
+        drone.run();
+        spike.run();
     }
 
     public void startAlgorithm(HardwareMap hardwareMap) {
@@ -83,6 +98,7 @@ public final class Robot {
 
     public void run() {
         drone.updateAngles(ANGLE_DRONE_INITIAL, ANGLE_DRONE_LAUNCHED);
+        spike.updateAngles(ANGLE_SPIKE_RELEASED, ANGLE_SPIKE_LOCKED);
 
         if (intake.pixelsTransferred()) {
             deposit.paintbrush.lockPixels(intake.colors);
@@ -96,6 +112,7 @@ public final class Robot {
                 deposit.lift.isExtended()
         );
         drone.run();
+        spike.run();
 
         LEDIndicator.State ledColor =
                 drivetrain.isBusy() ? RED :

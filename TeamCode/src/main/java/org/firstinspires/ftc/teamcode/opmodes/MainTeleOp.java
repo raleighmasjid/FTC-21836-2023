@@ -14,7 +14,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ANGLE_SPIKE_RELEASED;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BACKWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
@@ -30,7 +29,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.THREE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.TWO_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 
@@ -41,7 +39,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
@@ -79,11 +76,6 @@ public final class MainTeleOp extends LinearOpMode {
         robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
         if (isAutomated) robot.startAlgorithm(opMode.hardwareMap);
 
-        new SimpleServoPivot(
-                ANGLE_SPIKE_RELEASED, ANGLE_SPIKE_RELEASED,
-                getGoBildaServo(opMode.hardwareMap, "floor pixel")
-        ).run();
-
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
         gamepadEx2 = new GamepadEx(opMode.gamepad2);
@@ -100,7 +92,8 @@ public final class MainTeleOp extends LinearOpMode {
             }
             mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
-            robot.drone.run();
+
+            robot.initRun();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
         if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
@@ -112,8 +105,8 @@ public final class MainTeleOp extends LinearOpMode {
         );
 
         robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
-        if (keyPressed(2, LEFT_STICK_BUTTON)) robot.deposit.lift.reset();
-        if (keyPressed(2, RIGHT_STICK_BUTTON)) robot.drone.toggle();
+        if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
+        if (keyPressed(2, RIGHT_STICK_BUTTON))  robot.drone.toggle();
 
         if (gamepadEx2.isDown(LEFT_BUMPER)) {
             if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
@@ -133,6 +126,8 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, A))               robot.intake.setHeight(TWO_STACK);
             if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
         }
+
+        if (keyPressed(1, Y))                   robot.spike.toggle();
 
         double x = gamepadEx1.getRightX();
         if (gamepadEx1.isDown(LEFT_BUMPER)) {

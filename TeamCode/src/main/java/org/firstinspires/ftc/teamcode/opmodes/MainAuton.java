@@ -17,7 +17,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager.toPose2d;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
@@ -37,7 +36,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
 
 import java.util.ArrayList;
@@ -87,9 +85,7 @@ public final class MainAuton extends LinearOpMode {
             X_BACKDROP = 52,
             Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
-            WIDTH_PIXEL = 3.7,
-            ANGLE_SPIKE_LOCKED = 90,
-            ANGLE_SPIKE_RELEASED = 0;
+            WIDTH_PIXEL = 3.7;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -193,7 +189,6 @@ public final class MainAuton extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(hardwareMap);
         robot.preload();
-        robot.drone.run();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
@@ -225,11 +220,6 @@ public final class MainAuton extends LinearOpMode {
 
         PropDetectPipeline.Randomization location = PropDetectPipeline.Randomization.RIGHT;
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
-        SimpleServoPivot spikeServo = new SimpleServoPivot(
-                ANGLE_SPIKE_LOCKED,
-                ANGLE_SPIKE_RELEASED,
-                getGoBildaServo(hardwareMap, "floor pixel")
-        );
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
@@ -284,7 +274,7 @@ public final class MainAuton extends LinearOpMode {
             }
 
             sequence
-                    .addTemporalMarker(spikeServo::toggle)
+                    .addTemporalMarker(robot.spike::toggle)
                     .waitSeconds(TIME_SPIKE)
             ;
 
@@ -381,8 +371,7 @@ public final class MainAuton extends LinearOpMode {
         }
 
         while (opModeInInit()) {
-            spikeServo.run();
-            robot.drone.run();
+            robot.initRun();
 
             mTelemetry.addData("Location", (location = detector.run()).name());
             mTelemetry.update();
@@ -394,7 +383,6 @@ public final class MainAuton extends LinearOpMode {
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
             robot.readSensors();
-            spikeServo.run();
             robot.run();
 
             autonEndPose = robot.drivetrain.getPoseEstimate();
