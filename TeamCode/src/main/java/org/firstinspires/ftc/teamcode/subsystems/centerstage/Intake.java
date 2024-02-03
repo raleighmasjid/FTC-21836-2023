@@ -226,7 +226,7 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if ((timer.seconds() >= TIME_PIXEL_1_SETTLING && fromHSV(topSensor.getHSV()) == EMPTY) || requiredIntakingAmount == 0) {
+                if ((timer.seconds() >= TIME_PIXEL_1_SETTLING && isEmpty(topSensor)) || requiredIntakingAmount == 0) {
                     state = HAS_1_PIXEL;
                 } else break;
 
@@ -270,9 +270,7 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (fromHSV(topSensor.getHSV()) == EMPTY &&
-                    fromHSV(bottomSensor.getHSV()) == EMPTY
-                ) {
+                if (isEmpty(bottomSensor) && isEmpty(topSensor)) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
@@ -286,11 +284,14 @@ public final class Intake {
 
         }
 
+        double ANGLE_PIVOT_INTAKING =
+                vertical && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
+                height != FLOOR ? height.deltaTheta :
+                motorPower > 0 ? 0 :
+                ANGLE_PIVOT_FLOOR_CLEARANCE;
+
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET +
-                        (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) +
-                        height.deltaTheta +
-                        ((vertical && fromHSV(bottomSensor.getHSV()) == EMPTY) ? ANGLE_PIVOT_VERTICAL : 0),
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_INTAKING,
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
@@ -307,6 +308,10 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    private static boolean isEmpty(ColorSensor sensor) {
+        return fromHSV(sensor.getHSV()) == EMPTY;
     }
 
     boolean pixelsTransferred() {
