@@ -32,6 +32,17 @@ public class MainAuton {
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
 
+    /**
+     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
+     */
+    public static Pose2d toPose2d(Pixel pixel) {
+        return new Pose2d(
+                MainAuton.X_BACKDROP,
+                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                PI
+        );
+    }
+
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
@@ -45,18 +56,17 @@ public class MainAuton {
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
-            CYCLES_BACKDROP_SIDE = 0,
-            CYCLES_AUDIENCE_SIDE = 0,
+            TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 53,
-            Y_MAX_BLUE = 45.8,
+            X_BACKDROP = 52,
+            Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
-            WIDTH_PIXEL = 3.6;
+            WIDTH_PIXEL = 3.7;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
@@ -75,14 +85,14 @@ public class MainAuton {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-//                    robot.intake.toggleClimbing();
+//                    robot.intake.setRequiredIntakingAmount(0);
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-//                    robot.intake.toggleClimbing();
+//                    robot.intake.setRequiredIntakingAmount(2);
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
@@ -123,14 +133,6 @@ public class MainAuton {
         ;
     }
 
-    public static Pose2d toPose2d(Pixel pixel) {
-        return new Pose2d(
-                Backdrop.X,
-                (isRed ? Backdrop.Y_MAX_RED : Backdrop.Y_MAX_BLUE) - (pixel.x * Pixel.WIDTH) + (pixel.y % 2 == 0 ? 0.5 * Pixel.WIDTH : 0),
-                PI
-        );
-    }
-
     private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
@@ -142,7 +144,7 @@ public class MainAuton {
                 })
                 .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
                 .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixels(1);
+//                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
                 })
                 .waitSeconds(TIME_DROP_FIRST)
@@ -152,7 +154,7 @@ public class MainAuton {
                 })
                 .lineToConstantHeading(toPose2d(second).vec())
                 .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixels(2);
+//                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(second);
                 })
                 .waitSeconds(TIME_DROP_SECOND)
@@ -242,6 +244,11 @@ public class MainAuton {
                         sequence.splineTo(spike.vec(), spike.getHeading());
                     }
 
+                    sequence
+//                            .addTemporalMarker(robot.spike::toggle)
+                            .waitSeconds(TIME_SPIKE)
+                    ;
+
                     if (backdropSide) {
 
                         Pose2d afterSpike = new Pose2d(spike.getX() + X_SHIFT_BACKDROP_AFTER_SPIKE, spike.getY(), LEFT);
@@ -261,7 +268,7 @@ public class MainAuton {
                         sequence
                                 .waitSeconds(TIME_PRE_YELLOW)
                                 .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixels(1);
+//                                    robot.deposit.paintbrush.dropPixel();
                                     autonBackdrop.add(placements.get(0));
                                 })
                                 .waitSeconds(TIME_DROP_SECOND)
