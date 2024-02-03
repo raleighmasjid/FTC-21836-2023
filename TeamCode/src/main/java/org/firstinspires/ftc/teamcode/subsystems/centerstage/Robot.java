@@ -89,10 +89,12 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.colors);
         }
 
-        intake.setVertical(deposit.lift.isExtended());
-
         deposit.run();
-        intake.run(deposit.paintbrush.getPixelsLocked(), deposit.isRetracted());
+        intake.run(
+                deposit.paintbrush.getPixelsLocked(),
+                deposit.isRetracted(),
+                deposit.lift.isExtended()
+        );
         drone.run();
 
         LEDIndicator.State ledColor =

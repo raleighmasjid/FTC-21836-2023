@@ -119,7 +119,7 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
-    private boolean pixelsTransferred = false, vertical = false;
+    private boolean pixelsTransferred = false;
     private int requiredIntakingAmount = 2;
     private double motorPower = 0;
 
@@ -208,7 +208,7 @@ public final class Intake {
                 EMPTY;
     }
 
-    void run(int pixelsInDeposit, boolean depositRetracted) {
+    void run(int pixelsInDeposit, boolean depositRetracted, boolean isScoring) {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
@@ -285,7 +285,7 @@ public final class Intake {
         }
 
         double ANGLE_PIVOT_INTAKING =
-                vertical && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
+                isScoring && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
@@ -332,10 +332,6 @@ public final class Intake {
 
     public void setRequiredIntakingAmount(int pixelCount) {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
-    }
-
-    void setVertical(boolean vertical) {
-        this.vertical = vertical;
     }
 
     void printTelemetry() {
