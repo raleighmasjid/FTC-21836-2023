@@ -9,6 +9,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
+import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
@@ -16,6 +17,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Pain
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.getOtherPlacement;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
@@ -208,10 +210,13 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        int[] ourPlacements = {1, 3, 6};
+        int selectedPlacement = 0;
         boolean partnerWillDoRand = false, park = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
+            gamepadEx2.readButtons();
             if (keyPressed(1, B))           isRed = true;
             if (keyPressed(1, X))           isRed = false;
             if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
@@ -219,6 +224,20 @@ public final class MainAuton extends LinearOpMode {
             if (keyPressed(1, DPAD_UP))     park = false;
             if (keyPressed(1, DPAD_DOWN))   park = true;
             if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
+
+            if (keyPressed(2, DPAD_UP))     selectedPlacement = clip(selectedPlacement - 1, 0, 2);
+            if (keyPressed(2, DPAD_DOWN))   selectedPlacement = clip(selectedPlacement + 1, 0, 2);
+            if (keyPressed(2, X))  ourPlacements[selectedPlacement] = getOtherPlacement(ourPlacements[selectedPlacement]);
+
+            for (PropDetectPipeline.Randomization rand : randomizations) {
+                mTelemetry.addLine(
+                        rand.name() + ": " + (ourPlacements[rand.ordinal()] % 2 == 1 ? "left" : "right") +
+                        (rand.ordinal() == selectedPlacement ? " <" : "")
+                );
+            }
+            mTelemetry.addLine();
+            mTelemetry.addLine();
+
             mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE ") + (backdropSide ? "BACKDROP " : "AUDIENCE ") + "side");
             mTelemetry.addLine();
             mTelemetry.addLine("Your alliance PARTNER WILL " + (partnerWillDoRand ? "" : "NOT ") + "PLACE YELLOW");
@@ -229,7 +248,7 @@ public final class MainAuton extends LinearOpMode {
             mTelemetry.update();
         }
 
-        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, park);
+        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, park, ourPlacements);
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
@@ -256,7 +275,7 @@ public final class MainAuton extends LinearOpMode {
     }
 
     @NonNull
-    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean park) {
+    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean park, int[] ourPlacements) {
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -265,7 +284,7 @@ public final class MainAuton extends LinearOpMode {
 
         for (PropDetectPipeline.Randomization rand : randomizations) {
 
-            ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(rand, partnerWillDoRand);
+            ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(partnerWillDoRand, ourPlacements[rand.ordinal()]);
             if (partnerWillDoRand) {
                 autonBackdrop.add(placements.get(0));
                 placements.remove(0);
