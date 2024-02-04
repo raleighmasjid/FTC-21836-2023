@@ -208,7 +208,7 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
-        boolean partnerWillDoRand = false, doCycles = false;
+        boolean partnerWillDoRand = false, park = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
@@ -216,20 +216,20 @@ public final class MainAuton extends LinearOpMode {
             if (keyPressed(1, X))           isRed = false;
             if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
             if (keyPressed(1, DPAD_LEFT))   backdropSide = !isRed;
-            if (keyPressed(1, DPAD_UP))     doCycles = true;
-            if (keyPressed(1, DPAD_DOWN))   doCycles = false;
+            if (keyPressed(1, DPAD_UP))     park = false;
+            if (keyPressed(1, DPAD_DOWN))   park = true;
             if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
             mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE ") + (backdropSide ? "BACKDROP " : "AUDIENCE ") + "side");
             mTelemetry.addLine();
             mTelemetry.addLine("Your alliance PARTNER WILL " + (partnerWillDoRand ? "" : "NOT ") + "PLACE YELLOW");
             mTelemetry.addLine();
-            mTelemetry.addLine("You WILL " + (doCycles ? "CYCLE" : "PARK"));
+            mTelemetry.addLine("You WILL " + (park ? "PARK" : "CYCLE"));
             mTelemetry.addLine();
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
             mTelemetry.update();
         }
 
-        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, doCycles);
+        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, park);
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
@@ -256,7 +256,7 @@ public final class MainAuton extends LinearOpMode {
     }
 
     @NonNull
-    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean doCycles) {
+    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean park) {
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -326,7 +326,7 @@ public final class MainAuton extends LinearOpMode {
 
             }
 
-            if (!doCycles && partnerWillDoRand) {
+            if (park && partnerWillDoRand) {
                 sequence
                         .lineTo(parking.byAlliance().toPose2d().vec())
                         .lineTo(parked.byAlliance().toPose2d().vec())
