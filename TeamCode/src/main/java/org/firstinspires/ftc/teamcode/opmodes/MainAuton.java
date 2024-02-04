@@ -208,7 +208,7 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
-        boolean partnerWillDoRand = false, doCycles = true;
+        boolean partnerWillDoRand = false, doCycles = false;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
