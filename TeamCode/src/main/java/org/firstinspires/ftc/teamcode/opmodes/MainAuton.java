@@ -345,8 +345,8 @@ public final class MainAuton extends LinearOpMode {
 
             }
 
-            if (park && partnerWillDoRand) {
-                sequence
+            if (park) {
+                if (partnerWillDoRand) sequence
                         .lineTo(parking.byAlliance().toPose2d().vec())
                         .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
