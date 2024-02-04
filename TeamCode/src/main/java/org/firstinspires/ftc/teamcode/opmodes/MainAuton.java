@@ -106,8 +106,8 @@ public final class MainAuton extends LinearOpMode {
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
             centerSpike = new EditablePose(15, -23, LEFT),
-            nearTrussSpike = new EditablePose(3.4, -35, LEFT),
-            awayTrussSpike = new EditablePose(27, -32, LEFT),
+            nearTrussSpike = new EditablePose(5.4, -35, LEFT),
+            awayTrussSpike = new EditablePose(29, -32, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(36, -12, LEFT),
