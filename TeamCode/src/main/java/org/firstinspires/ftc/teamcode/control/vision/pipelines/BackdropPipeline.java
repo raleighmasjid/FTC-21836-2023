@@ -39,7 +39,9 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
+import static java.lang.Double.isNaN;
 import static java.lang.Math.round;
+import static java.lang.Math.sqrt;
 
 import androidx.annotation.NonNull;
 
@@ -52,7 +54,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -62,37 +66,47 @@ import java.util.ArrayList;
 
 public class BackdropPipeline extends OpenCvPipeline {
 
-    public static final double SCREEN_HEIGHT = 1280, SCREEN_WIDTH = 720;
+    public boolean
+            backdropVisible = false,
+            isRed = true,
+            showGraphics = true,
+            showSamples = false,
+            showBackground = false;
 
-    public static final Point
+    private static final double
+            SCREEN_HEIGHT = 1280,
+            SCREEN_WIDTH = 720,
+            X_TOP_LEFT_R_TAG = 536.25,
+            Y_TOP_LEFT = 1053.9285714285713,
+            TARGET_SIZE = 65,
+            X_FIRST_PIXEL = 80,
+            Y_FIRST_PIXEL = 966.875,
+            X_SHIFT_PIXEL_POINTS_L = -28.321428571428573,
+            X_SHIFT_PIXEL_POINTS_R = 28.321428571428573,
+            Y_SHIFT_PIXEL_POINTS_T = -35.75,
+            Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142,
+            X_SHIFT_WHITE = 2.6,
+            Y_SHIFT_WHITE = 81.25,
+            X_SHIFT_BLACK = 6,
+            Y_SHIFT_BLACK = 10,
+            X_SHIFT_U = 169.0,
+            Y_SHIFT_U = -991.25,
+            fx = 1430,
+            fy = 1430,
+            cx = 480,
+            cy = 620;
+
+    private static final Point
             CORNER_TL = new Point(0, 0),
             CORNER_TR = new Point(SCREEN_WIDTH, 0),
             CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
             CORNER_BL = new Point(0, SCREEN_HEIGHT);
 
-    public boolean
-            backdropVisible = false,
-            isRed = true,
-            graphic = true,
-            background = false,
-            showWarpPath = true;
-
-    public double
-            X_TOP_LEFT_R_TAG = 16.5,
-            Y_TOP_LEFT = 32.42857142857142,
-            TARGET_SIZE = 65,
-            X_FIRST_PIXEL = 29.25,
-            Y_FIRST_PIXEL = 966.875,
-            X_SHIFT_PIXEL_POINTS_L = -0.8714285714285714,
-            X_SHIFT_PIXEL_POINTS_R = 0.8714285714285714,
-            Y_SHIFT_PIXEL_POINTS_T = -1.1,
-            Y_SHIFT_PIXEL_POINTS_B = 0.7428571428571429,
-            X_SHIFT_WHITE = 0.08,
-            Y_SHIFT_WHITE = 2.5,
-            X_SHIFT_BLACK = 5,
-            Y_SHIFT_BLACK = -3.0,
-            X_SHIFT_U = 5.2,
-            Y_SHIFT_U = -30.5;
+    private Point
+            tagTR = new Point(),
+            tagBL = new Point(),
+            tagTL = new Point(),
+            tagBR = new Point();
 
     private static final double[]
             minPurple = {140, .15, .3},
@@ -112,17 +126,13 @@ public class BackdropPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat();
 
-    public Backdrop backdrop = new Backdrop();
+    public final Backdrop backdrop;
+    private final Telemetry telemetry;
+
     private final Point[][] centerPoints = new Point[11][7];
     private final Point[][][] samplePoints = new Point[11][7][4];
 
-    private final double
-            fx = 1430,
-            fy = 1430,
-            cx = 480,
-            cy = 620;
-
-    public BackdropPipeline(Telemetry telemetry) {
+    public BackdropPipeline(Telemetry telemetry, Backdrop backdrop) {
 
         //     Construct the camera matrix.
         //
@@ -149,10 +159,17 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         // Allocate a native context object. See the corresponding deletion in the finalizer
         nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
+
         this.telemetry = telemetry;
+        this.backdrop = backdrop;
+
+        generateCenterPoints();
+        generateSamplePoints();
     }
 
-    private final Telemetry telemetry;
+    public BackdropPipeline(Telemetry telemetry) {
+        this(telemetry, new Backdrop());
+    }
 
     @Override
     protected void finalize() {
@@ -179,7 +196,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
         // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-        if (showWarpPath) for (AprilTagDetection detection : detections) {
+        if (showSamples) for (AprilTagDetection detection : detections) {
             AprilTagDetectionPipeline.Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagSize, tagSize);
             drawAxisMarker(input, tagSize / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
             draw3dCubeMarker(input, tagSize, tagSize, tagSize, 5, pose.rvec, pose.tvec, cameraMatrix);
@@ -193,9 +210,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         for (AprilTagDetection detection : detections) {
             int id = detection.id;
-            if (id == left || id == middle || id == right) {
-                tags.add(detection);
-            }
+            if (id != left && id != middle && id != right) continue;
+            tags.add(detection);
         }
 
         backdropVisible = !tags.isEmpty();
@@ -206,179 +222,47 @@ public class BackdropPipeline extends OpenCvPipeline {
             for (int i = 0; i < tags.size(); i++) {
                 if (tags.get(i).id < tags.get(minInd).id) minInd = i;
                 if (tags.get(i).id > tags.get(maxInd).id) maxInd = i;
-                if (tags.size() < 3 && tags.get(i).id % 3 == 2) {
-                    minInd = maxInd = i;
-                    break;
-                }
+                if (tags.size() >= 3 || tags.get(i).id % 3 != 2) continue;
+                minInd = maxInd = i;
+                break;
             }
 
-            Point bl = tags.get(minInd).corners[0];
-            Point tl = tags.get(minInd).corners[3];
-            Point br = tags.get(maxInd).corners[1];
-            Point tr = tags.get(maxInd).corners[2];
-
-            MatOfPoint2f srcTag = new MatOfPoint2f(
-                    bl,
-                    br,
-                    tr,
-                    tl
-            );
-
-            double leftX = getLeftX(tags.get(minInd).id);
-            double rightX = getLeftX(tags.get(maxInd).id) + TARGET_SIZE;
-
-            Point
-                    tagTR = new Point(rightX, (Y_TOP_LEFT * TARGET_SIZE / 2.0)),
-                    tagBL = new Point(leftX, (Y_TOP_LEFT * TARGET_SIZE / 2.0) + TARGET_SIZE),
-                    tagTL = new Point(leftX, (Y_TOP_LEFT * TARGET_SIZE / 2.0)),
-                    tagBR = new Point(rightX, (Y_TOP_LEFT * TARGET_SIZE / 2.0) + TARGET_SIZE);
-
-            MatOfPoint2f dstTag = new MatOfPoint2f(
-                    tagBL,
-                    tagBR,
-                    tagTR,
-                    tagTL
-            );
-
-            if (showWarpPath) {
-                Imgproc.line(input, tl, tr, blue, 3);
-                Imgproc.line(input, bl, br, blue, 3);
-                Imgproc.line(input, tl, bl, blue, 3);
-                Imgproc.line(input, tr, br, blue, 3);
-            }
-
-            Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
-            Imgproc.warpPerspective(input, input, transformMatrix, input.size());
-            srcTag.release();
-            dstTag.release();
-            transformMatrix.release();
-
-            Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
-            generateCenterPoints();
-            generateSamplePoints();
+            warpImageToStraightenBackdrop(input, minInd, maxInd);
 
             Point whiteSample = new Point(
-                    getLeftX(tags.get(maxInd).id) + (X_SHIFT_WHITE * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_WHITE * TARGET_SIZE / 2.0)
+                    getLeftX(tags.get(maxInd).id) + X_SHIFT_WHITE,
+                    Y_TOP_LEFT + Y_SHIFT_WHITE
             );
             Point blackSample = new Point(
-                    (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_BLACK * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_BLACK * TARGET_SIZE / 2.0)
+                    X_TOP_LEFT_R_TAG + X_SHIFT_BLACK,
+                    Y_TOP_LEFT + Y_SHIFT_BLACK
             );
-            Point outSample = new Point((
-                    X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) + (X_SHIFT_U * TARGET_SIZE / 2.0),
-                    (Y_TOP_LEFT * TARGET_SIZE / 2.0) + (Y_SHIFT_U * TARGET_SIZE / 2.0)
+            Point outSample = new Point(
+                    X_TOP_LEFT_R_TAG + X_SHIFT_U,
+                    Y_TOP_LEFT + Y_SHIFT_U
             );
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
-            double blackVal = round(input.get((int) blackSample.y, (int) blackSample.x)[2] / 255.0 * 1000) / 1000.0;
-            telemetry.addLine("Black value: " + blackVal);
-
-            double whiteVal = round(input.get((int) whiteSample.y, (int) whiteSample.x)[2] / 255.0 * 1000) / 1000.0;
-            telemetry.addLine("White value: " + whiteVal);
-
-            double[] out = input.get((int) outSample.y, (int) outSample.x);
-            telemetry.addLine(out[0] + ", " + out[1] + ", " + out[2]);
-
+            double blackVal = getValue(input, blackSample);
+            double whiteVal = getValue(input, whiteSample);
             double valBoost = 1.0 / (whiteVal - blackVal);
+            if (isNaN(valBoost)) valBoost = 1;
 
-            int maxX = 0, maxY = 0;
-            for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
-                if (x == 0 && y % 2 == 0) continue;
-
-                Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
-                switch (color) {
-                    case EMPTY: case INVALID: continue;
-                }
-
-                maxX = x;
-                maxY = y;
-            }
-            telemetry.addLine("(" + maxX + ", " + maxY + ")");
-
-            for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
-                if (x == 0 && y % 2 == 0) continue;
-
-                double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
-
-                Pixel.Color c = hsvToColor(color);
-                if (c != INVALID && c != backdrop.get(x, y).color) {
-                    backdrop.add(new Pixel(x, y, c));
-                }
-
-                telemetry.addLine("(" + x + ", " + y + "), " + backdrop.get(x, y).color.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
-            }
+            warpToFitGrid(input, blackVal, valBoost);
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
 
-            for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
-                drawBlueSquare(input, point);
-            }
+            saveBackdropColors(input, blackVal, valBoost);
 
-            for (Point[][] row : samplePoints) for (Point[] pair : row) for (Point point : pair) {
-                drawBlueSquare(input, point);
-            }
+            if (showSamples) drawSamplingMarkers(
+                    input,
+                    whiteSample,
+                    blackSample,
+                    outSample
+            );
 
-            for (Point point : new Point[]{whiteSample, blackSample, outSample}) {
-                Imgproc.drawMarker(input, point, green, 2, 3);
-            }
-
-            if (graphic) {
-                if (background) {
-                    MatOfPoint background = new MatOfPoint(
-                            CORNER_TL,
-                            CORNER_TR,
-                            CORNER_BR,
-                            CORNER_BL
-                    );
-                    Imgproc.fillConvexPoly(
-                            input,
-                            background,
-                            gray
-                    );
-                    background.release();
-                }
-
-                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
-                    if (x == 0 && y % 2 == 0) continue;
-                    Pixel pixel = backdrop.get(x, y);
-                    Imgproc.circle(input, centerPoints[y][x], 40, colorToScalar(pixel.color), 8);
-                    Imgproc.putText(input, x + ", " + y, samplePoints[y][x][0], 2, 1, red);
-                }
-
-                PlacementCalculator.getOptimalPlacements(backdrop);
-                for (int y = 0; y < samplePoints.length; y++) for (int x = 0; x < samplePoints[y].length; x++) {
-                    if (x == 0 && y % 2 == 0) continue;
-                    Pixel pixel = backdrop.get(x, y);
-                    if (pixel.inMosaic()) {
-                        Pixel[] mPixels = new Pixel[3];
-                        mPixels[0] = pixel;
-                        int i = 1;
-                        for (Pixel[] row : backdrop.slots) for (Pixel p : row) {
-                            if (pixel.mosaic == p.mosaic) {
-                                mPixels[i++] = p;
-                                if (i > 1) break;
-                            }
-                        }
-                        Point center = centerPoints[mPixels[0].y][mPixels[0].x];
-                        Point center2 = centerPoints[mPixels[1].y][mPixels[1].x];
-                        Point center3 = centerPoints[mPixels[2].y][mPixels[2].x];
-
-                        Imgproc.line(input, center, center2, blue, 5);
-                        Imgproc.line(input, center2, center3, blue, 5);
-                        Imgproc.line(input, center3, center, blue, 5);
-
-                    }
-                }
-            }
-
-            if (showWarpPath) {
-                Imgproc.line(input, tagTL, tagTR, yellow, 5);
-                Imgproc.line(input, tagBL, tagBR, yellow, 5);
-                Imgproc.line(input, tagTL, tagBL, yellow, 5);
-                Imgproc.line(input, tagTR, tagBR, yellow, 5);
-            }
+            if (showGraphics) drawGraphics(input);
         }
 
         StringBuilder tagIds = new StringBuilder();
@@ -389,7 +273,325 @@ public class BackdropPipeline extends OpenCvPipeline {
         return input;
     }
 
-    private void drawBlueSquare(Mat input, Point point) {
+    private static double[] getHSV(Mat input, Point point) {
+        return input.get((int) point.y, (int) point.x);
+    }
+
+    private static double getValue(Mat input, Point point) {
+        return round(getHSV(input, point)[2] / 255.0 * 1000) / 1000.0;
+    }
+
+    private void warpImageToStraightenBackdrop(Mat input, int minInd, int maxInd) {
+        Point bl = tags.get(minInd).corners[0];
+        Point tl = tags.get(minInd).corners[3];
+        Point br = tags.get(maxInd).corners[1];
+        Point tr = tags.get(maxInd).corners[2];
+
+        MatOfPoint2f srcTag = new MatOfPoint2f(
+                bl,
+                br,
+                tr,
+                tl
+        );
+
+        double leftX = getLeftX(tags.get(minInd).id);
+        double rightX = getLeftX(tags.get(maxInd).id) + TARGET_SIZE;
+
+        tagTR = new Point(rightX, (Y_TOP_LEFT));
+        tagBL = new Point(leftX, (Y_TOP_LEFT) + TARGET_SIZE);
+        tagTL = new Point(leftX, (Y_TOP_LEFT));
+        tagBR = new Point(rightX, (Y_TOP_LEFT) + TARGET_SIZE);
+
+        MatOfPoint2f dstTag = new MatOfPoint2f(
+                tagBL,
+                tagBR,
+                tagTR,
+                tagTL
+        );
+
+        if (showSamples) {
+            Imgproc.line(input, tl, tr, blue, 3);
+            Imgproc.line(input, bl, br, blue, 3);
+            Imgproc.line(input, tl, bl, blue, 3);
+            Imgproc.line(input, tr, br, blue, 3);
+        }
+
+        Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
+        Imgproc.warpPerspective(input, input, transformMatrix, input.size());
+        srcTag.release();
+        dstTag.release();
+        transformMatrix.release();
+
+        Imgproc.cvtColor(input, warpedGray, Imgproc.COLOR_RGBA2GRAY);
+    }
+
+    private void drawGraphics(Mat input) {
+        if (showBackground) {
+            MatOfPoint background = new MatOfPoint(
+                    CORNER_TL,
+                    CORNER_TR,
+                    CORNER_BR,
+                    CORNER_BL
+            );
+            Imgproc.fillConvexPoly(
+                    input,
+                    background,
+                    gray
+            );
+            background.release();
+        }
+
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+            drawPixelIcon(input, y, x);
+        }
+
+        PlacementCalculator.getOptimalPlacements(backdrop);
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+            Pixel pixel = backdrop.get(x, y);
+            if (pixel.inMosaic()) drawMosaic(input, pixel);
+        }
+    }
+
+    private void drawSamplingMarkers(Mat input, Point... pointSamples) {
+        for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
+            drawBlueSquare(input, point);
+        }
+
+        for (Point[][] row : samplePoints) for (Point[] pair : row) {
+            for (Point point : pair) drawBlueSquare(input, point);
+        }
+
+        for (Point point : pointSamples) {
+            Imgproc.drawMarker(input, point, green, 2, 3);
+        }
+
+        Imgproc.line(input, tagTL, tagTR, yellow, 5);
+        Imgproc.line(input, tagBL, tagBR, yellow, 5);
+        Imgproc.line(input, tagTL, tagBL, yellow, 5);
+        Imgproc.line(input, tagTR, tagBR, yellow, 5);
+    }
+
+    private void saveBackdropColors(Mat input, double blackVal, double valBoost) {
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+
+            double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
+
+            Pixel.Color c = hsvToColor(color);
+            telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
+            if (c == INVALID || c == backdrop.get(x, y).color) continue;
+            backdrop.add(new Pixel(x, y, c));
+        }
+
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+    }
+
+    private void drawMosaic(Mat input, Pixel pixel) {
+        Pixel[] mPixels = new Pixel[3];
+        int i = 0;
+        pixels:
+        for (Pixel[] row : backdrop.slots) for (Pixel p : row) {
+            if (pixel.mosaic == p.mosaic) {
+                if (i > 2) break pixels;
+                else mPixels[i++] = p;
+            }
+        }
+        Point center1 = centerPoints[mPixels[0].y][mPixels[0].x];
+        Point center2 = centerPoints[mPixels[1].y][mPixels[1].x];
+        Point center3 = centerPoints[mPixels[2].y][mPixels[2].x];
+
+        Imgproc.line(input, center1, center2, blue, 5);
+        Imgproc.line(input, center2, center3, blue, 5);
+        Imgproc.line(input, center3, center1, blue, 5);
+    }
+
+    private void warpToFitGrid(Mat input, double blackVal, double valBoost) {
+        Point[] target = {
+                new Point(), // tl =
+                new Point(), // br =
+                new Point()  // bl =
+        };
+
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            switch (color) {
+                case EMPTY: case INVALID: continue;
+            }
+
+            target[0].x = x;
+            target[0].y = y;
+        }
+
+        a:
+        for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            switch (color) {
+                case EMPTY: case INVALID: continue;
+            }
+
+            target[2].x = x;
+            target[2].y = y;
+            break a;
+        }
+
+        b:
+        for (int y = 0; y < centerPoints.length; y++) for (int x = centerPoints[y].length - 1; x >= 0; x--) {
+            if (x == 0 && y % 2 == 0) continue;
+
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            switch (color) {
+                case EMPTY: case INVALID: continue;
+            }
+
+            if (x == target[2].x && y == target[2].y) continue;
+
+            target[1].x = x;
+            target[1].y = y;
+            break b;
+        }
+
+        for (Point p : new Point[]{target[0], target[1], target[2]}) {
+            telemetry.addLine("(" + p.x + ", " + p.y + ")");
+        }
+        boolean valid = !(
+                target[1].equals(target[0]) ||
+                target[1].equals(target[2]) ||
+                target[0].equals(target[2])
+        );
+        telemetry.addLine("Valid: " + valid);
+
+        Point[] source = {
+                findCenter(target[0]),
+                coordToPoint(target[1]),
+                coordToPoint(target[2])
+        };
+
+        MatOfPoint2f src = new MatOfPoint2f(
+                source[0],
+                source[1],
+                source[2]
+        );
+
+        Point[] targetPixels = {
+                coordToPoint(target[0]),
+                coordToPoint(target[1]),
+                coordToPoint(target[2])
+        };
+
+        MatOfPoint2f dst = new MatOfPoint2f(
+                targetPixels[0],
+                targetPixels[1],
+                targetPixels[2]
+        );
+
+        boolean warp = true;
+
+        if (!warp) {
+            Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+            Imgproc.line(input, source[0], source[1], blue, 3);
+            Imgproc.line(input, source[1], source[2], blue, 3);
+            Imgproc.line(input, source[2], source[0], blue, 3);
+            Imgproc.line(input, targetPixels[0], targetPixels[1], blue, 3);
+            Imgproc.line(input, targetPixels[1], targetPixels[2], blue, 3);
+            Imgproc.line(input, targetPixels[2], targetPixels[0], blue, 3);
+            Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+            return;
+        }
+
+        Mat transformMatrix = Imgproc.getAffineTransform(src, dst);
+        src.release();
+        dst.release();
+        Imgproc.warpAffine(input, input, transformMatrix, input.size());
+        transformMatrix.release();
+    }
+
+    private Point findCenter(Point p) {
+        Point estimate = coordToPoint(p);
+        int boxRadius = 45;
+        Point topLeft = new Point(
+                clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
+                clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
+        );
+        Mat region = warpedGray.submat(new Rect(
+                topLeft,
+                new Point(
+                        clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
+                        clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
+                )
+        ));
+
+        double blur = 13;
+        Imgproc.blur(region, region, new Size(blur, blur));
+        Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
+
+        Mat circles = new Mat();
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500, 1, .6, 5, -1);
+        region.release();
+
+        if (circles.size().width > 0) {
+
+            estimate = new Point(
+                    topLeft.x + circles.get(0, 0)[0],
+                    topLeft.y + circles.get(0, 0)[1]
+            );
+        }
+        circles.release();
+        Imgproc.drawMarker(warpedGray, estimate, red, 2, 12);
+        return estimate;
+    }
+
+    private Point coordToPoint(Point p) {
+        return centerPoints[(int) p.y][(int) p.x];
+    }
+
+    private void drawPixelIcon(Mat input, int y, int x) {
+        int size = 80;
+        double sideLength = size / sqrt(3);
+        int thickness = 8;
+        Scalar color = colorToScalar(backdrop.get(x, y).color);
+
+        Point
+                p1 = centerPoints[y][x].clone(),
+                p2 = centerPoints[y][x].clone(),
+                p3 = centerPoints[y][x].clone(),
+                p4 = centerPoints[y][x].clone(),
+                p5 = centerPoints[y][x].clone(),
+                p6 = centerPoints[y][x].clone();
+
+        p2.x += 0.5 * size;
+        p2.y += 0.5 * sideLength;
+
+        p3.x += 0.5 * size;
+        p3.y -= 0.5 * sideLength;
+
+        p5.x -= 0.5 * size;
+        p5.y -= 0.5 * sideLength;
+
+        p6.x -= 0.5 * size;
+        p6.y += 0.5 * sideLength;
+
+        p1.y += sideLength;
+        p4.y -= sideLength;
+
+        Imgproc.line(input, p1, p2, color, thickness);
+        Imgproc.line(input, p2, p3, color, thickness);
+        Imgproc.line(input, p3, p4, color, thickness);
+        Imgproc.line(input, p4, p5, color, thickness);
+        Imgproc.line(input, p5, p6, color, thickness);
+        Imgproc.line(input, p6, p1, color, thickness);
+
+        Imgproc.putText(input, x + ", " + y, p6, 2, 1, red);
+    }
+
+    private static void drawBlueSquare(Mat input, Point point) {
         if (point == null) return;
         double size = 5;
         Imgproc.rectangle(
@@ -461,39 +663,10 @@ public class BackdropPipeline extends OpenCvPipeline {
             boolean evenRow = y % 2 == 0;
             if (x == 0 && evenRow) continue;
 
-            double xCoord, yCoord;
-
-            if (y == 0) yCoord = Y_FIRST_PIXEL;
-            else if (y == 1) {
-                if (x == 0) yCoord = centerPoints[y-1][x+1].y + height;
-                else yCoord = centerPoints[y-1][x].y + height;
-            } else {
-                if (x == 0) yCoord = centerPoints[y-1][1].y + (centerPoints[y-1][1].y - centerPoints[y-2][0].y);
-                else yCoord = centerPoints[y-1][x].y + (centerPoints[y-1][x].y - centerPoints[y-2][x].y);
-            }
-
-            if (evenRow) {
-                if (x == 1) {
-                    if (y == 0) xCoord = X_FIRST_PIXEL + width;
-                    else xCoord = centerPoints[y - 1][0].x + width / 2.0;
-                } else if (x == 2) {
-                    xCoord = centerPoints[y][1].x + width;
-                } else {
-                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
-                }
-            } else {
-                if (x == 0) {
-                    xCoord = centerPoints[y - 1][1].x - width / 2.0;
-                } else if (x == 1) {
-                    xCoord = centerPoints[y][0].x + width;
-                } else {
-                    xCoord = centerPoints[y][x-1].x + (centerPoints[y][x-1].x - centerPoints[y][x-2].x);
-                }
-            }
-
-            Point estimate = new Point(xCoord, yCoord);
-            centerPoints[y][x] = estimate;
-
+            centerPoints[y][x] = new Point(
+                    X_FIRST_PIXEL + (x * width) - (evenRow ? 0.5 * width : 0),
+                    Y_FIRST_PIXEL + (y * height)
+            );
         }
     }
 
@@ -507,31 +680,31 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
     }
 
-    private double getLeftX(int id) {
-        return (X_TOP_LEFT_R_TAG * TARGET_SIZE / 2.0) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
+    private static double getLeftX(int id) {
+        return (X_TOP_LEFT_R_TAG) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 
     private Point pixelLeft(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_L * TARGET_SIZE / 2.0);
+        point.x += (X_SHIFT_PIXEL_POINTS_L);
         return point;
     }
 
     private Point pixelRight(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_R * TARGET_SIZE / 2.0);
+        point.x += (X_SHIFT_PIXEL_POINTS_R);
         return point;
     }
 
     private Point pixelTop(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_T * TARGET_SIZE / 2.0);
+        point.y += (Y_SHIFT_PIXEL_POINTS_T);
         return point;
     }
 
     private Point pixelBottom(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_B * TARGET_SIZE / 2.0);
+        point.y += (Y_SHIFT_PIXEL_POINTS_B);
         return point;
     }
 }

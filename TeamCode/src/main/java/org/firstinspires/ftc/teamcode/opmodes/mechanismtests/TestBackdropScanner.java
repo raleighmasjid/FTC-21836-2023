@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
-import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 
 @TeleOp(group = "Single mechanism test")
 public final class TestBackdropScanner extends LinearOpMode {
@@ -46,7 +45,6 @@ public final class TestBackdropScanner extends LinearOpMode {
         mTelemetry = new MultipleTelemetry(telemetry);
         BackdropScanner backdropScanner = new BackdropScanner(hardwareMap);
         gamepadEx1 = new GamepadEx(gamepad1);
-        Backdrop latestScan = backdropScanner.pipeline.backdrop;
 
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit()) {
@@ -60,7 +58,7 @@ public final class TestBackdropScanner extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            latestScan.toTelemetry(mTelemetry);
+            backdropScanner.pipeline.backdrop.toTelemetry(mTelemetry);
             telemetry.update();
         }
         backdropScanner.stop();
