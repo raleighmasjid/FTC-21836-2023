@@ -87,7 +87,7 @@ public final class Pixel implements Comparable<Pixel> {
 
     private String userFriendlyX() {
         switch (x) {
-            case 0: return y % 2 == 0 ? "UNKNOWN" : "FAR LEFT";
+            case 0: return "FAR LEFT";
             case 1: return y % 2 == 0 ? "FAR LEFT" : "ALMOST FAR LEFT";
             case 2: return y % 2 == 0 ? "ALMOST FAR LEFT" : "LEFT OF CENTER";
             case 3: return y % 2 == 0 ? "CENTER LEFT" : "DEAD CENTER";
@@ -141,23 +141,20 @@ public final class Pixel implements Comparable<Pixel> {
                 case GREEN:
                     if (printInColor) return "\u001B[32m" + "G" + RESET;
                 case WHITE:
-                case ANY:
-                case ANYCOLOR:
-                    return "" + name().charAt(0);
-                case INVALID:
-                    return " ";
+                case ANY: return "" + name().charAt(0);
+                case ANYCOLOR: return "C";
+                case INVALID: return " ";
                 case EMPTY:
-                default:
-                    return "_";
+                default: return "_";
             }
         }
 
         public String humanInstruction() {
             switch (this) {
-                case WHITE: return "0";
+                case WHITE:
                 case PURPLE:
                 case YELLOW:
-                case GREEN: return "" + (ordinal() + 1);
+                case GREEN: return "" + (ordinal() + 1) % 4;
                 default: return "";
             }
         }
@@ -168,24 +165,16 @@ public final class Pixel implements Comparable<Pixel> {
          */
         public static Color fromString(String color) {
             switch (color.toUpperCase()) {
-                case "W":
-                    return WHITE;
+                case "W": return WHITE;
                 case "#":
-                case "A":
-                    return ANY;
-                case "C":
-                    return ANYCOLOR;
-                case "P":
-                    return PURPLE;
-                case "Y":
-                    return YELLOW;
-                case "G":
-                    return GREEN;
-                case " ":
-                    return INVALID;
+                case "A": return ANY;
+                case "C": return ANYCOLOR;
+                case "P": return PURPLE;
+                case "Y": return YELLOW;
+                case "G": return GREEN;
+                case " ": return INVALID;
                 case "_":
-                default:
-                    return EMPTY;
+                default: return EMPTY;
             }
         }
 

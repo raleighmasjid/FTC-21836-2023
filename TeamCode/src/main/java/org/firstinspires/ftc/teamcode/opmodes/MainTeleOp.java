@@ -92,7 +92,8 @@ public final class MainTeleOp extends LinearOpMode {
             }
             mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
             mTelemetry.update();
-            robot.drone.run();
+
+            robot.initRun();
         }
         if (slowModeLocked) robot.drivetrain.lockSlowMode();
         if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
@@ -104,8 +105,8 @@ public final class MainTeleOp extends LinearOpMode {
         );
 
         robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
-        if (keyPressed(2, LEFT_STICK_BUTTON)) robot.deposit.lift.reset();
-        if (keyPressed(2, RIGHT_STICK_BUTTON)) robot.drone.toggle();
+        if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
+        if (keyPressed(2, RIGHT_STICK_BUTTON))  robot.drone.toggle();
 
         if (gamepadEx2.isDown(LEFT_BUMPER)) {
             if (keyPressed(2, Y))               robot.intake.setRequiredIntakingAmount(2);
@@ -125,6 +126,8 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, A))               robot.intake.setHeight(TWO_STACK);
             if (keyPressed(2, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
         }
+
+        if (keyPressed(1, Y))                   robot.spike.toggle();
 
         double x = gamepadEx1.getRightX();
         if (gamepadEx1.isDown(LEFT_BUMPER)) {

@@ -2,12 +2,9 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_BLUE;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.Y_MAX_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
-import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -24,17 +21,6 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import java.util.ArrayList;
 
 public final class AutoScoringManager {
-
-    /**
-     * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
-     */
-    public static Pose2d toPose2d(Pixel pixel) {
-        return new Pose2d(
-                MainAuton.X_BACKDROP,
-                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
-                PI
-        );
-    }
 
     public static MainAuton.EditablePose startPose = new MainAuton.EditablePose(24, -16, LEFT);
 
@@ -161,8 +147,8 @@ public final class AutoScoringManager {
             }
         }
 
-        Pose2d scoringPos1 = toPose2d(placements[0]);
-        Pose2d scoringPos2 = toPose2d(placements[1]);
+        Pose2d scoringPos1 = MainAuton.toPose2d(placements[0]);
+        Pose2d scoringPos2 = MainAuton.toPose2d(placements[1]);
 
         boolean sameScoringLocation = scoringPos1.epsilonEqualsHeading(scoringPos2);
 

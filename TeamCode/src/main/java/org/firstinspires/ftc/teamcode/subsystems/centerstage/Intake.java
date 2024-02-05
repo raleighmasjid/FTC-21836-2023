@@ -43,7 +43,7 @@ public final class Intake {
     public static double
             ANGLE_PIVOT_OFFSET = 11,
             ANGLE_PIVOT_FLOOR_CLEARANCE = 3,
-            ANGLE_PIVOT_TRANSFERRING = 196.1,
+            ANGLE_PIVOT_TRANSFERRING = 195.5,
             ANGLE_PIVOT_VERTICAL = 110,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
@@ -52,7 +52,7 @@ public final class Intake {
             TIME_PIXEL_2_SETTLING = 0,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 0,
-            TIME_SETTLING = 0.2,
+            TIME_SETTLING = 0.3,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             HEIGHT_SHIFT = -0.1,
@@ -69,7 +69,7 @@ public final class Intake {
                     0.05
             ),
             maxWhite = new HSV(
-                    0,
+                    360,
                     0.6,
                     0.45
             ),
@@ -119,7 +119,7 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
-    private boolean pixelsTransferred = false, vertical = false;
+    private boolean pixelsTransferred = false;
     private int requiredIntakingAmount = 2;
     private double motorPower = 0;
 
@@ -204,11 +204,11 @@ public final class Intake {
                 hsv.between(minPurple, maxPurple) ? PURPLE :
                 hsv.between(minGreen, maxGreen) ? GREEN :
                 hsv.between(minYellow, maxYellow) ? YELLOW :
-                new HSV(0, hsv.saturation, hsv.value).between(minWhite, maxWhite) ? WHITE :
+                hsv.between(minWhite, maxWhite) ? WHITE :
                 EMPTY;
     }
 
-    void run(int pixelsInDeposit, boolean depositRetracted) {
+    void run(int pixelsInDeposit, boolean depositRetracted, boolean isScoring) {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
@@ -226,28 +226,32 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (timer.seconds() >= TIME_PIXEL_1_SETTLING || requiredIntakingAmount == 0)
+                if ((timer.seconds() >= TIME_PIXEL_1_SETTLING && isEmpty(topSensor)) || requiredIntakingAmount == 0) {
                     state = HAS_1_PIXEL;
-                else break;
+                } else break;
 
             case HAS_1_PIXEL:
 
                 topHSV = topSensor.getHSV();
                 colors[1] = fromHSV(topHSV);
                 boolean topFull = !(colors[1] == EMPTY);
-                if (topFull || requiredIntakingAmount <= 1) {
+                if (topFull || requiredIntakingAmount < 2) {
                     if (topFull) decrementHeight();
-                    if (requiredIntakingAmount > 0) latch.setActivated(true);
+                    latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
                     timer.reset();
                 } else break;
 
             case PIXEL_2_SETTLING:
 
-                if (depositRetracted && (requiredIntakingAmount == 0 || (
-                        timer.seconds() >= TIME_PIXEL_2_SETTLING &&
-                                requiredIntakingAmount + pixelsInDeposit <= 2
-                ))) {
+                if (
+                        depositRetracted && (
+                                requiredIntakingAmount == 0 || (
+                                        timer.seconds() >= TIME_PIXEL_2_SETTLING &&
+                                        requiredIntakingAmount + pixelsInDeposit <= 2
+                                )
+                        )
+                ) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -266,9 +270,7 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (fromHSV(topSensor.getHSV()) == EMPTY &&
-                    fromHSV(bottomSensor.getHSV()) == EMPTY
-                ) {
+                if (isEmpty(bottomSensor) && isEmpty(topSensor)) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
@@ -282,22 +284,34 @@ public final class Intake {
 
         }
 
+        double ANGLE_PIVOT_INTAKING =
+                isScoring && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
+                height != FLOOR ? height.deltaTheta :
+                motorPower > 0 ? 0 :
+                ANGLE_PIVOT_FLOOR_CLEARANCE;
+
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET +
-                        (motorPower <= 0 && height == FLOOR ? ANGLE_PIVOT_FLOOR_CLEARANCE : 0) +
-                        height.deltaTheta +
-                        ((vertical && fromHSV(bottomSensor.getHSV()) == EMPTY) ? ANGLE_PIVOT_VERTICAL : 0),
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_INTAKING,
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
-        latch.updateAngles(
-                state != PIVOTING && state != PIXELS_FALLING && state != PIXELS_SETTLING && requiredIntakingAmount > 0 ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING,
-                ANGLE_LATCH_LOCKED
-        );
+
+        double ANGLE_LATCH_UNLOCKED = (
+                requiredIntakingAmount > 0 &&
+                state != PIVOTING &&
+                state != PIXELS_FALLING &&
+                state != PIXELS_SETTLING
+        ) ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING;
+
+        latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
         pivot.run();
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    private static boolean isEmpty(ColorSensor sensor) {
+        return fromHSV(sensor.getHSV()) == EMPTY;
     }
 
     boolean pixelsTransferred() {
@@ -318,10 +332,6 @@ public final class Intake {
 
     public void setRequiredIntakingAmount(int pixelCount) {
         this.requiredIntakingAmount = clip(pixelCount, 0, 2);
-    }
-
-    void setVertical(boolean vertical) {
-        this.vertical = vertical;
     }
 
     void printTelemetry() {

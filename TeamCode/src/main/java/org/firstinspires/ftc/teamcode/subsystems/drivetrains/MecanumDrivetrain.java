@@ -59,12 +59,12 @@ public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
-                0,
+                1,
                 0.1
             ),
             HEADING_PID = new PIDCoefficients(
                 8,
-                0,
+                1,
                     0
             );
     private double

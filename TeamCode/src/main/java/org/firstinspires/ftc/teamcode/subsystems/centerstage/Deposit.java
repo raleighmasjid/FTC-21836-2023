@@ -48,12 +48,8 @@ public final class Deposit {
             lift.setTargetRow(-1);
         }
 
-        if (lift.targetRow != HEIGHT_CLIMBING) {
-            paintbrush.pivot.setActivated(lift.isExtended());
-        }
-
         lift.run();
-
+        paintbrush.pivot.setActivated(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING);
         paintbrush.run();
     }
 
@@ -137,8 +133,12 @@ public final class Deposit {
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(this.targetRow == -1 ? 0 : (this.targetRow * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT));
+            targetState = new State(rowToInches(targetRow));
             controller.setTarget(targetState);
+        }
+
+        private static double rowToInches(double row) {
+            return row == -1 ? 0 : (row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT);
         }
 
         public void changeRow(int deltaRow) {
@@ -151,10 +151,7 @@ public final class Deposit {
 
         private void run() {
 
-            if (manualLiftPower != 0) {
-                targetState = currentState;
-                controller.setTarget(targetState);
-            }
+            if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
 
 //            if (lastKp != pidGains.kP) {
 //                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
@@ -210,7 +207,7 @@ public final class Deposit {
         private final ElapsedTime timer = new ElapsedTime();
         private boolean droppedPixel = true;
         private int pixelsLocked = 0;
-        private final Pixel.Color[] colors = {EMPTY, EMPTY};
+        final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
@@ -235,10 +232,6 @@ public final class Deposit {
 
         int getPixelsLocked() {
             return pixelsLocked;
-        }
-
-        Pixel.Color[] getColors() {
-            return colors;
         }
 
         void lockPixels(Pixel.Color... colors) {
