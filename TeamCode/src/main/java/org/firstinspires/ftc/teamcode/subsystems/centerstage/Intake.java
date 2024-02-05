@@ -52,7 +52,7 @@ public final class Intake {
             TIME_PIXEL_2_SETTLING = 0,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 0,
-            TIME_SETTLING = 0.2,
+            TIME_SETTLING = 0.3,
             COLOR_SENSOR_GAIN = 1,
             SPEED_SLOW_REVERSING = -0.25,
             HEIGHT_SHIFT = -0.1,
