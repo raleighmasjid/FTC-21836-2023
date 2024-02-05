@@ -226,7 +226,7 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if ((timer.seconds() >= TIME_PIXEL_1_SETTLING && isEmpty(topSensor)) || requiredIntakingAmount == 0) {
+                if (requiredIntakingAmount == 0 || timer.seconds() >= TIME_PIXEL_1_SETTLING || isEmpty(topSensor)) {
                     state = HAS_1_PIXEL;
                 } else break;
 
