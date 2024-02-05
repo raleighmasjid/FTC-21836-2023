@@ -252,7 +252,7 @@ public final class Intake {
 
             case PIVOTING:
 
-                if (timer.seconds() >= TIME_PIVOTING && pivotSensor.isPressed()) {
+                if (pivotSensor.isPressed() && timer.seconds() >= TIME_PIVOTING) {
                     setMotorPower(0);
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
