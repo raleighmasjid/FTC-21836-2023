@@ -49,7 +49,6 @@ public final class Intake {
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
             TIME_PIXEL_1_SETTLING = 0.25,
-            TIME_PIXEL_2_SETTLING = 0,
             TIME_REVERSING = 1,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
@@ -239,18 +238,12 @@ public final class Intake {
                     if (topFull) decrementHeight();
                     latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
-                    timer.reset();
                 } else break;
 
             case PIXEL_2_SETTLING:
 
                 if (
-                        depositRetracted && (
-                                requiredIntakingAmount == 0 || (
-                                        timer.seconds() >= TIME_PIXEL_2_SETTLING &&
-                                        requiredIntakingAmount + pixelsInDeposit <= 2
-                                )
-                        )
+                        depositRetracted && (requiredIntakingAmount == 0 || requiredIntakingAmount + pixelsInDeposit <= 2)
                 ) {
                     state = PIVOTING;
                     pivot.setActivated(true);
