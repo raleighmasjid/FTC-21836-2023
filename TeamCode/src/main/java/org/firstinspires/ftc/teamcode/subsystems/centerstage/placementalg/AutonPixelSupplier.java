@@ -45,10 +45,9 @@ public final class AutonPixelSupplier {
         while (backdrop.notFull()) {
             Pixel optimalPlacement = null;
             for (Pixel placement : optimalPlacements) {
-                if (placement.color == Pixel.Color.WHITE) {
-                    optimalPlacement = placement;
-                    break;
-                }
+                if (placement.color != Pixel.Color.WHITE) continue;
+                optimalPlacement = placement;
+                break;
             }
             if (optimalPlacement == null) break;
             optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop.add(optimalPlacement));
