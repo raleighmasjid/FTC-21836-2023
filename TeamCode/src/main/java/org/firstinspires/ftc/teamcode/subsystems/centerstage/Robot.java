@@ -87,6 +87,7 @@ public final class Robot {
         intake.topSensor.update();
         intake.bottomSensor.update();
         drivetrain.update();
+        deposit.lift.readSensors();
     }
 
     public boolean autoScore() {
@@ -105,12 +106,12 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.colors);
         }
 
-        deposit.run(intake.clearOfDeposit());
         intake.run(
                 deposit.paintbrush.getPixelsLocked(),
                 deposit.isRetracted(),
                 deposit.lift.isExtended()
         );
+        deposit.run(intake.clearOfDeposit());
         drone.run();
         spike.run();
 

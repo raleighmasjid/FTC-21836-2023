@@ -149,6 +149,13 @@ public final class Deposit {
             this.manualLiftPower = manualLiftPower;
         }
 
+        public void readSensors() {
+            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
+
+            kDFilter.setGains(kalmanGains);
+            controller.setGains(pidGains);
+        }
+
         private void run(boolean intakeClear) {
 
             if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
@@ -157,11 +164,6 @@ public final class Deposit {
 //                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
 //                lastKp = pidGains.kP;
 //            }
-
-            kDFilter.setGains(kalmanGains);
-            controller.setGains(pidGains);
-
-            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = !intakeClear ? 0 : (
