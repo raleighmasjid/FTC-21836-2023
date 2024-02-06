@@ -214,9 +214,7 @@ public final class Intake {
         switch (state) {
             case HAS_0_PIXELS:
 
-                bottomHSV = bottomSensor.getHSV();
-                colors[0] = fromHSV(bottomHSV);
-                boolean bottomFull = !(colors[0] == EMPTY);
+                boolean bottomFull = ((colors[0]) = fromHSV(bottomHSV = bottomSensor.getHSV())) != EMPTY;
                 if (bottomFull || requiredIntakingAmount == 0) {
                     if (bottomFull) decrementHeight();
                     state = PIXEL_1_SETTLING;
@@ -231,9 +229,7 @@ public final class Intake {
 
             case HAS_1_PIXEL:
 
-                topHSV = topSensor.getHSV();
-                colors[1] = fromHSV(topHSV);
-                boolean topFull = !(colors[1] == EMPTY);
+                boolean topFull = (colors[1] = fromHSV(topHSV = topSensor.getHSV())) != EMPTY;
                 if (topFull || requiredIntakingAmount < 2) {
                     if (topFull) decrementHeight();
                     latch.setActivated(true);
