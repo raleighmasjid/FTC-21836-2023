@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_MIN;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -43,18 +44,22 @@ public final class Deposit {
 
     void run(boolean intakeClear) {
 
-        if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
+        if (!paintbrush.droppedPixel && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
             lift.setTargetRow(-1);
         }
 
         lift.run(intakeClear);
-        paintbrush.pivot.setActivated(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING);
+        paintbrush.pivot.setActivated(paintbrushExtended());
         paintbrush.run();
     }
 
     boolean isRetracted() {
-        return !(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING) && lift.currentState.x <= 0.5;
+        return !paintbrushExtended() && lift.currentState.x <= HEIGHT_MIN;
+    }
+
+    private boolean paintbrushExtended() {
+        return lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING;
     }
 
     @Config
@@ -94,6 +99,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
                 HEIGHT_CLIMBING = 6.25,
+                HEIGHT_MIN = 0.25,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
