@@ -239,7 +239,7 @@ public final class Intake {
             case PIXEL_2_SETTLING:
 
                 if (
-                        depositRetracted && (requiredIntakingAmount == 0 || requiredIntakingAmount + pixelsInDeposit <= 2)
+                        depositRetracted && (requiredIntakingAmount + pixelsInDeposit <= 2)
                 ) {
                     state = PIVOTING;
                     pivot.setActivated(true);
