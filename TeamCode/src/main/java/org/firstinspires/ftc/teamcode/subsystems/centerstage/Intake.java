@@ -281,6 +281,8 @@ public final class Intake {
 
         boolean retracted = (state == PIVOTING) || (state == PIXELS_FALLING) || (state == PIXELS_SETTLING);
 
+        if (retracted) pivot.setActivated(!isScoring);
+
         double ANGLE_PIVOT_INTAKING =
                 isScoring && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
