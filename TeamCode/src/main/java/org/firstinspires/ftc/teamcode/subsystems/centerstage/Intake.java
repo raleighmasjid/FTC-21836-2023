@@ -216,7 +216,7 @@ public final class Intake {
         switch (state) {
             case HAS_0_PIXELS:
 
-                boolean bottomFull = ((colors[0]) = fromHSV(bottomHSV = bottomSensor.getHSV())) != EMPTY;
+                boolean bottomFull = (colors[0] = fromHSV(bottomHSV = bottomSensor.getHSV())) != EMPTY;
                 if (bottomFull || !willIntake) {
                     if (bottomFull) decrementHeight();
                     state = PIXEL_1_SETTLING;
@@ -259,13 +259,11 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
+                setMotorPower(0);
                 if (isEmpty(bottomSensor) && isEmpty(topSensor)) {
                     state = PIXELS_SETTLING;
                     timer.reset();
-                } else {
-                    setMotorPower(0);
-                    break;
-                }
+                } else break;
 
             case PIXELS_SETTLING:
 
