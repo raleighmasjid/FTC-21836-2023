@@ -14,7 +14,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator.colorsLeft;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator.initialColors;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -53,8 +53,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
                     if (gamepadEx2.isDown(RIGHT_BUMPER)) robot.autoScoringManager.reset();
                     if (keyPressed(2, DPAD_RIGHT)) selectedColor = (selectedColor + 1) % 3;
                     if (keyPressed(2, DPAD_LEFT)) selectedColor = (selectedColor - 1) % 3;
-                    if (keyPressed(2, DPAD_UP)) colorsLeft[selectedColor]++;
-                    if (keyPressed(2, DPAD_DOWN)) colorsLeft[selectedColor]--;
+                    if (keyPressed(2, DPAD_UP)) initialColors[selectedColor]++;
+                    if (keyPressed(2, DPAD_DOWN)) initialColors[selectedColor]--;
                 }
                 teleOpControls();
             }
@@ -62,7 +62,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
             robot.run();
 
             mTelemetry.addData("Scoring mode", autoScoring ? "auto" : "manual");
-            mTelemetry.addLine(Pixel.Color.get(selectedColor).name() + " pixels left: " + colorsLeft[selectedColor]);
+            mTelemetry.addLine(Pixel.Color.get(selectedColor).name() + " pixels left: " + initialColors[selectedColor]);
             mTelemetry.addLine();
             robot.printTelemetry();
             mTelemetry.update();
