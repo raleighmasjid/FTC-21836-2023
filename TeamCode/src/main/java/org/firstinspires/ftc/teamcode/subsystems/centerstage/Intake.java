@@ -262,14 +262,20 @@ public final class Intake {
                 if (isEmpty(bottomSensor) && isEmpty(topSensor)) {
                     state = PIXELS_SETTLING;
                     timer.reset();
-                } else break;
+                } else {
+                    setMotorPower(0);
+                    break;
+                }
 
             case PIXELS_SETTLING:
 
                 if (requiredIntakingAmount > 0 && (pixelsTransferred = timer.seconds() >= TIME_SETTLING)) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                } else break;
+                } else {
+                    setMotorPower(0);
+                    break;
+                }
 
         }
 
