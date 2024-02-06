@@ -54,7 +54,7 @@ public final class Deposit {
     }
 
     boolean isRetracted() {
-        return !paintbrush.pivot.isActivated() && lift.currentState.x <= 0.5;
+        return !(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING) && lift.currentState.x <= 0.5;
     }
 
     @Config
