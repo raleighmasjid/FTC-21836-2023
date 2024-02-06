@@ -211,11 +211,13 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
+        boolean willIntake = requiredIntakingAmount > 0;
+
         switch (state) {
             case HAS_0_PIXELS:
 
                 boolean bottomFull = ((colors[0]) = fromHSV(bottomHSV = bottomSensor.getHSV())) != EMPTY;
-                if (bottomFull || requiredIntakingAmount == 0) {
+                if (bottomFull || !willIntake) {
                     if (bottomFull) decrementHeight();
                     state = PIXEL_1_SETTLING;
                     timer.reset();
@@ -223,7 +225,7 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (requiredIntakingAmount == 0 || timer.seconds() >= TIME_PIXEL_1_SETTLING || isEmpty(topSensor)) {
+                if (!willIntake || timer.seconds() >= TIME_PIXEL_1_SETTLING || isEmpty(topSensor)) {
                     state = HAS_1_PIXEL;
                 } else break;
 
@@ -269,7 +271,7 @@ public final class Intake {
 
             case PIXELS_SETTLING:
 
-                if (requiredIntakingAmount > 0 && (pixelsTransferred = timer.seconds() >= TIME_SETTLING)) {
+                if (willIntake && (pixelsTransferred = timer.seconds() >= TIME_SETTLING)) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 } else {
@@ -291,7 +293,7 @@ public final class Intake {
         );
 
         double ANGLE_LATCH_UNLOCKED = (
-                requiredIntakingAmount > 0 &&
+                willIntake &&
                 state != PIVOTING &&
                 state != PIXELS_FALLING &&
                 state != PIXELS_SETTLING
