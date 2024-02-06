@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.TIME_INTAKE_FLIP_TO_LIFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
@@ -115,7 +116,7 @@ public final class Intake {
     private Intake.State state = HAS_0_PIXELS;
     private Intake.Height height = FLOOR;
 
-    private final ElapsedTime timer = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime(), flippingOut = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false;
@@ -212,6 +213,7 @@ public final class Intake {
         if (pixelsTransferred) pixelsTransferred = false;
 
         boolean willIntake = requiredIntakingAmount > 0;
+        boolean wasRetracted = pivot.isActivated();
 
         Pixel.Color bottom = fromHSV(bottomHSV = bottomSensor.getHSV());
         Pixel.Color top = fromHSV(topHSV = topSensor.getHSV());
@@ -284,6 +286,8 @@ public final class Intake {
 
         if (retracted) pivot.setActivated(!isScoring && depositRetracted);
 
+        if (wasRetracted && !pivot.isActivated()) flippingOut.reset();
+
         double ANGLE_PIVOT_INTAKING =
                 isScoring && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
@@ -303,6 +307,10 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    boolean clearOfDeposit() {
+        return flippingOut.seconds() >= TIME_INTAKE_FLIP_TO_LIFT;
     }
 
     boolean pixelsTransferred() {

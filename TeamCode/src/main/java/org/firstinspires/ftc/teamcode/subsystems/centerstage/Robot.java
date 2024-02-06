@@ -105,7 +105,7 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.colors);
         }
 
-        deposit.run();
+        deposit.run(intake.clearOfDeposit());
         intake.run(
                 deposit.paintbrush.getPixelsLocked(),
                 deposit.isRetracted(),

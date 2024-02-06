@@ -41,14 +41,14 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    void run() {
+    void run(boolean intakeClear) {
 
         if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
             lift.setTargetRow(-1);
         }
 
-        lift.run();
+        lift.run(intakeClear);
         paintbrush.pivot.setActivated(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING);
         paintbrush.run();
     }
@@ -149,7 +149,7 @@ public final class Deposit {
             this.manualLiftPower = manualLiftPower;
         }
 
-        private void run() {
+        private void run(boolean intakeClear) {
 
             if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
 
@@ -164,7 +164,7 @@ public final class Deposit {
             currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-            double output = (
+            double output = !intakeClear ? 0 : (
                     manualLiftPower != 0 ?
                             manualLiftPower * voltageScalar :
                             controller.calculate(currentState)
