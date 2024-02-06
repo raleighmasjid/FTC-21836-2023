@@ -213,10 +213,13 @@ public final class Intake {
 
         boolean willIntake = requiredIntakingAmount > 0;
 
+        Pixel.Color bottom = fromHSV(bottomHSV = bottomSensor.getHSV());
+        Pixel.Color top = fromHSV(topHSV = topSensor.getHSV());
+
         switch (state) {
             case HAS_0_PIXELS:
 
-                boolean bottomFull = (colors[0] = fromHSV(bottomHSV = bottomSensor.getHSV())) != EMPTY;
+                boolean bottomFull = (colors[0] = bottom) != EMPTY;
                 if (bottomFull || !willIntake) {
                     if (bottomFull) decrementHeight();
                     state = PIXEL_1_SETTLING;
@@ -225,13 +228,13 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (!willIntake || timer.seconds() >= TIME_PIXEL_1_SETTLING || isEmpty(topSensor)) {
+                if (!willIntake || timer.seconds() >= TIME_PIXEL_1_SETTLING || top == EMPTY) {
                     state = HAS_1_PIXEL;
                 } else break;
 
             case HAS_1_PIXEL:
 
-                boolean topFull = (colors[1] = fromHSV(topHSV = topSensor.getHSV())) != EMPTY;
+                boolean topFull = (colors[1] = top) != EMPTY;
                 if (topFull || requiredIntakingAmount < 2) {
                     if (topFull) decrementHeight();
                     latch.setActivated(true);
@@ -260,7 +263,7 @@ public final class Intake {
             case PIXELS_FALLING:
 
                 setMotorPower(0);
-                if (isEmpty(bottomSensor) && isEmpty(topSensor)) {
+                if (bottom == EMPTY && top == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
@@ -282,7 +285,7 @@ public final class Intake {
         if (retracted) pivot.setActivated(!isScoring && depositRetracted);
 
         double ANGLE_PIVOT_INTAKING =
-                isScoring && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
+                isScoring && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
@@ -300,10 +303,6 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
-    }
-
-    private static boolean isEmpty(ColorSensor sensor) {
-        return fromHSV(sensor.getHSV()) == EMPTY;
     }
 
     boolean pixelsTransferred() {
