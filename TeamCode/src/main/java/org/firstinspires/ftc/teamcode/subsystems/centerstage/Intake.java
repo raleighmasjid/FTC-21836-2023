@@ -279,6 +279,8 @@ public final class Intake {
 
         }
 
+        boolean retracted = (state == PIVOTING) || (state == PIXELS_FALLING) || (state == PIXELS_SETTLING);
+
         double ANGLE_PIVOT_INTAKING =
                 isScoring && isEmpty(bottomSensor) ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
@@ -290,12 +292,7 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
-        double ANGLE_LATCH_UNLOCKED = (
-                willIntake &&
-                state != PIVOTING &&
-                state != PIXELS_FALLING &&
-                state != PIXELS_SETTLING
-        ) ? ANGLE_LATCH_INTAKING : ANGLE_LATCH_TRANSFERRING;
+        double ANGLE_LATCH_UNLOCKED = retracted ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
