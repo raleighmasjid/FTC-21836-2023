@@ -202,7 +202,7 @@ public final class AutoScoringManager {
 
             colorsNeeded[0] = optimalPlacement.color;
 
-            ArrayList<Pixel> futureOptimalPlacements = PlacementCalculator.getOptimalPlacements(latestScan.clone().add(optimalPlacement));
+            ArrayList<Pixel> futureOptimalPlacements = PlacementCalculator.getOptimalPlacementsWithExtraWhites(latestScan.clone().add(optimalPlacement));
             if (!futureOptimalPlacements.isEmpty()) {
                 colorsNeeded[1] = futureOptimalPlacements.get(0).color;
             }
