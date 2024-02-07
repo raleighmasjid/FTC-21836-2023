@@ -256,7 +256,6 @@ public final class Intake {
             case PIVOTING:
 
                 if (pivotSensor.isPressed() && timer.seconds() >= TIME_PIVOTING) {
-                    setMotorPower(0);
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
@@ -266,7 +265,6 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                setMotorPower(0);
                 if (top == EMPTY && bottom == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
@@ -275,14 +273,12 @@ public final class Intake {
 
             case PIXELS_SETTLING:
 
-                setMotorPower(0);
                 pixelsTransferred = timer.seconds() >= TIME_SETTLING;
                 if (pixelsTransferred) state = RETRACTED;
                 else break;
 
             case RETRACTED:
 
-                setMotorPower(0);
                 if (intaking) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
@@ -308,10 +304,11 @@ public final class Intake {
 
         double ANGLE_LATCH_UNLOCKED;
         switch (state) {
-            case PIVOTING:
             case PIXELS_FALLING:
             case PIXELS_SETTLING:
             case RETRACTED:
+                setMotorPower(0);
+            case PIVOTING:
                 ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_TRANSFERRING; break;
             default:
                 ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_INTAKING;
