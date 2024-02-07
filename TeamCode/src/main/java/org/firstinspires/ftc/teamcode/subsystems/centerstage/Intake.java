@@ -18,6 +18,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
@@ -119,18 +120,19 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime(), flippingOut = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
-    private boolean pixelsTransferred = false;
-    private int requiredIntakingAmount = 2;
+    private boolean pixelsTransferred = false, intaking = false;
+    private int desiredPixelCount = 2;
     private double motorPower = 0;
 
     enum State {
         HAS_0_PIXELS,
         PIXEL_1_SETTLING,
-        PIXEL_2_SETTLING,
         HAS_1_PIXEL,
+        PIXEL_2_SETTLING,
         PIVOTING,
         PIXELS_FALLING,
         PIXELS_SETTLING,
+        RETRACTED,
     }
 
     public enum Height {
@@ -212,7 +214,6 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        boolean willIntake = requiredIntakingAmount > 0;
         boolean wasRetracted = pivot.isActivated();
 
         Pixel.Color bottom = fromHSV(bottomHSV = bottomSensor.getHSV());
@@ -222,30 +223,29 @@ public final class Intake {
             case HAS_0_PIXELS:
 
                 boolean bottomFull = (colors[0] = bottom) != EMPTY;
-                if (bottomFull || !willIntake) {
-                    if (bottomFull) decrementHeight();
+                if (bottomFull || !intaking) {
+                    if (bottomFull) setHeight(height.minus(1));
                     state = PIXEL_1_SETTLING;
                     timer.reset();
                 } else break;
 
             case PIXEL_1_SETTLING:
 
-                if (!willIntake || timer.seconds() >= TIME_PIXEL_1_SETTLING || top == EMPTY) {
-                    state = HAS_1_PIXEL;
-                } else break;
+                if (timer.seconds() >= TIME_PIXEL_1_SETTLING || top == EMPTY) state = HAS_1_PIXEL;
+                else break;
 
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = top) != EMPTY;
-                if (topFull || requiredIntakingAmount < 2) {
-                    if (topFull) decrementHeight();
+                if (topFull || !intaking || desiredPixelCount < 2) {
+                    if (topFull) setHeight(height.minus(1));
                     latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
                 } else break;
 
             case PIXEL_2_SETTLING:
 
-                if (depositRetracted && (requiredIntakingAmount + pixelsInDeposit <= 2)) {
+                if (depositRetracted && (!intaking || desiredPixelCount + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -265,26 +265,31 @@ public final class Intake {
             case PIXELS_FALLING:
 
                 setMotorPower(0);
-                if (bottom == EMPTY && top == EMPTY) {
+                if (top == EMPTY && bottom == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
+                    intaking = false;
                 } else break;
 
             case PIXELS_SETTLING:
 
-                if (willIntake && (pixelsTransferred = timer.seconds() >= TIME_SETTLING)) {
+                setMotorPower(0);
+                pixelsTransferred = timer.seconds() >= TIME_SETTLING;
+                if (pixelsTransferred) state = RETRACTED;
+                else break;
+
+            case RETRACTED:
+
+                setMotorPower(0);
+                if (intaking) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                } else {
-                    setMotorPower(0);
-                    break;
-                }
+                } else break;
 
         }
 
-        boolean retracted = (state == PIVOTING) || (state == PIXELS_FALLING) || (state == PIXELS_SETTLING);
 
-        if (retracted) pivot.setActivated(!isScoring && depositRetracted);
+        if (state == RETRACTED) pivot.setActivated(!isScoring && depositRetracted);
 
         if (wasRetracted && !pivot.isActivated()) flippingOut.reset();
 
@@ -299,7 +304,16 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
-        double ANGLE_LATCH_UNLOCKED = retracted ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
+        double ANGLE_LATCH_UNLOCKED;
+        switch (state) {
+            case PIVOTING:
+            case PIXELS_FALLING:
+            case PIXELS_SETTLING:
+            case RETRACTED:
+                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_TRANSFERRING; break;
+            default:
+                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_INTAKING;
+        }
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
@@ -317,20 +331,21 @@ public final class Intake {
         return pixelsTransferred;
     }
 
-    private void decrementHeight() {
-        setHeight(height.minus(1));
-    }
-
     public void setHeight(Intake.Height height) {
         this.height = height;
     }
 
     public void setMotorPower(double motorPower) {
+        if (motorPower != 0) intaking = true;
         this.motorPower = motorPower;
     }
 
-    public void setRequiredIntakingAmount(int pixelCount) {
-        this.requiredIntakingAmount = clip(pixelCount, 0, 2);
+    public void setDesiredPixelCount(int pixelCount) {
+        this.desiredPixelCount = clip(pixelCount, 1, 2);
+    }
+
+    public void toggle() {
+        intaking = !intaking;
     }
 
     void printTelemetry() {

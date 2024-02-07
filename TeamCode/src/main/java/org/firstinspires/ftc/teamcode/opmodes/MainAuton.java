@@ -120,14 +120,14 @@ public final class MainAuton extends LinearOpMode {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-                    robot.intake.setRequiredIntakingAmount(0);
+                    robot.intake.toggle();
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-                    robot.intake.setRequiredIntakingAmount(2);
+                    robot.intake.toggle();
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
@@ -323,9 +323,6 @@ public final class MainAuton extends LinearOpMode {
                         .waitSeconds(TIME_SPIKE)
                         .setTangent(RIGHT)
                         .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-                            robot.intake.setRequiredIntakingAmount(2);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
                         .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
