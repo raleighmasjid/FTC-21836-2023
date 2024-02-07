@@ -14,6 +14,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BACKWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
@@ -116,9 +117,8 @@ public final class MainTeleOp extends LinearOpMode {
         } else {
             if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
             else if (keyPressed(2, DPAD_UP))    robot.deposit.lift.changeRow(1);
-            else if (keyPressed(2, DPAD_LEFT) || keyPressed(2, DPAD_RIGHT)) {
-                robot.deposit.paintbrush.dropPixel();
-            }
+            else if (keyPressed(2, DPAD_LEFT))  robot.deposit.paintbrush.dropPixel();
+            else if (keyPressed(2, DPAD_RIGHT)) robot.deposit.paintbrush.lockPixels(WHITE);
 
             if (keyPressed(2, Y))               robot.intake.setHeight(FIVE_STACK);
             if (keyPressed(2, X))               robot.intake.setHeight(FOUR_STACK);
