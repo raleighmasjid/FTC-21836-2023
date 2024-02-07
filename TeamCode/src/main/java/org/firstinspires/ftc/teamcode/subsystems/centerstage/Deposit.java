@@ -139,8 +139,6 @@ public final class Deposit {
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(rowToInches(targetRow));
-            controller.setTarget(targetState);
         }
 
         private static double rowToInches(double row) {
@@ -164,6 +162,10 @@ public final class Deposit {
 
         private void run(boolean intakeClear) {
 
+            controller.setTarget(targetState = new State(
+                    intakeClear ? rowToInches(targetRow) : 0
+            ));
+
             if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
 
 //            if (lastKp != pidGains.kP) {
@@ -172,7 +174,7 @@ public final class Deposit {
 //            }
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-            double output = !intakeClear ? 0 : (
+            double output = (
                     manualLiftPower != 0 ?
                             manualLiftPower * voltageScalar :
                             controller.calculate(currentState)

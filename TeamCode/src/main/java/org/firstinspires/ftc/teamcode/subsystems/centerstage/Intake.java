@@ -117,7 +117,7 @@ public final class Intake {
     private Intake.State state = HAS_0_PIXELS;
     private Intake.Height height = FLOOR;
 
-    private final ElapsedTime timer = new ElapsedTime(), flippingOut = new ElapsedTime();
+    private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false, intaking = false;
@@ -214,8 +214,6 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        boolean wasRetracted = pivot.isActivated();
-
         Pixel.Color bottom = fromHSV(bottomHSV = bottomSensor.getHSV());
         Pixel.Color top = fromHSV(topHSV = topSensor.getHSV());
 
@@ -287,7 +285,7 @@ public final class Intake {
 
         if (state == RETRACTED) pivot.setActivated(!isScoring && depositRetracted);
 
-        if (wasRetracted && !pivot.isActivated()) flippingOut.reset();
+        if (pivot.isActivated()) timeSinceRetracted.reset();
 
         double ANGLE_PIVOT_INTAKING =
                 isScoring && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
@@ -321,7 +319,7 @@ public final class Intake {
     }
 
     boolean clearOfDeposit() {
-        return flippingOut.seconds() >= TIME_INTAKE_FLIP_TO_LIFT;
+        return timeSinceRetracted.seconds() >= TIME_INTAKE_FLIP_TO_LIFT;
     }
 
     boolean pixelsTransferred() {
