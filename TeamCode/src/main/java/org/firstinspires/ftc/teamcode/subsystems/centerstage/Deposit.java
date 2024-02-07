@@ -162,11 +162,11 @@ public final class Deposit {
 
         private void run(boolean intakeClear) {
 
-            controller.setTarget(targetState = new State(
-                    intakeClear ? rowToInches(targetRow) : 0
-            ));
-
-            if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
+            controller.setTarget(targetState =
+                    manualLiftPower == 0 ?
+                            new State(intakeClear ? rowToInches(targetRow) : 0) :
+                            currentState
+            );
 
 //            if (lastKp != pidGains.kP) {
 //                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
