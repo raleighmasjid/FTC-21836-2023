@@ -120,7 +120,7 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
-    private boolean pixelsTransferred = false, intaking = false;
+    private boolean pixelsTransferred = false, willIntake = false;
     private int desiredPixelCount = 2;
     private double motorPower = 0;
 
@@ -221,7 +221,7 @@ public final class Intake {
             case HAS_0_PIXELS:
 
                 boolean bottomFull = (colors[0] = bottom) != EMPTY;
-                if (bottomFull || !intaking) {
+                if (bottomFull || !willIntake) {
                     if (bottomFull) setHeight(height.minus(1));
                     state = PIXEL_1_SETTLING;
                     timer.reset();
@@ -235,7 +235,7 @@ public final class Intake {
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = top) != EMPTY;
-                if (topFull || !intaking || desiredPixelCount < 2) {
+                if (topFull || !willIntake || desiredPixelCount < 2) {
                     if (topFull) setHeight(height.minus(1));
                     latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
@@ -243,7 +243,7 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (depositRetracted && (!intaking || desiredPixelCount + pixelsInDeposit <= 2)) {
+                if (depositRetracted && (!willIntake || desiredPixelCount + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -264,18 +264,19 @@ public final class Intake {
                 if (top == EMPTY && bottom == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
-                    intaking = false;
                 } else break;
 
             case PIXELS_SETTLING:
 
                 pixelsTransferred = timer.seconds() >= TIME_SETTLING;
-                if (pixelsTransferred) state = RETRACTED;
-                else break;
+                if (pixelsTransferred) {
+                    willIntake = false;
+                    state = RETRACTED;
+                } else break;
 
             case RETRACTED:
 
-                if (intaking) {
+                if (willIntake) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
                 } else break;
@@ -331,7 +332,7 @@ public final class Intake {
     }
 
     public void setMotorPower(double motorPower) {
-        if (motorPower != 0) intaking = true;
+        if (motorPower != 0) willIntake = true;
         this.motorPower = motorPower;
     }
 
@@ -340,7 +341,7 @@ public final class Intake {
     }
 
     public void toggle() {
-        intaking = !intaking;
+        willIntake = !willIntake;
     }
 
     void printTelemetry() {
