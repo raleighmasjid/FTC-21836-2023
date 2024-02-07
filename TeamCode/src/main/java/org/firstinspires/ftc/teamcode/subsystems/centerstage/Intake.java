@@ -114,7 +114,7 @@ public final class Intake {
 
     private final SimpleServoPivot pivot, latch;
 
-    private Intake.State state = HAS_0_PIXELS;
+    private Intake.State state = RETRACTED;
     private Intake.Height height = FLOOR;
 
     private final ElapsedTime timer = new ElapsedTime(), flippingOut = new ElapsedTime();
@@ -196,6 +196,8 @@ public final class Intake {
         pivotSensor = hardwareMap.get(TouchSensor.class, "intake pivot sensor");
 
         timer.reset();
+
+        pivot.setActivated(true);
     }
 
     /**
