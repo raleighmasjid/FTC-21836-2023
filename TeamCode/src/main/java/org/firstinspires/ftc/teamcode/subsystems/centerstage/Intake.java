@@ -237,7 +237,7 @@ public final class Intake {
                 boolean topFull = (colors[1] = top) != EMPTY;
                 if (topFull || !willIntake || desiredPixelCount < 2) {
                     if (topFull) setHeight(height.minus(1));
-                    latch.setActivated(true);
+                    if (bottom != EMPTY) latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
                 } else break;
 
