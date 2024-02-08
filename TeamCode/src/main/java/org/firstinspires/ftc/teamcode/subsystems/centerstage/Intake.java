@@ -243,7 +243,7 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (depositRetracted && (!willIntake || desiredPixelCount + pixelsInDeposit <= 2)) {
+                if (depositRetracted && (!willIntake || (top == EMPTY ? 0 : 1) + (bottom == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
