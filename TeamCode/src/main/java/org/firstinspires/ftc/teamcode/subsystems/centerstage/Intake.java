@@ -289,7 +289,7 @@ public final class Intake {
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
         double ANGLE_PIVOT_INTAKING =
-                isScoring && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
+                (isScoring || !depositRetracted) && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
