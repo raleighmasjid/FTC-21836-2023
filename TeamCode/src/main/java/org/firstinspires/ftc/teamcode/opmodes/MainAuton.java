@@ -229,6 +229,7 @@ public final class MainAuton extends LinearOpMode {
             if (keyPressed(2, DPAD_DOWN))   selectedPlacement = clip(selectedPlacement + 1, 0, 2);
             if (keyPressed(2, X))  ourPlacements[selectedPlacement] = getOtherPlacement(ourPlacements[selectedPlacement]);
 
+            mTelemetry.addLine("Randomizations:");
             for (PropDetectPipeline.Randomization rand : randomizations) {
                 mTelemetry.addLine(
                         rand.name() + ": " + (ourPlacements[rand.ordinal()] % 2 == 1 ? "left" : "right") +
