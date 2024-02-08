@@ -63,7 +63,7 @@ public class MainAuton {
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 50,
+            X_BACKDROP = 52,
             Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
             WIDTH_PIXEL = 3.7,
@@ -72,9 +72,9 @@ public class MainAuton {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(X_START_RIGHT, -26, LEFT),
-            nearTrussSpike = new EditablePose(3.4, -35, LEFT),
-            awayTrussSpike = new EditablePose(24, -32, LEFT),
+            centerSpike = new EditablePose(15, -23, 2.86),
+            nearTrussSpike = new EditablePose(5.4, -35, 3.25),
+            awayTrussSpike = new EditablePose(29, -32, 2.65),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(36, -12, LEFT),
@@ -87,14 +87,14 @@ public class MainAuton {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-//                    robot.intake.setRequiredIntakingAmount(0);
+//                    robot.intake.toggle();
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-//                    robot.intake.setRequiredIntakingAmount(2);
+//                    robot.intake.toggle();
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
@@ -168,7 +168,7 @@ public class MainAuton {
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         boolean partnerWillDoRand = false;
-        boolean doCycles = false;
+        boolean park = true;
 
         PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
@@ -237,16 +237,9 @@ public class MainAuton {
                                 .waitSeconds(TIME_SPIKE)
                                 .setTangent(RIGHT)
                                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-//                                    robot.intake.setRequiredIntakingAmount(2);
-                                })
-                                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
                                 })
-                                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
-                                        outer ?
-                                                isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
-                                                RIGHT
-                                )
+                                .lineToSplineHeading(toPose2d(placements.get(0)))
                                 .waitSeconds(TIME_PRE_YELLOW)
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixel();
@@ -259,7 +252,12 @@ public class MainAuton {
 
                     }
 
-                    if (doCycles) {
+                    if (park) {
+                        if (partnerWillDoRand) sequence
+                                .lineTo(parking.byAlliance().toPose2d().vec())
+                                .lineTo(parked.byAlliance().toPose2d().vec())
+                                ;
+                    } else {
 
                         Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                         int placement = backdropSide ? 1 : 2;
@@ -275,11 +273,6 @@ public class MainAuton {
 //                    intake2Pixels(sequence, 1, height.minus(2));
 //                    score(sequence, placements, placement + 2);
 //                }
-                    } else if (partnerWillDoRand) {
-                        sequence
-                                .lineTo(parking.byAlliance().toPose2d().vec())
-                                .lineTo(parked.byAlliance().toPose2d().vec())
-                        ;
                     }
 
                     sequence.addTemporalMarker(() -> autonBackdrop.print());
