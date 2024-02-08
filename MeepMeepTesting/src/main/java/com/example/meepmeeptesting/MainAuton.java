@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = false;
+    static boolean isRed = true;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -46,15 +46,10 @@ public class MainAuton {
     public static double
             X_START_LEFT = -35,
             X_START_RIGHT = 12,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
-            Y_SHIFT_BEFORE_SPIKE = 15,
-            Y_SHIFT_AFTER_SPIKE = 26,
-            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
-            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_TILE = 24,
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
+            Y_INTAKING_2 = -24,
             Y_INTAKING_3 = -36,
             TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
@@ -67,21 +62,23 @@ public class MainAuton {
             Y_MAX_BLUE = 45.75,
             Y_MAX_RED = -26.25,
             WIDTH_PIXEL = 3.7,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
+            BACKING_AUDIENCE_SIDE_OUTER = 12;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(15, -23, 2.86),
-            nearTrussSpike = new EditablePose(5.4, -35, 3.25),
-            awayTrussSpike = new EditablePose(29, -32, 2.65),
+            spikeOuter = new EditablePose(5.4, -35, 3.25),
+            spikeCenterBackdrop = new EditablePose(15, -23, 2.86),
+            spikeCenterAudience = new EditablePose(-27, -23, -1.5708),
+            spikeOuterBackdrop = new EditablePose(29, -32, 2.65),
+            spikeOuterAudience = new EditablePose(-46, -32, BACKWARD),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(36, -12, LEFT),
+            approachingBackstage = new EditablePose(36, -12, LEFT),
+            approachingStacks = new EditablePose(-46, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
     private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
@@ -91,7 +88,7 @@ public class MainAuton {
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+                .lineTo(MainAuton.approachingBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
 //                    robot.intake.toggle();
@@ -107,7 +104,7 @@ public class MainAuton {
 //                    robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
-                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
+                .splineToConstantHeading(MainAuton.approachingBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(turnToStack1.vec(), LEFT)
                 .lineTo(movingToStack2.byAlliance().toPose2d().vec())
                 .lineTo(stackPos(2, height).vec())
@@ -139,7 +136,7 @@ public class MainAuton {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         sequence
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+                .lineTo(MainAuton.approachingBackstage.byAlliance().toPose2d().vec())
 
                 .addTemporalMarker(() -> {
 //                    robot.deposit.lift.setTargetRow(first.y);
@@ -220,13 +217,13 @@ public class MainAuton {
                                 (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
 
                         if (inner) {
-                            Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
+                            Pose2d spike = spikeOuter.byAlliance().flipBySide().toPose2d();
                             sequence.splineTo(spike.vec(), spike.getHeading());
                         } else {
                             sequence.lineToSplineHeading((
                                     outer ?
-                                            awayTrussSpike.byAlliance().flipBySide() :
-                                            centerSpike.byBoth()
+                                            spikeOuterBackdrop.byAlliance().flipBySide() :
+                                            spikeCenterBackdrop.byBoth()
                             ).toPose2d());
                         }
 
@@ -249,6 +246,30 @@ public class MainAuton {
                         ;
 
                     } else {
+
+                        boolean inner =
+                                (isRed && rand == PropDetectPipeline.Randomization.RIGHT) ||
+                                (!isRed && rand == PropDetectPipeline.Randomization.LEFT);
+
+                        boolean outer =
+                                (isRed && rand == PropDetectPipeline.Randomization.LEFT) ||
+                                (!isRed && rand == PropDetectPipeline.Randomization.RIGHT);
+
+
+                        if (inner) {
+                            Pose2d spike = spikeOuter.byAlliance().flipBySide().toPose2d();
+                            sequence.splineTo(spike.vec(), spike.getHeading());
+                        } else {
+
+                            Pose2d spike = (outer ?
+                                    spikeOuterAudience :
+                                    spikeCenterAudience).byAlliance().toPose2d();
+                            sequence
+                                    .lineToSplineHeading(spike)
+                                    .back(BACKING_AUDIENCE_SIDE_OUTER)
+                                    .lineToSplineHeading(approachingStacks.byAlliance().toPose2d())
+                            ;
+                        }
 
                     }
 
@@ -291,12 +312,16 @@ public class MainAuton {
 
         public double x, y, heading;
 
-        static boolean backdropSide = true;
+        static boolean backdropSide = false;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
             this.y = y;
             this.heading = heading;
+        }
+
+        public EditablePose clone() {
+            return new EditablePose(x, y, heading);
         }
 
         public EditablePose byAlliance() {
