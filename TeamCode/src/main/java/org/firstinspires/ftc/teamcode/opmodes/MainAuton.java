@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_PARK;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_PARTNER;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.selections;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -196,6 +196,25 @@ public final class MainAuton extends LinearOpMode {
         ;
     }
 
+    enum ConfigSelection {
+        EDITING_LEFT,
+        EDITING_CENTER,
+        EDITING_RIGHT,
+        EDITING_ALLIANCE,
+        EDITING_SIDE,
+        EDITING_PARK,
+        EDITING_PARTNER;
+
+        public static final ConfigSelection[] selections = values();
+
+        public ConfigSelection plus(int i) {
+            return selections[(ordinal() + i) % selections.length];
+        }
+        public String markIf(ConfigSelection s) {
+            return this == s ? " <" : "";
+        }
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -210,42 +229,57 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        ConfigSelection selection = EDITING_ALLIANCE;
+
         int[] ourPlacements = {1, 3, 6};
-        int selectedPlacement = 0;
         boolean partnerWillDoRand = false, park = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
-            gamepadEx2.readButtons();
-            if (keyPressed(1, B))           isRed = true;
-            if (keyPressed(1, X))           isRed = false;
-            if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
-            if (keyPressed(1, DPAD_LEFT))   backdropSide = !isRed;
-            if (keyPressed(1, DPAD_UP))     park = false;
-            if (keyPressed(1, DPAD_DOWN))   park = true;
-            if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
 
-            if (keyPressed(2, DPAD_UP))     selectedPlacement = clip(selectedPlacement - 1, 0, 2);
-            if (keyPressed(2, DPAD_DOWN))   selectedPlacement = clip(selectedPlacement + 1, 0, 2);
-            if (keyPressed(2, X))  ourPlacements[selectedPlacement] = getOtherPlacement(ourPlacements[selectedPlacement]);
+            if (keyPressed(1, DPAD_UP))   selection = selection.plus(-1);
+            if (keyPressed(1, DPAD_DOWN)) selection = selection.plus(1);
 
-            mTelemetry.addLine("Randomizations:");
-            for (PropDetectPipeline.Randomization rand : randomizations) {
-                mTelemetry.addLine(
-                        rand.name() + ": " + (ourPlacements[rand.ordinal()] % 2 == 1 ? "left" : "right") +
-                        (rand.ordinal() == selectedPlacement ? " <" : "")
-                );
+            if (keyPressed(1, X)) switch (selection) {
+                case EDITING_LEFT:
+                case EDITING_CENTER:
+                case EDITING_RIGHT:
+                    int index = selection.ordinal();
+                    ourPlacements[index] = getOtherPlacement(ourPlacements[index]);
+                    break;
+                case EDITING_ALLIANCE:
+                    isRed = !isRed;
+                    break;
+                case EDITING_SIDE:
+                    backdropSide = !backdropSide;
+                    break;
+                case EDITING_PARK:
+                    park = !park;
+                    break;
+                default:
+                case EDITING_PARTNER:
+                    partnerWillDoRand = !partnerWillDoRand;
+                    break;
             }
-            mTelemetry.addLine();
-            mTelemetry.addLine();
 
-            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE ") + (backdropSide ? "BACKDROP " : "AUDIENCE ") + "side");
+            mTelemetry.addLine(isRed ? "RED " : "BLUE " + selection.markIf(EDITING_ALLIANCE));
             mTelemetry.addLine();
-            mTelemetry.addLine("Your alliance PARTNER WILL " + (partnerWillDoRand ? "" : "NOT ") + "PLACE YELLOW");
+            mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
             mTelemetry.addLine();
-            mTelemetry.addLine("You WILL " + (park ? "PARK" : "CYCLE"));
+            mTelemetry.addLine("WILL " + (park ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
+            mTelemetry.addLine();
+            mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
+            mTelemetry.addLine();
+            mTelemetry.addLine("Randomizations:");
+            for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
+                    randomizations[i].name() + ": " +
+                    (ourPlacements[i] % 2 == 1 ? "left" : "right") +
+                    selection.markIf(selections[i])
+            );
+            mTelemetry.addLine();
             mTelemetry.addLine();
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
+
             mTelemetry.update();
         }
 
