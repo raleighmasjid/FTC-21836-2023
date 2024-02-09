@@ -6,11 +6,11 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_ALLIANCE;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_PARK;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_PARTNER;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.EDITING_SIDE;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.ConfigSelection.selections;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -59,7 +59,7 @@ public final class MainAuton extends LinearOpMode {
     public static MultipleTelemetry mTelemetry;
     static Robot robot;
     public static Backdrop autonBackdrop = new Backdrop();
-    static Pose2d autonEndPose = new Pose2d(0, 0, FORWARD);
+    static Pose2d autonEndPose = null;
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
@@ -196,7 +196,7 @@ public final class MainAuton extends LinearOpMode {
         ;
     }
 
-    enum ConfigSelection {
+    enum AutonConfig {
         EDITING_LEFT,
         EDITING_CENTER,
         EDITING_RIGHT,
@@ -205,12 +205,12 @@ public final class MainAuton extends LinearOpMode {
         EDITING_PARK,
         EDITING_PARTNER;
 
-        public static final ConfigSelection[] selections = values();
+        public static final AutonConfig[] selections = values();
 
-        public ConfigSelection plus(int i) {
+        public AutonConfig plus(int i) {
             return selections[(ordinal() + i) % selections.length];
         }
-        public String markIf(ConfigSelection s) {
+        public String markIf(AutonConfig s) {
             return this == s ? " <" : "";
         }
     }
@@ -229,7 +229,7 @@ public final class MainAuton extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
-        ConfigSelection selection = EDITING_ALLIANCE;
+        AutonConfig selection = EDITING_ALLIANCE;
 
         int[] ourPlacements = {1, 3, 6};
         boolean partnerWillDoRand = false, park = true;
