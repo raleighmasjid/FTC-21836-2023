@@ -285,12 +285,14 @@ public final class Intake {
         }
 
 
-        if (state == RETRACTED) pivot.setActivated(!isScoring && depositRetracted);
+        boolean liftIsRunning = isScoring || !depositRetracted;
+
+        if (state == RETRACTED) pivot.setActivated(!liftIsRunning);
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
         double ANGLE_PIVOT_INTAKING =
-                (isScoring || !depositRetracted) && bottom == EMPTY ? ANGLE_PIVOT_VERTICAL :
+                state == RETRACTED && liftIsRunning ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.deltaTheta :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
