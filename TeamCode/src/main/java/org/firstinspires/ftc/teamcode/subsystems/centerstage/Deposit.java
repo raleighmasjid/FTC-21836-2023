@@ -204,7 +204,8 @@ public final class Deposit {
     public static final class Paintbrush {
 
         public static double
-                ANGLE_PIVOT_OFFSET = 5,
+                ANGLE_PIVOT_OFFSET = 10,
+                ANGLE_PIVOT_SCORING = 115,
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
@@ -222,7 +223,7 @@ public final class Deposit {
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
                     ANGLE_PIVOT_OFFSET,
-                    ANGLE_PIVOT_OFFSET + 120,
+                    ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING,
                     getAxonServo(hardwareMap, "deposit left"),
                     getReversedServo(getAxonServo(hardwareMap, "deposit right"))
             );
@@ -270,7 +271,7 @@ public final class Deposit {
         }
 
         private void run() {
-            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
+            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING);
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 
