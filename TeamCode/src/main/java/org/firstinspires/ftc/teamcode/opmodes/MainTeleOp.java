@@ -16,6 +16,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BACKWARD;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
@@ -23,6 +24,9 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
@@ -65,6 +69,21 @@ public final class MainTeleOp extends LinearOpMode {
         }
     }
 
+    enum TeleOpConfig {
+        EDITING_ALLIANCE,
+        EDITING_SIDE,
+        EDITING_SLOW;
+
+        public static final TeleOpConfig[] selections = values();
+
+        public TeleOpConfig plus(int i) {
+            return selections[(ordinal() + i) % selections.length];
+        }
+        public String markIf(TeleOpConfig s) {
+            return this == s ? " <" : "";
+        }
+    }
+
     static void teleOpInit(LinearOpMode opMode) {
         boolean isAutomated = opMode instanceof AutomatedTeleOp;
 
@@ -73,8 +92,6 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(opMode.hardwareMap);
-        robot.drivetrain.setPoseEstimate(autonEndPose);
-        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
         robot.initRun();
         if (isAutomated) robot.startAlgorithm(opMode.hardwareMap);
 
@@ -82,23 +99,45 @@ public final class MainTeleOp extends LinearOpMode {
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
         gamepadEx2 = new GamepadEx(opMode.gamepad2);
 
-        boolean slowModeLocked = false;
+        TeleOpConfig selection = EDITING_ALLIANCE;
+
+        boolean lockSlowMode = false;
         // Get gamepad 1 button input and locks slow mode:
         while (opMode.opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, RIGHT_BUMPER)) slowModeLocked = !slowModeLocked;
-            if (isAutomated) {
-                if (keyPressed(1, B)) isRed = true;
-                if (keyPressed(1, X)) isRed = false;
-                mTelemetry.addLine((isRed ? "RED" : "BLUE") + " alliance");
-            }
-            mTelemetry.addLine((slowModeLocked ? "SLOW" : "NORMAL") + " mode");
-            mTelemetry.update();
 
-            robot.initRun();
+            if (keyPressed(1, DPAD_UP))   selection = selection.plus(-1);
+            if (keyPressed(1, DPAD_DOWN)) selection = selection.plus(1);
+
+            if (keyPressed(1, X)) switch (selection) {
+                case EDITING_ALLIANCE:
+                    isRed = !isRed;
+                    break;
+                case EDITING_SIDE:
+                    backdropSide = !backdropSide;
+                    break;
+                default:
+                case EDITING_SLOW:
+                    lockSlowMode = !lockSlowMode;
+                    break;
+            }
+
+            mTelemetry.addLine(isRed ? "RED " : "BLUE " + selection.markIf(EDITING_ALLIANCE));
+            mTelemetry.addLine();
+            mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
+            mTelemetry.addLine();
+            mTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + selection.markIf(EDITING_SLOW));
+
+            mTelemetry.update();
         }
-        if (slowModeLocked) robot.drivetrain.lockSlowMode();
+
+        if (lockSlowMode) robot.drivetrain.lockSlowMode();
+
         if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
+
+        if (autonEndPose == null) autonEndPose = MainAuton.startPose.byBoth().toPose2d();
+        robot.drivetrain.setPoseEstimate(autonEndPose);
+        robot.drivetrain.setCurrentHeading(autonEndPose.getHeading() - (isRed ? FORWARD : BACKWARD));
     }
 
     static void teleOpControls() {
