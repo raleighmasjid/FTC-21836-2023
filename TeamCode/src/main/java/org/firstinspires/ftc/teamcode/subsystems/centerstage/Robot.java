@@ -62,8 +62,6 @@ public final class Robot {
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
         };
-
-        drone.run();
     }
 
     public void preload() {
