@@ -122,7 +122,7 @@ public final class MainTeleOp extends LinearOpMode {
                     break;
             }
 
-            mTelemetry.addLine(isRed ? "RED " : "BLUE " + selection.markIf(EDITING_ALLIANCE));
+            mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
             mTelemetry.addLine();
             mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
             mTelemetry.addLine();
