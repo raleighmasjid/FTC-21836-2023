@@ -80,8 +80,8 @@ public final class Robot {
 
     public void readSensors() {
         bulkReader.bulkRead();
-        intake.topSensor.update();
-        intake.bottomSensor.update();
+        intake.sensors[0].update();
+        intake.sensors[1].update();
         drivetrain.update();
         deposit.lift.readSensors();
     }

@@ -107,8 +107,8 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    final ColorSensor bottomSensor, topSensor;
-    private HSV bottomHSV = new HSV(), topHSV = new HSV();
+    final ColorSensor[] sensors;
+    private final HSV[] HSVs = {new HSV(), new HSV()};
 
     private final TouchSensor pivotSensor;
 
@@ -119,6 +119,7 @@ public final class Intake {
 
     private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
+    private final Pixel.Color[] reads = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false, willIntake = false;
     private int desiredPixelCount = 2;
@@ -187,8 +188,10 @@ public final class Intake {
         motor.setZeroPowerBehavior(FLOAT);
         motor.setInverted(true);
 
-        bottomSensor = new ColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN);
-        topSensor = new ColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN);
+        sensors = new ColorSensor[]{
+            new ColorSensor(hardwareMap, "bottom color", (float) COLOR_SENSOR_GAIN),
+            new ColorSensor(hardwareMap, "top color", (float) COLOR_SENSOR_GAIN),
+        };
 
         pivotSensor = hardwareMap.get(TouchSensor.class, "intake pivot sensor");
 
@@ -211,13 +214,13 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        Pixel.Color bottom = fromHSV(bottomHSV = bottomSensor.getHSV());
-        Pixel.Color top = fromHSV(topHSV = topSensor.getHSV());
+        reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
+        reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
 
         switch (state) {
             case HAS_0_PIXELS:
 
-                boolean bottomFull = (colors[0] = bottom) != EMPTY;
+                boolean bottomFull = (colors[0] = reads[0]) != EMPTY;
                 if (bottomFull || !willIntake) {
                     if (bottomFull) setHeight(height.minus(1));
                     state = PIXEL_1_SETTLING;
@@ -226,21 +229,21 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (top == EMPTY || timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
+                if (reads[1] == EMPTY || timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
                 else break;
 
             case HAS_1_PIXEL:
 
-                boolean topFull = (colors[1] = top) != EMPTY;
+                boolean topFull = (colors[1] = reads[1]) != EMPTY;
                 if (topFull || !willIntake || desiredPixelCount < 2) {
                     if (topFull) setHeight(height.minus(1));
-                    if (bottom != EMPTY) latch.setActivated(true);
+                    if (reads[0] != EMPTY) latch.setActivated(true);
                     state = PIXEL_2_SETTLING;
                 } else break;
 
             case PIXEL_2_SETTLING:
 
-                if (depositRetracted && (!willIntake || (top == EMPTY ? 0 : 1) + (bottom == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
+                if (depositRetracted && (!willIntake || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -258,7 +261,7 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (top == EMPTY && bottom == EMPTY) {
+                if (reads[1] == EMPTY && reads[0] == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
@@ -344,13 +347,13 @@ public final class Intake {
     }
 
     void printTelemetry() {
-        mTelemetry.addData("Top color", colors[1].name());
-        mTelemetry.addData("Bottom color", colors[0].name());
+        mTelemetry.addData("Top color", reads[1].name());
+        mTelemetry.addData("Bottom color", reads[0].name());
     }
 
     void printNumericalTelemetry() {
-        topHSV.toTelemetry("Top HSV");
+        HSVs[1].toTelemetry("Top HSV");
         mTelemetry.addLine();
-        bottomHSV.toTelemetry("Bottom HSV");
+        HSVs[0].toTelemetry("Bottom HSV");
     }
 }
