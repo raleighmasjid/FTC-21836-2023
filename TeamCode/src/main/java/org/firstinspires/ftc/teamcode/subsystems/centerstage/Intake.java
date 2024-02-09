@@ -178,6 +178,7 @@ public final class Intake {
                 getAxonServo(hardwareMap, "intake right"),
                 getReversedServo(getAxonServo(hardwareMap, "intake left"))
         );
+        pivot.setActivated(true);
 
         latch = new SimpleServoPivot(
                 ANGLE_LATCH_TRANSFERRING,
