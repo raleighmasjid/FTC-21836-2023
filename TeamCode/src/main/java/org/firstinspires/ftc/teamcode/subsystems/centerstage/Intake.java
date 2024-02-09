@@ -146,10 +146,6 @@ public final class Intake {
 
         private static final Intake.Height[] values = values();
 
-        public static Intake.Height get(int ordinal) {
-            return values[ordinal];
-        }
-
         public Intake.Height minus(int less) {
             return values[max(ordinal() - less, 0)];
         }
