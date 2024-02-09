@@ -8,15 +8,8 @@ import java.util.ArrayList;
 
 public final class AutonPixelSupplier {
 
-    public static int getOtherPlacement(int placement) {
-        switch (placement) {
-            case 1: return 2;
-            case 2: return 1;
-            case 3: return 4;
-            case 4: return 3;
-            case 5: return 6;
-            default: case 6: return 5;
-        }
+    public static int getOtherPlacement(int i) {
+        return i + (i % 2 == 0 ? -1 : 1);
     }
 
     /**
