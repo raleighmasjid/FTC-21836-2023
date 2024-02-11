@@ -22,6 +22,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonEndPose;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopClip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_ALLIANCE;
@@ -77,7 +78,7 @@ public final class MainTeleOp extends LinearOpMode {
         public static final TeleOpConfig[] selections = values();
 
         public TeleOpConfig plus(int i) {
-            return selections[(ordinal() + i) % selections.length];
+            return selections[loopClip(ordinal() + i, selections.length)];
         }
         public String markIf(TeleOpConfig s) {
             return this == s ? " <" : "";
