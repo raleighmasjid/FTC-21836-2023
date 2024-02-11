@@ -43,9 +43,9 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 11,
+            ANGLE_PIVOT_OFFSET = 10,
             ANGLE_PIVOT_FLOOR_CLEARANCE = 3,
-            ANGLE_PIVOT_TRANSFERRING = 195.25,
+            ANGLE_PIVOT_TRANSFERRING = 195,
             ANGLE_PIVOT_VERTICAL = 110,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
