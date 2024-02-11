@@ -244,7 +244,6 @@ public final class Intake {
             case PIXEL_2_SETTLING:
 
                 if (depositRetracted && (!isIntaking || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
-                    isIntaking = false;
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -253,6 +252,7 @@ public final class Intake {
             case PIVOTING:
 
                 if (pivotSensor.isPressed() && timer.seconds() >= TIME_PIVOTING) {
+                    isIntaking = false;
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
