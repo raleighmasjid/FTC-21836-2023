@@ -229,7 +229,7 @@ public final class Intake {
 
             case PIXEL_1_SETTLING:
 
-                if (reads[1] == EMPTY || timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
+                if (timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
                 else break;
 
             case HAS_1_PIXEL:
