@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.TIME_INTAKE_FLIP_TO_LIFT;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopClip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
@@ -123,7 +125,7 @@ public final class Intake {
 
     private boolean pixelsTransferred = false, isIntaking = false;
     private int desiredPixelCount = 2;
-    private double motorPower = 0;
+    private double motorPower, rollerAngle;
 
     enum State {
         HAS_0_PIXELS,
@@ -216,6 +218,8 @@ public final class Intake {
 
         reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
         reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
+
+        rollerAngle = normalizeDegrees(loopClip(motor.encoder.getPosition(), motor.getCPR()) * 360 / motor.getCPR());
 
         switch (state) {
             case HAS_0_PIXELS:
@@ -355,5 +359,7 @@ public final class Intake {
         HSVs[1].toTelemetry("Top HSV");
         mTelemetry.addLine();
         HSVs[0].toTelemetry("Bottom HSV");
+        mTelemetry.addLine();
+        mTelemetry.addData("Roller angle", rollerAngle);
     }
 }
