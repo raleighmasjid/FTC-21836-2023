@@ -109,6 +109,8 @@ public final class Intake {
 
     final ColorSensor[] sensors;
     private final HSV[] HSVs = {new HSV(), new HSV()};
+    private final Pixel.Color[] reads = {EMPTY, EMPTY};
+    public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
     private final TouchSensor pivotSensor;
 
@@ -118,8 +120,6 @@ public final class Intake {
     private Intake.Height height = FLOOR;
 
     private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
-    public final Pixel.Color[] colors = {EMPTY, EMPTY};
-    private final Pixel.Color[] reads = {EMPTY, EMPTY};
 
     private boolean pixelsTransferred = false, isIntaking = false;
     private int desiredPixelCount = 2;
