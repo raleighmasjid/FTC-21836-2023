@@ -36,7 +36,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
+import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
@@ -57,10 +61,22 @@ public final class Intake {
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25,
             HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
             theta0 = -0.496183876745;
+
+    public static PIDGains pidGains = new PIDGains(
+            0,
+            0,
+            0,
+            1
+    );
+
+    public static KalmanGains kalmanGains = new KalmanGains(
+            3,
+            5,
+            10
+    );
 
     /**
      * HSV value bound for intake pixel detection
@@ -108,6 +124,8 @@ public final class Intake {
             );
 
     private final MotorEx motor;
+    private final KalmanFilter filter = new KalmanFilter(kalmanGains);
+    private final PIDController controller = new PIDController(filter);
 
     final ColorSensor[] sensors;
     private final HSV[] HSVs = {new HSV(), new HSV()};
@@ -221,6 +239,9 @@ public final class Intake {
 
         rollerAngle = normalizeDegrees(loopClip(motor.encoder.getPosition(), motor.getCPR()) * 360 / motor.getCPR());
 
+        filter.setGains(kalmanGains);
+        controller.setGains(pidGains);
+
         switch (state) {
             case HAS_0_PIXELS:
 
@@ -259,7 +280,9 @@ public final class Intake {
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
-                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : SPEED_SLOW_REVERSING);
+                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : (
+                            controller.calculate(new org.firstinspires.ftc.teamcode.control.motion.State(rollerAngle))
+                    ));
                     break;
                 }
 

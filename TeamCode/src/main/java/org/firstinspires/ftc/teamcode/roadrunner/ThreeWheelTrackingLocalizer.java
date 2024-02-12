@@ -52,7 +52,7 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
         lastEncPositions = lastTrackingEncPositions;
         lastEncVels = lastTrackingEncVels;
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "intake"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "lateral odo"));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left front"));
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
 
