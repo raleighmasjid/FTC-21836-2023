@@ -383,6 +383,7 @@ public final class Intake {
         mTelemetry.addLine();
         HSVs[0].toTelemetry("Bottom HSV");
         mTelemetry.addLine();
-        mTelemetry.addData("Roller angle", rollerAngle);
-    }
+        mTelemetry.addData("Roller angle (deg)", rollerAngle);
+        mTelemetry.addData("Roller angle (deg/s)", controller.getFilteredErrorDerivative());
+    } 
 }
