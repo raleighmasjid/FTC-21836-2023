@@ -252,7 +252,6 @@ public final class Intake {
             case PIVOTING:
 
                 if (pivotSensor.isPressed() && timer.seconds() >= TIME_PIVOTING) {
-                    isIntaking = false;
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
@@ -272,6 +271,7 @@ public final class Intake {
                 pixelsTransferred = timer.seconds() >= TIME_SETTLING;
                 if (pixelsTransferred) {
                     state = RETRACTED;
+                    isIntaking = false;
                 } else break;
 
             case RETRACTED:
