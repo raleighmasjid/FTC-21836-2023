@@ -216,6 +216,10 @@ public final class MainAuton extends LinearOpMode {
     }
 
     public static int loopClip(int a, int b) {
+        return (int) loopClip(a,(double) b);
+    }
+
+    public static double loopClip(double a, double b) {
         return (a % b + b) % b;
     }
 
