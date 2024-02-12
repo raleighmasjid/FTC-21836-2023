@@ -17,6 +17,7 @@ public class PIDController implements FeedbackController {
 
     private final Filter derivFilter;
     private final Differentiator differentiator = new Differentiator();
+    private final Differentiator filterDiff = new Differentiator();
     private final Integrator integrator = new Integrator();
 
     private State error = new State();
@@ -44,7 +45,7 @@ public class PIDController implements FeedbackController {
         if (signum(error.x) != signum(lastError.x)) reset();
         errorIntegral = integrator.getIntegral(error.x);
         rawErrorDerivative = differentiator.getDerivative(error.x);
-        filteredErrorDerivative = derivFilter.calculate(rawErrorDerivative);
+        filteredErrorDerivative = filterDiff.getDerivative(derivFilter.calculate(error.x));
 
         double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * filteredErrorDerivative);
 
