@@ -50,7 +50,7 @@ public final class Deposit {
         }
 
         lift.run(intakeClear);
-        paintbrush.pivot.setActivated(paintbrushExtended());
+        paintbrush.pivot.setActivated(paintbrushExtended() && intakeClear);
         paintbrush.run();
     }
 
