@@ -91,7 +91,6 @@ public final class MainAuton extends LinearOpMode {
             Y_INTAKING_3 = -36,
             TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,

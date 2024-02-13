@@ -4,7 +4,11 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.TIME_INTAKE_FLIP_TO_LIFT;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.GREEN;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopClip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
@@ -15,11 +19,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_2_SETTLING;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.GREEN;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -60,6 +59,7 @@ public final class Intake {
             TIME_REVERSING = 0.175,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
+            TIME_INTAKE_FLIP_TO_LIFT = 0.2,
             COLOR_SENSOR_GAIN = 1,
             HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
