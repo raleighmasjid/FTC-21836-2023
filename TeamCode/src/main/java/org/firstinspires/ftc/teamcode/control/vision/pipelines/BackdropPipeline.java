@@ -631,12 +631,12 @@ public class BackdropPipeline extends OpenCvPipeline {
             valSum += sampleColor[2];
         }
 
-        double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0;
+        double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
         double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
         double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
 
         return new double[]{
-                avgHue, // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+                avgHue,
                 round(avgSat * 1000) / 1000.0,
                 clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
         };
