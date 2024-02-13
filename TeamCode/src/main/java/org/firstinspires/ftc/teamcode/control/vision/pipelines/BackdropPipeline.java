@@ -39,7 +39,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
-import static java.lang.Double.isNaN;
+import static org.opencv.imgproc.Imgproc.INTER_AREA;
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 
@@ -74,27 +74,34 @@ public class BackdropPipeline extends OpenCvPipeline {
             showBackground = false;
 
     private static final double
-            SCREEN_HEIGHT = 1280,
-            SCREEN_WIDTH = 720,
-            X_TOP_LEFT_R_TAG = 536.25,
-            Y_TOP_LEFT = 1053.9285714285713,
-            TARGET_SIZE = 65,
-            X_FIRST_PIXEL = 80,
-            Y_FIRST_PIXEL = 966.875,
-            X_SHIFT_PIXEL_POINTS_L = -28.321428571428573,
-            X_SHIFT_PIXEL_POINTS_R = 28.321428571428573,
-            Y_SHIFT_PIXEL_POINTS_T = -35.75,
-            Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142,
-            X_SHIFT_WHITE = 2.6,
-            Y_SHIFT_WHITE = 81.25,
-            X_SHIFT_BLACK = 6,
-            Y_SHIFT_BLACK = 10,
-            X_SHIFT_U = 169.0,
-            Y_SHIFT_U = -991.25,
+            SCALING_FACTOR = 1 / 4.0,
+            SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
+            SCREEN_WIDTH = 720 * SCALING_FACTOR,
+            X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
+            Y_TOP_LEFT = 1053.9285714285713 * SCALING_FACTOR,
+            TARGET_SIZE = 65 * SCALING_FACTOR,
+            X_FIRST_PIXEL = 80 * SCALING_FACTOR,
+            Y_FIRST_PIXEL = 966.875 * SCALING_FACTOR,
+            X_SHIFT_PIXEL_POINTS_L = -28.321428571428573 * SCALING_FACTOR,
+            X_SHIFT_PIXEL_POINTS_R = 28.321428571428573 * SCALING_FACTOR,
+            Y_SHIFT_PIXEL_POINTS_T = -35.75 * SCALING_FACTOR,
+            Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
+            X_SHIFT_WHITE = 2.6 * SCALING_FACTOR,
+            Y_SHIFT_WHITE = 81.25 * SCALING_FACTOR,
+            X_SHIFT_BLACK = 6 * SCALING_FACTOR,
+            Y_SHIFT_BLACK = 10 * SCALING_FACTOR,
+            X_SHIFT_U = 169.0 * SCALING_FACTOR,
+            Y_SHIFT_U = -991.25 * SCALING_FACTOR,
             fx = 1430,
             fy = 1430,
             cx = 480,
             cy = 620;
+
+    private static final Size scalar = new Size(SCALING_FACTOR, SCALING_FACTOR);
+
+    private static Point scale(Point p) {
+        return new Point((p.x * SCALING_FACTOR), (p.y * SCALING_FACTOR));
+    }
 
     private static final Point
             CORNER_TL = new Point(0, 0),
@@ -162,9 +169,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         this.telemetry = telemetry;
         this.backdrop = backdrop;
-
-        generateCenterPoints();
-        generateSamplePoints();
     }
 
     public BackdropPipeline(Telemetry telemetry) {
@@ -218,6 +222,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         if (backdropVisible) {
 
+            Imgproc.resize(input, input, scalar, SCALING_FACTOR, SCALING_FACTOR, INTER_AREA);
+
             int minInd = 0, maxInd = 0;
             for (int i = 0; i < tags.size(); i++) {
                 if (tags.get(i).id < tags.get(minInd).id) minInd = i;
@@ -228,6 +234,14 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             warpImageToStraightenBackdrop(input, minInd, maxInd);
+
+            Imgproc.line(input, tagTL, tagTR, yellow, 1);
+            Imgproc.line(input, tagBL, tagBR, yellow, 1);
+            Imgproc.line(input, tagTL, tagBL, yellow, 1);
+            Imgproc.line(input, tagTR, tagBR, yellow, 1);
+
+            generateCenterPoints();
+            generateSamplePoints();
 
             Point whiteSample = new Point(
                     getLeftX(tags.get(maxInd).id) + X_SHIFT_WHITE,
@@ -246,8 +260,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             double blackVal = getValue(input, blackSample);
             double whiteVal = getValue(input, whiteSample);
-            double valBoost = 1.0 / (whiteVal - blackVal);
-            if (isNaN(valBoost)) valBoost = 1;
+            double diff = whiteVal - blackVal;
+            double valBoost = diff == 0 ? 1.0 : 1.0 / diff;
 
             warpToFitGrid(input, blackVal, valBoost);
 
@@ -282,10 +296,10 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void warpImageToStraightenBackdrop(Mat input, int minInd, int maxInd) {
-        Point bl = tags.get(minInd).corners[0];
-        Point tl = tags.get(minInd).corners[3];
-        Point br = tags.get(maxInd).corners[1];
-        Point tr = tags.get(maxInd).corners[2];
+        Point bl = scale(tags.get(minInd).corners[0]);
+        Point tl = scale(tags.get(minInd).corners[3]);
+        Point br = scale(tags.get(maxInd).corners[1]);
+        Point tr = scale(tags.get(maxInd).corners[2]);
 
         MatOfPoint2f srcTag = new MatOfPoint2f(
                 bl,
@@ -310,10 +324,10 @@ public class BackdropPipeline extends OpenCvPipeline {
         );
 
         if (showSamples) {
-            Imgproc.line(input, tl, tr, blue, 3);
-            Imgproc.line(input, bl, br, blue, 3);
-            Imgproc.line(input, tl, bl, blue, 3);
-            Imgproc.line(input, tr, br, blue, 3);
+            Imgproc.line(input, tl, tr, blue, 1);
+            Imgproc.line(input, bl, br, blue, 1);
+            Imgproc.line(input, tl, bl, blue, 1);
+            Imgproc.line(input, tr, br, blue, 1);
         }
 
         Mat transformMatrix = Imgproc.getPerspectiveTransform(srcTag, dstTag);
@@ -364,13 +378,13 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
 
         for (Point point : pointSamples) {
-            Imgproc.drawMarker(input, point, green, 2, 3);
+            Imgproc.drawMarker(input, point, green, 2, 1);
         }
 
-        Imgproc.line(input, tagTL, tagTR, yellow, 5);
-        Imgproc.line(input, tagBL, tagBR, yellow, 5);
-        Imgproc.line(input, tagTL, tagBL, yellow, 5);
-        Imgproc.line(input, tagTR, tagBR, yellow, 5);
+        Imgproc.line(input, tagTL, tagTR, yellow, 1);
+        Imgproc.line(input, tagBL, tagBR, yellow, 1);
+        Imgproc.line(input, tagTL, tagBL, yellow, 1);
+        Imgproc.line(input, tagTR, tagBR, yellow, 1);
     }
 
     private void saveBackdropColors(Mat input, double blackVal, double valBoost) {
@@ -404,9 +418,9 @@ public class BackdropPipeline extends OpenCvPipeline {
         Point center2 = centerPoints[mPixels[1].y][mPixels[1].x];
         Point center3 = centerPoints[mPixels[2].y][mPixels[2].x];
 
-        Imgproc.line(input, center1, center2, blue, 5);
-        Imgproc.line(input, center2, center3, blue, 5);
-        Imgproc.line(input, center3, center1, blue, 5);
+        Imgproc.line(input, center1, center2, blue, (int) (8 * SCALING_FACTOR));
+        Imgproc.line(input, center2, center3, blue, (int) (8 * SCALING_FACTOR));
+        Imgproc.line(input, center3, center1, blue, (int) (8 * SCALING_FACTOR));
     }
 
     private void warpToFitGrid(Mat input, double blackVal, double valBoost) {
@@ -515,7 +529,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private Point findCenter(Point p) {
         Point estimate = coordToPoint(p);
-        int boxRadius = 45;
+        int boxRadius = (int) (45 * SCALING_FACTOR);
         Point topLeft = new Point(
                 clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
                 clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
@@ -530,10 +544,12 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         double blur = 13;
         Imgproc.blur(region, region, new Size(blur, blur));
-        Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 61, -1);
+        int blockSize = (int) (61 * SCALING_FACTOR);
+        if (blockSize % 2 == 0) blockSize++;
+        Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
 
         Mat circles = new Mat();
-        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500, 1, .6, 5, -1);
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500 * SCALING_FACTOR, 1, .6, 5, -1);
         region.release();
 
         if (circles.size().width > 0) {
@@ -544,7 +560,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             );
         }
         circles.release();
-        Imgproc.drawMarker(warpedGray, estimate, red, 2, 12);
+        Imgproc.drawMarker(warpedGray, estimate, red, 2, (int) (12 * SCALING_FACTOR));
         return estimate;
     }
 
@@ -553,9 +569,9 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawPixelIcon(Mat input, int y, int x) {
-        int size = 80;
+        int size = (int) (80 * SCALING_FACTOR);
         double sideLength = size / sqrt(3);
-        int thickness = 8;
+        int thickness = (int) (8 * SCALING_FACTOR);
         Scalar color = colorToScalar(backdrop.get(x, y).color);
 
         Point
@@ -588,18 +604,18 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.line(input, p5, p6, color, thickness);
         Imgproc.line(input, p6, p1, color, thickness);
 
-        Imgproc.putText(input, x + ", " + y, p6, 2, 1, red);
+        Imgproc.putText(input, x + ", " + y, p6, 2, SCALING_FACTOR, red);
     }
 
     private static void drawBlueSquare(Mat input, Point point) {
         if (point == null) return;
-        double size = 5;
+        double size = 5 * SCALING_FACTOR;
         Imgproc.rectangle(
                 input,
                 new Point(point.x - size, point.y - size),
                 new Point(point.x + size, point.y + size),
                 blue,
-                2
+                1
         );
     }
 
@@ -657,8 +673,8 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generateCenterPoints() {
-        double width = 97.825;
-        double height = -85.0;
+        double width = 97.825 * SCALING_FACTOR;
+        double height = -85.0 * SCALING_FACTOR;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             boolean evenRow = y % 2 == 0;
             if (x == 0 && evenRow) continue;
