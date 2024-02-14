@@ -73,7 +73,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             showCircleDet = false;
 
     private static final double
-            SCALING_FACTOR = 1 / 6.0,
+            SCALING_FACTOR = 1 / 7.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
             SCREEN_WIDTH = 720 * SCALING_FACTOR,
             X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
@@ -228,10 +228,12 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             warpImageToStraightenBackdrop(input, minInd, maxInd);
 
-            Imgproc.line(input, tagTL, tagTR, yellow, 1);
-            Imgproc.line(input, tagBL, tagBR, yellow, 1);
-            Imgproc.line(input, tagTL, tagBL, yellow, 1);
-            Imgproc.line(input, tagTR, tagBR, yellow, 1);
+            if (showSamples) {
+                Imgproc.line(input, tagTL, tagTR, yellow, 1);
+                Imgproc.line(input, tagBL, tagBR, yellow, 1);
+                Imgproc.line(input, tagTL, tagBL, yellow, 1);
+                Imgproc.line(input, tagTR, tagBR, yellow, 1);
+            }
 
             generateCenterPoints();
             generateSamplePoints();
@@ -390,6 +392,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void warpToFitGrid(Mat input) {
+        Backdrop backdrop = new Backdrop();
 
         Point[] target = {
                 new Point(), // tl =
@@ -405,8 +408,12 @@ public class BackdropPipeline extends OpenCvPipeline {
                 case EMPTY: case INVALID: continue;
             }
 
+            Pixel pixel = new Pixel(x, y, WHITE);
+            if (!backdrop.isSupported(pixel)) continue;
+
             target[0].x = x;
             target[0].y = y;
+            backdrop.add(pixel);
         }
 
         a:
@@ -512,11 +519,11 @@ public class BackdropPipeline extends OpenCvPipeline {
         int blockSize = (int) (61 * SCALING_FACTOR);
         if (blockSize % 2 == 0) blockSize++;
         Imgproc.adaptiveThreshold(region, region, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
-        double blur = 12 * SCALING_FACTOR;
+        double blur = 16 * SCALING_FACTOR;
         Imgproc.blur(region, region, new Size(blur, blur));
         
         Mat circles = new Mat();
-        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500 * SCALING_FACTOR, 1, .4, 2, -1);
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.2, 500 * SCALING_FACTOR, 1, .5, 2, -1);
         region.release();
 
         if (circles.size().width > 0) {
