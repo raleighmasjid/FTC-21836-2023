@@ -73,7 +73,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             showCircleDet = false;
 
     private static final double
-            SCALING_FACTOR = 1 / 4.0,
+            SCALING_FACTOR = 1 / 6.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
             SCREEN_WIDTH = 720 * SCALING_FACTOR,
             X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
@@ -572,7 +572,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private static void drawBlueSquare(Mat input, Point point) {
         if (point == null) return;
-        double size = 5 * SCALING_FACTOR;
+        double size = 4 * SCALING_FACTOR;
         Imgproc.rectangle(
                 input,
                 new Point(point.x - size, point.y - size),
