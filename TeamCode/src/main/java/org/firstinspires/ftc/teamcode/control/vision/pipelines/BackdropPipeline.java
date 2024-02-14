@@ -58,7 +58,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             showBackground = false,
             showCircleDet = false;
 
-    public double
+    private static final double
             SCALING_FACTOR = 1 / 7.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
             SCREEN_WIDTH = 720 * SCALING_FACTOR,
@@ -71,6 +71,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_SHIFT_PIXEL_POINTS_R = 28.321428571428573 * SCALING_FACTOR,
             Y_SHIFT_PIXEL_POINTS_T = -35.75 * SCALING_FACTOR,
             Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
+            HEX_RADIUS = 80 * SCALING_FACTOR,
+            HEX_SIDE_LENGTH = HEX_RADIUS / sqrt(3),
             fx = 1430,
             fy = 1430,
             cx = 480,
@@ -117,6 +119,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private final Point[][] centerPoints = new Point[11][7];
     private final Point[][][] samplePoints = new Point[11][7][4];
+    private final Point[][][] hexCorners = new Point[11][7][6];
 
     public BackdropPipeline(Telemetry telemetry, Backdrop backdrop) {
 
@@ -148,6 +151,10 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         this.telemetry = telemetry;
         this.backdrop = backdrop;
+
+        generateCenterPoints();
+        generateSamplePoints();
+        generateHexCorners();
     }
 
     public BackdropPipeline(Telemetry telemetry) {
@@ -220,9 +227,6 @@ public class BackdropPipeline extends OpenCvPipeline {
                 Imgproc.line(input, tagTL, tagBL, yellow, 1);
                 Imgproc.line(input, tagTR, tagBR, yellow, 1);
             }
-
-            generateCenterPoints();
-            generateSamplePoints();
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
@@ -462,6 +466,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         if (!warp) {
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+
             Imgproc.line(input, source[0], source[1], blue, 3);
             Imgproc.line(input, source[1], source[2], blue, 3);
             Imgproc.line(input, source[2], source[0], blue, 3);
@@ -501,7 +506,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.blur(region, region, new Size(blur, blur));
         
         Mat circles = new Mat();
-        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.2, 500 * SCALING_FACTOR, 1, .5, 2, -1);
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.225, 500 * SCALING_FACTOR, 1, .5, 2, -1);
         region.release();
 
         if (circles.size().width > 0) {
@@ -521,42 +526,29 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawPixelIcon(Mat input, int y, int x) {
-        int size = (int) (80 * SCALING_FACTOR);
-        double sideLength = size / sqrt(3);
         int thickness = (int) (8 * SCALING_FACTOR);
         Scalar color = colorToScalar(backdrop.get(x, y).color);
 
-        Point
-                p1 = centerPoints[y][x].clone(),
-                p2 = centerPoints[y][x].clone(),
-                p3 = centerPoints[y][x].clone(),
-                p4 = centerPoints[y][x].clone(),
-                p5 = centerPoints[y][x].clone(),
-                p6 = centerPoints[y][x].clone();
+        for (int i = 0; i < hexCorners[y][x].length; i++) {
+            int i2 = loopClip(i + 1, hexCorners[y][x].length);
+            Imgproc.line(
+                    input,
+                    hexCorners[y][x][i],
+                    hexCorners[y][x][i2],
+                    color,
+                    thickness
+            );
+        }
 
-        p2.x += 0.5 * size;
-        p2.y += 0.5 * sideLength;
+        Imgproc.putText(input, x + ", " + y, hexCorners[y][x][5], 2, SCALING_FACTOR, red);
+    }
 
-        p3.x += 0.5 * size;
-        p3.y -= 0.5 * sideLength;
+    public static int loopClip(int a, int b) {
+        return (int) loopClip(a,(double) b);
+    }
 
-        p5.x -= 0.5 * size;
-        p5.y -= 0.5 * sideLength;
-
-        p6.x -= 0.5 * size;
-        p6.y += 0.5 * sideLength;
-
-        p1.y += sideLength;
-        p4.y -= sideLength;
-
-        Imgproc.line(input, p1, p2, color, thickness);
-        Imgproc.line(input, p2, p3, color, thickness);
-        Imgproc.line(input, p3, p4, color, thickness);
-        Imgproc.line(input, p4, p5, color, thickness);
-        Imgproc.line(input, p5, p6, color, thickness);
-        Imgproc.line(input, p6, p1, color, thickness);
-
-        Imgproc.putText(input, x + ", " + y, p6, 2, SCALING_FACTOR, red);
+    public static double loopClip(double a, double b) {
+        return (a % b + b) % b;
     }
 
     private void drawBlueSquare(Mat input, Point point) {
@@ -644,6 +636,37 @@ public class BackdropPipeline extends OpenCvPipeline {
             samplePoints[y][x][1] = pixelRight(x, y);
             samplePoints[y][x][2] = pixelTop(x, y);
             samplePoints[y][x][3] = pixelBottom(x, y);
+        }
+    }
+
+    private void generateHexCorners() {
+        for (int y = 0; y < hexCorners.length; y++) for (int x = 0; x < hexCorners[y].length; x++) {
+            if (x == 0 && y % 2 == 0) continue;
+
+            hexCorners[y][x] = new Point[]{
+                    centerPoints[y][x].clone(),
+                    centerPoints[y][x].clone(),
+                    centerPoints[y][x].clone(),
+                    centerPoints[y][x].clone(),
+                    centerPoints[y][x].clone(),
+                    centerPoints[y][x].clone(),
+            };
+
+            hexCorners[y][x][1].x += 0.5 * HEX_RADIUS;
+            hexCorners[y][x][1].y += 0.5 * HEX_SIDE_LENGTH;
+
+            hexCorners[y][x][2].x += 0.5 * HEX_RADIUS;
+            hexCorners[y][x][2].y -= 0.5 * HEX_SIDE_LENGTH;
+
+            hexCorners[y][x][4].x -= 0.5 * HEX_RADIUS;
+            hexCorners[y][x][4].y -= 0.5 * HEX_SIDE_LENGTH;
+
+            hexCorners[y][x][5].x -= 0.5 * HEX_RADIUS;
+            hexCorners[y][x][5].y += 0.5 * HEX_SIDE_LENGTH;
+
+            hexCorners[y][x][0].y += HEX_SIDE_LENGTH;
+            hexCorners[y][x][3].y -= HEX_SIDE_LENGTH;
+
         }
     }
 
