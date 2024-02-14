@@ -512,7 +512,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             );
         }
         circles.release();
-        Imgproc.drawMarker(warpedGray, estimate, red, 2, (int) (4 * SCALING_FACTOR));
+        Imgproc.drawMarker(warpedGray, estimate, red, 2, 1);
         return estimate;
     }
 
