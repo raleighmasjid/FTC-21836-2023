@@ -364,6 +364,10 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
             backdrop.add(new Pixel(x, y, c));
         }
+
+        for (Pixel[] row : backdrop.slots) for (Pixel pixel: row) {
+            if (pixel.color != EMPTY && !backdrop.isSupported(pixel)) backdrop.add(new Pixel(pixel, EMPTY));
+        }
     }
 
     private void drawMosaic(Mat input, Pixel pixel) {
