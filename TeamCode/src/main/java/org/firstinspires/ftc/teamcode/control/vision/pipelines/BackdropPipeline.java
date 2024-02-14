@@ -244,14 +244,6 @@ public class BackdropPipeline extends OpenCvPipeline {
         return showCircleDet ? warpedGray : input;
     }
 
-    private static double[] getHSV(Mat input, Point point) {
-        return input.get((int) point.y, (int) point.x);
-    }
-
-    private static double getValue(Mat input, Point point) {
-        return round(getHSV(input, point)[2] / 255.0 * 1000) / 1000.0;
-    }
-
     private void warpImageToStraightenBackdrop(Mat input, int minInd, int maxInd) {
         Point bl = scale(tags.get(minInd).corners[0]);
         Point tl = scale(tags.get(minInd).corners[3]);
