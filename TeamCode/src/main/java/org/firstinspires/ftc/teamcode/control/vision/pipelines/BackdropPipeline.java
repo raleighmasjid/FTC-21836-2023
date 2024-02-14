@@ -505,14 +505,14 @@ public class BackdropPipeline extends OpenCvPipeline {
         Point estimate = coordToPoint(p);
         int boxRadius = (int) (45 * SCALING_FACTOR);
         Point topLeft = new Point(
-                clip(estimate.x - boxRadius, 0, SCREEN_WIDTH),
-                clip(estimate.y - boxRadius, 0, SCREEN_HEIGHT)
+                clipX(estimate.x - boxRadius),
+                clipY(estimate.y - boxRadius)
         );
         Mat region = warpedGray.submat(new Rect(
                 topLeft,
                 new Point(
-                        clip(estimate.x + boxRadius, 0, SCREEN_WIDTH),
-                        clip(estimate.y + boxRadius, 0, SCREEN_HEIGHT)
+                        clipX(estimate.x + boxRadius),
+                        clipY(estimate.y + boxRadius)
                 )
         ));
 
@@ -653,8 +653,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (x == 0 && evenRow) continue;
 
             centerPoints[y][x] = new Point(
-                    X_FIRST_PIXEL + (x * width) - (evenRow ? 0.5 * width : 0),
-                    Y_FIRST_PIXEL + (y * height)
+                    clipX(X_FIRST_PIXEL + (x * width) - (evenRow ? 0.5 * width : 0)),
+                    clipY(Y_FIRST_PIXEL + (y * height))
             );
         }
     }
@@ -675,25 +675,33 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private Point pixelLeft(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_L);
+        point.x = clipX(point.x + (X_SHIFT_PIXEL_POINTS_L));
         return point;
     }
 
     private Point pixelRight(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.x += (X_SHIFT_PIXEL_POINTS_R);
+        point.x = clipX(point.x + (X_SHIFT_PIXEL_POINTS_R));
         return point;
     }
 
     private Point pixelTop(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_T);
+        point.y = clipY(point.y + (Y_SHIFT_PIXEL_POINTS_T));
         return point;
     }
 
     private Point pixelBottom(int x, int y) {
         Point point = centerPoints[y][x].clone();
-        point.y += (Y_SHIFT_PIXEL_POINTS_B);
+        point.y = clipY(point.y + (Y_SHIFT_PIXEL_POINTS_B));
         return point;
+    }
+
+    private double clipY(double y) {
+        return min(max(y, 0), SCREEN_HEIGHT);
+    }
+
+    private double clipX(double x) {
+        return min(max(x, 0), SCREEN_WIDTH);
     }
 }
