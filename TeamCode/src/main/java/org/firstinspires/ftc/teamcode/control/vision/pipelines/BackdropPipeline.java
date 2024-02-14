@@ -58,7 +58,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             showBackground = false,
             showCircleDet = false;
 
-    private static final double
+    public double
             SCALING_FACTOR = 1 / 7.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
             SCREEN_WIDTH = 720 * SCALING_FACTOR,
@@ -76,13 +76,13 @@ public class BackdropPipeline extends OpenCvPipeline {
             cx = 480,
             cy = 620;
 
-    private static final Size scalar = new Size(SCALING_FACTOR, SCALING_FACTOR);
+    private final Size scalar = new Size(SCALING_FACTOR, SCALING_FACTOR);
 
-    private static Point scale(Point p) {
+    private Point scale(Point p) {
         return new Point((p.x * SCALING_FACTOR), (p.y * SCALING_FACTOR));
     }
 
-    private static final Point
+    private final Point
             CORNER_TL = new Point(0, 0),
             CORNER_TR = new Point(SCREEN_WIDTH, 0),
             CORNER_BR = new Point(SCREEN_WIDTH, SCREEN_HEIGHT),
@@ -559,7 +559,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.putText(input, x + ", " + y, p6, 2, SCALING_FACTOR, red);
     }
 
-    private static void drawBlueSquare(Mat input, Point point) {
+    private void drawBlueSquare(Mat input, Point point) {
         if (point == null) return;
         double size = 4 * SCALING_FACTOR;
         Imgproc.rectangle(
@@ -647,7 +647,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
     }
 
-    private static double getLeftX(int id) {
+    private double getLeftX(int id) {
         return (X_TOP_LEFT_R_TAG) - ((3 - (id - (id > 3 ? 3 : 0))) * (6 * (TARGET_SIZE / 2.0)));
     }
 
