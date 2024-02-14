@@ -43,8 +43,6 @@ import static org.opencv.imgproc.Imgproc.INTER_AREA;
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 
-import androidx.annotation.NonNull;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
@@ -71,7 +69,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             isRed = true,
             showGraphics = true,
             showSamples = false,
-            showBackground = false;
+            showBackground = false,
+            showCircleDet = false;
 
     private static final double
             SCALING_FACTOR = 1 / 4.0,
@@ -86,12 +85,6 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_SHIFT_PIXEL_POINTS_R = 28.321428571428573 * SCALING_FACTOR,
             Y_SHIFT_PIXEL_POINTS_T = -35.75 * SCALING_FACTOR,
             Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
-            X_SHIFT_WHITE = 2.6 * SCALING_FACTOR,
-            Y_SHIFT_WHITE = 81.25 * SCALING_FACTOR,
-            X_SHIFT_BLACK = 6 * SCALING_FACTOR,
-            Y_SHIFT_BLACK = 10 * SCALING_FACTOR,
-            X_SHIFT_U = 169.0 * SCALING_FACTOR,
-            Y_SHIFT_U = -991.25 * SCALING_FACTOR,
             fx = 1430,
             fy = 1430,
             cx = 480,
@@ -125,7 +118,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             minGreen =  {70, .4, .215},
             maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0, 0.53},
+            minWhite =  {0, 0, 0.7},
             maxWhite =  {360, 0.242, 1};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
@@ -243,38 +236,14 @@ public class BackdropPipeline extends OpenCvPipeline {
             generateCenterPoints();
             generateSamplePoints();
 
-            Point whiteSample = new Point(
-                    getLeftX(tags.get(maxInd).id) + X_SHIFT_WHITE,
-                    Y_TOP_LEFT + Y_SHIFT_WHITE
-            );
-            Point blackSample = new Point(
-                    X_TOP_LEFT_R_TAG + X_SHIFT_BLACK,
-                    Y_TOP_LEFT + Y_SHIFT_BLACK
-            );
-            Point outSample = new Point(
-                    X_TOP_LEFT_R_TAG + X_SHIFT_U,
-                    Y_TOP_LEFT + Y_SHIFT_U
-            );
-
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
-            double blackVal = getValue(input, blackSample);
-            double whiteVal = getValue(input, whiteSample);
-            double diff = whiteVal - blackVal;
-            double valBoost = diff == 0 ? 1.0 : 1.0 / diff;
-
-            warpToFitGrid(input, blackVal, valBoost);
+            warpToFitGrid(input);
+            saveBackdropColors(input);
 
             Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
 
-            saveBackdropColors(input, blackVal, valBoost);
-
-            if (showSamples) drawSamplingMarkers(
-                    input,
-                    whiteSample,
-                    blackSample,
-                    outSample
-            );
+            if (showSamples) drawSamplingMarkers(input);
 
             if (showGraphics) drawGraphics(input);
         }
@@ -284,7 +253,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.addData("Detected tags", tagIds.toString());
         telemetry.update();
 
-        return input;
+        return showCircleDet ? warpedGray : input;
     }
 
     private static double[] getHSV(Mat input, Point point) {
@@ -368,7 +337,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
     }
 
-    private void drawSamplingMarkers(Mat input, Point... pointSamples) {
+    private void drawSamplingMarkers(Mat input) {
         for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
             drawBlueSquare(input, point);
         }
@@ -377,31 +346,24 @@ public class BackdropPipeline extends OpenCvPipeline {
             for (Point point : pair) drawBlueSquare(input, point);
         }
 
-        for (Point point : pointSamples) {
-            Imgproc.drawMarker(input, point, green, 2, 1);
-        }
-
         Imgproc.line(input, tagTL, tagTR, yellow, 1);
         Imgproc.line(input, tagBL, tagBR, yellow, 1);
         Imgproc.line(input, tagTL, tagBL, yellow, 1);
         Imgproc.line(input, tagTR, tagBR, yellow, 1);
     }
 
-    private void saveBackdropColors(Mat input, double blackVal, double valBoost) {
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+    private void saveBackdropColors(Mat input) {
 
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
-            double[] color = getColorOfPixel(input, blackVal, valBoost, y, x);
+            double[] color = getColorOfPixel(input, y, x);
 
             Pixel.Color c = hsvToColor(color);
             telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
             backdrop.add(new Pixel(x, y, c));
         }
-
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
     }
 
     private void drawMosaic(Mat input, Pixel pixel) {
@@ -423,7 +385,8 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.line(input, center3, center1, blue, (int) (8 * SCALING_FACTOR));
     }
 
-    private void warpToFitGrid(Mat input, double blackVal, double valBoost) {
+    private void warpToFitGrid(Mat input) {
+
         Point[] target = {
                 new Point(), // tl =
                 new Point(), // br =
@@ -433,7 +396,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
-            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, y, x));
             switch (color) {
                 case EMPTY: case INVALID: continue;
             }
@@ -446,7 +409,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
-            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, y, x));
             switch (color) {
                 case EMPTY: case INVALID: continue;
             }
@@ -460,7 +423,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         for (int y = 0; y < centerPoints.length; y++) for (int x = centerPoints[y].length - 1; x >= 0; x--) {
             if (x == 0 && y % 2 == 0) continue;
 
-            Pixel.Color color = hsvToColor(getColorOfPixel(input, blackVal, valBoost, y, x));
+            Pixel.Color color = hsvToColor(getColorOfPixel(input, y, x));
             switch (color) {
                 case EMPTY: case INVALID: continue;
             }
@@ -543,7 +506,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         ));
 
         double blur = 13;
-        Imgproc.blur(region, region, new Size(blur, blur));
+//        Imgproc.blur(region, region, new Size(blur, blur));
         int blockSize = (int) (61 * SCALING_FACTOR);
         if (blockSize % 2 == 0) blockSize++;
         Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
@@ -619,8 +582,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         );
     }
 
-    @NonNull
-    private double[] getColorOfPixel(Mat input, double blackVal, double valBoost, int y, int x) {
+    private double[] getColorOfPixel(Mat input, int y, int x) {
         double hueSum = 0, satSum = 0, valSum = 0;
 
         for (int i = 0; i < samplePoints[y][x].length; i++) {
@@ -638,7 +600,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         return new double[]{
                 avgHue,
                 round(avgSat * 1000) / 1000.0,
-                clip(round((avgVal - blackVal) * valBoost * 1000) / 1000.0, 0, 1)
+                round(avgVal * 1000) / 1000.0,
         };
     }
 
