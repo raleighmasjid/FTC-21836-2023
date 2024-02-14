@@ -201,7 +201,7 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         if (backdropVisible) {
 
-            Imgproc.resize(input, input, scalar, SCALING_FACTOR, SCALING_FACTOR, INTER_AREA);
+            if (SCALING_FACTOR != 1) Imgproc.resize(input, input, scalar, SCALING_FACTOR, SCALING_FACTOR, INTER_AREA);
 
             int minInd = 0, maxInd = 0;
             for (int i = 0; i < tags.size(); i++) {
