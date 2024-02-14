@@ -505,14 +505,14 @@ public class BackdropPipeline extends OpenCvPipeline {
                 )
         ));
 
-        double blur = 13;
-//        Imgproc.blur(region, region, new Size(blur, blur));
         int blockSize = (int) (61 * SCALING_FACTOR);
         if (blockSize % 2 == 0) blockSize++;
-        Imgproc.adaptiveThreshold(region, region, 80, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
-
+        Imgproc.adaptiveThreshold(region, region, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
+        double blur = 12 * SCALING_FACTOR;
+        Imgproc.blur(region, region, new Size(blur, blur));
+        
         Mat circles = new Mat();
-        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500 * SCALING_FACTOR, 1, .6, 5, -1);
+        Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.3, 500 * SCALING_FACTOR, 1, .4, 2, -1);
         region.release();
 
         if (circles.size().width > 0) {
@@ -523,7 +523,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             );
         }
         circles.release();
-        Imgproc.drawMarker(warpedGray, estimate, red, 2, (int) (12 * SCALING_FACTOR));
+        Imgproc.drawMarker(warpedGray, estimate, red, 2, (int) (4 * SCALING_FACTOR));
         return estimate;
     }
 
