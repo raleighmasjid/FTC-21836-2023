@@ -60,6 +60,7 @@ public final class Intake {
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             TIME_INTAKE_FLIP_TO_LIFT = 0.2,
+            SPEED_SLOW_REVERSING = -0.25,
             COLOR_SENSOR_GAIN = 1,
             HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
@@ -281,6 +282,7 @@ public final class Intake {
                     latch.setActivated(false);
                 } else {
                     setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : (
+                            pidGains.kP == 0 ? SPEED_SLOW_REVERSING :
                             controller.calculate(new org.firstinspires.ftc.teamcode.control.motion.State(rollerAngle))
                     ));
                     break;
