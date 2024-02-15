@@ -34,9 +34,6 @@ public class BackdropScanner {
 
         pipeline.isRed = isRed;
         pipeline.showGraphics = false;
-        pipeline.showSamples = false;
-        pipeline.showBackground = false;
-        pipeline.showCircleDet = false;
 
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
