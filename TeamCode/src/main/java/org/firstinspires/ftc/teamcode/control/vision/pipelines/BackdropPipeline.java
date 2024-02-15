@@ -73,6 +73,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
             HEX_RADIUS = 80 * SCALING_FACTOR,
             HEX_SIDE_LENGTH = HEX_RADIUS / sqrt(3),
+            X_DIST_GRID = 97.825 * SCALING_FACTOR,
+            Y_DIST_GRID = -85.0 * SCALING_FACTOR,
+            CIRCLE_DET_BLUR = 16 * SCALING_FACTOR,
             fx = 1430,
             fy = 1430,
             cx = 480,
@@ -112,7 +115,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
 
     private long nativeApriltagPtr;
-    private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat();
+    private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat(), circles = new Mat();
 
     public final Backdrop backdrop;
     private final Telemetry telemetry;
@@ -120,6 +123,12 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Point[][] centerPoints = new Point[11][7];
     private final Point[][][] samplePoints = new Point[11][7][4];
     private final Point[][][] hexCorners = new Point[11][7][6];
+    private final double[][][][] sampleHSVs = new double[11][7][4][3];
+    private final double[][][] averageHSVs = new double[11][7][3];
+
+    private final Size CIRCLE_DET_SIZE = new Size(CIRCLE_DET_BLUR, CIRCLE_DET_BLUR);
+
+    private final Backdrop recordOfHighestPixel = new Backdrop();
 
     public BackdropPipeline(Telemetry telemetry, Backdrop backdrop) {
 
@@ -245,7 +254,9 @@ public class BackdropPipeline extends OpenCvPipeline {
         telemetry.addData("Detected tags", tagIds.toString());
         telemetry.update();
 
-        return showCircleDet ? warpedGray : input;
+        if (showCircleDet) return warpedGray;
+        warpedGray.release();
+        return input;
     }
 
     private void warpImageToStraightenBackdrop(Mat input, int minInd, int maxInd) {
@@ -323,11 +334,13 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private void drawSamplingMarkers(Mat input) {
         for (Point[] centerPoint : centerPoints) for (Point point : centerPoint) {
-            drawBlueSquare(input, point);
+            if (point == null) continue;
+            Imgproc.drawMarker(input, point, blue, 2, 1);
         }
 
-        for (Point[][] row : samplePoints) for (Point[] pair : row) {
-            for (Point point : pair) drawBlueSquare(input, point);
+        for (Point[][] row : samplePoints) for (Point[] group : row) for (Point point : group) {
+            if (point == null) continue;
+            Imgproc.drawMarker(input, point, blue, 2, 1);
         }
 
         Imgproc.line(input, tagTL, tagTR, yellow, 1);
@@ -346,11 +359,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             Pixel.Color c = hsvToColor(color);
             telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
-            backdrop.add(new Pixel(x, y, c));
-        }
-
-        for (Pixel[] row : backdrop.slots) for (Pixel pixel: row) {
-            if (pixel.color != EMPTY && !backdrop.isSupported(pixel)) backdrop.add(new Pixel(pixel, EMPTY));
+            Pixel pixel = new Pixel(x, y, c);
+            if (c != EMPTY && !backdrop.isSupported(pixel)) pixel = new Pixel(pixel, EMPTY);
+            backdrop.add(pixel);
         }
     }
 
@@ -374,7 +385,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void warpToFitGrid(Mat input) {
-        Backdrop backdrop = new Backdrop();
+        recordOfHighestPixel.clear();
 
         Point[] target = {
                 new Point(), // tl =
@@ -391,11 +402,11 @@ public class BackdropPipeline extends OpenCvPipeline {
             }
 
             Pixel pixel = new Pixel(x, y, WHITE);
-            if (!backdrop.isSupported(pixel)) continue;
+            if (!recordOfHighestPixel.isSupported(pixel)) continue;
 
             target[0].x = x;
             target[0].y = y;
-            backdrop.add(pixel);
+            recordOfHighestPixel.add(pixel);
         }
 
         a:
@@ -428,15 +439,16 @@ public class BackdropPipeline extends OpenCvPipeline {
             break b;
         }
 
-        for (Point p : new Point[]{target[0], target[1], target[2]}) {
-            telemetry.addLine("(" + p.x + ", " + p.y + ")");
-        }
+        telemetry.addLine("(" + target[0].x + ", " + target[0].y + ")");
+        telemetry.addLine("(" + target[1].x + ", " + target[1].y + ")");
+        telemetry.addLine("(" + target[2].x + ", " + target[2].y + ")");
+
         boolean valid = !(
                 target[1].equals(target[0]) ||
                 target[1].equals(target[2]) ||
                 target[0].equals(target[2])
         );
-        telemetry.addLine("Valid: " + valid);
+        telemetry.addLine("Valid affine warp: " + valid);
 
         Point[] source = {
                 findCenter(target[0]),
@@ -502,10 +514,9 @@ public class BackdropPipeline extends OpenCvPipeline {
         int blockSize = (int) (61 * SCALING_FACTOR);
         if (blockSize % 2 == 0) blockSize++;
         Imgproc.adaptiveThreshold(region, region, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, blockSize, -1);
-        double blur = 16 * SCALING_FACTOR;
-        Imgproc.blur(region, region, new Size(blur, blur));
+        Imgproc.blur(region, region, CIRCLE_DET_SIZE);
         
-        Mat circles = new Mat();
+        circles.release();
         Imgproc.HoughCircles(region, circles, Imgproc.HOUGH_GRADIENT, 1.225, 500 * SCALING_FACTOR, 1, .5, 2, -1);
         region.release();
 
@@ -552,7 +563,6 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawBlueSquare(Mat input, Point point) {
-        if (point == null) return;
         double size = 4 * SCALING_FACTOR;
         Imgproc.rectangle(
                 input,
@@ -568,21 +578,21 @@ public class BackdropPipeline extends OpenCvPipeline {
 
         for (int i = 0; i < samplePoints[y][x].length; i++) {
             Point samplePoint = samplePoints[y][x][i];
-            double[] sampleColor = input.get((int) samplePoint.y, (int) samplePoint.x);
-            hueSum += sampleColor[0];
-            satSum += sampleColor[1];
-            valSum += sampleColor[2];
+            sampleHSVs[y][x][i] = input.get((int) samplePoint.y, (int) samplePoint.x);
+            hueSum += sampleHSVs[y][x][i][0];
+            satSum += sampleHSVs[y][x][i][1];
+            valSum += sampleHSVs[y][x][i][2];
         }
 
         double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
         double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
         double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
 
-        return new double[]{
-                avgHue,
-                round(avgSat * 1000) / 1000.0,
-                round(avgVal * 1000) / 1000.0,
-        };
+        averageHSVs[y][x][0] = avgHue;
+        averageHSVs[y][x][1] = round(avgSat * 1000) / 1000.0;
+        averageHSVs[y][x][2] = round(avgVal * 1000) / 1000.0;
+
+        return averageHSVs[y][x];
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
@@ -616,15 +626,13 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void generateCenterPoints() {
-        double width = 97.825 * SCALING_FACTOR;
-        double height = -85.0 * SCALING_FACTOR;
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             boolean evenRow = y % 2 == 0;
             if (x == 0 && evenRow) continue;
 
             centerPoints[y][x] = new Point(
-                    clipX(X_FIRST_PIXEL + (x * width) - (evenRow ? 0.5 * width : 0)),
-                    clipY(Y_FIRST_PIXEL + (y * height))
+                    clipX(X_FIRST_PIXEL + (x * X_DIST_GRID) - (evenRow ? 0.5 * X_DIST_GRID : 0)),
+                    clipY(Y_FIRST_PIXEL + (y * Y_DIST_GRID))
             );
         }
     }
