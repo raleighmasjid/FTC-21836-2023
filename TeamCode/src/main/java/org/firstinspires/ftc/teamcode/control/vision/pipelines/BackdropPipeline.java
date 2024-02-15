@@ -379,9 +379,9 @@ public class BackdropPipeline extends OpenCvPipeline {
         Point center2 = centerPoints[mPixels[1].y][mPixels[1].x];
         Point center3 = centerPoints[mPixels[2].y][mPixels[2].x];
 
-        Imgproc.line(input, center1, center2, blue, (int) (8 * SCALING_FACTOR));
-        Imgproc.line(input, center2, center3, blue, (int) (8 * SCALING_FACTOR));
-        Imgproc.line(input, center3, center1, blue, (int) (8 * SCALING_FACTOR));
+        Imgproc.line(input, center1, center2, blue, 1);
+        Imgproc.line(input, center2, center3, blue, 1);
+        Imgproc.line(input, center3, center1, blue, 1);
     }
 
     private void warpToFitGrid(Mat input) {
@@ -537,7 +537,6 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawPixelIcon(Mat input, int y, int x) {
-        int thickness = (int) (8 * SCALING_FACTOR);
         Scalar color = colorToScalar(backdrop.get(x, y).color);
 
         for (int i = 0; i < hexCorners[y][x].length; i++) {
@@ -547,7 +546,7 @@ public class BackdropPipeline extends OpenCvPipeline {
                     hexCorners[y][x][i],
                     hexCorners[y][x][i2],
                     color,
-                    thickness
+                    1
             );
         }
 
