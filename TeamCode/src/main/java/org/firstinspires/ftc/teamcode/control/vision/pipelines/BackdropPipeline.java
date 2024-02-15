@@ -56,7 +56,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             showGraphics = true,
             showSamples = false,
             showBackground = false,
-            showCircleDet = false;
+            showCircleDet = false,
+            logicEnhancements = true;
 
     private static final double
             SCALING_FACTOR = 1 / 8.0,
@@ -351,6 +352,8 @@ public class BackdropPipeline extends OpenCvPipeline {
 
     private void saveBackdropColors(Mat input) {
 
+        backdrop.clear();
+
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
 
@@ -360,7 +363,9 @@ public class BackdropPipeline extends OpenCvPipeline {
             telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
             Pixel pixel = new Pixel(x, y, c);
-            if (c != EMPTY && !backdrop.isSupported(pixel)) pixel = new Pixel(pixel, EMPTY);
+            if (logicEnhancements && c != EMPTY && !backdrop.isSupported(pixel)) {
+                pixel = new Pixel(pixel, EMPTY);
+            }
             backdrop.add(pixel);
         }
     }
@@ -401,12 +406,12 @@ public class BackdropPipeline extends OpenCvPipeline {
                 case EMPTY: case INVALID: continue;
             }
 
-            Pixel pixel = new Pixel(x, y, WHITE);
-            if (!recordOfHighestPixel.isSupported(pixel)) continue;
+            Pixel pixel = new Pixel(x, y, color);
+            if (logicEnhancements && !recordOfHighestPixel.isSupported(pixel)) continue;
 
             target[0].x = x;
             target[0].y = y;
-            recordOfHighestPixel.add(pixel);
+            if (logicEnhancements) recordOfHighestPixel.add(pixel);
         }
 
         a:
