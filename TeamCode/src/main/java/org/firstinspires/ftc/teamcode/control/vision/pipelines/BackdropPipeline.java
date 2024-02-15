@@ -59,7 +59,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             showCircleDet = false;
 
     private static final double
-            SCALING_FACTOR = 1 / 7.0,
+            SCALING_FACTOR = 1 / 8.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
             SCREEN_WIDTH = 720 * SCALING_FACTOR,
             X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
