@@ -561,17 +561,6 @@ public class BackdropPipeline extends OpenCvPipeline {
         return (a % b + b) % b;
     }
 
-    private void drawBlueSquare(Mat input, Point point) {
-        double size = 4 * SCALING_FACTOR;
-        Imgproc.rectangle(
-                input,
-                new Point(point.x - size, point.y - size),
-                new Point(point.x + size, point.y + size),
-                blue,
-                1
-        );
-    }
-
     private double[] getColorOfPixel(Mat input, int y, int x) {
         double hueSum = 0, satSum = 0, valSum = 0;
 
