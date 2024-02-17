@@ -46,6 +46,12 @@ public final class Pixel implements Comparable<Pixel> {
         return new Pixel(this, color);
     }
 
+    public boolean equals(Object o) {
+        if (!(o instanceof Pixel)) return false;
+        Pixel p = (Pixel) o;
+        return p.x == x && p.y == y;
+    }
+
     /**
      * @return Whether this {@link Pixel} is part of a valid mosaic
      */
