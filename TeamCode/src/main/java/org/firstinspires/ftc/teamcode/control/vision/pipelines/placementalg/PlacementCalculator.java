@@ -165,19 +165,15 @@ public final class PlacementCalculator {
 
                         Pixel p1 = new Pixel(pMosaic[1], ANYCOLOR);
                         Pixel p2 = new Pixel(pMosaic[2], ANYCOLOR);
-                        Pixel p3 = new Pixel(pMosaic[1], EMPTY);
-                        Pixel p4 = new Pixel(pMosaic[2], EMPTY);
 
-                        p1.scoreValue += 22 / 3.0;
-                        p2.scoreValue += 22 / 3.0;
-                        p3.scoreValue += 22 / 3.0;
-                        p4.scoreValue += 22 / 3.0;
+                        p1.scoreValue += 11 * .5;
+                        p2.scoreValue += 11 * .5;
 
                         optimalPlacements.add(p1);
                         optimalPlacements.add(p2);
 
-                        colorsToGetSPixels.add(p3);
-                        colorsToGetSPixels.add(p4);
+                        colorsToGetSPixels.add(new Pixel(p1, EMPTY));
+                        colorsToGetSPixels.add(new Pixel(p2, EMPTY));
                     }
                     if (pMosaic[1].color == EMPTY || pMosaic[2].color == EMPTY) {
                         invalidateMosaic(pixel);
@@ -256,11 +252,11 @@ public final class PlacementCalculator {
         return colors.get(0);
     }
 
-    private static void oneRemainingCase(Pixel pixel, Pixel x1, Pixel x2) {
-        Pixel lastPixel = new Pixel(x1, getRemainingColor(pixel.color, x2.color));
-        lastPixel.scoreValue += 11;
-        optimalPlacements.add(lastPixel);
-        colorsToGetSPixels.add(lastPixel);
+    private static void oneRemainingCase(Pixel pixel, Pixel p1, Pixel p2) {
+        Pixel p3 = new Pixel(p1, getRemainingColor(pixel.color, p2.color));
+        p3.scoreValue += 11;
+        optimalPlacements.add(p3);
+        colorsToGetSPixels.add(new Pixel(p3, EMPTY));
     }
 
     private static boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
@@ -426,6 +422,7 @@ public final class PlacementCalculator {
             if (!noColor) {
 //                if (pixel.color == WHITE) pixel.scoreValue += 11 / 9.0;
                 for (Pixel mosaicPixel : colorsToGetSPixels) {
+                    if (pixel.equals(mosaicPixel)) continue;
                     ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
                     if (pixel.isIn(mosaicSPixels)) {
                         pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
