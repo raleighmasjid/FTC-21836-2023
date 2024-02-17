@@ -26,8 +26,9 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopClip;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_AUTO_SLOW;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SIDE;
-import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SLOW;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SLOW_LOCK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
@@ -48,6 +49,8 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
+
+    static boolean autoSlowMode = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -73,7 +76,8 @@ public final class MainTeleOp extends LinearOpMode {
     enum TeleOpConfig {
         EDITING_ALLIANCE,
         EDITING_SIDE,
-        EDITING_SLOW;
+        EDITING_SLOW_LOCK,
+        EDITING_AUTO_SLOW;
 
         public static final TeleOpConfig[] selections = values();
 
@@ -117,8 +121,11 @@ public final class MainTeleOp extends LinearOpMode {
                 case EDITING_SIDE:
                     backdropSide = !backdropSide;
                     break;
+                case EDITING_AUTO_SLOW:
+                    autoSlowMode = !autoSlowMode;
+                    break;
                 default:
-                case EDITING_SLOW:
+                case EDITING_SLOW_LOCK:
                     lockSlowMode = !lockSlowMode;
                     break;
             }
@@ -127,7 +134,9 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.addLine();
             mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
             mTelemetry.addLine();
-            mTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + selection.markIf(EDITING_SLOW));
+            mTelemetry.addLine("Auto slow is" + (autoSlowMode ? "enabled" : "disabled") + selection.markIf(EDITING_AUTO_SLOW));
+            mTelemetry.addLine();
+            mTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + selection.markIf(EDITING_SLOW_LOCK));
 
             mTelemetry.update();
         }
@@ -146,16 +155,20 @@ public final class MainTeleOp extends LinearOpMode {
                 gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
         );
 
-        robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
-        if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
-        if (keyPressed(2, RIGHT_STICK_BUTTON))  robot.drone.toggle();
-
         if (gamepadEx2.isDown(LEFT_BUMPER)) {
             if (keyPressed(2, Y))               robot.intake.setDesiredPixelCount(2);
             if (keyPressed(2, X))               robot.intake.setDesiredPixelCount(1);
             if (keyPressed(2, A))               robot.intake.toggle();
             if (keyPressed(2, B))               robot.deposit.lift.setTargetRow(HEIGHT_CLIMBING);
+
+            if (keyPressed(2, RIGHT_STICK_BUTTON))  autoSlowMode = !autoSlowMode;
+
         } else {
+
+            robot.deposit.lift.setLiftPower(gamepadEx2.getLeftY());
+            if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
+            if (keyPressed(2, RIGHT_STICK_BUTTON))  robot.drone.toggle();
+
             if (keyPressed(2, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
             else if (keyPressed(2, DPAD_UP))    robot.deposit.lift.changeRow(1);
             else if (keyPressed(2, DPAD_LEFT))  robot.deposit.paintbrush.dropPixel();
@@ -178,11 +191,18 @@ public final class MainTeleOp extends LinearOpMode {
         }
 
         // Field-centric driving with control stick inputs:
+        boolean driveSlow =
+                gamepadEx1.isDown(RIGHT_BUMPER) ||
+                (autoSlowMode && (
+                        !robot.deposit.lift.isRetracted() ||
+                        gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
+                ));
+
         robot.drivetrain.run(
                 gamepadEx1.getLeftX(),
                 gamepadEx1.getLeftY(),
                 x,
-                gamepadEx1.isDown(RIGHT_BUMPER) || robot.deposit.isRetracted() || gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
+                driveSlow
         );
     }
 }
