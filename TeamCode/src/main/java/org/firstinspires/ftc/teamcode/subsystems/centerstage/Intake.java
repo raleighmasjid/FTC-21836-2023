@@ -9,7 +9,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopClip;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
@@ -238,7 +238,7 @@ public final class Intake {
         reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
         reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
 
-        rollerAngle = normalizeDegrees(loopClip(motor.encoder.getPosition(), motor.getCPR()) * 360 / motor.getCPR());
+        rollerAngle = normalizeDegrees(loopMod(motor.encoder.getPosition(), motor.getCPR()) * 360 / motor.getCPR());
 
         filter.setGains(kalmanGains);
         controller.setGains(pidGains);

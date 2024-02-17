@@ -207,18 +207,18 @@ public final class MainAuton extends LinearOpMode {
         public static final AutonConfig[] selections = values();
 
         public AutonConfig plus(int i) {
-            return selections[loopClip(ordinal() + i, selections.length)];
+            return selections[loopMod(ordinal() + i, selections.length)];
         }
         public String markIf(AutonConfig s) {
             return this == s ? " <" : "";
         }
     }
 
-    public static int loopClip(int a, int b) {
-        return (int) loopClip(a,(double) b);
+    public static int loopMod(int a, int b) {
+        return (int) loopMod(a,(double) b);
     }
 
-    public static double loopClip(double a, double b) {
+    public static double loopMod(double a, double b) {
         return (a % b + b) % b;
     }
 
