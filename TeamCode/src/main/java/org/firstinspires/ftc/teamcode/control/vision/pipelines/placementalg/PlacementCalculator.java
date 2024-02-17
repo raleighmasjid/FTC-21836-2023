@@ -380,7 +380,7 @@ public final class PlacementCalculator {
         }
     }
 
-    private static int[] iterationXs(int y) {
+    public static int[] iterationXs(int y) {
         return (y % 2 == 0) ? new int[]{1, 6, 2, 5, 3, 4} : new int[]{0, 6, 1, 5, 2, 4, 3};
     }
 
