@@ -13,6 +13,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPiv
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
 
+import static java.lang.Math.round;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -146,7 +148,7 @@ public final class Deposit {
         }
 
         public void changeRow(int deltaRow) {
-            setTargetRow(targetRow + deltaRow);
+            setTargetRow(round(targetRow + deltaRow));
         }
 
         public void setLiftPower(double manualLiftPower) {
