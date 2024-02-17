@@ -110,7 +110,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             minGreen =  {70, .4, .215},
             maxGreen =  {110, 1, 1},
 
-            minWhite =  {0, 0, 0.7},
+            minWhite =  {0, 0, 0.65},
             maxWhite =  {360, 0.242, 1};
 
     private final ArrayList<AprilTagDetection> tags = new ArrayList<>();
