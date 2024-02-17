@@ -138,6 +138,7 @@ public final class Deposit {
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
+            targetState = new State(rowToInches(this.targetRow));
         }
 
         private static double rowToInches(double row) {
@@ -161,9 +162,11 @@ public final class Deposit {
 
         private void run(boolean intakeClear) {
 
-            controller.setTarget(targetState =
+            controller.setTarget(
                     manualLiftPower == 0 ?
-                            new State(intakeClear ? rowToInches(targetRow) : 0) :
+                            intakeClear ?
+                                    targetState :
+                                    new State(0) :
                             currentState
             );
 
