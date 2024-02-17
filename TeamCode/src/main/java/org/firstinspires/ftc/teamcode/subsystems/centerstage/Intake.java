@@ -3,13 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1620;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.GREEN;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.HAS_0_PIXELS;
@@ -35,11 +33,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
-import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.HSV;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
-import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.ColorSensor;
@@ -56,28 +50,13 @@ public final class Intake {
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
             TIME_PIXEL_1_SETTLING = 0.25,
-            TIME_REVERSING = 0.175,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             TIME_INTAKE_FLIP_TO_LIFT = 0.2,
-            SPEED_SLOW_REVERSING = -0.25,
             COLOR_SENSOR_GAIN = 1,
             HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
             theta0 = -0.496183876745;
-
-    public static PIDGains pidGains = new PIDGains(
-            0,
-            0,
-            0,
-            1
-    );
-
-    public static KalmanGains kalmanGains = new KalmanGains(
-            3,
-            5,
-            10
-    );
 
     /**
      * HSV value bound for intake pixel detection
@@ -125,8 +104,6 @@ public final class Intake {
             );
 
     private final MotorEx motor;
-    private final KalmanFilter filter = new KalmanFilter(kalmanGains);
-    private final PIDController controller = new PIDController(filter);
 
     final ColorSensor[] sensors;
     private final HSV[] HSVs = {new HSV(), new HSV()};
@@ -144,7 +121,7 @@ public final class Intake {
 
     private boolean pixelsTransferred = false, isIntaking = false;
     private int desiredPixelCount = 2;
-    private double motorPower, rollerAngle;
+    private double motorPower;
 
     enum State {
         HAS_0_PIXELS,
@@ -238,11 +215,6 @@ public final class Intake {
         reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
         reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
 
-        rollerAngle = normalizeDegrees(loopMod(motor.encoder.getPosition(), motor.getCPR()) * 360 / motor.getCPR());
-
-        filter.setGains(kalmanGains);
-        controller.setGains(pidGains);
-
         switch (state) {
             case HAS_0_PIXELS:
 
@@ -281,10 +253,7 @@ public final class Intake {
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
-                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : (
-                            pidGains.kP == 0 ? SPEED_SLOW_REVERSING :
-                            controller.calculate(new org.firstinspires.ftc.teamcode.control.motion.State(rollerAngle))
-                    ));
+                    setMotorPower(-1);
                     break;
                 }
 
@@ -384,8 +353,5 @@ public final class Intake {
         HSVs[1].toTelemetry("Top HSV");
         mTelemetry.addLine();
         HSVs[0].toTelemetry("Bottom HSV");
-        mTelemetry.addLine();
-        mTelemetry.addData("Roller angle (deg)", rollerAngle);
-        mTelemetry.addData("Roller angle (deg/s)", controller.getFilteredErrorDerivative());
     } 
 }
