@@ -194,7 +194,7 @@ public final class MainTeleOp extends LinearOpMode {
         boolean driveSlow =
                 gamepadEx1.isDown(RIGHT_BUMPER) ||
                 (autoSlowMode && (
-                        !robot.deposit.lift.isRetracted() ||
+                        (robot.deposit.lift.isScoring() && !robot.deposit.lift.isRetracted()) ||
                         gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
                 ));
 
