@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_MIN;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
@@ -54,12 +53,8 @@ public final class Deposit {
         paintbrush.run();
     }
 
-    public boolean isRetracted() {
-        return !paintbrushExtended() && lift.currentState.x <= HEIGHT_MIN;
-    }
-
     private boolean paintbrushExtended() {
-        return lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING;
+        return lift.isScoring() && lift.targetRow != HEIGHT_CLIMBING;
     }
 
     @Config
@@ -133,8 +128,12 @@ public final class Deposit {
             targetState = currentState = new State();
         }
 
-        public boolean isExtended() {
+        public boolean isScoring() {
             return targetRow > -1;
+        }
+
+        public boolean isRetracted() {
+            return currentState.x <= HEIGHT_MIN;
         }
 
         public void setTargetRow(double targetRow) {

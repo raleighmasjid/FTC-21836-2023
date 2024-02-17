@@ -104,8 +104,8 @@ public final class Robot {
 
         intake.run(
                 deposit.paintbrush.getPixelsLocked(),
-                deposit.isRetracted(),
-                deposit.lift.isExtended()
+                deposit.lift.isRetracted(),
+                deposit.lift.isScoring()
         );
         deposit.run(intake.clearOfDeposit());
         drone.run();
