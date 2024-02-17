@@ -70,8 +70,8 @@ public final class MainAuton extends LinearOpMode {
      */
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
-                MainAuton.X_BACKDROP,
-                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                X_BACKDROP,
+                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE) - ((pixel.x - 1) * MainAuton.WIDTH_PIXEL) - (pixel.y % 2 != 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
                 PI
         );
     }
@@ -96,8 +96,8 @@ public final class MainAuton extends LinearOpMode {
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 52,
-            Y_MAX_BLUE = 45.75,
-            Y_MAX_RED = -26.25,
+            Y_BACKDROP_0_BLUE = 43.9,
+            Y_BACKDROP_0_RED = -28.1,
             WIDTH_PIXEL = 3.7,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
