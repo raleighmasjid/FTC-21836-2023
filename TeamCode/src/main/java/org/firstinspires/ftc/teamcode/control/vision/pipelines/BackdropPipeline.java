@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.aqua;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -341,11 +342,18 @@ public class BackdropPipeline extends OpenCvPipeline {
             drawPixelIcon(input, y, x);
         }
 
-        PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
             Pixel pixel = backdrop.get(x, y);
             if (pixel.inMosaic()) drawMosaic(input, pixel);
+        }
+
+        if (optimalPlacements.isEmpty()) return;
+        Pixel p = optimalPlacements.get(0);
+        Imgproc.circle(input, centerPoints[p.y][p.x], (int) HEX_SIDE_LENGTH, aqua);
+        for (Pixel a : optimalPlacements) {
+            telemetry.addLine(a.toString());
         }
     }
 
