@@ -54,7 +54,7 @@ public final class Deposit {
         paintbrush.run();
     }
 
-    boolean isRetracted() {
+    public boolean isRetracted() {
         return !paintbrushExtended() && lift.currentState.x <= HEIGHT_MIN;
     }
 
