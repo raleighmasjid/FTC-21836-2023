@@ -112,23 +112,21 @@ public final class MainAuton extends LinearOpMode {
             enteringBackstage = new EditablePose(36, -12, LEFT),
             movingToStack2 = new EditablePose(-45, -24, LEFT);
 
-    private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+    private static Pose2d stackPos(int stack) {
+        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-                    robot.intake.toggle();
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-                    robot.intake.toggle();
                 })
-                .splineTo(stackPos(1, height).vec(), LEFT)
+                .splineTo(stackPos(1).vec(), LEFT)
         ;
     }
 
@@ -142,7 +140,7 @@ public final class MainAuton extends LinearOpMode {
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(turnToStack1.vec(), LEFT)
                 .lineTo(movingToStack2.byAlliance().toPose2d().vec())
-                .lineTo(stackPos(2, height).vec())
+                .lineTo(stackPos(2).vec())
         ;
     }
 
@@ -158,7 +156,7 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.intake.setHeight(height2);
                 })
-                .lineTo(stackPos(stack, height2).vec())
+                .lineTo(stackPos(stack).vec())
                 .addTemporalMarker(() -> {
                     robot.intake.setMotorPower(SPEED_INTAKING);
                     while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}

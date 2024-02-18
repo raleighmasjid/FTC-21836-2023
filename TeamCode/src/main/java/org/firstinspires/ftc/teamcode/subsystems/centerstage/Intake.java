@@ -21,11 +21,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
-import static java.lang.Math.asin;
-import static java.lang.Math.cos;
 import static java.lang.Math.max;
-import static java.lang.Math.sin;
-import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -49,15 +45,16 @@ public final class Intake {
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
+            ANGLE_STACK_2 = 2.445263,
+            ANGLE_STACK_3 = 5.754518,
+            ANGLE_STACK_4 = 8.985675,
+            ANGLE_STACK_5 = 12.153670,
             TIME_PIXEL_1_SETTLING = 0.25,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             TIME_INTAKE_FLIP_TO_LIFT = 0.2,
             TIME_REVERSING = 0.175,
-            COLOR_SENSOR_GAIN = 1,
-            HEIGHT_SHIFT = -0.1,
-            r = 9.5019488189,
-            theta0 = -0.496183876745;
+            COLOR_SENSOR_GAIN = 1;
 
     /**
      * HSV value bound for intake pixel detection
@@ -142,26 +139,20 @@ public final class Intake {
         FOUR_STACK,
         FIVE_STACK;
 
-        public final double deltaX, deltaTheta;
-
         private static final Intake.Height[] values = values();
 
         public Intake.Height minus(int less) {
             return values[max(ordinal() - less, 0)];
         }
 
-        Height() {
-            if (ordinal() == 0) {
-                deltaTheta = 0;
-                deltaX = 0;
-                return;
+        public double getAngle() {
+            switch (this) {
+                default: case FLOOR: return 0;
+                case TWO_STACK: return ANGLE_STACK_2;
+                case THREE_STACK: return ANGLE_STACK_3;
+                case FIVE_STACK: return ANGLE_STACK_4;
+                case FOUR_STACK: return ANGLE_STACK_5;
             }
-
-            double deltaY = ordinal() * 0.5 + HEIGHT_SHIFT;
-
-            double theta1 = asin((r * sin(theta0) + deltaY) / r);
-            deltaTheta = toDegrees(theta1 - theta0);
-            deltaX = r * cos(theta1) - r * cos(theta0);
         }
     }
 
@@ -291,7 +282,7 @@ public final class Intake {
 
         double ANGLE_PIVOT_INTAKING =
                 state == RETRACTED && liftIsRunning ? ANGLE_PIVOT_VERTICAL :
-                height != FLOOR ? height.deltaTheta :
+                height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
 
