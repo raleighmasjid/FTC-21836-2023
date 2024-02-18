@@ -169,7 +169,7 @@ public final class Backdrop {
     /**
      * @return Whether the provided {@link Pixel} is supported by two other {@link Pixel}s below it in hexagonal grid space
      */
-    boolean isSupported(Pixel pixel) {
+    public boolean isSupported(Pixel pixel) {
         return get(pixel.x, pixel.y - 1).color != EMPTY && get(pixel.x - 1 + 2 * (pixel.y % 2), pixel.y - 1).color != EMPTY;
     }
 
