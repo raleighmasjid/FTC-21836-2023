@@ -134,8 +134,8 @@ public final class Deposit {
             return targetRow > -1;
         }
 
-        public boolean isRetracted() {
-            return currentState.x <= HEIGHT_MIN;
+        public boolean isExtended() {
+            return currentState.x > HEIGHT_MIN;
         }
 
         public void setTargetRow(double targetRow) {
