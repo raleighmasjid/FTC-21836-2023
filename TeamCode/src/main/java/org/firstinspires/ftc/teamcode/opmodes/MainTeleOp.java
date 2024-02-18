@@ -50,7 +50,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    static boolean autoSlowMode = true;
+    static boolean doAutoSlow = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -68,6 +68,8 @@ public final class MainTeleOp extends LinearOpMode {
 
             robot.run();
 
+            mTelemetry.addLine("Auto slow is " + (doAutoSlow ? "enabled" : "disabled"));
+            mTelemetry.addLine();
             robot.printTelemetry();
             mTelemetry.update();
         }
@@ -122,7 +124,7 @@ public final class MainTeleOp extends LinearOpMode {
                     backdropSide = !backdropSide;
                     break;
                 case EDITING_AUTO_SLOW:
-                    autoSlowMode = !autoSlowMode;
+                    doAutoSlow = !doAutoSlow;
                     break;
                 default:
                 case EDITING_SLOW_LOCK:
@@ -134,7 +136,7 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.addLine();
             mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
             mTelemetry.addLine();
-            mTelemetry.addLine("Auto slow is" + (autoSlowMode ? "enabled" : "disabled") + selection.markIf(EDITING_AUTO_SLOW));
+            mTelemetry.addLine("Auto slow is " + (doAutoSlow ? "enabled" : "disabled") + selection.markIf(EDITING_AUTO_SLOW));
             mTelemetry.addLine();
             mTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + selection.markIf(EDITING_SLOW_LOCK));
 
@@ -161,7 +163,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, A))               robot.intake.toggle();
             if (keyPressed(2, B))               robot.deposit.lift.setTargetRow(HEIGHT_CLIMBING);
 
-            if (keyPressed(2, RIGHT_STICK_BUTTON))  autoSlowMode = !autoSlowMode;
+            if (keyPressed(2, RIGHT_STICK_BUTTON))  doAutoSlow = !doAutoSlow;
 
         } else {
 
@@ -193,7 +195,7 @@ public final class MainTeleOp extends LinearOpMode {
         // Field-centric driving with control stick inputs:
         boolean driveSlow =
                 gamepadEx1.isDown(RIGHT_BUMPER) ||
-                (autoSlowMode && (
+                (doAutoSlow && (
                         (robot.deposit.lift.isScoring() && !robot.deposit.lift.isRetracted()) ||
                         gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
                 ));
