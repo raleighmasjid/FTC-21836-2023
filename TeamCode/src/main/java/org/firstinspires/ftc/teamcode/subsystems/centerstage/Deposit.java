@@ -66,7 +66,7 @@ public final class Deposit {
                 0.4,
                 0.3,
                 0,
-                0.1
+                0.075
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
