@@ -44,8 +44,12 @@ public class MainAuton {
     }
 
     public static double
-            X_START_LEFT = -35,
-            X_START_RIGHT = 11.6666666667,
+            LENGTH_ROBOT = 17.3984665354,
+            WIDTH_ROBOT = 16.4220472441,
+            SIZE_HALF_FIELD = 70,
+            SIZE_TILE = SIZE_HALF_FIELD / 3.0,
+            X_START_LEFT = SIZE_TILE * -1.5,
+            X_START_RIGHT = SIZE_TILE * 0.5,
             X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
             Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
@@ -62,7 +66,7 @@ public class MainAuton {
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 52,
+            X_BACKDROP = 50,
             Y_BACKDROP_0_BLUE = 43.9,
             Y_BACKDROP_0_RED = -28.1,
             WIDTH_PIXEL = 3.7,
@@ -70,7 +74,7 @@ public class MainAuton {
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
 
     public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, -61.3007667323, FORWARD),
+            startPose = new EditablePose(X_START_RIGHT, LENGTH_ROBOT * 0.5 - SIZE_HALF_FIELD, FORWARD),
             centerSpike = new EditablePose(15, -23, LEFT),
             nearTrussSpike = new EditablePose(5.4, -35, LEFT),
             awayTrussSpike = new EditablePose(29, -32, LEFT),
@@ -196,7 +200,7 @@ public class MainAuton {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(50, 50, toRadians(250), toRadians(250), 13.95)
 //                .setConstraints(70, 90, toRadians(295), toRadians(295), 13.95)
-                .setDimensions(16.42205, 17.39847)
+                .setDimensions(WIDTH_ROBOT, LENGTH_ROBOT)
                 .followTrajectorySequence(robotdrivetrain -> {
 
                     if (partnerWillDoRand) {
