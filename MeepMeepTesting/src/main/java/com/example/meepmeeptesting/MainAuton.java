@@ -45,7 +45,7 @@ public class MainAuton {
 
     public static double
             X_START_LEFT = -35,
-            X_START_RIGHT = 12,
+            X_START_RIGHT = 11.6666666667,
             X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
             Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
@@ -70,7 +70,7 @@ public class MainAuton {
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
 
     public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
+            startPose = new EditablePose(X_START_RIGHT, -61.3007667323, FORWARD),
             centerSpike = new EditablePose(15, -23, LEFT),
             nearTrussSpike = new EditablePose(5.4, -35, LEFT),
             awayTrussSpike = new EditablePose(29, -32, LEFT),
