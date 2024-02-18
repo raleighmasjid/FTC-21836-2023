@@ -248,13 +248,6 @@ public class BackdropPipeline extends OpenCvPipeline {
 
             warpImageToStraightenBackdrop(input, minInd, maxInd);
 
-            if (showSamples) {
-                Imgproc.line(input, tagTL, tagTR, yellow, 1);
-                Imgproc.line(input, tagBL, tagBR, yellow, 1);
-                Imgproc.line(input, tagTL, tagBL, yellow, 1);
-                Imgproc.line(input, tagTR, tagBR, yellow, 1);
-            }
-
             Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
             warpToFitGrid(input);
