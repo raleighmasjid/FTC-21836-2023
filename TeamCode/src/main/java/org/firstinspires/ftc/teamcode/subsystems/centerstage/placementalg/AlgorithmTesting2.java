@@ -18,16 +18,16 @@ final class AlgorithmTesting2 {
 
         String[] colors = {
                 " _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                " _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                " _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                " _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                " _ _ _ _ _ _",
-                "_ _ _ _ _ _ _",
-                " _ _ _ _ _ _",
+                "W _ _ _ _ _ _",
+                " W _ _ _ _ _",
+                "Y G W _ _ _ _",
+                " P W W _ _ _",
+                "W W W G _ _ _",
+                " W W W W _ _",
+                "W W W P W _ _",
+                " W W Y G W W",
+                "P Y W W W Y G",
+                " G W W W W P",
         };
 
         for (int y = 0; y < colors.length; y++) {
