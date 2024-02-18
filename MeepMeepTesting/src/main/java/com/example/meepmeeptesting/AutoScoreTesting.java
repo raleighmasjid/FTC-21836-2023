@@ -1,6 +1,7 @@
 package com.example.meepmeeptesting;
 
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static com.example.meepmeeptesting.MainAuton.toPose2d;
 import static com.example.meepmeeptesting.Pixel.Color.WHITE;
 import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.PI;
@@ -68,7 +69,7 @@ public class AutoScoreTesting {
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.lift.setTargetRow(placements[1].y);
                                 })
-                                .lineToSplineHeading(placements[0].toPose2d())
+                                .lineToSplineHeading(toPose2d(placements[0]))
                                 .addTemporalMarker(() -> {
 //                                    robot.deposit.paintbrush.dropPixels(2);
 //                                    latestScan.add(placements[1]);
