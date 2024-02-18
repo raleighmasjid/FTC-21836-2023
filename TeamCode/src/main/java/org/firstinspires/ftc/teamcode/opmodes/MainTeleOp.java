@@ -78,8 +78,8 @@ public final class MainTeleOp extends LinearOpMode {
     enum TeleOpConfig {
         EDITING_ALLIANCE,
         EDITING_SIDE,
-        EDITING_SLOW_LOCK,
-        EDITING_AUTO_SLOW;
+        EDITING_AUTO_SLOW,
+        EDITING_SLOW_LOCK;
 
         public static final TeleOpConfig[] selections = values();
 
