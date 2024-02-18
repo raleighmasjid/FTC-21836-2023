@@ -46,7 +46,7 @@ public class MainAuton {
     public static double
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
-            SIZE_HALF_FIELD = 70,
+            SIZE_HALF_FIELD = 72,
             SIZE_TILE = SIZE_HALF_FIELD / 3.0,
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
