@@ -54,6 +54,7 @@ public final class Intake {
             TIME_SETTLING = 0.2,
             TIME_INTAKE_FLIP_TO_LIFT = 0.2,
             TIME_REVERSING = 0.175,
+            SPEED_SLOW_REVERSING = -0.2,
             COLOR_SENSOR_GAIN = 1;
 
     /**
@@ -245,7 +246,7 @@ public final class Intake {
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
-                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : 0);
+                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : SPEED_SLOW_REVERSING);
                     break;
                 }
 
