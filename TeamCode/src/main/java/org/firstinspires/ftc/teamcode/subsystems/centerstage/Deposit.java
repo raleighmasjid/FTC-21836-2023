@@ -13,6 +13,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPiv
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
 
+import static java.lang.Math.round;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -41,20 +43,20 @@ public final class Deposit {
         paintbrush = new Paintbrush(hardwareMap);
     }
 
-    void run() {
+    void run(boolean intakeClear) {
 
-        if ((!paintbrush.droppedPixel) && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
+        if (!paintbrush.droppedPixel && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
             lift.setTargetRow(-1);
         }
 
-        lift.run();
-        paintbrush.pivot.setActivated(lift.isExtended() && lift.targetRow != HEIGHT_CLIMBING);
+        lift.run(intakeClear);
+        paintbrush.pivot.setActivated(paintbrushExtended() && intakeClear);
         paintbrush.run();
     }
 
-    boolean isRetracted() {
-        return !paintbrush.pivot.isActivated() && lift.currentState.x <= 0.5;
+    private boolean paintbrushExtended() {
+        return lift.isScoring() && lift.targetRow != HEIGHT_CLIMBING;
     }
 
     @Config
@@ -62,9 +64,9 @@ public final class Deposit {
 
         public static PIDGains pidGains = new PIDGains(
                 0.4,
-                0.1,
+                0.3,
                 0,
-                0.5
+                0.1
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
@@ -94,6 +96,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
                 HEIGHT_CLIMBING = 6.25,
+                HEIGHT_MIN = 0.25,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
@@ -127,14 +130,17 @@ public final class Deposit {
             targetState = currentState = new State();
         }
 
-        public boolean isExtended() {
+        public boolean isScoring() {
             return targetRow > -1;
+        }
+
+        public boolean isRetracted() {
+            return currentState.x <= HEIGHT_MIN;
         }
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(rowToInches(targetRow));
-            controller.setTarget(targetState);
+            targetState = new State(rowToInches(this.targetRow));
         }
 
         private static double rowToInches(double row) {
@@ -142,26 +148,30 @@ public final class Deposit {
         }
 
         public void changeRow(int deltaRow) {
-            setTargetRow(targetRow + deltaRow);
+            setTargetRow(round(targetRow + deltaRow));
         }
 
         public void setLiftPower(double manualLiftPower) {
             this.manualLiftPower = manualLiftPower;
         }
 
-        private void run() {
+        public void readSensors() {
+            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
-            if (manualLiftPower != 0) controller.setTarget(targetState = currentState);
+            kDFilter.setGains(kalmanGains);
+            controller.setGains(pidGains);
+        }
+
+        private void run(boolean intakeClear) {
+
+            if (manualLiftPower != 0) targetState = currentState;
+
+            controller.setTarget(intakeClear ? targetState : new State(0));
 
 //            if (lastKp != pidGains.kP) {
 //                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
 //                lastKp = pidGains.kP;
 //            }
-
-            kDFilter.setGains(kalmanGains);
-            controller.setGains(pidGains);
-
-            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
@@ -194,13 +204,14 @@ public final class Deposit {
     public static final class Paintbrush {
 
         public static double
-                ANGLE_PIVOT_OFFSET = 5,
+                ANGLE_PIVOT_OFFSET = 10,
+                ANGLE_PIVOT_SCORING = 127,
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 45,
-                TIME_DROP_FIRST = 0.7,
-                TIME_DROP_SECOND = 1;
+                TIME_DROP_FIRST = 0.35,
+                TIME_DROP_SECOND = 0.5;
 
         private final SimpleServoPivot pivot, hook, claw;
 
@@ -212,7 +223,7 @@ public final class Deposit {
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
                     ANGLE_PIVOT_OFFSET,
-                    ANGLE_PIVOT_OFFSET + 120,
+                    ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING,
                     getAxonServo(hardwareMap, "deposit left"),
                     getReversedServo(getAxonServo(hardwareMap, "deposit right"))
             );
@@ -234,7 +245,7 @@ public final class Deposit {
             return pixelsLocked;
         }
 
-        void lockPixels(Pixel.Color... colors) {
+        public void lockPixels(Pixel.Color... colors) {
             int pixelsInIntake = 0;
             for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
@@ -260,7 +271,7 @@ public final class Deposit {
         }
 
         private void run() {
-            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + 120);
+            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING);
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 

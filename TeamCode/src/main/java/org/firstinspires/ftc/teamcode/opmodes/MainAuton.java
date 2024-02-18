@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -59,7 +59,7 @@ public final class MainAuton extends LinearOpMode {
     public static MultipleTelemetry mTelemetry;
     static Robot robot;
     public static Backdrop autonBackdrop = new Backdrop();
-    static Pose2d autonEndPose = new Pose2d(0, 0, FORWARD);
+    static Pose2d autonEndPose = null;
 
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
@@ -70,8 +70,8 @@ public final class MainAuton extends LinearOpMode {
      */
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
-                MainAuton.X_BACKDROP,
-                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                X_BACKDROP,
+                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE) - ((pixel.x - 1) * MainAuton.WIDTH_PIXEL) - (pixel.y % 2 != 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
                 PI
         );
     }
@@ -91,14 +91,13 @@ public final class MainAuton extends LinearOpMode {
             Y_INTAKING_3 = -36,
             TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            TIME_INTAKE_FLIP_TO_LIFT = 0.25,
             TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 52,
-            Y_MAX_BLUE = 45.75,
-            Y_MAX_RED = -26.25,
+            Y_BACKDROP_0_BLUE = 43.9,
+            Y_BACKDROP_0_RED = -28.1,
             WIDTH_PIXEL = 3.7,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
@@ -120,14 +119,14 @@ public final class MainAuton extends LinearOpMode {
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
-                    robot.intake.setRequiredIntakingAmount(0);
+                    robot.intake.toggle();
                     robot.intake.setHeight(height);
                 })
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
                 .addTemporalMarker(() -> {
-                    robot.intake.setRequiredIntakingAmount(2);
+                    robot.intake.toggle();
                 })
                 .splineTo(stackPos(1, height).vec(), LEFT)
         ;
@@ -196,6 +195,33 @@ public final class MainAuton extends LinearOpMode {
         ;
     }
 
+    enum AutonConfig {
+        EDITING_LEFT,
+        EDITING_CENTER,
+        EDITING_RIGHT,
+        EDITING_ALLIANCE,
+        EDITING_SIDE,
+        EDITING_PARK,
+        EDITING_PARTNER;
+
+        public static final AutonConfig[] selections = values();
+
+        public AutonConfig plus(int i) {
+            return selections[loopMod(ordinal() + i, selections.length)];
+        }
+        public String markIf(AutonConfig s) {
+            return this == s ? " <" : "";
+        }
+    }
+
+    public static int loopMod(int a, int b) {
+        return (int) loopMod(a,(double) b);
+    }
+
+    public static double loopMod(double a, double b) {
+        return (a % b + b) % b;
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -205,46 +231,63 @@ public final class MainAuton extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(hardwareMap);
         robot.preload();
+        robot.initRun();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        AutonConfig selection = EDITING_ALLIANCE;
+
         int[] ourPlacements = {1, 3, 6};
-        int selectedPlacement = 0;
         boolean partnerWillDoRand = false, park = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
-            gamepadEx2.readButtons();
-            if (keyPressed(1, B))           isRed = true;
-            if (keyPressed(1, X))           isRed = false;
-            if (keyPressed(1, DPAD_RIGHT))  backdropSide = isRed;
-            if (keyPressed(1, DPAD_LEFT))   backdropSide = !isRed;
-            if (keyPressed(1, DPAD_UP))     park = false;
-            if (keyPressed(1, DPAD_DOWN))   park = true;
-            if (keyPressed(1, Y))           partnerWillDoRand = !partnerWillDoRand;
 
-            if (keyPressed(2, DPAD_UP))     selectedPlacement = clip(selectedPlacement - 1, 0, 2);
-            if (keyPressed(2, DPAD_DOWN))   selectedPlacement = clip(selectedPlacement + 1, 0, 2);
-            if (keyPressed(2, X))  ourPlacements[selectedPlacement] = getOtherPlacement(ourPlacements[selectedPlacement]);
+            if (keyPressed(1, DPAD_UP))   selection = selection.plus(-1);
+            if (keyPressed(1, DPAD_DOWN)) selection = selection.plus(1);
 
-            for (PropDetectPipeline.Randomization rand : randomizations) {
-                mTelemetry.addLine(
-                        rand.name() + ": " + (ourPlacements[rand.ordinal()] % 2 == 1 ? "left" : "right") +
-                        (rand.ordinal() == selectedPlacement ? " <" : "")
-                );
+            if (keyPressed(1, X)) switch (selection) {
+                case EDITING_LEFT:
+                case EDITING_CENTER:
+                case EDITING_RIGHT:
+                    int index = selection.ordinal();
+                    ourPlacements[index] = getOtherPlacement(ourPlacements[index]);
+                    break;
+                case EDITING_ALLIANCE:
+                    isRed = !isRed;
+                    break;
+                case EDITING_SIDE:
+                    backdropSide = !backdropSide;
+                    break;
+                case EDITING_PARK:
+                    park = !park;
+                    break;
+                default:
+                case EDITING_PARTNER:
+                    partnerWillDoRand = !partnerWillDoRand;
+                    break;
             }
-            mTelemetry.addLine();
-            mTelemetry.addLine();
 
-            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE ") + (backdropSide ? "BACKDROP " : "AUDIENCE ") + "side");
+            mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
             mTelemetry.addLine();
-            mTelemetry.addLine("Your alliance PARTNER WILL " + (partnerWillDoRand ? "" : "NOT ") + "PLACE YELLOW");
+            mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
             mTelemetry.addLine();
-            mTelemetry.addLine("You WILL " + (park ? "PARK" : "CYCLE"));
+            mTelemetry.addLine("WILL " + (park ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
+            mTelemetry.addLine();
+            mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
+            mTelemetry.addLine();
+            mTelemetry.addLine("Randomizations:");
+            for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
+                    randomizations[i].name() + ": " +
+                    (ourPlacements[i] % 2 == 1 ? "left" : "right") +
+                    selection.markIf(selections[i])
+            );
+            mTelemetry.addLine();
             mTelemetry.addLine();
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
+
             mTelemetry.update();
         }
 
@@ -323,9 +366,6 @@ public final class MainAuton extends LinearOpMode {
                         .waitSeconds(TIME_SPIKE)
                         .setTangent(RIGHT)
                         .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-                            robot.intake.setRequiredIntakingAmount(2);
-                        })
-                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP + TIME_INTAKE_FLIP_TO_LIFT, () -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
                         })
                         .splineToConstantHeading(toPose2d(placements.get(0)).vec(),

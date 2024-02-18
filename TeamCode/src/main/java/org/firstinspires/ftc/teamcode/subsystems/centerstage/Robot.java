@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
@@ -63,13 +62,10 @@ public final class Robot {
                 new LEDIndicator(hardwareMap, "led left green", "led left red"),
                 new LEDIndicator(hardwareMap, "led right green", "led right red")
         };
-
-        drone.run();
     }
 
     public void preload() {
-        intake.setRequiredIntakingAmount(0);
-        deposit.paintbrush.lockPixels(YELLOW, EMPTY);
+        deposit.paintbrush.lockPixels(YELLOW);
         spike.setActivated(true);
     }
 
@@ -84,9 +80,10 @@ public final class Robot {
 
     public void readSensors() {
         bulkReader.bulkRead();
-        intake.topSensor.update();
-        intake.bottomSensor.update();
+        intake.sensors[0].update();
+        intake.sensors[1].update();
         drivetrain.update();
+        deposit.lift.readSensors();
     }
 
     public boolean autoScore() {
@@ -105,12 +102,12 @@ public final class Robot {
             if (autoScoringManager != null) autoScoringManager.beginTrajectoryGeneration(deposit.paintbrush.colors);
         }
 
-        deposit.run();
         intake.run(
                 deposit.paintbrush.getPixelsLocked(),
-                deposit.isRetracted(),
-                deposit.lift.isExtended()
+                deposit.lift.isRetracted(),
+                deposit.lift.isScoring()
         );
+        deposit.run(intake.clearOfDeposit());
         drone.run();
         spike.run();
 

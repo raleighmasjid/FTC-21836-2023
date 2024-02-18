@@ -15,7 +15,7 @@ import java.util.Collections;
  */
 public final class PlacementCalculator {
     private static Backdrop backdrop;
-    public static final int[] colorsLeft = {5, 5, 5};
+    public static final int[] colorsLeft = {5, 5, 5}, initialColors = {5, 5, 5};
     private static final ArrayList<Pixel> optimalPlacements = new ArrayList<>();
     private static final ArrayList<Pixel> colorsToGetSPixels = new ArrayList<>();
     private static ArrayList<Pixel> setLineSPixels;
@@ -450,9 +450,9 @@ public final class PlacementCalculator {
     public static ArrayList<Pixel> getOptimalPlacements(Backdrop backdrop) {
         PlacementCalculator.backdrop = backdrop;
         backdrop.mosaicCount = 0;
-        colorsLeft[0] = 5;
-        colorsLeft[1] = 5;
-        colorsLeft[2] = 5;
+        colorsLeft[0] = initialColors[0];
+        colorsLeft[1] = initialColors[1];
+        colorsLeft[2] = initialColors[2];
         optimalPlacements.clear();
         colorsToGetSPixels.clear();
 
