@@ -77,8 +77,12 @@ public final class MainAuton extends LinearOpMode {
     }
 
     public static double
-            X_START_LEFT = -35,
-            X_START_RIGHT = 12,
+            LENGTH_ROBOT = 17.3984665354,
+            WIDTH_ROBOT = 16.4220472441,
+            SIZE_HALF_FIELD = 72,
+            SIZE_TILE = SIZE_HALF_FIELD / 3.0,
+            X_START_LEFT = SIZE_TILE * -1.5,
+            X_START_RIGHT = SIZE_TILE * 0.5,
             X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
             Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
@@ -95,15 +99,15 @@ public final class MainAuton extends LinearOpMode {
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 52,
-            Y_BACKDROP_0_BLUE = 43.9,
-            Y_BACKDROP_0_RED = -28.1,
+            X_BACKDROP = 50,
+            Y_BACKDROP_0_BLUE = 43,
+            Y_BACKDROP_0_RED = -27.5,
             WIDTH_PIXEL = 3.7,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
 
     public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
+            startPose = new EditablePose(X_START_RIGHT, LENGTH_ROBOT * 0.5 - SIZE_HALF_FIELD, FORWARD),
             centerSpike = new EditablePose(15, -23, LEFT),
             nearTrussSpike = new EditablePose(5.4, -35, LEFT),
             awayTrussSpike = new EditablePose(29, -32, LEFT),
@@ -332,19 +336,24 @@ public final class MainAuton extends LinearOpMode {
             }
             if (!backdropSide) swap(placements, 0, 1);
 
+            boolean outer, inner;
+            switch (rand) {
+                case LEFT:
+                    outer = !(inner = (backdropSide ? isRed : !isRed));
+                    break;
+                case RIGHT:
+                    inner = !(outer = (backdropSide ? isRed : !isRed));
+                    break;
+                default:
+                    outer = inner = false;
+                    break;
+            }
+
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
             ;
 
             if (backdropSide) {
-
-                boolean outer =
-                        (isRed && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                        (!isRed && (rand == PropDetectPipeline.Randomization.LEFT));
-
-                boolean inner =
-                        (isRed && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                        (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
 
                 if (inner) {
                     Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
@@ -380,6 +389,19 @@ public final class MainAuton extends LinearOpMode {
                 ;
 
             } else {
+
+                if (inner) {
+                    Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
+                    sequence.splineTo(spike.vec(), spike.getHeading());
+                } else {
+                    sequence.lineToSplineHeading((
+                            outer ?
+                                    awayTrussSpike.byAlliance().flipBySide() :
+                                    centerSpike.byAlliance().flipBySide()
+                    ).toPose2d());
+                }
+
+
 
             }
 
