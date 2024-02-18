@@ -167,7 +167,7 @@ public class MainAuton {
     }
 
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(960);
+        MeepMeep meepMeep = new MeepMeep(840);
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         boolean partnerWillDoRand = false;
@@ -209,14 +209,24 @@ public class MainAuton {
                     }
                     if (!backdropSide) swap(placements, 0, 1);
 
+                    boolean outer, inner;
+                    switch (rand) {
+                        case LEFT:
+                            outer = !(inner = (backdropSide ? isRed : !isRed));
+                            break;
+                        case RIGHT:
+                            inner = !(outer = (backdropSide ? isRed : !isRed));
+                            break;
+                        default:
+                            outer = inner = false;
+                            break;
+                    }
+
                     TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
                             .setTangent(startPose.getHeading())
                     ;
 
                     if (backdropSide) {
-
-                        boolean outer = rand == (isRed ? PropDetectPipeline.Randomization.RIGHT : PropDetectPipeline.Randomization.LEFT);
-                        boolean inner = rand == (isRed ? PropDetectPipeline.Randomization.LEFT : PropDetectPipeline.Randomization.RIGHT);
 
                         if (inner) {
                             Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
@@ -253,14 +263,15 @@ public class MainAuton {
 
                     } else {
 
-                        boolean inner = rand == (isRed ? PropDetectPipeline.Randomization.RIGHT : PropDetectPipeline.Randomization.LEFT);
-                        boolean outer = rand == (isRed ? PropDetectPipeline.Randomization.LEFT : PropDetectPipeline.Randomization.RIGHT);
-
                         if (inner) {
                             Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
                             sequence.splineTo(spike.vec(), spike.getHeading());
                         } else {
-
+                            sequence.lineToSplineHeading((
+                                    outer ?
+                                            awayTrussSpike.byAlliance().flipBySide() :
+                                            centerSpike.byAlliance().flipBySide()
+                            ).toPose2d());
                         }
 
 
