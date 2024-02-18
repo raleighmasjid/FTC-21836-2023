@@ -385,12 +385,7 @@ public final class MainAuton extends LinearOpMode {
 
             }
 
-            if (park) {
-                if (partnerWillDoRand) sequence
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
-                ;
-            } else {
+            if (!park) {
 
                 Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                 int placement = backdropSide ? 1 : 2;
@@ -406,6 +401,11 @@ public final class MainAuton extends LinearOpMode {
 //                    intake2Pixels(sequence, 1, height.minus(2));
 //                    score(sequence, placements, placement + 2);
 //                }
+            } else if (partnerWillDoRand) {
+                sequence
+                        .lineTo(parking.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
+                ;
             }
 
             sequences[rand.ordinal()] = sequence.build();
