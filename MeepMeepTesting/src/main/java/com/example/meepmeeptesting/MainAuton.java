@@ -67,8 +67,8 @@ public class MainAuton {
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 50,
-            Y_BACKDROP_0_BLUE = 43.9,
-            Y_BACKDROP_0_RED = -28.1,
+            Y_BACKDROP_0_BLUE = 43,
+            Y_BACKDROP_0_RED = -27.5,
             WIDTH_PIXEL = 3.7,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
@@ -167,7 +167,7 @@ public class MainAuton {
     }
 
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(720);
+        MeepMeep meepMeep = new MeepMeep(960);
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         boolean partnerWillDoRand = false;
