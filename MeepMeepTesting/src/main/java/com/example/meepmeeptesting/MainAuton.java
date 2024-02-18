@@ -215,13 +215,8 @@ public class MainAuton {
 
                     if (backdropSide) {
 
-                        boolean outer =
-                                (isRed && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                                (!isRed && (rand == PropDetectPipeline.Randomization.LEFT));
-
-                        boolean inner =
-                                (isRed && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                                (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
+                        boolean outer = rand == (isRed ? PropDetectPipeline.Randomization.RIGHT : PropDetectPipeline.Randomization.LEFT);
+                        boolean inner = rand == (isRed ? PropDetectPipeline.Randomization.LEFT : PropDetectPipeline.Randomization.RIGHT);
 
                         if (inner) {
                             Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
@@ -257,6 +252,18 @@ public class MainAuton {
                         ;
 
                     } else {
+
+                        boolean inner = rand == (isRed ? PropDetectPipeline.Randomization.RIGHT : PropDetectPipeline.Randomization.LEFT);
+                        boolean outer = rand == (isRed ? PropDetectPipeline.Randomization.LEFT : PropDetectPipeline.Randomization.RIGHT);
+
+                        if (inner) {
+                            Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
+                            sequence.splineTo(spike.vec(), spike.getHeading());
+                        } else {
+
+                        }
+
+
 
                     }
 
