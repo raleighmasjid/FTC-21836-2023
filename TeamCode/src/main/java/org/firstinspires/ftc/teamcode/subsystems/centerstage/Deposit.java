@@ -107,7 +107,7 @@ public final class Deposit {
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
-        private double lastKp = pidGains.kP, manualLiftPower, targetRow;
+        private double manualLiftPower, targetRow;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -167,11 +167,6 @@ public final class Deposit {
             if (manualLiftPower != 0) targetState = currentState;
 
             controller.setTarget(intakeClear ? targetState : new State(0));
-
-//            if (lastKp != pidGains.kP) {
-//                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
-//                lastKp = pidGains.kP;
-//            }
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
