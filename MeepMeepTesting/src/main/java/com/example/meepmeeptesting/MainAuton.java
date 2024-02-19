@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = true;
+    static boolean isRed = false;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -62,7 +62,8 @@ public class MainAuton {
             Y_INTAKING_1 = -SIZE_TILE * 0.5,
             Y_INTAKING_2 = -SIZE_TILE * 1,
             Y_INTAKING_3 = -SIZE_TILE * 1.5,
-            TIME_SPIKE = 0.75,
+            TIME_SPIKE_BACKDROP = 0.75,
+            TIME_SPIKE_AUDIENCE = 1,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 5,
@@ -74,6 +75,7 @@ public class MainAuton {
             WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
             Y_SHIFT_POST_INNER = 2;
 
     public static EditablePose
@@ -82,7 +84,7 @@ public class MainAuton {
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
             centerSpikeAudience = new EditablePose(-38, -24.5, BACKWARD + 1e-6),
-            innerSpikeAudience = new EditablePose(-29.025, -35, RIGHT),
+            innerSpikeAudience = new EditablePose(-38, -30, LEFT),
             outerSpikeAudience = new EditablePose(-45.5, -32.5, 4.4),
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
@@ -250,7 +252,7 @@ public class MainAuton {
                                 .addTemporalMarker(() -> {
 //                                    robot.spike.toggle();
                                 })
-                                .waitSeconds(TIME_SPIKE)
+                                .waitSeconds(TIME_SPIKE_BACKDROP)
                                 .setTangent(RIGHT)
                                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
 //                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
@@ -272,14 +274,31 @@ public class MainAuton {
 
                         if (inner) {
 
+                            Pose2d spike = innerSpikeAudience.byAlliance().toPose2d();
+                            double a = isRed ? 1 : -1;
+                            sequence
+                                    .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
+                                    .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
+                                    .addTemporalMarker(() -> {
+                                        // intake toggle
+                                        // set lift 0
+                                        // drop pixel
+                                    })
+                                    .waitSeconds(TIME_SPIKE_AUDIENCE)
+                                    .addTemporalMarker(() -> {
+                                        // set lift -1
+                                    })
+                            ;
+
                         } else if (outer) {
+
+
 
                         } else {
 
                         }
 
                         sequence
-                                .forward(1)
                                 .addTemporalMarker(() -> {
                                     // intake set 1
                                 })
