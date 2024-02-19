@@ -57,7 +57,6 @@ public class MainAuton {
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_TILE = 24,
             X_INTAKING = -56,
             Y_INTAKING_1 = -12,
             Y_INTAKING_3 = -36,
