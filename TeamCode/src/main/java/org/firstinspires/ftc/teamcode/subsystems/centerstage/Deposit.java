@@ -273,7 +273,7 @@ public final class Deposit {
         private void run() {
             pivot.updateAngles(
                     ANGLE_PIVOT_OFFSET,
-                    ANGLE_PIVOT_OFFSET + (floor ? ANGLE_PIVOT_SCORING : ANGLE_PIVOT_FLOOR)
+                    ANGLE_PIVOT_OFFSET + (floor ? ANGLE_PIVOT_FLOOR : ANGLE_PIVOT_SCORING)
             );
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
