@@ -59,8 +59,9 @@ public class MainAuton {
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_INTAKING = -56,
-            Y_INTAKING_1 = -12,
-            Y_INTAKING_3 = -36,
+            Y_INTAKING_1 = -SIZE_TILE * 0.5,
+            Y_INTAKING_2 = -SIZE_TILE * 1,
+            Y_INTAKING_3 = -SIZE_TILE * 1.5,
             TIME_SPIKE = 0.75,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
@@ -80,16 +81,16 @@ public class MainAuton {
             centerSpikeBackdrop = new EditablePose(15, -24.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
-            centerSpikeAudience = new EditablePose(-38.625, -24.5, RIGHT),
+            centerSpikeAudience = new EditablePose(-38, -24.5, BACKWARD + 1e-6),
             innerSpikeAudience = new EditablePose(-29.025, -35, RIGHT),
-            outerSpikeAudience = new EditablePose(-51.625, -32, RIGHT),
+            outerSpikeAudience = new EditablePose(-45.5, -32.5, 4.4),
+            postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(36, -12, LEFT),
-            movingToStack2 = new EditablePose(-45, -24, LEFT);
+            enteringBackstage = new EditablePose(36, -12, LEFT);
 
     private static Pose2d stackPos(int stack) {
-        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
@@ -115,7 +116,7 @@ public class MainAuton {
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(turnToStack1.vec(), LEFT)
-                .lineTo(movingToStack2.byAlliance().toPose2d().vec())
+                .lineTo(postOuterAudience.byAlliance().toPose2d().vec())
                 .lineTo(stackPos(2).vec())
         ;
     }
@@ -145,7 +146,7 @@ public class MainAuton {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         sequence
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+                .lineToSplineHeading(MainAuton.enteringBackstage.byAlliance().toPose2d())
 
                 .addTemporalMarker(() -> {
 //                    robot.deposit.lift.setTargetRow(first.y);
@@ -270,15 +271,19 @@ public class MainAuton {
                     } else {
 
                         if (inner) {
-                            Pose2d spike = innerSpikeBackdrop.byAlliance().flipBySide().toPose2d();
-                            sequence.splineTo(spike.vec(), spike.getHeading());
+
+                        } else if (outer) {
+
                         } else {
-                            sequence.lineToSplineHeading((
-                                    outer ?
-                                            outerSpikeBackdrop.byAlliance().flipBySide() :
-                                            centerSpikeBackdrop.byAlliance().flipBySide()
-                            ).toPose2d());
+
                         }
+
+                        sequence
+                                .forward(1)
+                                .addTemporalMarker(() -> {
+                                    // intake set 1
+                                })
+                        ;
 
 
 
@@ -323,7 +328,7 @@ public class MainAuton {
 
         public double x, y, heading;
 
-        static boolean backdropSide = true;
+        static boolean backdropSide = false;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
