@@ -201,6 +201,7 @@ public final class Deposit {
         public static double
                 ANGLE_PIVOT_OFFSET = 17.25,
                 ANGLE_PIVOT_SCORING = 127,
+                ANGLE_PIVOT_FLOOR = 170,
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
@@ -211,7 +212,7 @@ public final class Deposit {
         private final SimpleServoPivot pivot, hook, claw;
 
         private final ElapsedTime timer = new ElapsedTime();
-        private boolean droppedPixel = true;
+        private boolean droppedPixel = true, floor = false;
         private int pixelsLocked = 0;
         final Pixel.Color[] colors = {EMPTY, EMPTY};
 
@@ -255,6 +256,10 @@ public final class Deposit {
             pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
+        public void toggleFloor() {
+            floor = !floor;
+        }
+
         public void dropPixel() {
             pixelsLocked = clip(pixelsLocked - 1, 0, 2);
             if (pixelsLocked <= 1) colors[0] = EMPTY;
@@ -266,7 +271,10 @@ public final class Deposit {
         }
 
         private void run() {
-            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING);
+            pivot.updateAngles(
+                    ANGLE_PIVOT_OFFSET,
+                    ANGLE_PIVOT_OFFSET + (floor ? ANGLE_PIVOT_SCORING : ANGLE_PIVOT_FLOOR)
+            );
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 
