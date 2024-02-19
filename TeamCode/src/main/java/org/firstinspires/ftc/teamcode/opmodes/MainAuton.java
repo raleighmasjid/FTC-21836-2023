@@ -99,18 +99,18 @@ public final class MainAuton extends LinearOpMode {
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 50,
-            Y_BACKDROP_0_BLUE = 43,
+            X_BACKDROP = 51.5,
+            Y_BACKDROP_0_BLUE = 44.75,
             Y_BACKDROP_0_RED = -27.5,
-            WIDTH_PIXEL = 3.7,
+            WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, LENGTH_ROBOT * 0.5 - SIZE_HALF_FIELD, FORWARD),
-            centerSpike = new EditablePose(15, -23, LEFT),
-            nearTrussSpike = new EditablePose(5.4, -35, LEFT),
-            awayTrussSpike = new EditablePose(29, -32, LEFT),
+            centerSpikeBackdrop = new EditablePose(15, -25.5, LEFT),
+            innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
+            outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(36, -12, LEFT),
@@ -356,13 +356,13 @@ public final class MainAuton extends LinearOpMode {
             if (backdropSide) {
 
                 if (inner) {
-                    Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
+                    Pose2d spike = innerSpikeBackdrop.byAlliance().flipBySide().toPose2d();
                     sequence.splineTo(spike.vec(), spike.getHeading());
                 } else {
                     sequence.lineToSplineHeading((
                             outer ?
-                                    awayTrussSpike.byAlliance().flipBySide() :
-                                    centerSpike.byBoth()
+                                    outerSpikeBackdrop.byAlliance().flipBySide() :
+                                    centerSpikeBackdrop.byBoth()
                     ).toPose2d());
                 }
 
@@ -391,13 +391,13 @@ public final class MainAuton extends LinearOpMode {
             } else {
 
                 if (inner) {
-                    Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
+                    Pose2d spike = innerSpikeBackdrop.byAlliance().flipBySide().toPose2d();
                     sequence.splineTo(spike.vec(), spike.getHeading());
                 } else {
                     sequence.lineToSplineHeading((
                             outer ?
-                                    awayTrussSpike.byAlliance().flipBySide() :
-                                    centerSpike.byAlliance().flipBySide()
+                                    outerSpikeBackdrop.byAlliance().flipBySide() :
+                                    centerSpikeBackdrop.byAlliance().flipBySide()
                     ).toPose2d());
                 }
 

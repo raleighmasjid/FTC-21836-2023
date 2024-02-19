@@ -210,8 +210,8 @@ public final class Deposit {
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 45,
-                TIME_DROP_FIRST = 0.35,
-                TIME_DROP_SECOND = 0.5;
+                TIME_DROP_FIRST = 0.5,
+                TIME_DROP_SECOND = 0.65;
 
         private final SimpleServoPivot pivot, hook, claw;
 
