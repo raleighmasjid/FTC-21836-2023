@@ -437,7 +437,7 @@ public final class MainAuton extends LinearOpMode {
 
         public double x, y, heading;
 
-        static boolean backdropSide = true;
+        public static boolean backdropSide = true;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
@@ -66,7 +68,8 @@ public final class Robot {
 
     public void preload() {
         deposit.paintbrush.lockPixels(YELLOW);
-        spike.setActivated(true);
+        if (backdropSide) spike.setActivated(true);
+        else deposit.paintbrush.lockPixels(PURPLE);
     }
 
     public void initRun() {
