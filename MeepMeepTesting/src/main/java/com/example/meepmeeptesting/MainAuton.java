@@ -44,6 +44,7 @@ public class MainAuton {
     }
 
     public static double
+            SIZE_WINDOW = 840,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
             SIZE_HALF_FIELD = 70.5,
@@ -67,8 +68,8 @@ public class MainAuton {
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 50,
-            Y_BACKDROP_0_BLUE = 44.75,
-            Y_BACKDROP_0_RED = -30,
+            Y_BACKDROP_0_BLUE = 43,
+            Y_BACKDROP_0_RED = -27.5,
             WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
@@ -79,6 +80,9 @@ public class MainAuton {
             centerSpikeBackdrop = new EditablePose(15, -24.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
+            centerSpikeAudience = new EditablePose(-38.625, -24.5, RIGHT),
+            innerSpikeAudience = new EditablePose(-29.025, -35, RIGHT),
+            outerSpikeAudience = new EditablePose(-51.625, -32, RIGHT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
             enteringBackstage = new EditablePose(36, -12, LEFT),
@@ -166,7 +170,7 @@ public class MainAuton {
     }
 
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(720);
+        MeepMeep meepMeep = new MeepMeep((int) SIZE_WINDOW);
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         boolean partnerWillDoRand = false;
@@ -228,16 +232,16 @@ public class MainAuton {
                     if (backdropSide) {
 
                         if (inner) {
-                            Pose2d spike = innerSpikeBackdrop.byAlliance().flipBySide().toPose2d();
+                            Pose2d spike = innerSpikeBackdrop.byAlliance().toPose2d();
                             sequence
                                     .splineTo(spike.vec(), spike.getHeading())
-                                    .strafeRight(Y_SHIFT_POST_INNER * (isRed ? 1 : -1))
+//                                    .strafeRight(Y_SHIFT_POST_INNER * (isRed ? 1 : -1))
                             ;
                         } else {
                             sequence.lineToSplineHeading((
                                     outer ?
-                                            outerSpikeBackdrop.byAlliance().flipBySide() :
-                                            centerSpikeBackdrop.byBoth()
+                                            outerSpikeBackdrop.byAlliance() :
+                                            centerSpikeBackdrop.byAlliance()
                             ).toPose2d());
                         }
 
