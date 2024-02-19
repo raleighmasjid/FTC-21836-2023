@@ -232,7 +232,6 @@ public final class MainAuton extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
-        robot.preload();
         robot.initRun();
 
         // Initialize gamepads:
@@ -292,14 +291,14 @@ public final class MainAuton extends LinearOpMode {
 
             mTelemetry.update();
         }
+        robot.preload();
+        robot.initRun();
 
         TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, park, ourPlacements);
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
-            robot.initRun();
-
             mTelemetry.addData("Location", detector.run().name());
             mTelemetry.update();
         }
