@@ -69,7 +69,10 @@ public final class Robot {
     public void preload() {
         deposit.paintbrush.lockPixels(YELLOW);
         if (backdropSide) spike.setActivated(true);
-        else deposit.paintbrush.lockPixels(PURPLE);
+        else {
+            deposit.paintbrush.lockPixels(PURPLE);
+            deposit.paintbrush.toggleFloor();
+        }
     }
 
     public void initRun() {
