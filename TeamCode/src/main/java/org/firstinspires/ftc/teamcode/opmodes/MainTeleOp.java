@@ -164,6 +164,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, B))               robot.deposit.lift.setTargetRow(HEIGHT_CLIMBING);
 
             if (keyPressed(2, RIGHT_STICK_BUTTON))  doAutoSlow = !doAutoSlow;
+            if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.paintbrush.toggleFloor();
 
         } else {
 
