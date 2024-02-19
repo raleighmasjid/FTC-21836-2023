@@ -46,8 +46,8 @@ public class MainAuton {
     public static double
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
-            SIZE_HALF_FIELD = 72,
-            SIZE_TILE = SIZE_HALF_FIELD / 3.0,
+            SIZE_HALF_FIELD = 70.5,
+            SIZE_TILE = 23.625,
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
             X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
@@ -66,7 +66,7 @@ public class MainAuton {
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 51.5,
+            X_BACKDROP = 50,
             Y_BACKDROP_0_BLUE = 44.75,
             Y_BACKDROP_0_RED = -30,
             WIDTH_PIXEL = 3.15,
@@ -308,7 +308,7 @@ public class MainAuton {
                     return sequence.build();
                 });
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .setDarkMode(false)
                 .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
