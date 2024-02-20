@@ -39,7 +39,7 @@ public final class Intake {
 
     public static double
             ANGLE_PIVOT_OFFSET = 9,
-            ANGLE_PIVOT_FLOOR_CLEARANCE = 3,
+            ANGLE_PIVOT_FLOOR_CLEARANCE = 2.5,
             ANGLE_PIVOT_TRANSFERRING = 196.5,
             ANGLE_PIVOT_VERTICAL = 110,
             ANGLE_LATCH_INTAKING = 105,
