@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipelin
 public class TeamPropDetector {
 
     public static double
-            MIN_DISTANCE = 10,
+            MIN_DISTANCE = 17,
             MAX_DISTANCE = 26.6;
 
     private PropDetectPipeline.Randomization location = CENTER;
