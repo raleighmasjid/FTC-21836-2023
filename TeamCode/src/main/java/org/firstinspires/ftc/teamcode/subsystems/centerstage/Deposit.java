@@ -201,7 +201,7 @@ public final class Deposit {
         public static double
                 ANGLE_PIVOT_OFFSET = 17.25,
                 ANGLE_PIVOT_SCORING = 127,
-                ANGLE_PIVOT_FLOOR = 170,
+                ANGLE_PIVOT_FLOOR = 195,
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
