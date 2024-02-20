@@ -39,7 +39,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.TeamPropDetector;
 
 import java.util.ArrayList;
 
