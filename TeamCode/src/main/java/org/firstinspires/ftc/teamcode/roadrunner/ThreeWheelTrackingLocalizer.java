@@ -35,7 +35,7 @@ public class ThreeWheelTrackingLocalizer extends com.acmerobotics.roadrunner.loc
             GEAR_RATIO = 1, // output (wheel) speed / input (encoder) speed
             X_MULTIPLIER = 1,
             Y_MULTIPLIER = 1,
-            LATERAL_DISTANCE = 13.8784496878075698137951917969287, // in; distance between the left and right wheels
+            LATERAL_DISTANCE = 13.8483259565555, // in; distance between the left and right wheels
             FORWARD_OFFSET = 0.86938; // in; offset of the lateral wheel
 
     private final Encoder leftEncoder, rightEncoder, frontEncoder;
