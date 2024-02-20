@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGainsKt.computeKd;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USE_VELO_PID;
@@ -60,18 +59,15 @@ import java.util.List;
 public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
-                8,
-                1,
+                9,
+                4,
                 0.1
             ),
             HEADING_PID = new PIDCoefficients(
-                8,
-                1,
+                10,
+                4,
                     0
             );
-    private double
-            lastTranslationKp = TRANSLATIONAL_PID.kP,
-            lastHeadingKp = HEADING_PID.kP;
 
     public static double
             LATERAL_MULTIPLIER = 1.75,
@@ -207,17 +203,6 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     public void update() {
-
-        if (!USE_VELO_PID && lastTranslationKp != TRANSLATIONAL_PID.kP) {
-            TRANSLATIONAL_PID.kD = computeKd(TRANSLATIONAL_PID.kP, DriveConstants.kV, DriveConstants.kA);
-            lastTranslationKp = TRANSLATIONAL_PID.kP;
-        }
-
-        if (!USE_VELO_PID && lastHeadingKp != HEADING_PID.kP) {
-            HEADING_PID.kD = computeKd(HEADING_PID.kP, DriveConstants.kV, DriveConstants.kA);
-            lastHeadingKp = HEADING_PID.kP;
-        }
-
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
