@@ -265,8 +265,10 @@ public final class Deposit {
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;
-                droppedPixel = false;
-                timer.reset();
+                if (pivot.isActivated()) {
+                    droppedPixel = false;
+                    timer.reset();
+                }
             }
         }
 
