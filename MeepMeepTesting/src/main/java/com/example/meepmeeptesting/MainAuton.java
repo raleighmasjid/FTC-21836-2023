@@ -1,6 +1,5 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
@@ -52,22 +51,17 @@ public class MainAuton {
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
-            Y_SHIFT_BEFORE_SPIKE = 15,
-            Y_SHIFT_AFTER_SPIKE = 26,
-            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
-            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_INTAKING = -52,
             Y_INTAKING_1 = -SIZE_TILE * 0.5,
             Y_INTAKING_2 = -SIZE_TILE * 1,
             Y_INTAKING_3 = -SIZE_TILE * 1.5,
+            X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
             TIME_SPIKE_BACKDROP = 0.75,
             TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH = 0.5,
             TIME_SPIKE_AUDIENCE = 1,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
-            TIME_PRE_STACK_FLIP = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
@@ -77,8 +71,7 @@ public class MainAuton {
             WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
-            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
-            Y_SHIFT_POST_INNER = 2;
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
@@ -102,11 +95,8 @@ public class MainAuton {
                 .addTemporalMarker(() -> {
 //                    robot.intake.setHeight(height);
                 })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
                 .setTangent(LEFT)
-                .addTemporalMarker(() -> {
-                })
+                .splineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(stackPos(1).vec(), LEFT)
         ;
     }
@@ -117,7 +107,7 @@ public class MainAuton {
                 .addTemporalMarker(() -> {
 //                    robot.intake.setHeight(height);
                 })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
+                .setTangent(LEFT)
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(turnToStack1.vec(), LEFT)
                 .lineTo(postOuterAudience.byAlliance().toPose2d().vec())
@@ -125,8 +115,7 @@ public class MainAuton {
         ;
     }
 
-    private static void intake2Pixels(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
-        Intake.Height height2 = height.minus(1);
+    private static void intake2Pixels(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
                 .addTemporalMarker(() -> {
 //                    robot.intake.setMotorPower(SPEED_INTAKING);
@@ -135,42 +124,14 @@ public class MainAuton {
                 })
                 .back(X_SHIFT_INTAKING)
                 .addTemporalMarker(() -> {
-//                    robot.intake.setHeight(height2);
+//                    robot.intake.setHeight(height.minus(1));
                 })
-                .lineTo(stackPos(stack).vec())
+                .forward(X_SHIFT_INTAKING)
                 .addTemporalMarker(() -> {
 //                    robot.intake.setMotorPower(SPEED_INTAKING);
 //                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
 //                    robot.intake.setMotorPower(0);
                 })
-        ;
-    }
-
-    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
-        Pixel first = placements.get(index);
-        Pixel second = placements.get(index + 1);
-        sequence
-                .lineToSplineHeading(MainAuton.enteringBackstage.byAlliance().toPose2d())
-
-                .addTemporalMarker(() -> {
-//                    robot.deposit.lift.setTargetRow(first.y);
-                })
-                .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
-                .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(first);
-                })
-                .waitSeconds(TIME_DROP_FIRST)
-
-                .addTemporalMarker(() -> {
-//                    robot.deposit.lift.setTargetRow(second.y);
-                })
-                .lineToConstantHeading(toPose2d(second).vec())
-                .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(second);
-                })
-                .waitSeconds(TIME_DROP_SECOND)
         ;
     }
 
@@ -323,7 +284,7 @@ public class MainAuton {
         if (inner) {
 
             EditablePose preStack = new EditablePose(stack).clone();
-            preStack.x += 6;
+            preStack.x += X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE;
             Pose2d spike = innerSpikeAudience.byAlliance().toPose2d();
             sequence
                     .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
