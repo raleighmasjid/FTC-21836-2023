@@ -1,5 +1,6 @@
 package com.example.meepmeeptesting;
 
+import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
 import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
@@ -53,17 +54,18 @@ public class MainAuton {
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_INTAKING = -52,
-            Y_INTAKING_1 = -SIZE_TILE * 0.5,
-            Y_INTAKING_2 = -SIZE_TILE * 1,
-            Y_INTAKING_3 = -SIZE_TILE * 1.5,
+            Y_INTAKING_1 = -11.8125,
+            Y_INTAKING_2 = -23.625,
+            Y_INTAKING_3 = -35.4375,
             X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
             TIME_SPIKE_BACKDROP = 0.75,
             TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH = 0.5,
             TIME_SPIKE_AUDIENCE = 1,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
-            X_SHIFT_INTAKING = 5,
-            SPEED_INTAKING = 0.5,
+            X_SHIFT_INTAKING = 2,
+            SPEED_INTAKING = 1,
+            SPEED_INTAKE_STACK_APPROACH = 0.1,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 50,
             Y_BACKDROP_0_BLUE = 43,
@@ -135,6 +137,34 @@ public class MainAuton {
         ;
     }
 
+    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
+        Pixel first = placements.get(index);
+        Pixel second = placements.get(index + 1);
+        sequence
+                .lineToSplineHeading(MainAuton.enteringBackstage.byAlliance().toPose2d())
+
+                .addTemporalMarker(() -> {
+//                    robot.deposit.lift.setTargetRow(first.y);
+                })
+                .splineTo(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
+                .addTemporalMarker(() -> {
+//                    robot.deposit.paintbrush.dropPixel();
+                    autonBackdrop.add(first);
+                })
+                .waitSeconds(TIME_DROP_FIRST)
+
+                .addTemporalMarker(() -> {
+//                    robot.deposit.lift.setTargetRow(second.y);
+                })
+                .lineToConstantHeading(toPose2d(second).vec())
+                .addTemporalMarker(() -> {
+//                    robot.deposit.paintbrush.dropPixel();
+                    autonBackdrop.add(second);
+                })
+                .waitSeconds(TIME_DROP_SECOND)
+        ;
+    }
+
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep((int) SIZE_WINDOW);
 
@@ -196,8 +226,8 @@ public class MainAuton {
                             .setTangent(startPose.getHeading())
                     ;
 
-                    if (backdropSide) backdropSpike(sequence, placements, outer, inner);
-                    else audienceSpike(sequence, placements, a, outer, inner);
+                    if (backdropSide) backdropPurpleYellow(sequence, placements, outer, inner);
+                    else audiencePurpleWhiteYellow(sequence, placements, a, outer, inner);
 
                     if (cycle) {
 
@@ -234,7 +264,7 @@ public class MainAuton {
                 .start();
     }
 
-    private static void backdropSpike(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, boolean outer, boolean inner) {
+    private static void backdropPurpleYellow(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, boolean outer, boolean inner) {
         if (inner) {
             Pose2d spike = innerSpikeBackdrop.byAlliance().toPose2d();
             sequence
@@ -251,12 +281,12 @@ public class MainAuton {
 
         sequence
                 .addTemporalMarker(() -> {
-//                                    robot.spike.toggle();
+//                    robot.spike.toggle();
                 })
                 .waitSeconds(TIME_SPIKE_BACKDROP)
                 .setTangent(RIGHT)
                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
+//                    robot.deposit.lift.setTargetRow(placements.get(0).y);
                 })
                 .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
                         outer ?
@@ -265,17 +295,17 @@ public class MainAuton {
                 )
                 .waitSeconds(TIME_PRE_YELLOW)
                 .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixel();
+//                    robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(placements.get(0));
                 })
                 .waitSeconds(TIME_DROP_SECOND)
         ;
     }
 
-    private static void audienceSpike(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
+    private static void audiencePurpleWhiteYellow(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
         sequence
                 .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
-                    // set lift 0
+//                    robot.deposit.lift.setTargetRow(0);
                 })
         ;
 
@@ -290,11 +320,12 @@ public class MainAuton {
                     .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
                     .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
                     .addTemporalMarker(() -> {
-                        // drop pixel
+//                        robot.deposit.paintbrush.dropPixel();
                     })
                     .waitSeconds(TIME_SPIKE_AUDIENCE)
                     .addTemporalMarker(() -> {
-                        // set lift -1
+//                        robot.deposit.lift.setTargetRow(-1);
+//                        robot.intake.toggle();
                     })
                     .lineToSplineHeading(preStack.toPose2d())
             ;
@@ -304,15 +335,15 @@ public class MainAuton {
             Pose2d spike = outerSpikeAudience.byAlliance().toPose2d();
             sequence
                     .addTemporalMarker(() -> {
-                        // intake flip
+//                        robot.intake.toggle();
                     })
                     .splineTo(spike.vec(), spike.getHeading())
                     .addTemporalMarker(() -> {
-                        // drop pixel
+//                        robot.deposit.paintbrush.dropPixel();
                     })
                     .waitSeconds(TIME_SPIKE_AUDIENCE)
                     .addTemporalMarker(() -> {
-                        // set lift -1
+//                        robot.deposit.lift.setTargetRow(-1);
                     })
                     .setTangent(a * FORWARD)
                     .turn(a * FORWARD)
@@ -324,15 +355,15 @@ public class MainAuton {
             sequence
                     .forward(10)
                     .addTemporalMarker(() -> {
-                        // intake flip
+//                        robot.intake.toggle();
                     })
                     .splineTo(spike.vec(), spike.getHeading())
                     .addTemporalMarker(() -> {
-                        // drop pixel
+//                        robot.deposit.paintbrush.dropPixel();
                     })
                     .waitSeconds(TIME_SPIKE_AUDIENCE)
                     .addTemporalMarker(() -> {
-                        // set lift -1
+//                        robot.deposit.lift.setTargetRow(-1);
                     })
                     .setTangent(a * FORWARD)
                     .turn(a * PI / 4.0)
@@ -341,21 +372,29 @@ public class MainAuton {
         }
 
         sequence
+                .addTemporalMarker(() -> {
+//                    robot.deposit.paintbrush.toggleFloor();
+                    // robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
+                })
 
                 .lineToSplineHeading(stack)
                 .setTangent(LEFT)
 
                 .addTemporalMarker(() -> {
-                    // intake set 1
+//                    robot.intake.setMotorPower(SPEED_INTAKING);
+//                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+//                    robot.intake.setMotorPower(0);
                 })
         ;
+
+        score(sequence, placements, 0);
     }
 
     public static class EditablePose {
 
         public double x, y, heading;
 
-        static boolean backdropSide = false;
+        public static boolean backdropSide = false;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;

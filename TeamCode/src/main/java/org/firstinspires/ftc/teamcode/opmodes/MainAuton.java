@@ -87,9 +87,9 @@ public final class MainAuton extends LinearOpMode {
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_INTAKING = -52,
-            Y_INTAKING_1 = -SIZE_TILE * 0.5,
-            Y_INTAKING_2 = -SIZE_TILE * 1,
-            Y_INTAKING_3 = -SIZE_TILE * 1.5,
+            Y_INTAKING_1 = -11.8125,
+            Y_INTAKING_2 = -23.625,
+            Y_INTAKING_3 = -35.4375,
             X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
             TIME_SPIKE_BACKDROP = 0.75,
             TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH = 0.5,
@@ -97,7 +97,8 @@ public final class MainAuton extends LinearOpMode {
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
             X_SHIFT_INTAKING = 2,
-            SPEED_INTAKING = 0.5,
+            SPEED_INTAKING = 1,
+            SPEED_INTAKE_STACK_APPROACH = 0.1,
             BOTTOM_ROW_HEIGHT = 2,
             X_BACKDROP = 50,
             Y_BACKDROP_0_BLUE = 43,
@@ -173,12 +174,12 @@ public final class MainAuton extends LinearOpMode {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         sequence
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
+                .lineToSplineHeading(MainAuton.enteringBackstage.byAlliance().toPose2d())
 
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
+                .splineTo(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
@@ -494,15 +495,20 @@ public final class MainAuton extends LinearOpMode {
         sequence
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.toggleFloor();
+                    robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
                 })
 
                 .lineToSplineHeading(stack)
                 .setTangent(LEFT)
 
                 .addTemporalMarker(() -> {
-                    // intake set 1
+                    robot.intake.setMotorPower(SPEED_INTAKING);
+                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+                    robot.intake.setMotorPower(0);
                 })
         ;
+
+        score(sequence, placements, 0);
     }
 
     public static class EditablePose {
