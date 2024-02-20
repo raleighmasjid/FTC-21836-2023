@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MainAuton {
 
-    static boolean isRed = false;
+    static boolean isRed = true;
     static Backdrop autonBackdrop = new Backdrop();
 
     public static final double
@@ -44,7 +44,7 @@ public class MainAuton {
     }
 
     public static double
-            SIZE_WINDOW = 840,
+            SIZE_WINDOW = 720,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
             SIZE_HALF_FIELD = 70.5,
@@ -58,7 +58,7 @@ public class MainAuton {
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_INTAKING = -56,
+            X_INTAKING = -52,
             Y_INTAKING_1 = -SIZE_TILE * 0.5,
             Y_INTAKING_2 = -SIZE_TILE * 1,
             Y_INTAKING_3 = -SIZE_TILE * 1.5,
@@ -85,9 +85,9 @@ public class MainAuton {
             centerSpikeBackdrop = new EditablePose(15, -24.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
-            centerSpikeAudience = new EditablePose(-38, -24.5, BACKWARD + 1e-6),
+            centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
             innerSpikeAudience = new EditablePose(-38, -30, LEFT),
-            outerSpikeAudience = new EditablePose(-45.5, -32.5, 4.4),
+            outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
@@ -179,10 +179,10 @@ public class MainAuton {
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         boolean partnerWillDoRand = false;
-        boolean park = true;
+        boolean cycle = false;
 
         int[] ourPlacements = {1, 3, 6};
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
+        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.CENTER;
         ArrayList<Pixel> placements = new ArrayList<>(asList(
                 new Pixel(ourPlacements[rand.ordinal()], 0, YELLOW),
                 new Pixel(1, 0, WHITE),
@@ -229,88 +229,16 @@ public class MainAuton {
                             outer = inner = false;
                             break;
                     }
+                    double a = isRed ? 1 : -1;
 
                     TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
                             .setTangent(startPose.getHeading())
                     ;
 
-                    if (backdropSide) {
+                    if (backdropSide) backdropSpike(sequence, placements, outer, inner);
+                    else audienceSpike(sequence, placements, a, outer, inner);
 
-                        if (inner) {
-                            Pose2d spike = innerSpikeBackdrop.byAlliance().toPose2d();
-                            sequence
-                                    .splineTo(spike.vec(), spike.getHeading())
-//                                    .strafeRight(Y_SHIFT_POST_INNER * (isRed ? 1 : -1))
-                            ;
-                        } else {
-                            sequence.lineToSplineHeading((
-                                    outer ?
-                                            outerSpikeBackdrop.byAlliance() :
-                                            centerSpikeBackdrop.byAlliance()
-                            ).toPose2d());
-                        }
-
-                        sequence
-                                .addTemporalMarker(() -> {
-//                                    robot.spike.toggle();
-                                })
-                                .waitSeconds(TIME_SPIKE_BACKDROP)
-                                .setTangent(RIGHT)
-                                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
-                                })
-                                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
-                                        outer ?
-                                                isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
-                                                RIGHT
-                                )
-                                .waitSeconds(TIME_PRE_YELLOW)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixel();
-                                    autonBackdrop.add(placements.get(0));
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                        ;
-
-                    } else {
-
-                        if (inner) {
-
-                            Pose2d spike = innerSpikeAudience.byAlliance().toPose2d();
-                            double a = isRed ? 1 : -1;
-                            sequence
-                                    .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
-                                    .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
-                                    .addTemporalMarker(() -> {
-                                        // intake toggle
-                                        // set lift 0
-                                        // drop pixel
-                                    })
-                                    .waitSeconds(TIME_SPIKE_AUDIENCE)
-                                    .addTemporalMarker(() -> {
-                                        // set lift -1
-                                    })
-                            ;
-
-                        } else if (outer) {
-
-
-
-                        } else {
-
-                        }
-
-                        sequence
-                                .addTemporalMarker(() -> {
-                                    // intake set 1
-                                })
-                        ;
-
-
-
-                    }
-
-                    if (!park) {
+                    if (cycle) {
 
                         Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                         int placement = backdropSide ? 1 : 2;
@@ -345,6 +273,123 @@ public class MainAuton {
                 .start();
     }
 
+    private static void backdropSpike(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, boolean outer, boolean inner) {
+        if (inner) {
+            Pose2d spike = innerSpikeBackdrop.byAlliance().toPose2d();
+            sequence
+                    .splineTo(spike.vec(), spike.getHeading())
+//                                    .strafeRight(Y_SHIFT_POST_INNER * (isRed ? 1 : -1))
+            ;
+        } else {
+            sequence.lineToSplineHeading((
+                    outer ?
+                            outerSpikeBackdrop.byAlliance() :
+                            centerSpikeBackdrop.byAlliance()
+            ).toPose2d());
+        }
+
+        sequence
+                .addTemporalMarker(() -> {
+//                                    robot.spike.toggle();
+                })
+                .waitSeconds(TIME_SPIKE_BACKDROP)
+                .setTangent(RIGHT)
+                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
+//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
+                })
+                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
+                        outer ?
+                                isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
+                                RIGHT
+                )
+                .waitSeconds(TIME_PRE_YELLOW)
+                .addTemporalMarker(() -> {
+//                                    robot.deposit.paintbrush.dropPixel();
+                    autonBackdrop.add(placements.get(0));
+                })
+                .waitSeconds(TIME_DROP_SECOND)
+        ;
+    }
+
+    private static void audienceSpike(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
+        sequence
+                .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
+                    // set lift 0
+                })
+        ;
+
+        Pose2d stack = stackPos(1);
+
+        if (inner) {
+
+            EditablePose preStack = new EditablePose(stack).clone();
+            preStack.x += 6;
+            Pose2d spike = innerSpikeAudience.byAlliance().toPose2d();
+            sequence
+                    .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
+                    .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
+                    .addTemporalMarker(() -> {
+                        // drop pixel
+                    })
+                    .waitSeconds(TIME_SPIKE_AUDIENCE)
+                    .addTemporalMarker(() -> {
+                        // set lift -1
+                    })
+                    .lineToSplineHeading(preStack.toPose2d())
+            ;
+
+        } else if (outer) {
+
+            Pose2d spike = outerSpikeAudience.byAlliance().toPose2d();
+            sequence
+                    .addTemporalMarker(() -> {
+                        // intake flip
+                    })
+                    .splineTo(spike.vec(), spike.getHeading())
+                    .addTemporalMarker(() -> {
+                        // drop pixel
+                    })
+                    .waitSeconds(TIME_SPIKE_AUDIENCE)
+                    .addTemporalMarker(() -> {
+                        // set lift -1
+                    })
+                    .setTangent(a * FORWARD)
+                    .turn(a * FORWARD)
+            ;
+
+        } else {
+
+            Pose2d spike = centerSpikeAudience.byAlliance().toPose2d();
+            sequence
+                    .forward(10)
+                    .addTemporalMarker(() -> {
+                        // intake flip
+                    })
+                    .splineTo(spike.vec(), spike.getHeading())
+                    .addTemporalMarker(() -> {
+                        // drop pixel
+                    })
+                    .waitSeconds(TIME_SPIKE_AUDIENCE)
+                    .addTemporalMarker(() -> {
+                        // set lift -1
+                    })
+                    .setTangent(a * FORWARD)
+                    .turn(a * PI / 4.0)
+            ;
+
+        }
+
+        sequence
+
+                .lineToSplineHeading(stack)
+                .setTangent(LEFT)
+
+                .addTemporalMarker(() -> {
+                    // intake set 1
+                })
+        ;
+    }
+
     public static class EditablePose {
 
         public double x, y, heading;
@@ -355,6 +400,10 @@ public class MainAuton {
             this.x = x;
             this.y = y;
             this.heading = heading;
+        }
+
+        public EditablePose(Pose2d pose) {
+            this(pose.getX(), pose.getY(), pose.getHeading());
         }
 
         public EditablePose clone() {
