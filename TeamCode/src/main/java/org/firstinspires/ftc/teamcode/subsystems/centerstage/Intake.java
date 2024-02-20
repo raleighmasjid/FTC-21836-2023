@@ -64,7 +64,7 @@ public final class Intake {
             minWhite = new HSV(
                     0,
                     0,
-                    0.05
+                    0.03
             ),
             maxWhite = new HSV(
                     360,
@@ -74,7 +74,7 @@ public final class Intake {
             minPurple = new HSV(
                     205,
                     0.55,
-                    0.02
+                    0.01
             ),
             maxPurple = new HSV(
                     225,
@@ -83,8 +83,8 @@ public final class Intake {
             ),
             minYellow = new HSV(
                     90,
-                    0.55,
-                    0.02
+                    0.4,
+                    0.01
             ),
             maxYellow = new HSV(
                     125,
