@@ -119,7 +119,7 @@ public final class MainAuton extends LinearOpMode {
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(36, -12, LEFT);
+            enteringBackstage = new EditablePose(22, -12, LEFT);
 
     private static Pose2d stackPos(int stack) {
         return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
@@ -179,7 +179,7 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .splineTo(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
+                .splineTo(toPose2d(first).vec(), RIGHT)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
