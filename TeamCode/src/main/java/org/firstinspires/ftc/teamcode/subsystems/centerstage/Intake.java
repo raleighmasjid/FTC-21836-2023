@@ -45,10 +45,10 @@ public final class Intake {
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
-            ANGLE_STACK_2 = 2.445263,
-            ANGLE_STACK_3 = 5.754518,
-            ANGLE_STACK_4 = 8.985675,
-            ANGLE_STACK_5 = 12.153670,
+            ANGLE_STACK_2 = 10,
+            ANGLE_STACK_3 = 13.5,
+            ANGLE_STACK_4 = 16,
+            ANGLE_STACK_5 = 17.5,
             TIME_PIXEL_1_SETTLING = 0.25,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
@@ -151,8 +151,8 @@ public final class Intake {
                 default: case FLOOR: return 0;
                 case TWO_STACK: return ANGLE_STACK_2;
                 case THREE_STACK: return ANGLE_STACK_3;
-                case FIVE_STACK: return ANGLE_STACK_4;
-                case FOUR_STACK: return ANGLE_STACK_5;
+                case FOUR_STACK: return ANGLE_STACK_4;
+                case FIVE_STACK: return ANGLE_STACK_5;
             }
         }
     }
