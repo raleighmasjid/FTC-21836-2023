@@ -445,6 +445,7 @@ public final class MainAuton extends LinearOpMode {
                     .waitSeconds(TIME_SPIKE_AUDIENCE)
                     .addTemporalMarker(() -> {
                         robot.deposit.lift.setTargetRow(-1);
+                        robot.intake.toggle();
                     })
                     .lineToSplineHeading(preStack.toPose2d())
             ;
