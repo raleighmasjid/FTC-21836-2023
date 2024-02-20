@@ -77,47 +77,57 @@ public final class MainAuton extends LinearOpMode {
     }
 
     public static double
+            SIZE_WINDOW = 840,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
-            SIZE_HALF_FIELD = 72,
-            SIZE_TILE = SIZE_HALF_FIELD / 3.0,
+            SIZE_HALF_FIELD = 70.5,
+            SIZE_TILE = 23.625,
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
+            Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
             Y_SHIFT_BEFORE_SPIKE = 15,
             Y_SHIFT_AFTER_SPIKE = 26,
             Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
             X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_TILE = 24,
             X_INTAKING = -56,
-            Y_INTAKING_1 = -12,
-            Y_INTAKING_3 = -36,
-            TIME_SPIKE = 0.75,
+            Y_INTAKING_1 = -SIZE_TILE * 0.5,
+            Y_INTAKING_2 = -SIZE_TILE * 1,
+            Y_INTAKING_3 = -SIZE_TILE * 1.5,
+            TIME_SPIKE_BACKDROP = 0.75,
+            TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH = 0.5,
+            TIME_SPIKE_AUDIENCE = 1,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
+            TIME_PRE_STACK_FLIP = 0.5,
             X_SHIFT_INTAKING = 5,
             SPEED_INTAKING = 0.5,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 51.5,
-            Y_BACKDROP_0_BLUE = 44.75,
-            Y_BACKDROP_0_RED = -30,
-            WIDTH_PIXEL = 3.65,
+            X_BACKDROP = 50,
+            Y_BACKDROP_0_BLUE = 43,
+            Y_BACKDROP_0_RED = -27.5,
+            WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
+            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
+            Y_SHIFT_POST_INNER = 2;
 
     public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, LENGTH_ROBOT * 0.5 - SIZE_HALF_FIELD, FORWARD),
+            startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
             centerSpikeBackdrop = new EditablePose(15, -24.5, LEFT),
-            innerSpikeBackdrop = new EditablePose(5.4, -35.5, LEFT),
+            innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
+            centerSpikeAudience = new EditablePose(-38, -24.5, BACKWARD + 1e-6),
+            innerSpikeAudience = new EditablePose(-38, -30, LEFT),
+            outerSpikeAudience = new EditablePose(-45.5, -32.5, 4.4),
+            postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(36, -12, LEFT),
-            movingToStack2 = new EditablePose(-45, -24, LEFT);
+            enteringBackstage = new EditablePose(36, -12, LEFT);
 
     private static Pose2d stackPos(int stack) {
-        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
+        return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
     }
 
     private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
@@ -143,7 +153,7 @@ public final class MainAuton extends LinearOpMode {
                 .setTangent(MainAuton.startPose.byAlliance().heading)
                 .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
                 .splineTo(turnToStack1.vec(), LEFT)
-                .lineTo(movingToStack2.byAlliance().toPose2d().vec())
+                .lineTo(postOuterAudience.byAlliance().toPose2d().vec())
                 .lineTo(stackPos(2).vec())
         ;
     }
@@ -369,7 +379,7 @@ public final class MainAuton extends LinearOpMode {
                         .addTemporalMarker(() -> {
                             robot.spike.toggle();
                         })
-                        .waitSeconds(TIME_SPIKE)
+                        .waitSeconds(TIME_SPIKE_BACKDROP)
                         .setTangent(RIGHT)
                         .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
                             robot.deposit.lift.setTargetRow(placements.get(0).y);
