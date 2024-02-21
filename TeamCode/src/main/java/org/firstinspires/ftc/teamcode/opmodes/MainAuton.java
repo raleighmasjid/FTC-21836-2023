@@ -61,6 +61,9 @@ public final class MainAuton extends LinearOpMode {
     public static Backdrop autonBackdrop = new Backdrop();
     static Pose2d autonEndPose = null;
 
+    private static final int[] ourPlacements = {1, 3, 6};
+    private static boolean partnerWillDoRand = false, cycle = false;
+
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
@@ -242,8 +245,6 @@ public final class MainAuton extends LinearOpMode {
 
         AutonConfig selection = EDITING_ALLIANCE;
 
-        int[] ourPlacements = {1, 3, 6};
-        boolean partnerWillDoRand = false, cycle = false;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
