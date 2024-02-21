@@ -318,15 +318,17 @@ public final class MainAuton extends LinearOpMode {
         TrajectorySequence[] sequences = generateTrajectories(startPose);
 
         while (opModeInInit()) {
-            mTelemetry.addData("Location", detector.getLocation().name());
+            detector.printTelemetry();
             mTelemetry.addLine();
             mTelemetry.addLine();
             printConfig(selection);
             mTelemetry.update();
         }
 
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[detector.getLocation().ordinal()]);
+        PropDetectPipeline.Randomization location = detector.getLocation();
         detector.stop();
+
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
         // Control loop:
         while (opModeIsActive()) {

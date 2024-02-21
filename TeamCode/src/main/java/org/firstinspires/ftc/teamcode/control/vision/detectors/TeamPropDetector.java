@@ -48,6 +48,10 @@ public class TeamPropDetector {
         return pipeline.getLocation();
     }
 
+    public void printTelemetry() {
+        mTelemetry.addData("Location", getLocation().name());
+    }
+
     public void stop() {
         while (!isOpen) {}
         camera.stopStreaming();
