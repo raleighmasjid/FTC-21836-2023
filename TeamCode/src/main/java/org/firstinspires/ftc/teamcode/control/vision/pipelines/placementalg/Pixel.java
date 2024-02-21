@@ -49,6 +49,10 @@ public final class Pixel implements Comparable<Pixel> {
     public boolean equals(Object o) {
         if (!(o instanceof Pixel)) return false;
         Pixel p = (Pixel) o;
+        return this.equals(p);
+    }
+
+    public boolean equals(Pixel p) {
         return p.x == x && p.y == y;
     }
 
@@ -71,7 +75,7 @@ public final class Pixel implements Comparable<Pixel> {
      * Returns null if no such {@link Pixel} is found
      */
     Pixel getCounterpartIn(Iterable<Pixel> array) {
-        for (Pixel p1 : array) if (x == p1.x && y == p1.y) return p1;
+        for (Pixel p1 : array) if (this.equals(p1)) return p1;
         return null;
     }
 
