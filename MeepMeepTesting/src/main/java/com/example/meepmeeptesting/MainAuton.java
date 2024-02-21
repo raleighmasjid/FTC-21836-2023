@@ -325,6 +325,7 @@ public class MainAuton {
             sequence
                     .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
                     .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
+                    .strafeLeft(a * 2)
                     .addTemporalMarker(() -> {
 //                        robot.deposit.paintbrush.dropPixel();
                     })
