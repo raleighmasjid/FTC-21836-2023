@@ -74,7 +74,10 @@ public final class MainAuton extends LinearOpMode {
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
                 X_BACKDROP,
-                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE) - ((pixel.x - 1) * MainAuton.WIDTH_PIXEL) - (pixel.y % 2 != 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE)
+                        - ((pixel.x - 1) * MainAuton.WIDTH_PIXEL)
+                        - (pixel.y % 2 != 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0
+                ),
                 PI
         );
     }
@@ -89,8 +92,8 @@ public final class MainAuton extends LinearOpMode {
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_INTAKING = -52,
-            Y_INTAKING_1 = -11.8125,
+            X_INTAKING = -55,
+            Y_INTAKING_1 = -11,
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
             X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
@@ -104,8 +107,8 @@ public final class MainAuton extends LinearOpMode {
             X_SHIFT_INTAKING = 2,
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
-            BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 50.1,
+            BOTTOM_ROW_HEIGHT = 2.25,
+            X_BACKDROP = 49.75,
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -28.5,
             WIDTH_PIXEL = 3.25,
@@ -302,7 +305,7 @@ public final class MainAuton extends LinearOpMode {
         robot.preload();
         robot.initRun();
 
-        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, cycle, ourPlacements);
+        TrajectorySequence[] sequences = generateTrajectories();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
@@ -327,7 +330,7 @@ public final class MainAuton extends LinearOpMode {
     }
 
     @NonNull
-    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean cycle, int[] ourPlacements) {
+    private static TrajectorySequence[] generateTrajectories() {
 
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -505,6 +508,7 @@ public final class MainAuton extends LinearOpMode {
                     robot.deposit.paintbrush.toggleFloor();
                     robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
                     robot.intake.setHeight(FIVE_STACK);
+                    robot.intake.setDesiredPixelCount(1);
                 })
 
                 .lineToSplineHeading(stack)
@@ -516,6 +520,8 @@ public final class MainAuton extends LinearOpMode {
                 .waitSeconds(TIME_INTAKING)
                 .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
+                    robot.intake.setHeight(FOUR_STACK);
+                    robot.intake.setDesiredPixelCount(2);
                 })
         ;
 

@@ -59,14 +59,14 @@ import java.util.List;
 public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
-                7.5,
-                4,
+                10,
+                6,
                 0.1
             ),
             HEADING_PID = new PIDCoefficients(
-                9,
-                4,
-                    0
+                10,
+                6,
+                0
             );
 
     public static double
