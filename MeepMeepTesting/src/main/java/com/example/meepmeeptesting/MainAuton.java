@@ -211,23 +211,21 @@ public class MainAuton {
 
                     ArrayList<Pixel> placements = new ArrayList<>(asList(
                             new Pixel(ourPlacements[rand.ordinal()], 0, YELLOW),
+                            new Pixel(5, 0, WHITE),
                             new Pixel(1, 0, WHITE),
                             new Pixel(2, 0, WHITE),
                             new Pixel(1, 1, WHITE),
                             new Pixel(0, 1, WHITE),
                             new Pixel(1, 2, WHITE),
+                            new Pixel(3, 0, WHITE),
                             new Pixel(2, 1, WHITE),
                             new Pixel(2, 2, WHITE),
                             new Pixel(1, 3, WHITE),
                             new Pixel(0, 3, WHITE),
                             new Pixel(1, 4, WHITE),
                             new Pixel(0, 5, WHITE),
-                            new Pixel(6, 0, WHITE),
-                            new Pixel(5, 0, WHITE),
-                            new Pixel(6, 1, WHITE),
-                            new Pixel(5, 1, WHITE),
-                            new Pixel(6, 2, WHITE),
-                            new Pixel(6, 3, WHITE)
+                            new Pixel(4, 0, WHITE),
+                            new Pixel(3, 1, WHITE)
                     ));
 
                     if (partnerWillDoRand) {
