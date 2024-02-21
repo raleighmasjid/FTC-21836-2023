@@ -185,8 +185,15 @@ public final class MainAuton extends LinearOpMode {
     private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
+        Pose2d backstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
+        mTelemetry.addLine(backstage.toString());
+        mTelemetry.addLine(first.toString());
+        mTelemetry.addLine(toPose2d(first).toString());
+        mTelemetry.addLine(second.toString());
+        mTelemetry.addLine(toPose2d(second).toString());
+        mTelemetry.addLine();
         sequence
-                .lineToSplineHeading(MainAuton.enteringBackstage.byAlliance().toPose2d())
+                .lineToSplineHeading(backstage)
 
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(first.y);
@@ -308,14 +315,23 @@ public final class MainAuton extends LinearOpMode {
         TrajectorySequence[] sequences = generateTrajectories();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        mTelemetry.addData("Location", detector.run().name());
+        mTelemetry.update();
 
         while (opModeInInit()) {
-            mTelemetry.addData("Location", detector.run().name());
-            mTelemetry.update();
         }
+        PropDetectPipeline.Randomization location = detector.getLocation();
+        mTelemetry.addData("choosing", location.name());
+        mTelemetry.addData("choosing ordinal", location.ordinal());
+        mTelemetry.addData("choosing sequence", sequences[location.ordinal()].toString());
+        TrajectorySequence selected = sequences[location.ordinal()];
+        for (int x = 0; x < selected.size(); x++){
+            mTelemetry.addLine(selected.get(x).getEndPose().toString());
+        }
+        mTelemetry.addLine();
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[detector.getLocation().ordinal()]);
-
+        mTelemetry.update();
         // Control loop:
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
@@ -325,7 +341,7 @@ public final class MainAuton extends LinearOpMode {
             autonEndPose = robot.drivetrain.getPoseEstimate();
             // Push telemetry data
             robot.printTelemetry();
-            mTelemetry.update();
+//            mTelemetry.update();
         }
     }
 
