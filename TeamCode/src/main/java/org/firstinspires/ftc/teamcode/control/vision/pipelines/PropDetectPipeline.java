@@ -36,7 +36,7 @@ public class PropDetectPipeline extends OpenCvPipeline {
             X_CENTER_BOUND = 240,
             Y_TOP = 0,
             Y_BOTTOM = 480,
-            MIN_RED = 15,
+            MIN_RED = 7,
             MIN_BLUE = 25;
 
     private final Scalar
@@ -112,8 +112,8 @@ public class PropDetectPipeline extends OpenCvPipeline {
         Scalar colorDefault = new Scalar(255, 255, 255);
         Scalar colorFound = new Scalar(0, 255, 0);
 
-        Imgproc.rectangle(input, LEFT_AREA, location == LEFT ? colorFound : colorDefault, 3);
-        Imgproc.rectangle(input, CENTER_AREA, location == CENTER ? colorFound : colorDefault, 3);
+        Imgproc.rectangle(input, LEFT_AREA, location == LEFT ? colorFound : colorDefault, 2);
+        Imgproc.rectangle(input, CENTER_AREA, location == CENTER ? colorFound : colorDefault, 2);
 
         return input;
     }
