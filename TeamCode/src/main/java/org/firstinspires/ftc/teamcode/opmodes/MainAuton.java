@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -38,8 +39,8 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 
 import java.util.ArrayList;
 
@@ -61,12 +62,12 @@ public final class MainAuton extends LinearOpMode {
     public static Backdrop autonBackdrop = new Backdrop();
     static Pose2d autonEndPose = null;
 
-    private static final int[] ourPlacements = {1, 3, 6};
-    private static boolean partnerWillDoRand = false, cycle = false;
-
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
+
+    private static final int[] ourPlacements = {1, 3, 6};
+    private static boolean partnerWillDoRand = false, cycle = false;
 
     /**
      * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
@@ -186,19 +187,29 @@ public final class MainAuton extends LinearOpMode {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         Pose2d backstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
+
+        Pose2d firstPose = toPose2d(first);
+        Pose2d secondPose = toPose2d(second);
+        Vector2d firstVec = firstPose.vec();
+        Vector2d secondVec = secondPose.vec();
+
         mTelemetry.addLine(backstage.toString());
         mTelemetry.addLine(first.toString());
-        mTelemetry.addLine(toPose2d(first).toString());
+        mTelemetry.addLine(firstPose.toString());
+        mTelemetry.addLine(firstVec.toString());
         mTelemetry.addLine(second.toString());
-        mTelemetry.addLine(toPose2d(second).toString());
+        mTelemetry.addLine(secondPose.toString());
+        mTelemetry.addLine(secondVec.toString());
         mTelemetry.addLine();
+
         sequence
-                .lineToSplineHeading(backstage)
+                .setTangent(RIGHT)
+                .splineToSplineHeading(backstage, RIGHT)
 
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .splineTo(toPose2d(first).vec(), RIGHT)
+                .splineToSplineHeading(firstPose, RIGHT)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
@@ -208,7 +219,7 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.deposit.lift.setTargetRow(second.y);
                 })
-                .lineToConstantHeading(toPose2d(second).vec())
+                .lineTo(secondVec)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(second);
@@ -312,13 +323,16 @@ public final class MainAuton extends LinearOpMode {
         robot.preload();
         robot.initRun();
 
-        TrajectorySequence[] sequences = generateTrajectories();
+        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
+        robot.drivetrain.setPoseEstimate(startPose);
 
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
-        mTelemetry.addData("Location", detector.run().name());
+        TrajectorySequence[] sequences = generateTrajectories(startPose);
         mTelemetry.update();
 
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+
         while (opModeInInit()) {
+            detector.run();
         }
         PropDetectPipeline.Randomization location = detector.getLocation();
         mTelemetry.addData("choosing", location.name());
@@ -346,10 +360,7 @@ public final class MainAuton extends LinearOpMode {
     }
 
     @NonNull
-    private static TrajectorySequence[] generateTrajectories() {
-
-        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
-        robot.drivetrain.setPoseEstimate(startPose);
+    private static TrajectorySequence[] generateTrajectories(Pose2d startPose) {
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
