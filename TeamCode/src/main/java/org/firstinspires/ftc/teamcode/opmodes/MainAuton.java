@@ -91,6 +91,7 @@ public final class MainAuton extends LinearOpMode {
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
             X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
+            Y_SHIFT_POST_INNER_SPIKE_BACKDROP = 1,
             TIME_SPIKE_BACKDROP = 0.75,
             TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH = 0.5,
             TIME_SPIKE_AUDIENCE = 1,
@@ -100,9 +101,9 @@ public final class MainAuton extends LinearOpMode {
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
             BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 50,
+            X_BACKDROP = 50.1,
             Y_BACKDROP_0_BLUE = 43,
-            Y_BACKDROP_0_RED = -27.5,
+            Y_BACKDROP_0_RED = -28.5,
             WIDTH_PIXEL = 3.15,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
@@ -110,7 +111,7 @@ public final class MainAuton extends LinearOpMode {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
-            centerSpikeBackdrop = new EditablePose(15, -24.5, LEFT),
+            centerSpikeBackdrop = new EditablePose(15, -25, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
@@ -354,7 +355,7 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
                     ;
 
-            if (backdropSide) backdropPurpleYellow(sequence, placements, outer, inner);
+            if (backdropSide) backdropPurpleYellow(sequence, placements, a, outer, inner);
             else audiencePurple(sequence, placements, a, outer, inner);
 
             if (cycle) {
@@ -385,12 +386,12 @@ public final class MainAuton extends LinearOpMode {
         return sequences;
     }
 
-    private static void backdropPurpleYellow(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, boolean outer, boolean inner) {
+    private static void backdropPurpleYellow(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
         if (inner) {
             Pose2d spike = innerSpikeBackdrop.byAlliance().toPose2d();
             sequence
                     .splineTo(spike.vec(), spike.getHeading())
-//                                    .strafeRight(Y_SHIFT_POST_INNER * (isRed ? 1 : -1))
+                    .strafeRight(Y_SHIFT_POST_INNER_SPIKE_BACKDROP * a)
             ;
         } else {
             sequence.lineToSplineHeading((
@@ -515,7 +516,7 @@ public final class MainAuton extends LinearOpMode {
 
         public double x, y, heading;
 
-        public static boolean backdropSide = false;
+        public static boolean backdropSide = true;
 
         public EditablePose(double x, double y, double heading) {
             this.x = x;
