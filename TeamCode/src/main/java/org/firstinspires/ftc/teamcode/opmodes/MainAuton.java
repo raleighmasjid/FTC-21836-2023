@@ -39,7 +39,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
-import org.firstinspires.ftc.teamcode.subsystems.centerstage.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.TeamPropDetector;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
 
 import java.util.ArrayList;
@@ -300,20 +300,7 @@ public final class MainAuton extends LinearOpMode {
                     break;
             }
 
-            mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
-            mTelemetry.addLine();
-            mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
-            mTelemetry.addLine();
-            mTelemetry.addLine("WILL " + (!cycle ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
-            mTelemetry.addLine();
-            mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
-            mTelemetry.addLine();
-            mTelemetry.addLine("Randomizations:");
-            for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
-                    randomizations[i].name() + ": " +
-                    (ourPlacements[i] % 2 == 1 ? "left" : "right") +
-                    selection.markIf(selections[i])
-            );
+            printConfig(selection);
             mTelemetry.addLine();
             mTelemetry.addLine();
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
@@ -323,29 +310,24 @@ public final class MainAuton extends LinearOpMode {
         robot.preload();
         robot.initRun();
 
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+
         Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
 
         TrajectorySequence[] sequences = generateTrajectories(startPose);
-        mTelemetry.update();
-
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
-            detector.run();
+            mTelemetry.addData("Location", detector.getLocation().name());
+            mTelemetry.addLine();
+            mTelemetry.addLine();
+            printConfig(selection);
+            mTelemetry.update();
         }
-        PropDetectPipeline.Randomization location = detector.getLocation();
-        mTelemetry.addData("choosing", location.name());
-        mTelemetry.addData("choosing ordinal", location.ordinal());
-        mTelemetry.addData("choosing sequence", sequences[location.ordinal()].toString());
-        TrajectorySequence selected = sequences[location.ordinal()];
-        for (int x = 0; x < selected.size(); x++){
-            mTelemetry.addLine(selected.get(x).getEndPose().toString());
-        }
-        mTelemetry.addLine();
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
-        mTelemetry.update();
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[detector.getLocation().ordinal()]);
+        detector.stop();
+
         // Control loop:
         while (opModeIsActive()) {
             // Manually clear old sensor data from the last loop:
@@ -355,8 +337,25 @@ public final class MainAuton extends LinearOpMode {
             autonEndPose = robot.drivetrain.getPoseEstimate();
             // Push telemetry data
             robot.printTelemetry();
-//            mTelemetry.update();
+            mTelemetry.update();
         }
+    }
+
+    private void printConfig(AutonConfig selection) {
+        mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
+        mTelemetry.addLine();
+        mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
+        mTelemetry.addLine();
+        mTelemetry.addLine("WILL " + (!cycle ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine();
+        mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
+        mTelemetry.addLine();
+        mTelemetry.addLine("Randomizations:");
+        for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
+                randomizations[i].name() + ": " +
+                (ourPlacements[i] % 2 == 1 ? "left" : "right") +
+                selection.markIf(selections[i])
+        );
     }
 
     @NonNull
