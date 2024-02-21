@@ -100,6 +100,7 @@ public final class MainAuton extends LinearOpMode {
             TIME_SPIKE_AUDIENCE = 1,
             TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
             TIME_PRE_YELLOW = 0.5,
+            TIME_INTAKING = 2,
             X_SHIFT_INTAKING = 2,
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
@@ -158,7 +159,9 @@ public final class MainAuton extends LinearOpMode {
         sequence
                 .addTemporalMarker(() -> {
                     robot.intake.setMotorPower(SPEED_INTAKING);
-                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+                })
+                .waitSeconds(TIME_INTAKING)
+                .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
                 })
                 .back(X_SHIFT_INTAKING)
@@ -168,7 +171,9 @@ public final class MainAuton extends LinearOpMode {
                 .forward(X_SHIFT_INTAKING)
                 .addTemporalMarker(() -> {
                     robot.intake.setMotorPower(SPEED_INTAKING);
-                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
+                })
+                .waitSeconds(TIME_INTAKING)
+                .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
                 })
         ;
@@ -442,6 +447,7 @@ public final class MainAuton extends LinearOpMode {
             sequence
                     .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
                     .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
+                    .strafeLeft(a * 2)
                     .addTemporalMarker(() -> {
                         robot.deposit.paintbrush.dropPixel();
                     })
@@ -498,14 +504,17 @@ public final class MainAuton extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.toggleFloor();
                     robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
+                    robot.intake.setHeight(FIVE_STACK);
                 })
 
                 .lineToSplineHeading(stack)
                 .setTangent(LEFT)
 
                 .addTemporalMarker(() -> {
-                    robot.intake.setMotorPower(SPEED_INTAKING);
-                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
+                            robot.intake.setMotorPower(SPEED_INTAKING);
+                })
+                .waitSeconds(TIME_INTAKING)
+                .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
                 })
         ;
