@@ -107,14 +107,14 @@ public final class MainAuton extends LinearOpMode {
             X_BACKDROP = 50.1,
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -28.5,
-            WIDTH_PIXEL = 3.15,
+            WIDTH_PIXEL = 3.25,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
             ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
             ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
-            centerSpikeBackdrop = new EditablePose(15, -25, LEFT),
+            centerSpikeBackdrop = new EditablePose(15, -22.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),

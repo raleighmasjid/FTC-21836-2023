@@ -59,23 +59,23 @@ import java.util.List;
 public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
-                9,
+                7.5,
                 4,
                 0.1
             ),
             HEADING_PID = new PIDCoefficients(
-                10,
+                9,
                 4,
                     0
             );
 
     public static double
-            LATERAL_MULTIPLIER = 1.75,
+            LATERAL_MULTIPLIER = 1.65,
             VX_WEIGHT = 1,
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
 
-    public static MainAuton.EditablePose admissibleError = new MainAuton.EditablePose(0.25, 0.25, toRadians(1.0));
+    public static MainAuton.EditablePose admissibleError = new MainAuton.EditablePose(0.125, 0.125, toRadians(0.5));
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
