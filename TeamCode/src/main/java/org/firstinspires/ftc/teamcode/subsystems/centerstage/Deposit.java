@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_FLOOR_RETRACTION;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_SCORING_RETRACTION;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -53,6 +55,10 @@ public final class Deposit {
         lift.run(intakeClear);
         paintbrush.pivot.setActivated(paintbrushExtended() && intakeClear);
         paintbrush.run();
+    }
+
+    boolean isExtended() {
+        return lift.isExtended() || paintbrush.retractionTimer.seconds() <= (paintbrush.floor ? TIME_FLOOR_RETRACTION : TIME_SCORING_RETRACTION);
     }
 
     private boolean paintbrushExtended() {
@@ -207,11 +213,13 @@ public final class Deposit {
                 ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 45,
                 TIME_DROP_FIRST = 0.5,
-                TIME_DROP_SECOND = 0.65;
+                TIME_DROP_SECOND = 0.65,
+                TIME_SCORING_RETRACTION = 0.5,
+                TIME_FLOOR_RETRACTION = 0.75;
 
         private final SimpleServoPivot pivot, hook, claw;
 
-        private final ElapsedTime timer = new ElapsedTime();
+        private final ElapsedTime timer = new ElapsedTime(), retractionTimer = new ElapsedTime();
         private boolean droppedPixel = true, floor = false;
         private int pixelsLocked = 0;
         final Pixel.Color[] colors = {EMPTY, EMPTY};
@@ -286,6 +294,8 @@ public final class Deposit {
             pivot.run();
             claw.run();
             hook.run();
+
+            if (pivot.isActivated()) retractionTimer.reset();
         }
 
         void printTelemetry() {

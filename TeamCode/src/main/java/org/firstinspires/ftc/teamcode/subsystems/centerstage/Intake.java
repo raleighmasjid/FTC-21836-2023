@@ -201,7 +201,7 @@ public final class Intake {
                 EMPTY;
     }
 
-    void run(int pixelsInDeposit, boolean liftIsExtended, boolean liftIsScoring) {
+    void run(int pixelsInDeposit, boolean depositIsExtended, boolean liftIsScoring) {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
@@ -234,7 +234,7 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (!liftIsExtended && (!isIntaking || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
+                if (!depositIsExtended && (!isIntaking || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -275,7 +275,7 @@ public final class Intake {
         }
 
 
-        boolean liftIsRunning = liftIsScoring || liftIsExtended;
+        boolean liftIsRunning = liftIsScoring || depositIsExtended;
 
         if (state == RETRACTED) pivot.setActivated(!liftIsRunning);
 
