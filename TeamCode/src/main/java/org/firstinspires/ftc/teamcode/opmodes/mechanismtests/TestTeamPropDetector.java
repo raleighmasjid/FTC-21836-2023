@@ -40,6 +40,10 @@ public final class TestTeamPropDetector extends LinearOpMode {
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
+
+            if (gamepad1.x) detector.pipeline.isRed = false;
+            if (gamepad1.b) detector.pipeline.isRed = true;
+
             detector.printTelemetry();
             mTelemetry.update();
         }

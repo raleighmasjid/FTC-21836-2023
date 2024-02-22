@@ -325,7 +325,7 @@ public final class MainAuton extends LinearOpMode {
             mTelemetry.update();
         }
 
-        PropDetectPipeline.Randomization location = detector.getLocation();
+        PropDetectPipeline.Randomization location = detector.pipeline.getLocation();
         detector.stop();
 
         robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);

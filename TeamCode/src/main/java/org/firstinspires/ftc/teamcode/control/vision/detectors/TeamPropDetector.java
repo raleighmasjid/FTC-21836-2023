@@ -15,7 +15,7 @@ public class TeamPropDetector {
 
     private final OpenCvCamera camera;
 
-    private final PropDetectPipeline pipeline;
+    public final PropDetectPipeline pipeline;
 
     private volatile boolean isOpen = false;
 
@@ -44,12 +44,8 @@ public class TeamPropDetector {
         });
     }
 
-    public PropDetectPipeline.Randomization getLocation() {
-        return pipeline.getLocation();
-    }
-
     public void printTelemetry() {
-        mTelemetry.addData("Location", getLocation().name());
+        mTelemetry.addData("Location", pipeline.getLocation().name());
     }
 
     public void stop() {
