@@ -69,8 +69,8 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.4,
                 0.3,
+                0.4,
                 0,
                 0.075
         );
@@ -102,7 +102,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
                 HEIGHT_CLIMBING = 6.25,
-                HEIGHT_MIN = 0.25,
+                HEIGHT_MIN = 0.5,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
@@ -214,8 +214,8 @@ public final class Deposit {
                 ANGLE_HOOK_CLOSED = 45,
                 TIME_DROP_FIRST = 0.5,
                 TIME_DROP_SECOND = 0.65,
-                TIME_SCORING_RETRACTION = 0.5,
-                TIME_FLOOR_RETRACTION = 0.75;
+                TIME_SCORING_RETRACTION = 0.2,
+                TIME_FLOOR_RETRACTION = 0.25;
 
         private final SimpleServoPivot pivot, hook, claw;
 
