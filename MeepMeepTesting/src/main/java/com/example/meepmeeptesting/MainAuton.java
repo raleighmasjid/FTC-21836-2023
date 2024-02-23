@@ -11,8 +11,11 @@ import static com.example.meepmeeptesting.AutonVars.X_BACKDROP;
 import static com.example.meepmeeptesting.AutonVars.Y_BACKDROP_0_BLUE;
 import static com.example.meepmeeptesting.AutonVars.Y_BACKDROP_0_RED;
 import static com.example.meepmeeptesting.AutonVars.backdropSide;
+import static com.example.meepmeeptesting.AutonVars.cycle;
+import static com.example.meepmeeptesting.AutonVars.ourPlacements;
 import static com.example.meepmeeptesting.AutonVars.parked;
 import static com.example.meepmeeptesting.AutonVars.parking;
+import static com.example.meepmeeptesting.AutonVars.partnerWillDoRand;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
 import static java.lang.Math.PI;
@@ -41,9 +44,6 @@ public class MainAuton {
             FORWARD = 1.5707963267948966,
             RIGHT = 0,
             BACKWARD = -1.5707963267948966;
-
-    private static final int[] ourPlacements = {1, 3, 6};
-    private static boolean partnerWillDoRand = false, cycle = false;
 
     /**
      * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
