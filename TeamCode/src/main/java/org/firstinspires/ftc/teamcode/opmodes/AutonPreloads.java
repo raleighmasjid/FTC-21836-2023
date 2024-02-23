@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.stackPos;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_INNER_SPIKE_AUDIENCE_APPROACH;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_BLUE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_RED;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.HEIGHT_SPIKE_AUDIENCE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKE_STACK_APPROACH;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.TIME_INTAKING;
@@ -94,7 +95,7 @@ class AutonPreloads {
 
         sequence
                 .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
-                    robot.deposit.lift.setTargetRow(0);
+                    robot.deposit.lift.setTargetRow(HEIGHT_SPIKE_AUDIENCE);
                 })
         ;
 

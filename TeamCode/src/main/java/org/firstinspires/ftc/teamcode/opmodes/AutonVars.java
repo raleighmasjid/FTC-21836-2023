@@ -45,7 +45,8 @@ public class AutonVars {
             WIDTH_PIXEL = 3.15,
             ANGLE_OUTER_SPIKE_APPROACH_RED = 5,
             ANGLE_OUTER_SPIKE_APPROACH_BLUE = 7.5,
-            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3;
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
+            HEIGHT_SPIKE_AUDIENCE = 0;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
