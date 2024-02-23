@@ -11,7 +11,11 @@ public class AutonVars {
 
     public static boolean
             isRed = true,
-            backdropSide = true;
+            backdropSide = true,
+            cycle = false,
+            partnerWillDoRand = false;
+
+    static final int[] ourPlacements = {1, 3, 6};
 
     public static double
             SIZE_WINDOW = 720,

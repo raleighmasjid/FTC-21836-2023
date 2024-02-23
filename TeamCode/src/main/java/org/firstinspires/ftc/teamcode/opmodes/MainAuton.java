@@ -13,9 +13,12 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parked;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
@@ -69,9 +72,6 @@ public final class MainAuton extends LinearOpMode {
     public static boolean keyPressed(int gamepad, GamepadKeys.Button button) {
         return (gamepad == 2 ? gamepadEx2 : gamepadEx1).wasJustPressed(button);
     }
-
-    private static final int[] ourPlacements = {1, 3, 6};
-    private static boolean partnerWillDoRand = false, cycle = false;
 
     /**
      * @return A {@link Pose2d} corresponding to the phsyical scoring location of this {@link Pixel}
