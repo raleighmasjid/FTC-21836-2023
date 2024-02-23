@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
+import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -75,7 +75,7 @@ public class MecanumDrivetrain extends MecanumDrive {
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
 
-    public static MainAuton.EditablePose admissibleError = new MainAuton.EditablePose(0.125, 0.125, toRadians(0.5));
+    public static EditablePose admissibleError = new EditablePose(0.125, 0.125, toRadians(0.5));
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 

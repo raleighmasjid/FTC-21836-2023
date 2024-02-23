@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.control.vision.detectors;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.openftc.easyopencv.OpenCvCameraRotation.UPRIGHT;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;

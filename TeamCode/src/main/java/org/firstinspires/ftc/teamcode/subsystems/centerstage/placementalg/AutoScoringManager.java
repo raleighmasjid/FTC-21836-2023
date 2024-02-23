@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.control.vision.detectors.BackdropScanner;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
+import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.opmodes.MainAuton;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 
 public final class AutoScoringManager {
 
-    public static MainAuton.EditablePose startPose = new MainAuton.EditablePose(24, -16, LEFT);
+    public static EditablePose startPose = new EditablePose(24, -16, LEFT);
 
     private final ElapsedTime timeSinceUpdate = new ElapsedTime();
 

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.control.vision.detectors;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.openftc.easyopencv.OpenCvCameraRotation.SIDEWAYS_RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
