@@ -128,7 +128,10 @@ public final class MainAuton extends LinearOpMode {
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(22, -12, LEFT);
+            enteringBackstage = new EditablePose(22, -12, LEFT),
+            offsetAudienceInner = new EditablePose(0, 0, 0),
+            offsetAudienceOuter = new EditablePose(0, 0, 0),
+            offsetAudienceCenter = new EditablePose(0, 0, 0);
 
     private static Pose2d stackPos(int stack) {
         return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
@@ -183,7 +186,7 @@ public final class MainAuton extends LinearOpMode {
         ;
     }
 
-    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
+    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index, Pose2d offset) {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         Pose2d backstage = MainAuton.enteringBackstage.byAlliance().toPose2d();
@@ -207,6 +210,7 @@ public final class MainAuton extends LinearOpMode {
                 .splineToSplineHeading(backstage, RIGHT)
 
                 .addTemporalMarker(() -> {
+                    offsetLocalization(backstage, offset);
                     robot.deposit.lift.setTargetRow(first.y);
                 })
                 .splineToSplineHeading(firstPose, RIGHT)
@@ -226,6 +230,16 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .waitSeconds(TIME_DROP_SECOND)
         ;
+    }
+
+    private static void offsetLocalization(Pose2d current, Pose2d offset) {
+        EditablePose corrected = new EditablePose(current);
+
+        corrected.x -= offset.getX();
+        corrected.y -= offset.getY();
+        corrected.heading -= offset.getHeading();
+
+        robot.drivetrain.setPoseEstimate(corrected.toPose2d());
     }
 
     enum AutonConfig {
@@ -462,6 +476,13 @@ public final class MainAuton extends LinearOpMode {
     }
 
     private static void audiencePurple(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
+
+        Pose2d offset = (
+                            inner ? offsetAudienceInner :
+                            outer ? offsetAudienceOuter :
+                                    offsetAudienceCenter
+                        ).byAlliance().toPose2d();
+
         sequence
                 .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
                     robot.deposit.lift.setTargetRow(0);
@@ -553,7 +574,7 @@ public final class MainAuton extends LinearOpMode {
                 })
         ;
 
-        score(sequence, placements, 0);
+        score(sequence, placements, 0, offset);
     }
 
     public static class EditablePose {
