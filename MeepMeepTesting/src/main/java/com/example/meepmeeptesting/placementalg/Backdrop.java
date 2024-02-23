@@ -1,7 +1,7 @@
-package com.example.meepmeeptesting;
+package com.example.meepmeeptesting.placementalg;
 
-import static com.example.meepmeeptesting.Pixel.Color.EMPTY;
-import static com.example.meepmeeptesting.Pixel.Color.INVALID;
+import static com.example.meepmeeptesting.placementalg.Pixel.Color.EMPTY;
+import static com.example.meepmeeptesting.placementalg.Pixel.Color.INVALID;
 import static java.lang.Math.random;
 import static java.lang.Math.round;
 

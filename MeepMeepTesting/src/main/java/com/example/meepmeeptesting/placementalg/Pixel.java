@@ -1,7 +1,8 @@
-package com.example.meepmeeptesting;
+package com.example.meepmeeptesting.placementalg;
 
-import static com.example.meepmeeptesting.Pixel.Color.INVALID;
-
+/**
+ * Note: this class has a natural ordering that is not consistent with equals.
+ */
 public final class Pixel implements Comparable<Pixel> {
 
     /**
@@ -19,7 +20,7 @@ public final class Pixel implements Comparable<Pixel> {
     double scoreValue = 0;
     public Pixel mosaic = null;
 
-    public Pixel(int x, int y, Pixel.Color color) {
+    public Pixel(int x, int y, Color color) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -28,7 +29,7 @@ public final class Pixel implements Comparable<Pixel> {
     /**
      * Instantiate a new {@link Pixel} object based on an existing {@link Pixel} but with a new {@link Color}
      */
-    public Pixel(Pixel p, Pixel.Color color) {
+    public Pixel(Pixel p, Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
     }
@@ -43,6 +44,10 @@ public final class Pixel implements Comparable<Pixel> {
     public boolean equals(Object o) {
         if (!(o instanceof Pixel)) return false;
         Pixel p = (Pixel) o;
+        return this.equals(p);
+    }
+
+    public boolean equals(Pixel p) {
         return p.x == x && p.y == y;
     }
 
@@ -50,7 +55,7 @@ public final class Pixel implements Comparable<Pixel> {
      * @return Whether this {@link Pixel} is part of a valid mosaic
      */
     public boolean inMosaic() {
-        return mosaic != null && mosaic.color != INVALID;
+        return mosaic != null && mosaic.color != Color.INVALID;
     }
 
     /**
@@ -65,7 +70,7 @@ public final class Pixel implements Comparable<Pixel> {
      * Returns null if no such {@link Pixel} is found
      */
     Pixel getCounterpartIn(Iterable<Pixel> array) {
-        for (Pixel p1 : array) if (x == p1.x && y == p1.y) return p1;
+        for (Pixel p1 : array) if (this.equals(p1)) return p1;
         return null;
     }
 
