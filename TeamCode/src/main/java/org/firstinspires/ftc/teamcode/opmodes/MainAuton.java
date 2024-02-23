@@ -113,8 +113,8 @@ public final class MainAuton extends LinearOpMode {
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -28.85,
             WIDTH_PIXEL = 3.15,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5,
+            ANGLE_OUTER_SPIKE_APPROACH_RED = 5,
+            ANGLE_OUTER_SPIKE_APPROACH_BLUE = 7.5,
             ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3;
 
     public static EditablePose
@@ -449,7 +449,7 @@ public final class MainAuton extends LinearOpMode {
                 })
                 .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
                         outer ?
-                                isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
+                                isRed ? ANGLE_OUTER_SPIKE_APPROACH_RED : ANGLE_OUTER_SPIKE_APPROACH_BLUE :
                                 RIGHT
                 )
                 .waitSeconds(TIME_PRE_YELLOW)
