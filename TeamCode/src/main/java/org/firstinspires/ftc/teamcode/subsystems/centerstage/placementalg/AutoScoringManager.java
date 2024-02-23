@@ -89,10 +89,7 @@ public final class AutoScoringManager {
         if (!robot.drivetrain.isBusy() && (clearingScan || !latestScan.equals(lastScan))) {
             timeSinceUpdate.reset();
 
-            if (clearingScan) {
-                clearingScan = false;
-                latestScan.clear();
-            }
+            if (clearingScan) clearScan();
 
             lastScan = latestScan.clone();
             calculateColorsNeeded();
@@ -107,6 +104,11 @@ public final class AutoScoringManager {
             beginTrajectoryGeneration = false;
             trajectoryReady = generateTrajectory();
         }
+    }
+
+    private void clearScan() {
+        clearingScan = false;
+        latestScan.clear();
     }
 
     /**
