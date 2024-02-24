@@ -70,9 +70,9 @@ public final class Deposit {
 
         public static PIDGains pidGains = new PIDGains(
                 0.3,
-                0.4,
+                0.2,
                 0,
-                0.075
+                0.2
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
