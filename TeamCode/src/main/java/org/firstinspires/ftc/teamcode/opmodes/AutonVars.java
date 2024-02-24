@@ -13,6 +13,7 @@ public class AutonVars {
             isRed = true,
             backdropSide = true,
             cycle = false,
+            park = true,
             partnerWillDoRand = false;
 
     static final int[] ourPlacements = {1, 3, 6};
@@ -27,7 +28,7 @@ public class AutonVars {
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_INTAKING = -54,
+            X_INTAKING = -52,
             Y_INTAKING_1 = -10,
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
@@ -52,7 +53,7 @@ public class AutonVars {
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
-            centerSpikeBackdrop = new EditablePose(15, -22.5, LEFT),
+            centerSpikeBackdrop = new EditablePose(19, -22.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(30, -32, LEFT),
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
@@ -61,7 +62,7 @@ public class AutonVars {
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
             parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(22, -12, LEFT),
+            enteringBackstage = new EditablePose(22, -11, LEFT),
             offsetAudienceInner = new EditablePose(0, 0, 0),
             offsetAudienceOuter = new EditablePose(0, 0, 0),
             offsetAudienceCenter = new EditablePose(0, 0, 0);
