@@ -45,7 +45,7 @@ public class AutonVars {
             BOTTOM_ROW_HEIGHT = 2.5,
             X_BACKDROP = 53.1,
             Y_BACKDROP_0_BLUE = 43,
-            Y_BACKDROP_0_RED = -27.65,
+            Y_BACKDROP_0_RED = -28.05,
             WIDTH_PIXEL = 3.15,
             ANGLE_OUTER_SPIKE_APPROACH_RED = 5,
             ANGLE_OUTER_SPIKE_APPROACH_BLUE = 7.5,
