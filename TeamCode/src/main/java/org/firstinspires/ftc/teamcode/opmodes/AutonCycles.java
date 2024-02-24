@@ -38,6 +38,7 @@ class AutonCycles {
         sequence
                 .addTemporalMarker(() -> {
                     robot.intake.setHeight(height);
+                    robot.intake.toggle();
                 })
                 .setTangent(LEFT)
                 .splineTo(AutonVars.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
