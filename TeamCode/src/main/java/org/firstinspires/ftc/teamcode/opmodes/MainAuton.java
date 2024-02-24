@@ -17,11 +17,13 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parked;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_SIDE;
@@ -96,6 +98,7 @@ public final class MainAuton extends LinearOpMode {
         EDITING_ALLIANCE,
         EDITING_SIDE,
         EDITING_PARK,
+        EDITING_CYCLE,
         EDITING_PARTNER;
 
         public static final AutonConfig[] selections = values();
@@ -153,6 +156,9 @@ public final class MainAuton extends LinearOpMode {
                     backdropSide = !backdropSide;
                     break;
                 case EDITING_PARK:
+                    park = !park;
+                    break;
+                case EDITING_CYCLE:
                     cycle = !cycle;
                     break;
                 default:
@@ -209,7 +215,9 @@ public final class MainAuton extends LinearOpMode {
         mTelemetry.addLine();
         mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
         mTelemetry.addLine();
-        mTelemetry.addLine("WILL " + (!cycle ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine("WILL " + (park ? "PARK" : "NOT PARK") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine();
+        mTelemetry.addLine("WILL " + (cycle ? "CYCLE" : "NOT CYCLE") + selection.markIf(EDITING_CYCLE));
         mTelemetry.addLine();
         mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
         mTelemetry.addLine();
@@ -272,7 +280,9 @@ public final class MainAuton extends LinearOpMode {
 //                    intake2Pixels(sequence, 1, height.minus(2));
 //                    score(sequence, placements, placement + 2);
 //                }
-            } else if (partnerWillDoRand) {
+            }
+
+            if (park) {
                 sequence
                         .lineTo(parking.byAlliance().toPose2d().vec())
                         .lineTo(parked.byAlliance().toPose2d().vec())
