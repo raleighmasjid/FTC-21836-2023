@@ -96,6 +96,9 @@ class AutonPreloads {
                 .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
                     robot.deposit.lift.setTargetRow(HEIGHT_SPIKE_AUDIENCE);
                 })
+                .addTemporalMarker(() -> {
+                    robot.intake.toggle();
+                })
         ;
 
         Pose2d stack = stackPos(1);
@@ -115,7 +118,6 @@ class AutonPreloads {
                     .waitSeconds(TIME_SPIKE_AUDIENCE)
                     .addTemporalMarker(() -> {
                         robot.deposit.lift.setTargetRow(-1);
-                        robot.intake.toggle();
                     })
                     .lineToSplineHeading(preStack.toPose2d())
             ;
@@ -124,9 +126,6 @@ class AutonPreloads {
 
             Pose2d spike = outerSpikeAudience.byAlliance().toPose2d();
             sequence
-                    .addTemporalMarker(() -> {
-                        robot.intake.toggle();
-                    })
                     .splineTo(spike.vec(), spike.getHeading())
                     .addTemporalMarker(() -> {
                         robot.deposit.paintbrush.dropPixel();
@@ -144,9 +143,6 @@ class AutonPreloads {
             Pose2d spike = centerSpikeAudience.byAlliance().toPose2d();
             sequence
                     .forward(10)
-                    .addTemporalMarker(() -> {
-                        robot.intake.toggle();
-                    })
                     .splineTo(spike.vec(), spike.getHeading())
                     .addTemporalMarker(() -> {
                         robot.deposit.paintbrush.dropPixel();
