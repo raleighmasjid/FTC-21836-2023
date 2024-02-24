@@ -27,8 +27,8 @@ public class AutonVars {
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
             X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_INTAKING = -55,
-            Y_INTAKING_1 = -11,
+            X_INTAKING = -54,
+            Y_INTAKING_1 = -10,
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
             X_SHIFT_PRE_STACK_AUDIENCE_INNER_SPIKE = 6,
@@ -43,13 +43,13 @@ public class AutonVars {
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
             BOTTOM_ROW_HEIGHT = 2.5,
-            X_BACKDROP = 53.1,
+            X_BACKDROP = 50,
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -28.05,
             WIDTH_PIXEL = 3.15,
             ANGLE_OUTER_SPIKE_APPROACH_RED = 5,
             ANGLE_OUTER_SPIKE_APPROACH_BLUE = 7.5,
-            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1,
             HEIGHT_SPIKE_AUDIENCE = -0.5;
 
     public static EditablePose
