@@ -59,14 +59,14 @@ import java.util.List;
 public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
-                5,
+                8,
                 0.5,
-                1
+                2
             ),
             HEADING_PID = new PIDCoefficients(
-                    9,
-                    0,
-                0
+                    4,
+                    1,
+                    1
             );
 
     public static double
@@ -75,7 +75,7 @@ public class MecanumDrivetrain extends MecanumDrive {
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
 
-    public static EditablePose admissibleError = new EditablePose(0.125, 0.125, toRadians(0.5));
+    public static EditablePose admissibleError = new EditablePose(0.0125, 0.0125, toRadians(0.25));
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 

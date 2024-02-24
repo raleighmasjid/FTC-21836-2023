@@ -50,7 +50,7 @@ public class AutonVars {
             ANGLE_OUTER_SPIKE_APPROACH_RED = 5,
             ANGLE_OUTER_SPIKE_APPROACH_BLUE = 7.5,
             ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1.3,
-            HEIGHT_SPIKE_AUDIENCE = 0;
+            HEIGHT_SPIKE_AUDIENCE = -0.5;
 
     public static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
@@ -58,7 +58,7 @@ public class AutonVars {
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(28, -32, LEFT),
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
-            innerSpikeAudience = new EditablePose(-38, -30, LEFT),
+            innerSpikeAudience = new EditablePose(-36, -30, LEFT),
             outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
             parking = new EditablePose(X_BACKDROP, -60, LEFT),
