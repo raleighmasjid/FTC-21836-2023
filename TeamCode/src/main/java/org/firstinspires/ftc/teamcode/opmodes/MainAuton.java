@@ -7,6 +7,8 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.driveToStack1;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
@@ -261,8 +263,8 @@ public final class MainAuton extends LinearOpMode {
 
                 // CYCLE 1
                 driveToStack1(sequence, height);
-//                intake2Pixels(sequence, 1, height);
-//                score(sequence, placements, placement);
+                intake2Pixels(sequence, height);
+                score(sequence, placements, placement);
 
                 // CYCLE 2
 //                if (backdropSide) {

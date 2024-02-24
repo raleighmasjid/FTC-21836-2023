@@ -11,7 +11,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 import static java.util.Arrays.asList;
 import static java.util.Collections.max;
 
@@ -60,12 +59,12 @@ public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
-                0.5,
+                8,
                 2
             ),
             HEADING_PID = new PIDCoefficients(
-                    4,
-                    1,
+                    8,
+                    12,
                     1
             );
 
@@ -75,7 +74,7 @@ public class MecanumDrivetrain extends MecanumDrive {
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
 
-    public static EditablePose admissibleError = new EditablePose(0.0125, 0.0125, toRadians(0.25));
+    public static EditablePose admissibleError = new EditablePose(0.01, 0.01, 0.001);
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
