@@ -4,6 +4,8 @@ import static com.example.meepmeeptesting.AutonVars.X_START_LEFT;
 import static com.example.meepmeeptesting.AutonVars.X_START_RIGHT;
 import static com.example.meepmeeptesting.AutonVars.isRed;
 
+import static java.lang.Math.toDegrees;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 public class EditablePose {
@@ -14,6 +16,10 @@ public class EditablePose {
         this.x = x;
         this.y = y;
         this.heading = heading;
+    }
+
+    public String toString() {
+        return x + ", " + y + ", " + toDegrees(heading);
     }
 
     public EditablePose(Pose2d pose) {
