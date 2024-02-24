@@ -64,8 +64,8 @@ public class MecanumDrivetrain extends MecanumDrive {
                 1
             ),
             HEADING_PID = new PIDCoefficients(
-                    2,
-                    0.5,
+                    3,
+                    1,
                 0
             );
 
