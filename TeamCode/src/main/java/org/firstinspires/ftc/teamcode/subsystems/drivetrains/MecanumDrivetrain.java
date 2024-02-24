@@ -70,7 +70,7 @@ public class MecanumDrivetrain extends MecanumDrive {
             );
 
     public static double
-            LATERAL_MULTIPLIER = 1.65,
+            LATERAL_MULTIPLIER = 1.48,
             VX_WEIGHT = 1,
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
