@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.stackPos;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_INNER_SPIKE_AUDIENCE_APPROACH;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_BLUE;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.HEIGHT_SPIKE_AUDIENCE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKE_STACK_APPROACH;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKING;
@@ -30,15 +29,14 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.REVERSE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.RIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.toPose2d;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -71,11 +69,12 @@ class AutonPreloads {
                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
                     robot.deposit.lift.setTargetRow(placements.get(0).y);
                 })
-                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
-                        outer ?
-                                isRed ? ANGLE_OUTER_SPIKE_APPROACH_RED : ANGLE_OUTER_SPIKE_APPROACH_BLUE :
-                                RIGHT
-                )
+        ;
+        Pose2d yellow = toPose2d(placements.get(0));
+        Vector2d distance = new Vector2d(1.0, 0.0);
+        if (!outer) sequence.splineTo(yellow.vec().minus(distance), RIGHT).lineTo(yellow.vec());
+        else sequence.lineTo(yellow.vec().minus(distance)).lineTo(yellow.vec());
+        sequence
                 .waitSeconds(TIME_PRE_YELLOW)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();

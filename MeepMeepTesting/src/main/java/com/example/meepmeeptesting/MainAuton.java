@@ -72,7 +72,7 @@ public class MainAuton {
                     Pose2d startPose = AutonVars.startPose.byBoth().toPose2d();
                     // robot.drivetrain.setPoseEstimate(startPose);
 
-                    PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.CENTER;
+                    PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
 
 
                     ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(partnerWillDoRand, ourPlacements[rand.ordinal()]);

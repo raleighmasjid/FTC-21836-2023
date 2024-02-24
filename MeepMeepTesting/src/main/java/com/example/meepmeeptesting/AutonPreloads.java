@@ -3,8 +3,6 @@ package com.example.meepmeeptesting;
 import static com.example.meepmeeptesting.AutonCycles.score;
 import static com.example.meepmeeptesting.AutonCycles.stackPos;
 import static com.example.meepmeeptesting.AutonVars.ANGLE_INNER_SPIKE_AUDIENCE_APPROACH;
-import static com.example.meepmeeptesting.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_BLUE;
-import static com.example.meepmeeptesting.AutonVars.ANGLE_OUTER_SPIKE_APPROACH_RED;
 import static com.example.meepmeeptesting.AutonVars.TIME_INTAKING;
 import static com.example.meepmeeptesting.AutonVars.TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH;
 import static com.example.meepmeeptesting.AutonVars.TIME_PRE_YELLOW;
@@ -17,7 +15,6 @@ import static com.example.meepmeeptesting.AutonVars.centerSpikeAudience;
 import static com.example.meepmeeptesting.AutonVars.centerSpikeBackdrop;
 import static com.example.meepmeeptesting.AutonVars.innerSpikeAudience;
 import static com.example.meepmeeptesting.AutonVars.innerSpikeBackdrop;
-import static com.example.meepmeeptesting.AutonVars.isRed;
 import static com.example.meepmeeptesting.AutonVars.offsetAudienceCenter;
 import static com.example.meepmeeptesting.AutonVars.offsetAudienceInner;
 import static com.example.meepmeeptesting.AutonVars.offsetAudienceOuter;
@@ -33,6 +30,7 @@ import static com.example.meepmeeptesting.MainAuton.toPose2d;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.example.meepmeeptesting.placementalg.Pixel;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
@@ -64,11 +62,12 @@ class AutonPreloads {
                 .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
                     // robot.deposit.lift.setTargetRow(placements.get(0).y);
                 })
-                .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
-                        outer ?
-                                isRed ? ANGLE_OUTER_SPIKE_APPROACH_RED : ANGLE_OUTER_SPIKE_APPROACH_BLUE :
-                                RIGHT
-                )
+        ;
+        Pose2d yellow = toPose2d(placements.get(0));
+        Vector2d distance = new Vector2d(1.0, 0.0);
+        if (!outer) sequence.splineTo(yellow.vec().minus(distance), RIGHT).lineTo(yellow.vec());
+        else sequence.lineTo(yellow.vec().minus(distance)).lineTo(yellow.vec());
+        sequence
                 .waitSeconds(TIME_PRE_YELLOW)
                 .addTemporalMarker(() -> {
                     // robot.deposit.paintbrush.dropPixel();
