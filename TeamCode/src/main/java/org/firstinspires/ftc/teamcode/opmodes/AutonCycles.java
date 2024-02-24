@@ -110,7 +110,7 @@ class AutonCycles {
                 .splineToSplineHeading(backstage, RIGHT)
 
                 .addTemporalMarker(() -> {
-                    offsetLocalization(backstage, offset);
+//                    offsetLocalization(backstage, offset);
                     robot.deposit.lift.setTargetRow(first.y);
                 })
                 .splineToSplineHeading(firstPose, RIGHT)
