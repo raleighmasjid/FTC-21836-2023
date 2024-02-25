@@ -9,20 +9,20 @@ import static java.lang.Math.toDegrees;
 public final class Intake {
 
     public static double
-            ANGLE_PIVOT_OFFSET = 13,
-            ANGLE_PIVOT_FLOOR_CLEARANCE = 5,
-            ANGLE_PIVOT_TRANSFERRING = 197,
-            ANGLE_PIVOT_CLIMBING = 50,
+            ANGLE_PIVOT_OFFSET = 9,
+            ANGLE_PIVOT_FLOOR_CLEARANCE = 3,
+            ANGLE_PIVOT_TRANSFERRING = 196.7,
+            ANGLE_PIVOT_VERTICAL = 110,
             ANGLE_LATCH_INTAKING = 105,
             ANGLE_LATCH_LOCKED = 159,
             ANGLE_LATCH_TRANSFERRING = 0,
-            TIME_PIXEL_1_SETTLING = 0.5,
-            TIME_PIXEL_2_SETTLING = 0,
-            TIME_REVERSING = 1,
+            TIME_PIXEL_1_SETTLING = 0.25,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
+            TIME_INTAKE_FLIP_TO_LIFT = 0.2,
+            TIME_REVERSING = 0.175,
             COLOR_SENSOR_GAIN = 1,
-            SPEED_SLOW_REVERSING = -0.25,
+            HEIGHT_SHIFT = -0.1,
             r = 9.5019488189,
             theta0 = -0.496183876745;
 
@@ -45,13 +45,9 @@ public final class Intake {
 
         public final double deltaX, deltaTheta;
 
-        private static final Height[] values = values();
+        private static final Intake.Height[] values = values();
 
-        public static Height get(int ordinal) {
-            return values[ordinal];
-        }
-
-        public Height minus(int less) {
+        public Intake.Height minus(int less) {
             return values[max(ordinal() - less, 0)];
         }
 
@@ -62,7 +58,7 @@ public final class Intake {
                 return;
             }
 
-            double deltaY = ordinal() * 0.5 - 0.1;
+            double deltaY = ordinal() * 0.5 + HEIGHT_SHIFT;
 
             double theta1 = asin((r * sin(theta0) + deltaY) / r);
             deltaTheta = toDegrees(theta1 - theta0);

@@ -18,7 +18,6 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class PropDetectPipeline extends OpenCvPipeline {
 
     private final Telemetry telemetry;
-    private final Mat mat = new Mat();
 
     public boolean isRed = true;
 
@@ -32,12 +31,13 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
     private Randomization location = RIGHT;
 
-    private final double
+    private static final double
             X_LEFT_BOUND = 0,
             X_CENTER_BOUND = 240,
-            X_RIGHT_BOUND = 640,
             Y_TOP = 0,
-            Y_BOTTOM = 480;
+            Y_BOTTOM = 480,
+            MIN_RED = 7,
+            MIN_BLUE = 25;
 
     private final Scalar
             minBlue = new Scalar(
@@ -51,24 +51,24 @@ public class PropDetectPipeline extends OpenCvPipeline {
                     255
             ),
             minRed = new Scalar(
-                    -20,
-                    15,
-                    1
+                    -30,
+                    40,
+                    0
             ),
             maxRed = new Scalar(
-                    20,
+                    15,
                     255,
                     255
             );
 
     private final Rect
             LEFT_AREA = new Rect(
-                    new Point(X_LEFT_BOUND, Y_TOP),
-                    new Point(X_CENTER_BOUND, Y_BOTTOM)
+                    new Point(5, 0),
+                    new Point(220, 300)
             ),
             CENTER_AREA = new Rect(
-                    new Point(X_CENTER_BOUND, Y_TOP),
-                    new Point(X_RIGHT_BOUND, Y_BOTTOM)
+                    new Point(300, 0),
+                    new Point(550, 150)
             );
 
     public PropDetectPipeline(Telemetry t) {
@@ -82,12 +82,12 @@ public class PropDetectPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         // Executed every time a new frame is dispatched
-        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
-        Core.inRange(mat, (isRed ? minRed : minBlue), (isRed ? maxRed : maxBlue), mat);
+        Core.inRange(input, (isRed ? minRed : minBlue), (isRed ? maxRed : maxBlue), input);
 
-        Mat left = mat.submat(LEFT_AREA);
-        Mat middle = mat.submat(CENTER_AREA);
+        Mat left = input.submat(LEFT_AREA);
+        Mat middle = input.submat(CENTER_AREA);
 
         double leftValue = Core.sumElems(left).val[0] / LEFT_AREA.area() / 255;
         double middleValue = Core.sumElems(middle).val[0] / CENTER_AREA.area() / 255;
@@ -103,18 +103,18 @@ public class PropDetectPipeline extends OpenCvPipeline {
 
         int max = max(leftInt, middleInt);
 
-        location = max < (isRed ? 5 : 3) ? RIGHT : max == leftInt ? LEFT : CENTER;
+        location = max < (isRed ? MIN_RED : MIN_BLUE) ? RIGHT : max == leftInt ? LEFT : CENTER;
         telemetry.addData("Prop Location", location.toString());
         telemetry.update();
 
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2RGB);
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_GRAY2RGB);
 
-        Scalar colorDefault = new Scalar(0, 0, 0);
+        Scalar colorDefault = new Scalar(255, 255, 255);
         Scalar colorFound = new Scalar(0, 255, 0);
 
-        Imgproc.rectangle(mat, LEFT_AREA, location == LEFT ? colorFound : colorDefault);
-        Imgproc.rectangle(mat, CENTER_AREA, location == CENTER ? colorFound : colorDefault);
+        Imgproc.rectangle(input, LEFT_AREA, location == LEFT ? colorFound : colorDefault, 2);
+        Imgproc.rectangle(input, CENTER_AREA, location == CENTER ? colorFound : colorDefault, 2);
 
-        return mat;
+        return input;
     }
 }

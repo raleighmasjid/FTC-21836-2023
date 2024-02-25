@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.doAutoSlow;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
 
@@ -66,6 +67,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
             for (int i = 0; i < initialColors.length; i++) mTelemetry.addLine(
                 Pixel.Color.get(i).name() + ": " + initialColors[i] + (i == selectedColor ? " <" : "")
             );
+            mTelemetry.addLine();
+            mTelemetry.addLine("Auto slow is " + (doAutoSlow ? "enabled" : "disabled"));
             mTelemetry.addLine();
             robot.printTelemetry();
             mTelemetry.update();

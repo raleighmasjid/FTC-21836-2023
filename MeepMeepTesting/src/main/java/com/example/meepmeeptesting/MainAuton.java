@@ -1,18 +1,31 @@
 package com.example.meepmeeptesting;
 
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static com.example.meepmeeptesting.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static com.example.meepmeeptesting.AutonCycles.driveToStack1;
+import static com.example.meepmeeptesting.AutonPreloads.audiencePreloadsAndWhite;
+import static com.example.meepmeeptesting.AutonPreloads.backdropPreloads;
+import static com.example.meepmeeptesting.AutonVars.LENGTH_ROBOT;
+import static com.example.meepmeeptesting.AutonVars.SIZE_WINDOW;
+import static com.example.meepmeeptesting.AutonVars.WIDTH_PIXEL;
+import static com.example.meepmeeptesting.AutonVars.WIDTH_ROBOT;
+import static com.example.meepmeeptesting.AutonVars.X_BACKDROP;
+import static com.example.meepmeeptesting.AutonVars.Y_BACKDROP_0_BLUE;
+import static com.example.meepmeeptesting.AutonVars.Y_BACKDROP_0_RED;
+import static com.example.meepmeeptesting.AutonVars.backdropSide;
+import static com.example.meepmeeptesting.AutonVars.cycle;
+import static com.example.meepmeeptesting.AutonVars.ourPlacements;
+import static com.example.meepmeeptesting.AutonVars.parked;
+import static com.example.meepmeeptesting.AutonVars.parking;
+import static com.example.meepmeeptesting.AutonVars.partnerWillDoRand;
 import static com.example.meepmeeptesting.Intake.Height.FIVE_STACK;
 import static com.example.meepmeeptesting.Intake.Height.FOUR_STACK;
-import static com.example.meepmeeptesting.MainAuton.EditablePose.backdropSide;
-import static com.example.meepmeeptesting.Pixel.Color.WHITE;
-import static com.example.meepmeeptesting.Pixel.Color.YELLOW;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
-import static java.util.Arrays.asList;
 import static java.util.Collections.swap;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.example.meepmeeptesting.placementalg.AutonPixelSupplier;
+import com.example.meepmeeptesting.placementalg.Backdrop;
+import com.example.meepmeeptesting.placementalg.Pixel;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
@@ -37,248 +50,60 @@ public class MainAuton {
      */
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
-                MainAuton.X_BACKDROP,
-                (isRed ? Y_MAX_RED : Y_MAX_BLUE) - (pixel.x * MainAuton.WIDTH_PIXEL) + (pixel.y % 2 == 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                X_BACKDROP,
+                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE)
+                        - ((pixel.x - 1) * WIDTH_PIXEL)
+                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0
+                ),
                 PI
         );
     }
 
-    public static double
-            X_START_LEFT = -35,
-            X_START_RIGHT = 12,
-            X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_INTAKING = -56,
-            Y_INTAKING_1 = -12,
-            Y_INTAKING_2 = -24,
-            Y_INTAKING_3 = -36,
-            TIME_SPIKE = 0.75,
-            TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            TIME_INTAKE_FLIP_TO_LIFT = 0.25,
-            TIME_PRE_YELLOW = 0.5,
-            X_SHIFT_INTAKING = 5,
-            SPEED_INTAKING = 0.5,
-            BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 52,
-            Y_MAX_BLUE = 45.75,
-            Y_MAX_RED = -26.25,
-            WIDTH_PIXEL = 3.7,
-            BACKING_AUDIENCE_SIDE_OUTER = 12;
-
-    public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            spikeOuter = new EditablePose(5.4, -35, 3.25),
-            spikeCenterBackdrop = new EditablePose(15, -23, 2.86),
-            spikeCenterAudience = new EditablePose(-27, -23, -1.5708),
-            spikeOuterBackdrop = new EditablePose(29, -32, 2.65),
-            spikeOuterAudience = new EditablePose(-46, -32, BACKWARD),
-            parking = new EditablePose(X_BACKDROP, -60, LEFT),
-            parked = new EditablePose(60, parking.y, LEFT),
-            approachingBackstage = new EditablePose(36, -12, LEFT),
-            approachingStacks = new EditablePose(-46, -12, LEFT),
-            movingToStack2 = new EditablePose(-45, -24, LEFT);
-
-    private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
-    }
-
-    private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
-        sequence
-                .addTemporalMarker(() -> {
-//                    robot.intake.toggle();
-//                    robot.intake.setHeight(height);
-                })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .lineTo(MainAuton.approachingBackstage.byAlliance().toPose2d().vec())
-                .setTangent(LEFT)
-                .addTemporalMarker(() -> {
-//                    robot.intake.toggle();
-                })
-                .splineTo(stackPos(1, height).vec(), LEFT)
-        ;
-    }
-
-    private static void driveToStack2(TrajectorySequenceBuilder sequence, Intake.Height height) {
-        Pose2d turnToStack1 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byAlliance().toPose2d();
-        sequence
-                .addTemporalMarker(() -> {
-//                    robot.intake.setHeight(height);
-                })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .splineToConstantHeading(MainAuton.approachingBackstage.byAlliance().toPose2d().vec(), LEFT)
-                .splineTo(turnToStack1.vec(), LEFT)
-                .lineTo(movingToStack2.byAlliance().toPose2d().vec())
-                .lineTo(stackPos(2, height).vec())
-        ;
-    }
-
-    private static void intake2Pixels(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
-        Intake.Height height2 = height.minus(1);
-        sequence
-                .addTemporalMarker(() -> {
-//                    robot.intake.setMotorPower(SPEED_INTAKING);
-//                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
-//                    robot.intake.setMotorPower(0);
-                })
-                .back(X_SHIFT_INTAKING)
-                .addTemporalMarker(() -> {
-//                    robot.intake.setHeight(height2);
-                })
-                .lineTo(stackPos(stack, height2).vec())
-                .addTemporalMarker(() -> {
-//                    robot.intake.setMotorPower(SPEED_INTAKING);
-//                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
-//                    robot.intake.setMotorPower(0);
-                })
-        ;
-    }
-
-    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
-        Pixel first = placements.get(index);
-        Pixel second = placements.get(index + 1);
-        sequence
-                .lineTo(MainAuton.approachingBackstage.byAlliance().toPose2d().vec())
-
-                .addTemporalMarker(() -> {
-//                    robot.deposit.lift.setTargetRow(first.y);
-                })
-                .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
-                .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(first);
-                })
-                .waitSeconds(TIME_DROP_FIRST)
-
-                .addTemporalMarker(() -> {
-//                    robot.deposit.lift.setTargetRow(second.y);
-                })
-                .lineToConstantHeading(toPose2d(second).vec())
-                .addTemporalMarker(() -> {
-//                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(second);
-                })
-                .waitSeconds(TIME_DROP_SECOND)
-        ;
-    }
-
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(720);
-
-        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
-        boolean partnerWillDoRand = false;
-        boolean park = true;
-
-        PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.LEFT;
-        ArrayList<Pixel> placements = new ArrayList<>(asList(
-                new Pixel(rand.x1, 0, YELLOW),
-                new Pixel(1, 0, WHITE),
-                new Pixel(2, 0, WHITE),
-                new Pixel(1, 1, WHITE),
-                new Pixel(0, 1, WHITE),
-                new Pixel(1, 2, WHITE),
-                new Pixel(2, 1, WHITE),
-                new Pixel(2, 2, WHITE),
-                new Pixel(1, 3, WHITE),
-                new Pixel(0, 3, WHITE),
-                new Pixel(1, 4, WHITE),
-                new Pixel(0, 5, WHITE),
-                new Pixel(6, 0, WHITE),
-                new Pixel(5, 0, WHITE),
-                new Pixel(6, 1, WHITE),
-                new Pixel(5, 1, WHITE),
-                new Pixel(6, 2, WHITE),
-                new Pixel(6, 3, WHITE)
-        ));
+        MeepMeep meepMeep = new MeepMeep((int) SIZE_WINDOW);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(50, 50, toRadians(250), toRadians(250), 13.95)
 //                .setConstraints(70, 90, toRadians(295), toRadians(295), 13.95)
-                .setDimensions(16.42205, 17.39847)
+                .setDimensions(WIDTH_ROBOT, LENGTH_ROBOT)
                 .followTrajectorySequence(robotdrivetrain -> {
 
+                    Pose2d startPose = AutonVars.startPose.byBoth().toPose2d();
+                    // robot.drivetrain.setPoseEstimate(startPose);
+
+                    PropDetectPipeline.Randomization rand = PropDetectPipeline.Randomization.RIGHT;
+
+
+                    ArrayList<Pixel> placements = AutonPixelSupplier.getPlacements(partnerWillDoRand, ourPlacements[rand.ordinal()]);
                     if (partnerWillDoRand) {
                         autonBackdrop.add(placements.get(0));
                         placements.remove(0);
                     }
                     if (!backdropSide) swap(placements, 0, 1);
 
+                    boolean outer, inner;
+                    switch (rand) {
+                        case LEFT:
+                            outer = !(inner = (backdropSide == isRed));
+                            break;
+                        case RIGHT:
+                            inner = !(outer = (backdropSide == isRed));
+                            break;
+                        default:
+                            outer = inner = false;
+                            break;
+                    }
+                    double a = isRed ? 1 : -1;
+
                     TrajectorySequenceBuilder sequence = robotdrivetrain.trajectorySequenceBuilder(startPose)
                             .setTangent(startPose.getHeading())
-                    ;
-
-                    if (backdropSide) {
-
-                        boolean outer =
-                                (isRed && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                                (!isRed && (rand == PropDetectPipeline.Randomization.LEFT));
-
-                        boolean inner =
-                                (isRed && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                                (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
-
-                        if (inner) {
-                            Pose2d spike = spikeOuter.byAlliance().flipBySide().toPose2d();
-                            sequence.splineTo(spike.vec(), spike.getHeading());
-                        } else {
-                            sequence.lineToSplineHeading((
-                                    outer ?
-                                            spikeOuterBackdrop.byAlliance().flipBySide() :
-                                            spikeCenterBackdrop.byBoth()
-                            ).toPose2d());
-                        }
-
-                        sequence
-                                .addTemporalMarker(() -> {
-//                                    robot.spike.toggle();
-                                })
-                                .waitSeconds(TIME_SPIKE)
-                                .setTangent(RIGHT)
-                                .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-//                                    robot.deposit.lift.setTargetRow(placements.get(0).y);
-                                })
-                                .lineToSplineHeading(toPose2d(placements.get(0)))
-                                .waitSeconds(TIME_PRE_YELLOW)
-                                .addTemporalMarker(() -> {
-//                                    robot.deposit.paintbrush.dropPixel();
-                                    autonBackdrop.add(placements.get(0));
-                                })
-                                .waitSeconds(TIME_DROP_SECOND)
-                        ;
-
-                    } else {
-
-                        boolean inner =
-                                (isRed && rand == PropDetectPipeline.Randomization.RIGHT) ||
-                                (!isRed && rand == PropDetectPipeline.Randomization.LEFT);
-
-                        boolean outer =
-                                (isRed && rand == PropDetectPipeline.Randomization.LEFT) ||
-                                (!isRed && rand == PropDetectPipeline.Randomization.RIGHT);
-
-
-                        if (inner) {
-                            Pose2d spike = spikeOuter.byAlliance().flipBySide().toPose2d();
-                            sequence.splineTo(spike.vec(), spike.getHeading());
-                        } else {
-
-                            Pose2d spike = (outer ?
-                                    spikeOuterAudience :
-                                    spikeCenterAudience).byAlliance().toPose2d();
-                            sequence
-                                    .lineToSplineHeading(spike)
-                                    .back(BACKING_AUDIENCE_SIDE_OUTER)
-                                    .lineToSplineHeading(approachingStacks.byAlliance().toPose2d())
                             ;
-                        }
 
-                    }
+                    if (backdropSide) backdropPreloads(sequence, placements, a, outer, inner);
+                    else audiencePreloadsAndWhite(sequence, placements, a, outer, inner);
 
-                    if (park) {
-                        if (partnerWillDoRand) sequence
-                                .lineTo(parking.byAlliance().toPose2d().vec())
-                                .lineTo(parked.byAlliance().toPose2d().vec())
-                                ;
-                    } else {
+                    if (cycle) {
 
                         Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                         int placement = backdropSide ? 1 : 2;
@@ -294,67 +119,20 @@ public class MainAuton {
 //                    intake2Pixels(sequence, 1, height.minus(2));
 //                    score(sequence, placements, placement + 2);
 //                }
+                    } else if (partnerWillDoRand) {
+                        sequence
+                                .lineTo(parking.byAlliance().toPose2d().vec())
+                                .lineTo(parked.byAlliance().toPose2d().vec())
+                        ;
                     }
-
-                    sequence.addTemporalMarker(() -> autonBackdrop.print());
-
+                    
                     return sequence.build();
                 });
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .setDarkMode(false)
                 .setBackgroundAlpha(.85f)
                 .addEntity(myBot)
                 .start();
-    }
-
-    public static class EditablePose {
-
-        public double x, y, heading;
-
-        static boolean backdropSide = false;
-
-        public EditablePose(double x, double y, double heading) {
-            this.x = x;
-            this.y = y;
-            this.heading = heading;
-        }
-
-        public EditablePose clone() {
-            return new EditablePose(x, y, heading);
-        }
-
-        public EditablePose byAlliance() {
-            double alliance = isRed ? 1 : -1;
-            return new EditablePose(
-                    x,
-                    y * alliance,
-                    heading * alliance
-            );
-        }
-
-        public EditablePose bySide() {
-            return new EditablePose(
-                    x + (backdropSide ? 0 : X_START_LEFT - X_START_RIGHT),
-                    y,
-                    heading
-            );
-        }
-
-        public EditablePose flipBySide() {
-            return new EditablePose(
-                    backdropSide ? x : X_START_RIGHT + X_START_LEFT - x,
-                    y,
-                    backdropSide ? heading : Math.PI - heading
-            );
-        }
-
-        public EditablePose byBoth() {
-            return byAlliance().bySide();
-        }
-
-        public Pose2d toPose2d() {
-            return new Pose2d(x, y, heading);
-        }
     }
 }

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
@@ -27,8 +29,6 @@ public final class Robot {
             ANGLE_DRONE_LAUNCHED = 0,
             ANGLE_SPIKE_LOCKED = 90,
             ANGLE_SPIKE_RELEASED = 0;
-
-    public static boolean isRed = true;
 
     public final AutoTurnMecanum drivetrain;
     public final Intake intake;
@@ -66,7 +66,11 @@ public final class Robot {
 
     public void preload() {
         deposit.paintbrush.lockPixels(YELLOW);
-        spike.setActivated(true);
+        if (backdropSide) spike.setActivated(true);
+        else {
+            deposit.paintbrush.lockPixels(PURPLE);
+            deposit.paintbrush.toggleFloor();
+        }
     }
 
     public void initRun() {
@@ -104,7 +108,7 @@ public final class Robot {
 
         intake.run(
                 deposit.paintbrush.getPixelsLocked(),
-                deposit.lift.isRetracted(),
+                deposit.isExtended(),
                 deposit.lift.isScoring()
         );
         deposit.run(intake.clearOfDeposit());

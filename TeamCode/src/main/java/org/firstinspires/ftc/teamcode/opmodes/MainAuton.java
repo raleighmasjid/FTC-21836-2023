@@ -6,24 +6,37 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.driveToStack1;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.EditablePose.backdropSide;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.getOtherPlacement;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
 
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -31,6 +44,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.control.vision.detectors.TeamPropDetector;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
@@ -39,11 +53,9 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
 
 import java.util.ArrayList;
 
-@Config
 @Autonomous(preselectTeleOp = "MainTeleOp")
 public final class MainAuton extends LinearOpMode {
 
@@ -71,128 +83,12 @@ public final class MainAuton extends LinearOpMode {
     public static Pose2d toPose2d(Pixel pixel) {
         return new Pose2d(
                 X_BACKDROP,
-                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE) - ((pixel.x - 1) * MainAuton.WIDTH_PIXEL) - (pixel.y % 2 != 0 ? 0.5 * MainAuton.WIDTH_PIXEL : 0),
+                (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE)
+                        - ((pixel.x - 1) * WIDTH_PIXEL)
+                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0
+                ),
                 PI
         );
-    }
-
-    public static double
-            X_START_LEFT = -35,
-            X_START_RIGHT = 12,
-            X_SHIFT_BACKDROP_AFTER_SPIKE = 8,
-            Y_SHIFT_BEFORE_SPIKE = 15,
-            Y_SHIFT_AFTER_SPIKE = 26,
-            Y_SHIFT_AUDIENCE_AFTER_SPIKE = 16,
-            X_SHIFT_CENTER_AUDIENCE_AFTER_SPIKE = -22,
-            X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
-            X_TILE = 24,
-            X_INTAKING = -56,
-            Y_INTAKING_1 = -12,
-            Y_INTAKING_3 = -36,
-            TIME_SPIKE = 0.75,
-            TIME_SPIKE_TO_INTAKE_FLIP = 0.5,
-            TIME_PRE_YELLOW = 0.5,
-            X_SHIFT_INTAKING = 5,
-            SPEED_INTAKING = 0.5,
-            BOTTOM_ROW_HEIGHT = 2,
-            X_BACKDROP = 52,
-            Y_BACKDROP_0_BLUE = 43.9,
-            Y_BACKDROP_0_RED = -28.1,
-            WIDTH_PIXEL = 3.7,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED = 5,
-            ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE = 7.5;
-
-    public static EditablePose
-            startPose = new EditablePose(X_START_RIGHT, -61.788975, FORWARD),
-            centerSpike = new EditablePose(15, -23, LEFT),
-            nearTrussSpike = new EditablePose(5.4, -35, LEFT),
-            awayTrussSpike = new EditablePose(29, -32, LEFT),
-            parking = new EditablePose(X_BACKDROP, -60, LEFT),
-            parked = new EditablePose(60, parking.y, LEFT),
-            enteringBackstage = new EditablePose(36, -12, LEFT),
-            movingToStack2 = new EditablePose(-45, -24, LEFT);
-
-    private static Pose2d stackPos(int stack, Intake.Height height) {
-        return new EditablePose(X_INTAKING + height.deltaX, stack == 3 ? Y_INTAKING_3 : stack == 2 ? movingToStack2.y : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
-    }
-
-    private static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
-        sequence
-                .addTemporalMarker(() -> {
-                    robot.intake.toggle();
-                    robot.intake.setHeight(height);
-                })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
-                .setTangent(LEFT)
-                .addTemporalMarker(() -> {
-                    robot.intake.toggle();
-                })
-                .splineTo(stackPos(1, height).vec(), LEFT)
-        ;
-    }
-
-    private static void driveToStack2(TrajectorySequenceBuilder sequence, Intake.Height height) {
-        Pose2d turnToStack1 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byAlliance().toPose2d();
-        sequence
-                .addTemporalMarker(() -> {
-                    robot.intake.setHeight(height);
-                })
-                .setTangent(MainAuton.startPose.byAlliance().heading)
-                .splineToConstantHeading(MainAuton.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                .splineTo(turnToStack1.vec(), LEFT)
-                .lineTo(movingToStack2.byAlliance().toPose2d().vec())
-                .lineTo(stackPos(2, height).vec())
-        ;
-    }
-
-    private static void intake2Pixels(TrajectorySequenceBuilder sequence, int stack, Intake.Height height) {
-        Intake.Height height2 = height.minus(1);
-        sequence
-                .addTemporalMarker(() -> {
-                    robot.intake.setMotorPower(SPEED_INTAKING);
-                    while (robot.intake.colors[0] == Pixel.Color.EMPTY) {Thread.yield();}
-                    robot.intake.setMotorPower(0);
-                })
-                .back(X_SHIFT_INTAKING)
-                .addTemporalMarker(() -> {
-                    robot.intake.setHeight(height2);
-                })
-                .lineTo(stackPos(stack, height2).vec())
-                .addTemporalMarker(() -> {
-                    robot.intake.setMotorPower(SPEED_INTAKING);
-                    while (robot.intake.colors[1] == Pixel.Color.EMPTY) {Thread.yield();}
-                    robot.intake.setMotorPower(0);
-                })
-        ;
-    }
-
-    private static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
-        Pixel first = placements.get(index);
-        Pixel second = placements.get(index + 1);
-        sequence
-                .lineTo(MainAuton.enteringBackstage.byAlliance().toPose2d().vec())
-
-                .addTemporalMarker(() -> {
-                    robot.deposit.lift.setTargetRow(first.y);
-                })
-                .splineToConstantHeading(toPose2d(first).vec(), MainAuton.startPose.byAlliance().heading + REVERSE)
-                .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(first);
-                })
-                .waitSeconds(TIME_DROP_FIRST)
-
-                .addTemporalMarker(() -> {
-                    robot.deposit.lift.setTargetRow(second.y);
-                })
-                .lineToConstantHeading(toPose2d(second).vec())
-                .addTemporalMarker(() -> {
-                    robot.deposit.paintbrush.dropPixel();
-                    autonBackdrop.add(second);
-                })
-                .waitSeconds(TIME_DROP_SECOND)
-        ;
     }
 
     enum AutonConfig {
@@ -202,6 +98,7 @@ public final class MainAuton extends LinearOpMode {
         EDITING_ALLIANCE,
         EDITING_SIDE,
         EDITING_PARK,
+        EDITING_CYCLE,
         EDITING_PARTNER;
 
         public static final AutonConfig[] selections = values();
@@ -230,7 +127,6 @@ public final class MainAuton extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
-        robot.preload();
         robot.initRun();
 
         // Initialize gamepads:
@@ -239,8 +135,6 @@ public final class MainAuton extends LinearOpMode {
 
         AutonConfig selection = EDITING_ALLIANCE;
 
-        int[] ourPlacements = {1, 3, 6};
-        boolean partnerWillDoRand = false, park = true;
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit() && !(gamepadEx1.isDown(RIGHT_BUMPER) && gamepadEx1.isDown(LEFT_BUMPER))) {
             gamepadEx1.readButtons();
@@ -264,45 +158,44 @@ public final class MainAuton extends LinearOpMode {
                 case EDITING_PARK:
                     park = !park;
                     break;
+                case EDITING_CYCLE:
+                    cycle = !cycle;
+                    break;
                 default:
                 case EDITING_PARTNER:
                     partnerWillDoRand = !partnerWillDoRand;
                     break;
             }
 
-            mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
-            mTelemetry.addLine();
-            mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
-            mTelemetry.addLine();
-            mTelemetry.addLine("WILL " + (park ? "PARK" : "CYCLE") + selection.markIf(EDITING_PARK));
-            mTelemetry.addLine();
-            mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
-            mTelemetry.addLine();
-            mTelemetry.addLine("Randomizations:");
-            for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
-                    randomizations[i].name() + ": " +
-                    (ourPlacements[i] % 2 == 1 ? "left" : "right") +
-                    selection.markIf(selections[i])
-            );
+            printConfig(selection);
             mTelemetry.addLine();
             mTelemetry.addLine();
             mTelemetry.addLine("Press both shoulder buttons to CONFIRM!");
 
             mTelemetry.update();
         }
-
-        TrajectorySequence[] sequences = generateTrajectories(partnerWillDoRand, park, ourPlacements);
+        robot.preload();
+        robot.initRun();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
-        while (opModeInInit()) {
-            robot.initRun();
+        Pose2d startPose = AutonVars.startPose.byBoth().toPose2d();
+        robot.drivetrain.setPoseEstimate(startPose);
 
-            mTelemetry.addData("Location", detector.run().name());
+        TrajectorySequence[] sequences = generateTrajectories(startPose);
+
+        while (opModeInInit()) {
+            detector.printTelemetry();
+            mTelemetry.addLine();
+            mTelemetry.addLine();
+            printConfig(selection);
             mTelemetry.update();
         }
 
-        robot.drivetrain.followTrajectorySequenceAsync(sequences[detector.getLocation().ordinal()]);
+        PropDetectPipeline.Randomization location = detector.pipeline.getLocation();
+        detector.stop();
+
+        robot.drivetrain.followTrajectorySequenceAsync(sequences[location.ordinal()]);
 
         // Control loop:
         while (opModeIsActive()) {
@@ -317,11 +210,27 @@ public final class MainAuton extends LinearOpMode {
         }
     }
 
-    @NonNull
-    private static TrajectorySequence[] generateTrajectories(boolean partnerWillDoRand, boolean park, int[] ourPlacements) {
+    private void printConfig(AutonConfig selection) {
+        mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
+        mTelemetry.addLine();
+        mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
+        mTelemetry.addLine();
+        mTelemetry.addLine("WILL " + (park ? "PARK" : "NOT PARK") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine();
+        mTelemetry.addLine("WILL " + (cycle ? "CYCLE" : "NOT CYCLE") + selection.markIf(EDITING_CYCLE));
+        mTelemetry.addLine();
+        mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
+        mTelemetry.addLine();
+        mTelemetry.addLine("Randomizations:");
+        for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
+                randomizations[i].name() + ": " +
+                (ourPlacements[i] % 2 == 1 ? "left" : "right") +
+                selection.markIf(selections[i])
+        );
+    }
 
-        Pose2d startPose = MainAuton.startPose.byBoth().toPose2d();
-        robot.drivetrain.setPoseEstimate(startPose);
+    @NonNull
+    private static TrajectorySequence[] generateTrajectories(Pose2d startPose) {
 
         TrajectorySequence[] sequences = new TrajectorySequence[3];
 
@@ -334,71 +243,36 @@ public final class MainAuton extends LinearOpMode {
             }
             if (!backdropSide) swap(placements, 0, 1);
 
+            boolean outer, inner;
+            switch (rand) {
+                case LEFT:
+                    outer = !(inner = (backdropSide == isRed));
+                    break;
+                case RIGHT:
+                    inner = !(outer = (backdropSide == isRed));
+                    break;
+                default:
+                    outer = inner = false;
+                    break;
+            }
+            double a = isRed ? 1 : -1;
+
             TrajectorySequenceBuilder sequence = robot.drivetrain.trajectorySequenceBuilder(startPose)
                     .setTangent(startPose.getHeading())
-            ;
+                    ;
 
-            if (backdropSide) {
+            if (backdropSide) backdropPreloads(sequence, placements, a, outer, inner);
+            else audiencePreloadsAndWhite(sequence, placements, a, outer, inner);
 
-                boolean outer =
-                        (isRed && (rand == PropDetectPipeline.Randomization.RIGHT)) ||
-                        (!isRed && (rand == PropDetectPipeline.Randomization.LEFT));
-
-                boolean inner =
-                        (isRed && (rand == PropDetectPipeline.Randomization.LEFT)) ||
-                        (!isRed && (rand == PropDetectPipeline.Randomization.RIGHT));
-
-                if (inner) {
-                    Pose2d spike = nearTrussSpike.byAlliance().flipBySide().toPose2d();
-                    sequence.splineTo(spike.vec(), spike.getHeading());
-                } else {
-                    sequence.lineToSplineHeading((
-                            outer ?
-                                    awayTrussSpike.byAlliance().flipBySide() :
-                                    centerSpike.byBoth()
-                    ).toPose2d());
-                }
-
-                sequence
-                        .addTemporalMarker(() -> {
-                            robot.spike.toggle();
-                        })
-                        .waitSeconds(TIME_SPIKE)
-                        .setTangent(RIGHT)
-                        .UNSTABLE_addTemporalMarkerOffset(TIME_SPIKE_TO_INTAKE_FLIP, () -> {
-                            robot.deposit.lift.setTargetRow(placements.get(0).y);
-                        })
-                        .splineToConstantHeading(toPose2d(placements.get(0)).vec(),
-                                outer ?
-                                        isRed ? ANGLE_AWAY_TRUSS_SPIKE_APPROACH_RED : ANGLE_AWAY_TRUSS_SPIKE_APPROACH_BLUE :
-                                        RIGHT
-                        )
-                        .waitSeconds(TIME_PRE_YELLOW)
-                        .addTemporalMarker(() -> {
-                            robot.deposit.paintbrush.dropPixel();
-                            autonBackdrop.add(placements.get(0));
-                        })
-                        .waitSeconds(TIME_DROP_SECOND)
-                ;
-
-            } else {
-
-            }
-
-            if (park) {
-                if (partnerWillDoRand) sequence
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
-                ;
-            } else {
+            if (cycle) {
 
                 Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
                 int placement = backdropSide ? 1 : 2;
 
                 // CYCLE 1
                 driveToStack1(sequence, height);
-//                intake2Pixels(sequence, 1, height);
-//                score(sequence, placements, placement);
+                intake2Pixels(sequence, height);
+                score(sequence, placements, placement);
 
                 // CYCLE 2
 //                if (backdropSide) {
@@ -408,54 +282,16 @@ public final class MainAuton extends LinearOpMode {
 //                }
             }
 
+            if (park) {
+                sequence
+                        .lineTo(parkingInner.byAlliance().toPose2d().vec())
+                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                ;
+            }
+
             sequences[rand.ordinal()] = sequence.build();
         }
         return sequences;
     }
 
-    public static class EditablePose {
-
-        public double x, y, heading;
-
-        static boolean backdropSide = true;
-
-        public EditablePose(double x, double y, double heading) {
-            this.x = x;
-            this.y = y;
-            this.heading = heading;
-        }
-
-        public EditablePose byAlliance() {
-            double alliance = isRed ? 1 : -1;
-            return new EditablePose(
-                    x,
-                    y * alliance,
-                    heading * alliance
-            );
-        }
-
-        public EditablePose bySide() {
-            return new EditablePose(
-                    x + (backdropSide ? 0 : X_START_LEFT - X_START_RIGHT),
-                    y,
-                    heading
-            );
-        }
-
-        public EditablePose flipBySide() {
-            return new EditablePose(
-                    backdropSide ? x : (X_START_LEFT + X_START_RIGHT) - x,
-                    y,
-                    backdropSide ? heading : Math.PI - heading
-            );
-        }
-
-        public EditablePose byBoth() {
-            return byAlliance().bySide();
-        }
-
-        public Pose2d toPose2d() {
-            return new Pose2d(x, y, heading);
-        }
-    }
 }

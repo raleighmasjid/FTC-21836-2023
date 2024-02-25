@@ -28,7 +28,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detectors.TeamPropDetector;
 
 @TeleOp(group = "Single mechanism test")
 public final class TestTeamPropDetector extends LinearOpMode {
@@ -40,8 +40,11 @@ public final class TestTeamPropDetector extends LinearOpMode {
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
 
         while (opModeInInit()) {
-            mTelemetry.addData("Location", detector.run().name());
-            detector.printNumericalTelemetry();
+
+            if (gamepad1.x) detector.pipeline.isRed = false;
+            if (gamepad1.b) detector.pipeline.isRed = true;
+
+            detector.printTelemetry();
             mTelemetry.update();
         }
     }

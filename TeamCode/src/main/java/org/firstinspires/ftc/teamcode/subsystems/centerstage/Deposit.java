@@ -4,10 +4,12 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.BOTTOM_ROW_HEIGHT;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_FLOOR_RETRACTION;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_SCORING_RETRACTION;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -55,6 +57,10 @@ public final class Deposit {
         paintbrush.run();
     }
 
+    boolean isExtended() {
+        return lift.isExtended() || paintbrush.retractionTimer.seconds() <= (paintbrush.floor ? TIME_FLOOR_RETRACTION : TIME_SCORING_RETRACTION);
+    }
+
     private boolean paintbrushExtended() {
         return lift.isScoring() && lift.targetRow != HEIGHT_CLIMBING;
     }
@@ -63,10 +69,10 @@ public final class Deposit {
     public static final class Lift {
 
         public static PIDGains pidGains = new PIDGains(
-                0.4,
                 0.3,
+                0.2,
                 0,
-                0.1
+                0.2
         );
 
         public static FeedforwardGains feedforwardGains = new FeedforwardGains(
@@ -96,7 +102,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
                 HEIGHT_CLIMBING = 6.25,
-                HEIGHT_MIN = 0.25,
+                HEIGHT_MIN = 0.5,
                 PERCENT_OVERSHOOT = 0,
                 POS_1 = 0,
                 POS_2 = 25;
@@ -107,7 +113,7 @@ public final class Deposit {
         private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
         private final PIDController controller = new PIDController(kDFilter);
 
-        private double lastKp = pidGains.kP, manualLiftPower, targetRow;
+        private double manualLiftPower, targetRow;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -134,8 +140,8 @@ public final class Deposit {
             return targetRow > -1;
         }
 
-        public boolean isRetracted() {
-            return currentState.x <= HEIGHT_MIN;
+        public boolean isExtended() {
+            return currentState.x > HEIGHT_MIN;
         }
 
         public void setTargetRow(double targetRow) {
@@ -168,11 +174,6 @@ public final class Deposit {
 
             controller.setTarget(intakeClear ? targetState : new State(0));
 
-//            if (lastKp != pidGains.kP) {
-//                pidGains.computeKd(feedforwardGains, PERCENT_OVERSHOOT);
-//                lastKp = pidGains.kP;
-//            }
-
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
                     manualLiftPower != 0 ?
@@ -204,19 +205,22 @@ public final class Deposit {
     public static final class Paintbrush {
 
         public static double
-                ANGLE_PIVOT_OFFSET = 10,
+                ANGLE_PIVOT_OFFSET = 17.25,
                 ANGLE_PIVOT_SCORING = 127,
+                ANGLE_PIVOT_FLOOR = 190,
                 ANGLE_CLAW_OPEN = 13,
                 ANGLE_CLAW_CLOSED = 50,
                 ANGLE_HOOK_OPEN = 8,
                 ANGLE_HOOK_CLOSED = 45,
-                TIME_DROP_FIRST = 0.35,
-                TIME_DROP_SECOND = 0.5;
+                TIME_DROP_FIRST = 0.5,
+                TIME_DROP_SECOND = 0.65,
+                TIME_SCORING_RETRACTION = 0.2,
+                TIME_FLOOR_RETRACTION = 0.25;
 
         private final SimpleServoPivot pivot, hook, claw;
 
-        private final ElapsedTime timer = new ElapsedTime();
-        private boolean droppedPixel = true;
+        private final ElapsedTime timer = new ElapsedTime(), retractionTimer = new ElapsedTime();
+        private boolean droppedPixel = true, floor = false;
         private int pixelsLocked = 0;
         final Pixel.Color[] colors = {EMPTY, EMPTY};
 
@@ -260,18 +264,27 @@ public final class Deposit {
             pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
         }
 
+        public void toggleFloor() {
+            floor = !floor;
+        }
+
         public void dropPixel() {
             pixelsLocked = clip(pixelsLocked - 1, 0, 2);
             if (pixelsLocked <= 1) colors[0] = EMPTY;
             if (pixelsLocked == 0) {
                 colors[1] = EMPTY;
-                droppedPixel = false;
-                timer.reset();
+                if (pivot.isActivated()) {
+                    droppedPixel = false;
+                    timer.reset();
+                }
             }
         }
 
         private void run() {
-            pivot.updateAngles(ANGLE_PIVOT_OFFSET, ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_SCORING);
+            pivot.updateAngles(
+                    ANGLE_PIVOT_OFFSET,
+                    ANGLE_PIVOT_OFFSET + (floor ? ANGLE_PIVOT_FLOOR : ANGLE_PIVOT_SCORING)
+            );
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 
@@ -281,6 +294,8 @@ public final class Deposit {
             pivot.run();
             claw.run();
             hook.run();
+
+            if (pivot.isActivated()) retractionTimer.reset();
         }
 
         void printTelemetry() {

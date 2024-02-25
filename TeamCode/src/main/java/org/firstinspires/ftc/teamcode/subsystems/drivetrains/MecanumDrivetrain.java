@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGainsKt.computeKd;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USE_VELO_PID;
@@ -40,6 +39,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -59,23 +59,22 @@ public class MecanumDrivetrain extends MecanumDrive {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
-                1,
-                0.1
+                8,
+                2
             ),
             HEADING_PID = new PIDCoefficients(
-                8,
-                1,
-                    0
+                    8,
+                    12,
+                    1
             );
-    private double
-            lastTranslationKp = TRANSLATIONAL_PID.kP,
-            lastHeadingKp = HEADING_PID.kP;
 
     public static double
-            LATERAL_MULTIPLIER = 1.75,
+            LATERAL_MULTIPLIER = 1.48,
             VX_WEIGHT = 1,
             VY_WEIGHT = 1,
             OMEGA_WEIGHT = 1;
+
+    public static EditablePose admissibleError = new EditablePose(0.01, 0.01, 0.001);
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
@@ -94,7 +93,7 @@ public class MecanumDrivetrain extends MecanumDrive {
         super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                admissibleError.toPose2d(), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -203,17 +202,6 @@ public class MecanumDrivetrain extends MecanumDrive {
     }
 
     public void update() {
-
-        if (!USE_VELO_PID && lastTranslationKp != TRANSLATIONAL_PID.kP) {
-            TRANSLATIONAL_PID.kD = computeKd(TRANSLATIONAL_PID.kP, DriveConstants.kV, DriveConstants.kA);
-            lastTranslationKp = TRANSLATIONAL_PID.kP;
-        }
-
-        if (!USE_VELO_PID && lastHeadingKp != HEADING_PID.kP) {
-            HEADING_PID.kD = computeKd(HEADING_PID.kP, DriveConstants.kV, DriveConstants.kA);
-            lastHeadingKp = HEADING_PID.kP;
-        }
-
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
