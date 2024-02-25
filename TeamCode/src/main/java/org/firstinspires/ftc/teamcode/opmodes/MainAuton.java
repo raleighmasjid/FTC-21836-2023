@@ -18,8 +18,8 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parked;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
@@ -284,8 +284,8 @@ public final class MainAuton extends LinearOpMode {
 
             if (park) {
                 sequence
-                        .lineTo(parking.byAlliance().toPose2d().vec())
-                        .lineTo(parked.byAlliance().toPose2d().vec())
+                        .lineTo(parkingInner.byAlliance().toPose2d().vec())
+                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
                 ;
             }
 

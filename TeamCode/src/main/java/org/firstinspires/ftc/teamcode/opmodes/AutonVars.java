@@ -14,6 +14,7 @@ public class AutonVars {
             backdropSide = true,
             cycle = false,
             park = true,
+            parkInner = true,
             partnerWillDoRand = false;
 
     static final int[] ourPlacements = {1, 3, 6};
@@ -60,8 +61,10 @@ public class AutonVars {
             innerSpikeAudience = new EditablePose(-36, -30, LEFT),
             outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
             postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
-            parking = new EditablePose(X_BACKDROP, -60, LEFT),
-            parked = new EditablePose(60, parking.y, LEFT),
+            parkingInner = new EditablePose(X_BACKDROP, -60, LEFT),
+            parkedInner = new EditablePose(60, parkingInner.y, LEFT),
+            parkingOuter = new EditablePose(X_BACKDROP, -12, LEFT),
+            parkedOuter = new EditablePose(60, parkingOuter.y, LEFT),
             enteringBackstage = new EditablePose(22, -11, LEFT),
             offsetAudienceInner = new EditablePose(0, 0, 0),
             offsetAudienceOuter = new EditablePose(0, 0, 0),
