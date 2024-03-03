@@ -9,7 +9,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class AutonVars {
 
-    public static boolean
+    static boolean
             isRed = true,
             backdropSide = true,
             cycle = false,
