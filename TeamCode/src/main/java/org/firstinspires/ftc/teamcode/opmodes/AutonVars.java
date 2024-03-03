@@ -1,13 +1,27 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.INNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class AutonVars {
+
+    enum ParkingLocation {
+        OUTER,
+        CENTER,
+        INNER;
+
+        public static final ParkingLocation[] locations = values();
+
+        public ParkingLocation plus(int i) {
+            return locations[loopMod(ordinal() + i, locations.length)];
+        }
+    }
 
     static boolean
             isRed = true,
@@ -18,6 +32,8 @@ public class AutonVars {
             partnerWillDoRand = false;
 
     static final int[] ourPlacements = {1, 3, 6};
+
+    static ParkingLocation parking = INNER;
 
     public static double
             SIZE_WINDOW = 720,
