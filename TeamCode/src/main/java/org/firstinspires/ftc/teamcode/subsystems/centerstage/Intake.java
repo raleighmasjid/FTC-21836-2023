@@ -341,6 +341,10 @@ public final class Intake {
         setExtended(!isIntaking);
     }
 
+    public boolean isExtended() {
+        return state == HAS_0_PIXELS || state == HAS_1_PIXEL || state == PIXEL_1_SETTLING;
+    }
+
     void printTelemetry() {
         mTelemetry.addData("Top color", reads[1].name());
         mTelemetry.addData("Bottom color", reads[0].name());
