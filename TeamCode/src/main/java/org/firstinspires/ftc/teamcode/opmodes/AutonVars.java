@@ -23,8 +23,10 @@ public class AutonVars {
         }
     }
 
+
+    public static boolean isRed = true;
+
     static boolean
-            isRed = true,
             isBackdropSide = true,
             cycle = false,
             partnerWillDoRand = false;
