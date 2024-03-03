@@ -354,7 +354,7 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param yCommand forward input
      * @param turnCommand turning input
      */
-    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
+    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode, boolean intakeExtended) {
 
         // counter-rotate translation vector by current heading
         double theta = -getHeading();
