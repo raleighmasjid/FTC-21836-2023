@@ -27,8 +27,6 @@ public class AutonVars {
             isRed = true,
             isBackdropSide = true,
             cycle = false,
-            park = true,
-            parkInner = true,
             partnerWillDoRand = false;
 
     static final int[] ourPlacements = {1, 3, 6};

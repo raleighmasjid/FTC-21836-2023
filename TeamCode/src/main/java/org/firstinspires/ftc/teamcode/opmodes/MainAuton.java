@@ -11,16 +11,21 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.INNER;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.OUTER;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isBackdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedOuter;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingOuter;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
@@ -30,7 +35,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITI
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.getOtherPlacement;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
@@ -156,7 +160,7 @@ public final class MainAuton extends LinearOpMode {
                     isBackdropSide = !isBackdropSide;
                     break;
                 case EDITING_PARK:
-                    park = !park;
+                    parking = parking.plus(1);
                     break;
                 case EDITING_CYCLE:
                     cycle = !cycle;
@@ -215,7 +219,7 @@ public final class MainAuton extends LinearOpMode {
         mTelemetry.addLine();
         mTelemetry.addLine((isBackdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
         mTelemetry.addLine();
-        mTelemetry.addLine("WILL " + (park ? "PARK" : "NOT PARK") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine(parking.name() + " PARKING" + selection.markIf(EDITING_PARK));
         mTelemetry.addLine();
         mTelemetry.addLine("WILL " + (cycle ? "CYCLE" : "NOT CYCLE") + selection.markIf(EDITING_CYCLE));
         mTelemetry.addLine();
@@ -282,10 +286,16 @@ public final class MainAuton extends LinearOpMode {
 //                }
             }
 
-            if (park) {
+            if (parking == INNER || parking == OUTER) {
+
+                EditablePose movingToPark, parked;
+
+                movingToPark =  parking == INNER ? parkingInner : parkingOuter;
+                parked =        parking == INNER ? parkedInner  : parkedOuter;
+
                 sequence
-                        .lineTo(parkingInner.byAlliance().toPose2d().vec())
-                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                        .lineTo(movingToPark.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
             }
 
