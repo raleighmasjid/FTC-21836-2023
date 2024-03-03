@@ -145,7 +145,8 @@ public final class Deposit {
 
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(rowToInches(this.targetRow));
+            double inches = rowToInches(this.targetRow);
+            targetState = new State(inches);
         }
 
         private static double rowToInches(double row) {
