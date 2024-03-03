@@ -61,7 +61,7 @@ public final class Deposit {
     }
 
     private boolean paintbrushExtended() {
-        return lift.isScoring() && lift.targetRow != HEIGHT_CLIMBING;
+        return lift.targetRow != HEIGHT_CLIMBING && lift.isScoring();
     }
 
     @Config
