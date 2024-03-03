@@ -238,6 +238,7 @@ public final class Intake {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
+                    setHeight(FLOOR);
                 } else break;
 
             case PIVOTING:
