@@ -24,7 +24,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
-import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
@@ -110,8 +109,7 @@ public final class Deposit {
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
         private State currentState, targetState;
-        private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
-        private final PIDController controller = new PIDController(kDFilter);
+        private final PIDController controller = new PIDController();
 
         private double manualLiftPower, targetRow;
 
@@ -164,7 +162,6 @@ public final class Deposit {
         public void readSensors() {
             currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
 
-            kDFilter.setGains(kalmanGains);
             controller.setGains(pidGains);
         }
 
