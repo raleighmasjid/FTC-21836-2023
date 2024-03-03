@@ -20,7 +20,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isBackdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
@@ -153,7 +153,7 @@ public final class MainAuton extends LinearOpMode {
                     isRed = !isRed;
                     break;
                 case EDITING_SIDE:
-                    backdropSide = !backdropSide;
+                    isBackdropSide = !isBackdropSide;
                     break;
                 case EDITING_PARK:
                     park = !park;
@@ -174,7 +174,7 @@ public final class MainAuton extends LinearOpMode {
 
             mTelemetry.update();
         }
-        robot.preload(backdropSide);
+        robot.preload(isBackdropSide);
         robot.initRun();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
@@ -213,7 +213,7 @@ public final class MainAuton extends LinearOpMode {
     private void printConfig(AutonConfig selection) {
         mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
         mTelemetry.addLine();
-        mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
+        mTelemetry.addLine((isBackdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
         mTelemetry.addLine();
         mTelemetry.addLine("WILL " + (park ? "PARK" : "NOT PARK") + selection.markIf(EDITING_PARK));
         mTelemetry.addLine();
@@ -241,15 +241,15 @@ public final class MainAuton extends LinearOpMode {
                 autonBackdrop.add(placements.get(0));
                 placements.remove(0);
             }
-            if (!backdropSide) swap(placements, 0, 1);
+            if (!isBackdropSide) swap(placements, 0, 1);
 
             boolean outer, inner;
             switch (rand) {
                 case LEFT:
-                    outer = !(inner = (backdropSide == isRed));
+                    outer = !(inner = (isBackdropSide == isRed));
                     break;
                 case RIGHT:
-                    inner = !(outer = (backdropSide == isRed));
+                    inner = !(outer = (isBackdropSide == isRed));
                     break;
                 default:
                     outer = inner = false;
@@ -261,13 +261,13 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
                     ;
 
-            if (backdropSide) backdropPreloads(sequence, placements, a, outer, inner);
+            if (isBackdropSide) backdropPreloads(sequence, placements, a, outer, inner);
             else audiencePreloadsAndWhite(sequence, placements, a, outer, inner);
 
             if (cycle) {
 
-                Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
-                int placement = backdropSide ? 1 : 2;
+                Intake.Height height = isBackdropSide ? FIVE_STACK : FOUR_STACK;
+                int placement = isBackdropSide ? 1 : 2;
 
                 // CYCLE 1
                 driveToStack1(sequence, height);

@@ -11,7 +11,7 @@ public class AutonVars {
 
     static boolean
             isRed = true,
-            backdropSide = true,
+            isBackdropSide = true,
             cycle = false,
             park = true,
             parkInner = true,
