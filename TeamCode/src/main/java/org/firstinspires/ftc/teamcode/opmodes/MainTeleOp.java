@@ -36,6 +36,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Heigh
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.THREE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.TWO_STACK;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
+import static java.lang.Math.PI;
 import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 
@@ -185,6 +186,11 @@ public final class MainTeleOp extends LinearOpMode {
         }
 
         if (keyPressed(1, Y))                   robot.spike.toggle();
+
+        if (keyPressed(1, DPAD_UP))             robot.drivetrain.setTargetHeading(0);
+        else if (keyPressed(1, DPAD_LEFT))      robot.drivetrain.setTargetHeading(PI * 0.5);
+        else if (keyPressed(1, DPAD_DOWN))      robot.drivetrain.setTargetHeading(PI);
+        else if (keyPressed(1, DPAD_RIGHT))     robot.drivetrain.setTargetHeading(PI * 1.5);
 
         double x = gamepadEx1.getRightX();
         if (gamepadEx1.isDown(LEFT_BUMPER)) {
