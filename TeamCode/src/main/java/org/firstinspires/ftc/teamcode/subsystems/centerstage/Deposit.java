@@ -149,7 +149,8 @@ public final class Deposit {
         }
 
         private static double rowToInches(double row) {
-            return row == -1 ? 0 : (row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT);
+            if (row == -1) return 0;
+            return row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT;
         }
 
         public void changeRow(int deltaRow) {
