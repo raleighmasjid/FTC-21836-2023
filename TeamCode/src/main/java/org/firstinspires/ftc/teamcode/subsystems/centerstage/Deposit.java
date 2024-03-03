@@ -103,6 +103,7 @@ public final class Deposit {
                 HEIGHT_CLIMBING = 6.25,
                 HEIGHT_MIN = 0.5,
                 PERCENT_OVERSHOOT = 0,
+                SPEED_RETRACTION = -0.05,
                 POS_1 = 0,
                 POS_2 = 25;
 
@@ -169,15 +170,16 @@ public final class Deposit {
 
             if (manualLiftPower != 0) targetState = currentState;
 
-            controller.setTarget(intakeClear ? targetState : new State(0));
+            State setpoint = intakeClear ? targetState : new State(0);
+            controller.setTarget(setpoint);
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output = (
-                    manualLiftPower != 0 ?
-                            manualLiftPower * voltageScalar :
-                            controller.calculate(currentState)
+                    manualLiftPower != 0 ? manualLiftPower * voltageScalar :
+                    setpoint.x == 0 && currentState.x <= HEIGHT_MIN ? SPEED_RETRACTION :
+                    controller.calculate(currentState)
             ) + (
-                    currentState.x > 0.15 ?
+                    currentState.x > HEIGHT_MIN ?
                             kG * voltageScalar :
                             0
             );
