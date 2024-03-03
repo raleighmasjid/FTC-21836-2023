@@ -47,6 +47,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 if (keyPressed(1, X)) robot.drivetrain.breakFollowing();
                 if (!robot.drivetrain.isBusy()) autoScoring = false;
 
+                robot.run();
+
             } else {
 
 //                if (keyPressed(1, X)) autoScoring = robot.autoScore();
@@ -61,7 +63,6 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 teleOpControls();
             }
 
-            robot.run();
 
             mTelemetry.addData("Scoring mode", autoScoring ? "auto" : "manual");
             for (int i = 0; i < initialColors.length; i++) mTelemetry.addLine(
