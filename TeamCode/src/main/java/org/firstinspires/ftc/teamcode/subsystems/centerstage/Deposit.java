@@ -190,7 +190,7 @@ public final class Deposit {
 
         void printTelemetry() {
             String namedPos =
-                    targetRow < 0 ? "Retracted" :
+                    targetRow == -1 ? "Retracted" :
                     targetRow == HEIGHT_CLIMBING ? "Climbing" :
                     "Row " + targetRow;
             mTelemetry.addData("Named target position", namedPos);
