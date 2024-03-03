@@ -371,12 +371,17 @@ public class MecanumDrivetrain extends MecanumDrive {
             turnCommand *= SLOW_FACTOR;
         }
 
-        // run motors
         double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
+
+        yCommand *= voltageScalar;
+        xCommand *= voltageScalar;
+        turnCommand *= voltageScalar;
+
+        // run motors
         setDrivePower(new Pose2d(
-                yCommand * voltageScalar,
-                -xCommand * voltageScalar,
-                -turnCommand * voltageScalar
+                yCommand,
+                -xCommand,
+                -turnCommand
         ));
     }
 
