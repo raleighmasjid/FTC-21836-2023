@@ -333,8 +333,12 @@ public final class Intake {
         this.desiredPixelCount = clip(pixelCount, 1, 2);
     }
 
+    public void setExtended(boolean isIntaking) {
+        this.isIntaking = isIntaking;
+    }
+
     public void toggle() {
-        isIntaking = !isIntaking;
+        setExtended(!isIntaking);
     }
 
     void printTelemetry() {

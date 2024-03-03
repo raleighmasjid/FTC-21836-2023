@@ -107,6 +107,10 @@ class AutonCycles {
         mTelemetry.addLine();
 
         sequence
+                .addTemporalMarker( () -> {
+                    robot.intake.setMotorPower(0);
+                    robot.intake.setExtended(false);
+                })
                 .setTangent(RIGHT)
                 .splineToSplineHeading(backstage, RIGHT)
 
