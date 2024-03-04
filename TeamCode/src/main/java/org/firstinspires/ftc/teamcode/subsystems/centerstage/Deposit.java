@@ -53,16 +53,14 @@ public final class Deposit {
         }
 
         lift.run(intakeClear);
-        paintbrush.pivot.setActivated(paintbrushExtended() && intakeClear);
+
+        boolean extendPaintbrush = intakeClear && lift.targetRow != ROW_CLIMBING && lift.isScoring();
+        paintbrush.pivot.setActivated(extendPaintbrush);
         paintbrush.run();
     }
 
     boolean isExtended() {
         return lift.isExtended() || paintbrush.retractionTimer.seconds() <= (paintbrush.floor ? TIME_FLOOR_RETRACTION : TIME_SCORING_RETRACTION);
-    }
-
-    private boolean paintbrushExtended() {
-        return lift.targetRow != HEIGHT_CLIMBING && lift.isScoring();
     }
 
     @Config
