@@ -176,7 +176,7 @@ public final class Deposit {
             controller.setTarget(setpoint);
 
             boolean withinRetractionTolerance = currentState.x <= HEIGHT_MIN;
-            boolean tryingToRetract = setpoint.x == 0 && withinRetractionTolerance;
+            boolean tryingToRetract = withinRetractionTolerance && setpoint.x == 0;
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output =
