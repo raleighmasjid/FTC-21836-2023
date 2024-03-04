@@ -29,7 +29,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDI
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_AUTO_SLOW;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SLOW_LOCK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
@@ -162,7 +162,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(2, Y))               robot.intake.setDesiredPixelCount(2);
             if (keyPressed(2, X))               robot.intake.setDesiredPixelCount(1);
             if (keyPressed(2, A))               robot.intake.toggle();
-            if (keyPressed(2, B))               robot.deposit.lift.setTargetRow(HEIGHT_CLIMBING);
+            if (keyPressed(2, B))               robot.deposit.lift.setTargetRow(ROW_CLIMBING);
 
             if (keyPressed(2, RIGHT_STICK_BUTTON))  doAutoSlow = !doAutoSlow;
             if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.paintbrush.toggleFloor();

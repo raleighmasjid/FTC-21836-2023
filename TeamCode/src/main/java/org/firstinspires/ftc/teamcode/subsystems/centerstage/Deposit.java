@@ -6,7 +6,8 @@ import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_FLOOR_RETRACTION;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_SCORING_RETRACTION;
@@ -48,7 +49,7 @@ public final class Deposit {
 
         if (!paintbrush.droppedPixel && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
-            lift.setTargetRow(-1);
+            lift.setTargetRow(ROW_RETRACTED);
         }
 
         lift.run(intakeClear);
@@ -100,7 +101,9 @@ public final class Deposit {
                 kG = 0.15,
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
-                HEIGHT_CLIMBING = 6.25,
+                ROW_CLIMBING = 6.25,
+                ROW_RETRACTED = -1,
+                ROW_FLOOR_SCORING = -0.5,
                 HEIGHT_MIN = 0.5,
                 PERCENT_OVERSHOOT = 0,
                 SPEED_RETRACTION = -0.05,
@@ -129,14 +132,14 @@ public final class Deposit {
         }
 
         public void reset() {
-            targetRow = -1;
+            targetRow = ROW_RETRACTED;
             controller.reset();
             for (MotorEx motor : motors) motor.encoder.reset();
             targetState = currentState = new State();
         }
 
         public boolean isScoring() {
-            return targetRow != -1;
+            return targetRow != ROW_RETRACTED;
         }
 
         public boolean isExtended() {
@@ -144,13 +147,13 @@ public final class Deposit {
         }
 
         public void setTargetRow(double targetRow) {
-            this.targetRow = clip(targetRow, -1, 10);
+            this.targetRow = clip(targetRow, ROW_RETRACTED, 10);
             double inches = rowToInches(this.targetRow);
             targetState = new State(inches);
         }
 
         private static double rowToInches(double row) {
-            if (row == -1) return 0;
+            if (row == ROW_RETRACTED) return 0;
             return row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT;
         }
 
@@ -195,8 +198,8 @@ public final class Deposit {
 
         void printTelemetry() {
             String namedPos =
-                    targetRow == -1 ? "Retracted" :
-                    targetRow == HEIGHT_CLIMBING ? "Climbing" :
+                    targetRow == ROW_RETRACTED ? "Retracted" :
+                    targetRow == ROW_CLIMBING ? "Climbing" :
                     "Row " + targetRow;
             mTelemetry.addData("Named target position", namedPos);
         }
