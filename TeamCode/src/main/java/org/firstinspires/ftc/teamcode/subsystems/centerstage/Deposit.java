@@ -136,7 +136,7 @@ public final class Deposit {
         }
 
         public boolean isScoring() {
-            return targetRow > -1;
+            return targetRow != -1;
         }
 
         public boolean isExtended() {
