@@ -216,12 +216,15 @@ public final class Intake {
 //                    if (bottomFull) setHeight(height.minus(1));
                     state = PIXEL_1_SETTLING;
                     timer.reset();
+                    latch.setActivated(true);
                 } else break;
 
             case PIXEL_1_SETTLING:
 
-                if (!isIntaking || timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
-                else break;
+                if (!isIntaking || timer.seconds() >= TIME_PIXEL_1_SETTLING) {
+                    state = HAS_1_PIXEL;
+                    latch.setActivated(false);
+                } else break;
 
             case HAS_1_PIXEL:
 
