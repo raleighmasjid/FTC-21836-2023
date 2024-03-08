@@ -286,7 +286,7 @@ public final class Intake {
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
         double ANGLE_PIVOT_INTAKING =
-                state == RETRACTED && depositIsRunning ? ANGLE_PIVOT_VERTICAL :
+                state.ordinal() >= PIVOTING.ordinal() ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
