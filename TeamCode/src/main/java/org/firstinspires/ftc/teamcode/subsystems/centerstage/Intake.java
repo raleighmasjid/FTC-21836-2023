@@ -285,14 +285,14 @@ public final class Intake {
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
-        double ANGLE_PIVOT_INTAKING =
+        double ANGLE_PIVOT_DOWN =
                 state.ordinal() >= PIVOTING.ordinal() ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
 
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_INTAKING,
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_DOWN,
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
