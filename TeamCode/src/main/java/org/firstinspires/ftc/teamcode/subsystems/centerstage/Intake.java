@@ -104,7 +104,7 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    final ColorSensor[] sensors;
+    private final ColorSensor[] sensors;
     private final HSV[] HSVs = {new HSV(), new HSV()};
     private final Pixel.Color[] reads = {EMPTY, EMPTY};
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
@@ -205,8 +205,17 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
-        reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
+        if (state == PIXELS_FALLING || state == HAS_0_PIXELS) {
+            sensors[0].update();
+            HSVs[0] = sensors[0].getHSV();
+            reads[0] = fromHSV(HSVs[0]);
+        }
+
+        if (state == PIXELS_FALLING || state == HAS_1_PIXEL) {
+            sensors[1].update();
+            HSVs[1] = sensors[1].getHSV();
+            reads[1] = fromHSV(HSVs[1]);
+        }
 
         switch (state) {
             case HAS_0_PIXELS:
