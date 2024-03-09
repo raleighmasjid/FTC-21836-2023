@@ -237,7 +237,7 @@ public final class Intake {
 
             case PIXEL_2_SETTLING:
 
-                if (!depositIsExtended && (!isIntaking || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
+                if (!depositIsExtended && (!isIntaking || (colors[1] == EMPTY ? 0 : 1) + (colors[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
