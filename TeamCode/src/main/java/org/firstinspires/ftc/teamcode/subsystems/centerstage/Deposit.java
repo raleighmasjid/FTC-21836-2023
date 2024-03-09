@@ -164,8 +164,7 @@ public final class Deposit {
         }
 
         public void readSensors() {
-            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
-
+            currentState = new State(INCHES_PER_TICK * motors[0].encoder.getPosition());
             controller.setGains(pidGains);
         }
 
