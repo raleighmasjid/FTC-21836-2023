@@ -15,11 +15,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVol
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
-
 import static java.lang.Math.round;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @Config
@@ -110,10 +111,11 @@ public final class Deposit {
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
+        private final Encoder encoder;
         private State currentState, targetState;
         private final PIDController controller = new PIDController();
 
-        private double manualLiftPower, targetRow;
+        private double manualLiftPower, targetRow, offset;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -126,13 +128,16 @@ public final class Deposit {
             };
             motors[1].setInverted(true);
             for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+
+            encoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right back"));
+
             reset();
         }
 
         public void reset() {
             targetRow = ROW_RETRACTED;
             controller.reset();
-            for (MotorEx motor : motors) motor.encoder.reset();
+            offset = encoder.getCurrentPosition();
             targetState = currentState = new State();
         }
 
@@ -164,7 +169,7 @@ public final class Deposit {
         }
 
         public void readSensors() {
-            currentState = new State(INCHES_PER_TICK * motors[0].encoder.getPosition());
+            currentState = new State(INCHES_PER_TICK * (encoder.getCurrentPosition() - offset));
             controller.setGains(pidGains);
         }
 
