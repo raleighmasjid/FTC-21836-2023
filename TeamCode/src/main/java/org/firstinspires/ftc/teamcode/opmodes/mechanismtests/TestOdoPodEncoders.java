@@ -21,9 +21,9 @@ public final class TestOdoPodEncoders extends LinearOpMode {
         BulkReader bulkReader = new BulkReader(hardwareMap);
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left back"));
+        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
         Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left front"));
-        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
+        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left back"));
         leftEncoder.setDirection(REVERSE);
 
         waitForStart();
