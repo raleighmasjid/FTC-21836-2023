@@ -16,7 +16,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_2_SETTLING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.WAITING_FOR_DEPOSIT;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -126,7 +126,7 @@ public final class Intake {
         HAS_0_PIXELS,
         PIXEL_1_SETTLING,
         HAS_1_PIXEL,
-        PIXEL_2_SETTLING,
+        WAITING_FOR_DEPOSIT,
         PIVOTING,
         PIXELS_FALLING,
         PIXELS_SETTLING,
@@ -239,10 +239,10 @@ public final class Intake {
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
                 if (topFull || !isIntaking || desiredPixelCount < 2) {
                     if (isIntaking) latch.setActivated(true);
-                    state = PIXEL_2_SETTLING;
+                    state = WAITING_FOR_DEPOSIT;
                 } else break;
 
-            case PIXEL_2_SETTLING:
+            case WAITING_FOR_DEPOSIT:
 
                 if (!depositIsExtended && (!isIntaking || (colors[1] == EMPTY ? 0 : 1) + (colors[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
@@ -293,7 +293,7 @@ public final class Intake {
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
         double ANGLE_PIVOT_DOWN =
-                state.ordinal() >= PIVOTING.ordinal() ? ANGLE_PIVOT_VERTICAL :
+                state.ordinal() >= WAITING_FOR_DEPOSIT.ordinal() ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
