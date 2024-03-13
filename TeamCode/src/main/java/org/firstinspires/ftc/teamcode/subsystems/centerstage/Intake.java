@@ -353,7 +353,7 @@ public final class Intake {
     }
 
     public boolean isExtended() {
-        return state == HAS_0_PIXELS || state == HAS_1_PIXEL || state == PIXEL_1_SETTLING;
+        return state.ordinal() <= HAS_1_PIXEL.ordinal();
     }
 
     void printTelemetry() {
