@@ -155,8 +155,9 @@ public final class MainTeleOp extends LinearOpMode {
 
     static void teleOpControls() {
 
-        if (keyPressed(2, RIGHT_STICK_BUTTON))  doAutoSlow = !doAutoSlow;
-        if (keyPressed(2, LEFT_STICK_BUTTON))   robot.deposit.paintbrush.toggleFloor();
+        if (keyPressed(2, Y))   robot.spike.toggle();
+        if (keyPressed(2, X))   doAutoSlow = !doAutoSlow;
+        if (keyPressed(2, A))   robot.deposit.paintbrush.toggleFloor();
 
         robot.intake.setMotorPower(
                 gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
