@@ -139,7 +139,7 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.addLine();
             mTelemetry.addLine("Auto slow is " + (doAutoSlow ? "enabled" : "disabled") + selection.markIf(EDITING_AUTO_SLOW));
             mTelemetry.addLine();
-            mTelemetry.addLine((lockSlowMode ? "SLOW" : "NORMAL") + selection.markIf(EDITING_SLOW_LOCK));
+            mTelemetry.addLine("Slow mode is " + (lockSlowMode ? "LOCKED" : "OFF") + selection.markIf(EDITING_SLOW_LOCK));
 
             mTelemetry.update();
         }
