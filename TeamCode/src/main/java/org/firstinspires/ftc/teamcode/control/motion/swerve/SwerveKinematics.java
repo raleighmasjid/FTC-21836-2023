@@ -19,38 +19,38 @@ public final class SwerveKinematics {
 
         double
 
-        y = drive.getY(),
-        x = drive.getX(),
+        iY = drive.getY(),
+        iX = drive.getX(),
         t = drive.getHeading() / hypot(WIDTH, LENGTH),
 
-        yTurn = LENGTH * t,
-        xTurn = WIDTH * t,
+        tY = t * LENGTH,
+        tX = t * WIDTH,
 
-        a = -y + yTurn,
-        b = -y - yTurn,
-        c = x + xTurn,
-        d = x - xTurn,
+        a = iY - tY,
+        b = iY + tY,
+        c = iX - tX,
+        d = iX + tX,
 
-        br = hypot(a, d),
-        bl = hypot(a, c),
-        fr = hypot(b, d),
-        fl = hypot(b, c),
+        vBR = hypot(a, d),
+        vBL = hypot(a, c),
+        vFR = hypot(b, d),
+        vFL = hypot(b, c),
+
+        aBR = atan2(a, d),
+        aBL = atan2(a, c),
+        aFR = atan2(b, d),
+        aFL = atan2(b, c),
 
         max = max(1.0, max(
-                    max(abs(br), abs(bl)),
-                    max(abs(fr), abs(fl))
+                max(abs(vBR), abs(vBL)),
+                max(abs(vFR), abs(vFL))
         ));
 
-        br /= max;
-        bl /= max;
-        fr /= max;
-        fl /= max;
-
         return new SwervePodState[]{
-            new SwervePodState(br, atan2(a, d)),
-            new SwervePodState(bl, atan2(a, c)),
-            new SwervePodState(fr, atan2(b, d)),
-            new SwervePodState(fl, atan2(b, c)),
+            new SwervePodState(vBR / max, aBR),
+            new SwervePodState(vBL / max, aBL),
+            new SwervePodState(vFR / max, aFR),
+            new SwervePodState(vFL / max, aFL),
         };
     }
 }
