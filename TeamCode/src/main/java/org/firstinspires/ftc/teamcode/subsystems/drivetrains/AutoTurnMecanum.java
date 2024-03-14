@@ -50,7 +50,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
     }
 
     @Override
-    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode, boolean intakeExtended) {
+    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
         headingController.setGains(pidGains);
         kDFilter.setGains(derivFilterGains);
 
@@ -78,7 +78,7 @@ public class AutoTurnMecanum extends MecanumDrivetrain {
 
         lastXCommand = xCommand;
         lastYCommand = yCommand;
-        super.run(xCommand, yCommand, turnCommand / voltageScalar, useSlowMode, intakeExtended);
+        super.run(xCommand, yCommand, turnCommand / voltageScalar, useSlowMode);
     }
 
 

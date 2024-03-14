@@ -327,9 +327,7 @@ public class MecanumDrivetrain extends MecanumDrive {
     public final HeadingIMU imu;
 
     private double headingOffset;
-    public static double
-            SLOW_FACTOR = 0.3,
-            PIXEL_ORBITING_STRAFE_FACTOR = 0;
+    public static double SLOW_FACTOR = 0.3;
     private boolean slowModeLocked = false;
 
     /**
@@ -356,7 +354,7 @@ public class MecanumDrivetrain extends MecanumDrive {
      * @param yCommand forward input
      * @param turnCommand turning input
      */
-    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode, boolean intakeExtended) {
+    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
 
         // counter-rotate translation vector by current heading
         double theta = -getHeading();
@@ -378,8 +376,6 @@ public class MecanumDrivetrain extends MecanumDrive {
         yCommand *= voltageScalar;
         xCommand *= voltageScalar;
         turnCommand *= voltageScalar;
-
-        if (intakeExtended) xCommand -= turnCommand * PIXEL_ORBITING_STRAFE_FACTOR;
 
         // run motors
         setDrivePower(new Pose2d(
