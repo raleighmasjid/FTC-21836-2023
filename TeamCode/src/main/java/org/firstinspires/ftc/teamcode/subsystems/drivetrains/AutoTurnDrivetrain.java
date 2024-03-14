@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
 @Config
-public class AutoTurnMecanum implements Drivetrain {
+public class AutoTurnDrivetrain implements Drivetrain {
 
     public static double
             kStatic = 0.0,
@@ -52,7 +52,7 @@ public class AutoTurnMecanum implements Drivetrain {
     private final Drivetrain drivetrain;
     private final VoltageSensor batteryVoltageSensor;
 
-    public AutoTurnMecanum(HardwareMap hardwareMap, Drivetrain drivetrain) {
+    public AutoTurnDrivetrain(HardwareMap hardwareMap, Drivetrain drivetrain) {
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         this.drivetrain = drivetrain;
     }

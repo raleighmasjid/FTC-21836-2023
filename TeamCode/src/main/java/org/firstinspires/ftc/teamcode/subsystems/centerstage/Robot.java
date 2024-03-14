@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
@@ -30,7 +30,7 @@ public final class Robot {
             ANGLE_SPIKE_LOCKED = 90,
             ANGLE_SPIKE_RELEASED = 0;
 
-    public final AutoTurnMecanum drivetrain;
+    public final AutoTurnDrivetrain drivetrain;
     public final Intake intake;
     public final Deposit deposit;
     public final SimpleServoPivot drone, spike;
@@ -43,7 +43,7 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap) {
         bulkReader = new BulkReader(hardwareMap);
 
-        drivetrain = new AutoTurnMecanum(hardwareMap, new MecanumDrivetrain(hardwareMap));
+        drivetrain = new AutoTurnDrivetrain(hardwareMap, new MecanumDrivetrain(hardwareMap));
         drivetrain.update();
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
