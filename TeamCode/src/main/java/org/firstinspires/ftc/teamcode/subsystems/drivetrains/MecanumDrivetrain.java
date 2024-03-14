@@ -55,7 +55,7 @@ import java.util.List;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class MecanumDrivetrain extends MecanumDrive {
+public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
