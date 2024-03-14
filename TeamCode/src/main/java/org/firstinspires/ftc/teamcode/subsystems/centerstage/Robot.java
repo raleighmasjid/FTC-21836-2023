@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoScoringManager;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnMecanum;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
@@ -42,7 +43,7 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap) {
         bulkReader = new BulkReader(hardwareMap);
 
-        drivetrain = new AutoTurnMecanum(hardwareMap);
+        drivetrain = new AutoTurnMecanum(hardwareMap, new MecanumDrivetrain(hardwareMap));
         drivetrain.update();
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
