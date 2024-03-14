@@ -21,4 +21,7 @@ public interface Drivetrain {
 
     void printNumericalTelemetry();
 
+    void setPoseEstimate(Pose2d pose);
+
+    Pose2d getPoseEstimate();
 }

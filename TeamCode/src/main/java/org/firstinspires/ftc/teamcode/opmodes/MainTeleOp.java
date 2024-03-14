@@ -223,8 +223,7 @@ public final class MainTeleOp extends LinearOpMode {
                 gamepadEx1.getLeftX(),
                 gamepadEx1.getLeftY(),
                 x,
-                driveSlow,
-                robot.intake.isExtended()
+                driveSlow
         );
     }
 }
