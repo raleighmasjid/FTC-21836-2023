@@ -53,9 +53,11 @@ public final class SwerveModule {
         FR,
         FL;
 
+        public final int o;
         public final String motorName, servoName, encoderName;
 
         SwerveModuleID() {
+            this.o = ordinal();
             this.motorName = "motor " + name();
             this.servoName = "servo " + name();
             this.encoderName = "encoder " + name();
