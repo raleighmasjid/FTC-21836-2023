@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.BARE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
-
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,6 +12,9 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
+import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
+import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
 
 @Config
@@ -35,12 +37,21 @@ public final class SwerveModule {
             OFFSET_FR = 0,
             OFFSET_FL = 0;
 
+    public static PIDGains thetaGains = new PIDGains(
+            0,
+            0,
+            0,
+            1
+    );
+
     private final double podRotOffset;
     private final SwervePodState current, target;
 
     private final MotorEx motor;
     private final CRServo servo;
     private final VoltageSensor batteryVoltageSensor;
+
+    private final PIDController thetaController = new PIDController();
 
     public SwerveModule(HardwareMap hardwareMap, String motorName, String servoName, double podRotOffset) {
 
@@ -58,6 +69,7 @@ public final class SwerveModule {
 
     public void readSensors() {
         current.theta = normalizeRadians( - podRotOffset);
+        thetaController.setGains(thetaGains);
     }
 
     public void setVelo(SwervePodState target) {
@@ -74,12 +86,12 @@ public final class SwerveModule {
 
         target.optimize(current);
 
-        double thetaError = normalizeRadians(target.theta - current.theta);
-        double thetaTarget = thetaError + current.theta;
+        double thetaTarget = normalizeRadians(target.theta - current.theta) + current.theta;
 
-        // update controller gains
-        // set controller
-        double pidOutput = 0;
+        thetaController.setTarget(new State(thetaTarget));
+
+        double pidOutput = thetaController.calculate(new State(current.theta));
+        
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
         double motorPower = target.velo * scalar;
