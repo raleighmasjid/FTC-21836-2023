@@ -1,48 +1,86 @@
 package org.firstinspires.ftc.teamcode.control.motion.swerve;
 
+import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.BARE;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
+
+import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.hardware.motors.CRServo;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 @Config
 public final class SwerveModule {
 
     public static double
+            RATIO_TOP_PULLEY_TO_MOTOR = 39.0 / 26.0,
+            RATIO_RPM_SERVO_TO_MOTOR = 10.019166666666667 / 6000.0,
             ANTI_COAX_EFFECT_GAIN = 0,
+            kS_SERVO = 0,
             OFFSET_BR = 0,
             OFFSET_BL = 0,
             OFFSET_FR = 0,
             OFFSET_FL = 0;
 
     private final double podRotOffset;
-    private final SwervePodState current;
-    private SwervePodState target;
+    private final SwervePodState current, target;
 
-    public SwerveModule(double podRotOffset) {
+    private final MotorEx motor;
+    private final CRServo servo;
+    private final VoltageSensor batteryVoltageSensor;
+
+    public SwerveModule(HardwareMap hardwareMap, String motorName, String servoName, double podRotOffset) {
+
+        this.motor = new MotorEx(hardwareMap, motorName, BARE);
+        this.motor.setZeroPowerBehavior(BRAKE);
+
+        this.servo = new CRServo(hardwareMap, servoName);
+
+        this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
+
         this.podRotOffset = podRotOffset;
-        target = current = new SwervePodState(0, podRotOffset);
+
+        this.target = this.current = new SwervePodState(0, 0);
     }
 
     public void readSensors() {
         current.theta = normalizeRadians( - podRotOffset);
     }
 
-    public void setTarget(SwervePodState target) {
-        this.target = target;
+    public void setVelo(SwervePodState target) {
+        this.target.velo = target.velo;
+    }
+
+    public void setAngle(SwervePodState target) {
+        this.target.theta = target.theta;
     }
 
     public void run() {
 
+        double scalar = maxVoltage / batteryVoltageSensor.getVoltage();
+
         target.optimize(current);
 
-        // set motors
+        // calculate error
+        // calculate target
+        // update controller gains
+        // set controller
+        double pidOutput = 0;
+        double staticFF = kS_SERVO * signum(pidOutput);
 
-        if (target.velo == 0) return;
+        // get servo power
+        double motorPower = target.velo * scalar;
+        double servoPower = (pidOutput + staticFF) * scalar;
 
-        // set angle controllers
+        double wheelCoaxOffset = servoPower * RATIO_RPM_SERVO_TO_MOTOR * RATIO_TOP_PULLEY_TO_MOTOR;
+        double podCoaxOffset = motorPower * ANTI_COAX_EFFECT_GAIN;
 
-        // run cr servos
-        // include + COAX_EFFECT_CORRECTION_GAIN * target.velo
+        motor.set(motorPower + wheelCoaxOffset);
+        servo.set(servoPower + podCoaxOffset);
     }
 
 }
