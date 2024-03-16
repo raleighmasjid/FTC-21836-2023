@@ -74,8 +74,9 @@ public final class SwerveModule {
 
         target.optimize(current);
 
-        // calculate error
-        // calculate target
+        double thetaError = normalizeRadians(target.theta - current.theta);
+        double thetaTarget = thetaError + current.theta;
+
         // update controller gains
         // set controller
         double pidOutput = 0;
