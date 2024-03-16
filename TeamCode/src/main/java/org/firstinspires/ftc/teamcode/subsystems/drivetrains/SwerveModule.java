@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.control.motion.swerve;
+package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.BARE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
@@ -12,6 +12,8 @@ import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
 
 @Config
 public final class SwerveModule {
