@@ -16,6 +16,10 @@ public final class SwerveKinematics {
             LENGTH = 10;
 
     public static SwervePodState[] robotToPodStates(Pose2d drive) {
+        return robotToPodStates(drive, true);
+    }
+
+    public static SwervePodState[] robotToPodStates(Pose2d drive, boolean normalize) {
 
         double
 
@@ -43,19 +47,21 @@ public final class SwerveKinematics {
         aBR = atan2(a, d),
         aBL = atan2(a, c),
         aFR = atan2(b, d),
-        aFL = atan2(b, c),
+        aFL = atan2(b, c);
 
-        // Get max to normalize wheel velocities
-        max = max(1.0, max(
-                max(abs(vBR), abs(vBL)),
-                max(abs(vFR), abs(vFL))
-        ));
+        if (normalize) {
+            // Get max to normalize wheel velocities
+            double max = max(1.0, max(
+                    max(abs(vBR), abs(vBL)),
+                    max(abs(vFR), abs(vFL))
+            ));
 
-        // Normalize motor powers to [-1, 1]
-        vBR /= max;
-        vBL /= max;
-        vFR /= max;
-        vFL /= max;
+            // Normalize motor powers to [-1, 1]
+            vBR /= max;
+            vBL /= max;
+            vFR /= max;
+            vFL /= max;
+        }
 
         return new SwervePodState[]{
             new SwervePodState(vBR, aBR),
