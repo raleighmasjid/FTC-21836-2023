@@ -46,7 +46,32 @@ public final class SwerveModule {
             1
     );
 
-    private final double thetaOffset;
+    public enum SwerveModuleID {
+        BR,
+        BL,
+        FR,
+        FL;
+
+        public final String motorName, servoName, encoderName;
+
+        SwerveModuleID() {
+            this.motorName = "motor " + name();
+            this.servoName = "servo " + name();
+            this.encoderName = "encoder " + name();
+        }
+
+        public double offset() {
+            switch(this) {
+                default:
+                case BR: return OFFSET_BR;
+                case BL: return OFFSET_BL;
+                case FR: return OFFSET_FR;
+                case FL: return OFFSET_FL;
+            }
+        }
+    }
+
+    private final SwerveModuleID id;
     private final SwervePodState current, target;
 
     private final MotorEx motor;
@@ -57,24 +82,23 @@ public final class SwerveModule {
 
     private final AnalogEncoder thetaEncoder;
 
-    public SwerveModule(HardwareMap hardwareMap, String motorName, String servoName, String encoderName, double thetaOffset) {
+    public SwerveModule(HardwareMap hardwareMap, SwerveModuleID id) {
 
-        this.motor = new MotorEx(hardwareMap, motorName, BARE);
+        this.id = id;
+        
+        this.motor = new MotorEx(hardwareMap, id.motorName, BARE);
         this.motor.setZeroPowerBehavior(BRAKE);
 
-        this.servo = new CRServo(hardwareMap, servoName);
-
-        this.thetaEncoder = new AnalogEncoder(hardwareMap, encoderName, 2 * PI);
+        this.servo = new CRServo(hardwareMap, id.servoName);
+        this.thetaEncoder = new AnalogEncoder(hardwareMap, id.encoderName, 2 * PI);
 
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        this.thetaOffset = thetaOffset;
 
         this.target = this.current = new SwervePodState(0, 0);
     }
 
     public void readSensors() {
-        current.theta = normalizeRadians(thetaEncoder.getPosition() - thetaOffset);
+        current.theta = normalizeRadians(thetaEncoder.getPosition() - id.offset());
         thetaController.setGains(thetaGains);
     }
 
