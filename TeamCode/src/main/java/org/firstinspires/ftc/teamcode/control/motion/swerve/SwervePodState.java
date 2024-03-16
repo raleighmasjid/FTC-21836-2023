@@ -14,7 +14,7 @@ public final class SwervePodState {
     }
 
     public void optimize(SwervePodState real) {
-        if (abs(real.theta - theta) <= 0.5 * PI) return;
+        if (abs(normalizeRadians(real.theta - theta)) <= 0.5 * PI) return;
         velo *= -1;
         theta = normalizeRadians(theta + PI);
     }
