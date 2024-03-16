@@ -131,7 +131,7 @@ public final class SwerveModule {
         
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
-        double motorPower = target.velo * scalar;
+        double motorPower = target.velo;
         double servoPower = pidOutput + staticFF;
 
         double coaxWheelCorrection = servoPower * COAX_EFFECT_WHEEL_CORRECTION_GAIN;
