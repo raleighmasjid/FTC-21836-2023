@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.BARE;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
+import static java.lang.Math.PI;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
+import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.AnalogEncoder;
 
 @Config
 public final class SwerveModule {
@@ -44,7 +46,7 @@ public final class SwerveModule {
             1
     );
 
-    private final double podRotOffset;
+    private final double thetaOffset;
     private final SwervePodState current, target;
 
     private final MotorEx motor;
@@ -53,22 +55,26 @@ public final class SwerveModule {
 
     private final PIDController thetaController = new PIDController();
 
-    public SwerveModule(HardwareMap hardwareMap, String motorName, String servoName, double podRotOffset) {
+    private final AnalogEncoder thetaEncoder;
+
+    public SwerveModule(HardwareMap hardwareMap, String motorName, String servoName, String encoderName, double thetaOffset) {
 
         this.motor = new MotorEx(hardwareMap, motorName, BARE);
         this.motor.setZeroPowerBehavior(BRAKE);
 
         this.servo = new CRServo(hardwareMap, servoName);
 
+        this.thetaEncoder = new AnalogEncoder(hardwareMap, encoderName, 2 * PI);
+
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        this.podRotOffset = podRotOffset;
+        this.thetaOffset = thetaOffset;
 
         this.target = this.current = new SwervePodState(0, 0);
     }
 
     public void readSensors() {
-        current.theta = normalizeRadians( - podRotOffset);
+        current.theta = normalizeRadians(thetaEncoder.getPosition() - thetaOffset);
         thetaController.setGains(thetaGains);
     }
 
