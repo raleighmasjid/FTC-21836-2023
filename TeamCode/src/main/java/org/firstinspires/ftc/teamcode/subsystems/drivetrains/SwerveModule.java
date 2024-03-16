@@ -72,11 +72,10 @@ public final class SwerveModule {
         // update controller gains
         // set controller
         double pidOutput = 0;
-        double staticFF = kS_SERVO * signum(pidOutput);
+        double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
-        // get servo power
         double motorPower = target.velo * scalar;
-        double servoPower = (pidOutput + staticFF) * scalar;
+        double servoPower = pidOutput + staticFF;
 
         double wheelCoaxOffset = servoPower * RATIO_RPM_SERVO_TO_MOTOR * RATIO_TOP_PULLEY_TO_MOTOR;
         double podCoaxOffset = motorPower * ANTI_COAX_EFFECT_GAIN;
