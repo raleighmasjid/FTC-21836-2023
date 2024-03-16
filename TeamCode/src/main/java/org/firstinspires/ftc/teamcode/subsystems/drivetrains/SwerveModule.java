@@ -113,7 +113,7 @@ public final class SwerveModule {
         this.target.velo = target.velo;
     }
 
-    public void setAngle(SwervePodState target) {
+    public void setTheta(SwervePodState target) {
         this.target.theta = target.theta;
     }
 
