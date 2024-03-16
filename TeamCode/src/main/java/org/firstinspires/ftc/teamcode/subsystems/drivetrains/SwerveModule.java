@@ -9,6 +9,7 @@ import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -85,9 +86,9 @@ public final class SwerveModule {
     public SwerveModule(HardwareMap hardwareMap, SwerveModuleID id) {
 
         this.id = id;
-        
+
         this.motor = new MotorEx(hardwareMap, id.motorName, BARE);
-        this.motor.setZeroPowerBehavior(BRAKE);
+        setZeroPowerBehavior(BRAKE);
 
         this.servo = new CRServo(hardwareMap, id.servoName);
         this.thetaEncoder = new AnalogEncoder(hardwareMap, id.encoderName, 2 * PI);
@@ -95,6 +96,10 @@ public final class SwerveModule {
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         this.target = this.current = new SwervePodState(0, 0);
+    }
+
+    public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {
+        motor.setZeroPowerBehavior(behavior);
     }
 
     public void readSensors() {
