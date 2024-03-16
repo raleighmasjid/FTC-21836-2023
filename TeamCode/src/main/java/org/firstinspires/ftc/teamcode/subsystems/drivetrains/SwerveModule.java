@@ -19,9 +19,16 @@ import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
 public final class SwerveModule {
 
     public static double
-            RATIO_TOP_PULLEY_TO_MOTOR = 39.0 / 26.0,
-            RATIO_RPM_SERVO_TO_MOTOR = 10.019166666666667 / 6000.0,
-            ANTI_COAX_EFFECT_GAIN = 0,
+            TEETH_MOTOR_PULLEY = 26,
+            TEETH_TOP_PULLEY = 39,
+            MAX_RPM_SERVO = 10.019166666666667,
+            MAX_RPM_MOTOR = 5900,
+            MAX_SERVO_TORQUE = 347,
+            COAX_EFFECT_TORQUE = 30.675,
+            RATIO_RPM_SERVO_TO_MOTOR = MAX_RPM_SERVO / MAX_RPM_MOTOR,
+            RATIO_TOP_PULLEY_TO_MOTOR = TEETH_TOP_PULLEY / TEETH_MOTOR_PULLEY,
+            COAX_EFFECT_TORQUE_CORRECTION_GAIN = -COAX_EFFECT_TORQUE / MAX_SERVO_TORQUE,
+            COAX_EFFECT_WHEEL_CORRECTION_GAIN = RATIO_TOP_PULLEY_TO_MOTOR * RATIO_RPM_SERVO_TO_MOTOR,
             kS_SERVO = 0,
             OFFSET_BR = 0,
             OFFSET_BL = 0,
@@ -77,11 +84,11 @@ public final class SwerveModule {
         double motorPower = target.velo * scalar;
         double servoPower = pidOutput + staticFF;
 
-        double wheelCoaxOffset = servoPower * RATIO_RPM_SERVO_TO_MOTOR * RATIO_TOP_PULLEY_TO_MOTOR;
-        double podCoaxOffset = motorPower * ANTI_COAX_EFFECT_GAIN;
+        double coaxWheelCorrection = servoPower * COAX_EFFECT_WHEEL_CORRECTION_GAIN;
+        double coaxTorqueCorrection = motorPower * COAX_EFFECT_TORQUE_CORRECTION_GAIN;
 
-        motor.set(motorPower + wheelCoaxOffset);
-        servo.set(servoPower + podCoaxOffset);
+        motor.set(motorPower + coaxWheelCorrection);
+        servo.set(servoPower + coaxTorqueCorrection);
     }
 
 }
