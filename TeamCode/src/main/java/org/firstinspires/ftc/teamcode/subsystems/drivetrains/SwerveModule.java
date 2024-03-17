@@ -5,6 +5,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRA
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -24,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.AnalogEncoder
 public final class SwerveModule {
 
     public static double
+            PRECISION_REQUIREMENT = 24,
             TEETH_MOTOR_PULLEY = 26,
             TEETH_TOP_PULLEY = 39,
             MAX_RPM_SERVO = 10.019166666666667,
@@ -123,7 +125,8 @@ public final class SwerveModule {
 
         target.optimize(current);
 
-        double thetaTarget = normalizeRadians(target.theta - current.theta) + current.theta;
+        double thetaError = normalizeRadians(target.theta - current.theta);
+        double thetaTarget = thetaError + current.theta;
 
         thetaController.setTarget(new State(thetaTarget));
 
@@ -131,7 +134,7 @@ public final class SwerveModule {
         
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
-        double motorPower = target.velo;
+        double motorPower = target.velo * scaleByError(thetaError);
         double servoPower = pidOutput + staticFF;
 
         double coaxWheelCorrection = servoPower * COAX_EFFECT_WHEEL_CORRECTION_GAIN;
@@ -139,6 +142,11 @@ public final class SwerveModule {
 
         motor.set(motorPower + coaxWheelCorrection);
         servo.set(servoPower + coaxTorqueCorrection);
+    }
+
+    private static double scaleByError(double x) {
+        double bound = 2 * PI / PRECISION_REQUIREMENT;
+        return abs(x) > bound ? 0 : 1 - abs(x) / bound;
     }
 
 }
