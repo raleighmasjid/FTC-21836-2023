@@ -145,8 +145,8 @@ public final class SwerveModule {
     }
 
     private static double scaleByError(double x) {
-        double bound = 2 * PI / PRECISION_REQUIREMENT;
-        return abs(x) > bound ? 0 : 1 - abs(x) / bound;
+        double absX = abs(x), bound = 2 * PI / PRECISION_REQUIREMENT;
+        return absX > bound ? 0 : 1 - absX / bound;
     }
 
 }
