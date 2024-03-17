@@ -17,8 +17,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
-import org.firstinspires.ftc.teamcode.control.motion.State;
-import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.AnalogEncoder;
 
 @Config
@@ -77,7 +75,7 @@ public final class SwerveModule {
     }
 
     private final SwerveModuleID id;
-    private final SwervePodState current, target;
+    private final SwerveModule.State current, target;
 
     private final MotorEx motor;
     private final CRServo servo;
@@ -99,7 +97,7 @@ public final class SwerveModule {
 
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        this.target = this.current = new SwervePodState(0, 0);
+        this.target = this.current = new SwerveModule.State(0, 0);
     }
 
     public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {
@@ -111,12 +109,12 @@ public final class SwerveModule {
         thetaController.setGains(thetaGains);
     }
 
-    public void setVelo(SwervePodState target) {
-        this.target.velo = target.velo;
+    public void setVelo(double velo) {
+        target.velo = velo;
     }
 
-    public void setTheta(SwervePodState target) {
-        this.target.theta = target.theta;
+    public void setTheta(double theta) {
+        target.theta = theta;
     }
 
     public void run() {
@@ -128,9 +126,9 @@ public final class SwerveModule {
         double thetaError = normalizeRadians(target.theta - current.theta);
         double thetaTarget = thetaError + current.theta;
 
-        thetaController.setTarget(new State(thetaTarget));
+        thetaController.setTarget(new org.firstinspires.ftc.teamcode.control.motion.State(thetaTarget));
 
-        double pidOutput = thetaController.calculate(new State(current.theta));
+        double pidOutput = thetaController.calculate(new org.firstinspires.ftc.teamcode.control.motion.State(current.theta));
         
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
@@ -149,4 +147,19 @@ public final class SwerveModule {
         return absX > bound ? 0 : 1 - absX / bound;
     }
 
+    public static final class State {
+
+        public double velo, theta;
+
+        public State(double velo, double theta) {
+            this.velo = velo;
+            this.theta = normalizeRadians(theta);
+        }
+
+        private void optimize(SwerveModule.State real) {
+            if (abs(normalizeRadians(real.theta - theta)) <= 0.5 * PI) return;
+            velo *= -1;
+            theta = normalizeRadians(theta + PI);
+        }
+    }
 }

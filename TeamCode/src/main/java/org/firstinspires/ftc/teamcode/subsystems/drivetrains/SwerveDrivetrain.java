@@ -13,7 +13,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.BR;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.FL;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.FR;
+import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
+import static java.lang.Math.hypot;
+import static java.lang.Math.max;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 import static java.util.Arrays.asList;
@@ -38,8 +42,6 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.teamcode.control.motion.swerve.SwerveKinematics;
-import org.firstinspires.ftc.teamcode.control.motion.swerve.SwervePodState;
 import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -52,7 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Config
-public class SwerveDrivetrain implements Drivetrain {
+public final class SwerveDrivetrain implements Drivetrain {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
@@ -77,7 +79,7 @@ public class SwerveDrivetrain implements Drivetrain {
     private final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
     private final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(DriveConstants.MAX_ACCEL);
 
-    protected final VoltageSensor batteryVoltageSensor;
+    private final VoltageSensor batteryVoltageSensor;
 
     public SwerveDrivetrain(HardwareMap hardwareMap) {
 
@@ -184,8 +186,8 @@ public class SwerveDrivetrain implements Drivetrain {
     }
 
     private void setDriveSignal(DriveSignal signal) {
-        SwervePodState[] velocities = SwerveKinematics.robotToPodStates(signal.getVel(), false);
-        SwervePodState[] accelerations = SwerveKinematics.robotToPodStates(signal.getAccel(), false);
+        SwerveModule.State[] velocities = SwerveKinematics.robotToPodStates(signal.getVel());
+        SwerveModule.State[] accelerations = SwerveKinematics.robotToPodStates(signal.getAccel());
 
         List<Double> vels = asList(
                 velocities[BR.o].velo,
@@ -204,27 +206,48 @@ public class SwerveDrivetrain implements Drivetrain {
         List<Double> powers = Kinematics.calculateMotorFeedforward(vels, accels, kV, kA, kStatic);
 
         setModules(
-                new SwervePodState(powers.get(BR.o), velocities[BR.o].theta),
-                new SwervePodState(powers.get(BL.o), velocities[BL.o].theta),
-                new SwervePodState(powers.get(FR.o), velocities[FR.o].theta),
-                new SwervePodState(powers.get(FL.o), velocities[FL.o].theta)
+                new SwerveModule.State(powers.get(BR.o), velocities[BR.o].theta),
+                new SwerveModule.State(powers.get(BL.o), velocities[BL.o].theta),
+                new SwerveModule.State(powers.get(FR.o), velocities[FR.o].theta),
+                new SwerveModule.State(powers.get(FL.o), velocities[FL.o].theta)
         );
     }
 
-    private void setModules(SwervePodState... states) {
+    private void setModules(SwerveModule.State... states) {
 
-        modules[BR.o].setVelo(states[BR.o]);
-        modules[BL.o].setVelo(states[BL.o]);
-        modules[FR.o].setVelo(states[FR.o]);
-        modules[FL.o].setVelo(states[FL.o]);
+        double vBR = states[BR.o].velo;
+        double vBL = states[BL.o].velo;
+        double vFR = states[FR.o].velo;
+        double vFL = states[FL.o].velo;
 
-        double veloSum = states[0].velo + states[1].velo + states[2].velo + states[3].velo;
+        // Get max of all motor power commands
+        double max = max(1.0, max(
+                max(abs(vBR), abs(vBL)),
+                max(abs(vFR), abs(vFL))
+        ));
+
+        // Normalize motor powers to [-1, 1]
+        vBR /= max;
+        vBL /= max;
+        vFR /= max;
+        vFL /= max;
+
+        modules[BR.o].setVelo(vBR);
+        modules[BL.o].setVelo(vBL);
+        modules[FR.o].setVelo(vFR);
+        modules[FL.o].setVelo(vFL);
+
+        double veloSum =
+                        vBR +
+                        vBL +
+                        vFR +
+                        vFL ;
 
         if (veloSum != 0) {
-            modules[BR.o].setTheta(states[BR.o]);
-            modules[BL.o].setTheta(states[BL.o]);
-            modules[FR.o].setTheta(states[FR.o]);
-            modules[FL.o].setTheta(states[FL.o]);
+            modules[BR.o].setTheta(states[BR.o].theta);
+            modules[BL.o].setTheta(states[BL.o].theta);
+            modules[FR.o].setTheta(states[FR.o].theta);
+            modules[FL.o].setTheta(states[FL.o].theta);
         }
 
         modules[BR.o].run();
@@ -342,11 +365,56 @@ public class SwerveDrivetrain implements Drivetrain {
 
     @Override
     public void setPoseEstimate(Pose2d pose) {
-
     }
 
     @Override
     public Pose2d getPoseEstimate() {
         return null;
+    }
+
+    @Config
+    public static final class SwerveKinematics {
+
+        public static double
+                WIDTH = 10,
+                LENGTH = 10;
+
+        public static SwerveModule.State[] robotToPodStates(Pose2d drive) {
+
+            double
+
+            iY = drive.getY(),
+            iX = drive.getX(),
+            t = drive.getHeading() / hypot(WIDTH, LENGTH),
+
+            // Calculate rotation component vectors
+            tY = t * LENGTH,
+            tX = t * WIDTH,
+
+            // Combine component vectors into total x and y vectors (per pod)
+            a = iY - tY,
+            b = iY + tY,
+            c = iX - tX,
+            d = iX + tX,
+
+            // Get velocity vector (hypotenuse) of total x and y vectors (per pod)
+            vBR = hypot(a, d),
+            vBL = hypot(a, c),
+            vFR = hypot(b, d),
+            vFL = hypot(b, c),
+
+            // Calculate pod angles with total x and y vectors (per pod)
+            aBR = atan2(a, d),
+            aBL = atan2(a, c),
+            aFR = atan2(b, d),
+            aFL = atan2(b, c);
+
+            return new SwerveModule.State[]{
+                new SwerveModule.State(vBR, aBR),
+                new SwerveModule.State(vBL, aBL),
+                new SwerveModule.State(vFR, aFR),
+                new SwerveModule.State(vFL, aFL),
+            };
+        }
     }
 }
