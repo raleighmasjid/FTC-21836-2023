@@ -114,7 +114,7 @@ public final class SwerveModule {
     }
 
     public void setTheta(double theta) {
-        target.theta = theta;
+        target.theta = normalizeRadians(theta);
     }
 
     public void run() {
