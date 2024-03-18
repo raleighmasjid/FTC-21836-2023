@@ -42,6 +42,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.control.filters.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -295,8 +296,12 @@ public final class SwerveDrivetrain implements Drivetrain {
     public final HeadingIMU imu;
 
     private double headingOffset, rawHeading;
-    public static double SLOW_FACTOR = 0.3;
+    public static double SLOW_FACTOR = 0.3, ACCEL_LIMIT = 10000;
     private boolean slowModeLocked = false;
+
+    private final SlewRateLimiter
+            xRateLimiter = new SlewRateLimiter(ACCEL_LIMIT),
+            yRateLimiter = new SlewRateLimiter(ACCEL_LIMIT);
 
     /**
      * Set internal heading of the robot to correct field-centric direction
@@ -323,6 +328,12 @@ public final class SwerveDrivetrain implements Drivetrain {
      * @param turnCommand turning input
      */
     public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
+
+        xRateLimiter.setLimit(ACCEL_LIMIT);
+        yRateLimiter.setLimit(ACCEL_LIMIT);
+
+        xCommand = xRateLimiter.calculate(xCommand);
+        yCommand = yRateLimiter.calculate(yCommand);
 
         // counter-rotate translation vector by current heading
         double
