@@ -149,6 +149,10 @@ public final class Deposit {
             return currentState.x > HEIGHT_MIN;
         }
 
+        public void climb() {
+            setTargetRow(ROW_CLIMBING);
+        }
+
         public void setTargetRow(double targetRow) {
             this.targetRow = clip(targetRow, ROW_RETRACTED, 10);
             double inches = rowToInches(this.targetRow);

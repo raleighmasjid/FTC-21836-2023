@@ -30,7 +30,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDI
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_AUTO_SLOW;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.TeleOpConfig.EDITING_SLOW_LOCK;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FLOOR;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
@@ -206,7 +205,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, Y))               robot.intake.setDesiredPixelCount(2);
             if (keyPressed(1, X))               robot.intake.setDesiredPixelCount(1);
             if (keyPressed(1, A))               robot.intake.toggle();
-            if (keyPressed(1, B))               robot.deposit.lift.setTargetRow(ROW_CLIMBING);
+            if (keyPressed(1, B))               robot.deposit.lift.climb();
 
         }
 
