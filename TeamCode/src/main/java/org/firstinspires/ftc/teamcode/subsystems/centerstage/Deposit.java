@@ -101,6 +101,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 HEIGHT_PIXEL = 2.59945,
                 ROW_CLIMBING = 6.25,
+                ROW_CLIMBED = 0.5,
                 ROW_RETRACTED = -1,
                 ROW_FLOOR_SCORING = -0.5,
                 HEIGHT_MIN = 0.5,
@@ -150,7 +151,7 @@ public final class Deposit {
         }
 
         public void climb() {
-            setTargetRow(ROW_CLIMBING);
+            setTargetRow(targetRow == ROW_CLIMBING ? ROW_CLIMBED : ROW_CLIMBING);
         }
 
         public void setTargetRow(double targetRow) {
