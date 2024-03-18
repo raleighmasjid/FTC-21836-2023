@@ -325,12 +325,15 @@ public final class SwerveDrivetrain implements Drivetrain {
     public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
 
         // counter-rotate translation vector by current heading
-        double theta = -getHeading();
-        double cos = cos(theta);
-        double sin = sin(theta);
-        double x = xCommand;
-        xCommand = xCommand * cos - yCommand * sin;
-        yCommand = yCommand * cos + x * sin;
+        double
+                theta = -getHeading(),
+                cos = cos(theta),
+                sin = sin(theta),
+                x = xCommand,
+                y = yCommand;
+
+        xCommand = x * cos - y * sin;
+        yCommand = y * cos + x * sin;
 
         if (useSlowMode) slowModeLocked = false;
         if (useSlowMode || slowModeLocked) {
