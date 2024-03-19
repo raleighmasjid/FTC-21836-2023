@@ -76,7 +76,7 @@ public final class MainTeleOp extends LinearOpMode {
             mTelemetry.addLine();
             mTelemetry.addLine();
 
-            mTelemetry.addLine("Auto slow is " + (doAutoSlow ? "enabled" : "disabled"));
+            mTelemetry.addData("Auto slow is", doAutoSlow ? "enabled" : "disabled");
             mTelemetry.addLine();
             robot.printTelemetry();
             mTelemetry.update();
