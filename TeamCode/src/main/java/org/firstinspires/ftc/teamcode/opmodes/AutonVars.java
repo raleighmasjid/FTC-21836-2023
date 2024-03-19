@@ -12,9 +12,9 @@ import com.acmerobotics.dashboard.config.Config;
 public class AutonVars {
 
     enum ParkingLocation {
-        OUTER,
+        INNER,
         CENTER,
-        INNER;
+        OUTER;
 
         public static final ParkingLocation[] locations = values();
 
