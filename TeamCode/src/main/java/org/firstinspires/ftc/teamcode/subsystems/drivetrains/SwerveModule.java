@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.AnalogEncoder
 public final class SwerveModule {
 
     public static double
-            PRECISION_REQUIREMENT = 24,
+            ANGLE_TOLERANCE = 0.2617993877991494,
             TEETH_MOTOR_PULLEY = 26,
             TEETH_TOP_PULLEY = 39,
             RATIO_TOP_PULLEY_TO_MOTOR = TEETH_TOP_PULLEY / TEETH_MOTOR_PULLEY,
@@ -132,7 +132,7 @@ public final class SwerveModule {
         
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 
-        double motorPower = target.velo * scaleByError(thetaError);
+        double motorPower = abs(thetaError) > ANGLE_TOLERANCE ? 0 : target.velo;
         double servoPower = pidOutput + staticFF;
 
         double coaxWheelCorrection = servoPower * COAX_EFFECT_WHEEL_CORRECTION_GAIN;
@@ -140,11 +140,6 @@ public final class SwerveModule {
 
         motor.set(motorPower + coaxWheelCorrection);
         servo.set(servoPower + coaxTorqueCorrection);
-    }
-
-    private static double scaleByError(double x) {
-        double absX = abs(x), bound = 2 * PI / PRECISION_REQUIREMENT;
-        return absX > bound ? 0 : 1 - absX / bound;
     }
 
     public static final class State {
