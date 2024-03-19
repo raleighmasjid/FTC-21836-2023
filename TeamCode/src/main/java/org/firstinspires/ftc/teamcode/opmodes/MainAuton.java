@@ -288,10 +288,8 @@ public final class MainAuton extends LinearOpMode {
 
             if (parking == INNER || parking == OUTER) {
 
-                EditablePose movingToPark, parked;
-
-                movingToPark =  parking == INNER ? parkingInner : parkingOuter;
-                parked =        parking == INNER ? parkedInner  : parkedOuter;
+                EditablePose movingToPark =  parking == INNER ? parkingInner : parkingOuter;
+                EditablePose parked =        parking == INNER ? parkedInner  : parkedOuter;
 
                 sequence
                         .lineTo(movingToPark.byAlliance().toPose2d().vec())
