@@ -6,6 +6,7 @@ import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
@@ -55,7 +56,7 @@ public final class Deposit {
 
         lift.run(intakeClear);
 
-        boolean extendPaintbrush = intakeClear && lift.targetRow != ROW_CLIMBING && lift.isScoring();
+        boolean extendPaintbrush = intakeClear && lift.targetRow != ROW_CLIMBING && lift.targetRow != ROW_CLIMBED && lift.isScoring();
         paintbrush.pivot.setActivated(extendPaintbrush);
         paintbrush.run();
     }
@@ -207,6 +208,7 @@ public final class Deposit {
             String namedPos =
                     targetRow == ROW_RETRACTED ? "Retracted" :
                     targetRow == ROW_CLIMBING ? "Climbing" :
+                    targetRow == ROW_CLIMBED? "Climbed" :
                     "Row " + targetRow;
             mTelemetry.addData("Named target position", namedPos);
         }
