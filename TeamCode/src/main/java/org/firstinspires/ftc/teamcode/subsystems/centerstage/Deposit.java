@@ -186,19 +186,16 @@ public final class Deposit {
             State setpoint = intakeClear ? targetState : new State(0);
             controller.setTarget(setpoint);
 
-            boolean withinRetractionTolerance = currentState.x <= HEIGHT_RETRACTED;
-            boolean tryingToRetract = withinRetractionTolerance && setpoint.x == 0;
+            boolean retracted = !isExtended();
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
             double output =
                     (
-                            withinRetractionTolerance ? 0 : kG * voltageScalar
+                            retracted ? 0 : kG * voltageScalar
                     ) + (
-
-                        manualLiftPower != 0 ?      manualLiftPower * voltageScalar :
-                        tryingToRetract ?           SPEED_RETRACTION * voltageScalar :
+                        manualLiftPower != 0 ?          manualLiftPower * voltageScalar :
+                        retracted && setpoint.x == 0 ?  SPEED_RETRACTION * voltageScalar :
                         controller.calculate(currentState)
-
                     )
             ;
             for (MotorEx motor : motors) motor.set(output);
