@@ -46,7 +46,7 @@ public class SimpleServoPivot {
      * Toggles the state of the {@link #servos}
      */
     public void toggle() {
-        setActivated(!activated);
+        setActivated(!isActivated());
     }
 
     /**
