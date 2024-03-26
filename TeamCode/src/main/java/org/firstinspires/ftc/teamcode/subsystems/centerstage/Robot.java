@@ -74,6 +74,11 @@ public final class Robot {
         spike.run();
     }
 
+    public void endgame() {
+        if (!drone.isActivated()) drone.toggle();
+        else deposit.lift.climb();
+    }
+
     public void startAlgorithm(HardwareMap hardwareMap) {
         autoScoringManager = new AutoScoringManager(hardwareMap, this);
     }

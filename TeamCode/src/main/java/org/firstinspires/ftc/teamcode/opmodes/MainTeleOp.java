@@ -9,7 +9,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_STICK_BUTTON;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
@@ -191,7 +190,6 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, A))               robot.intake.setHeight(TWO_STACK);
             if (keyPressed(1, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
 
-            if (keyPressed(1, RIGHT_STICK_BUTTON))  robot.drone.toggle();
             if (keyPressed(1, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
 
             // SET HEADING:
@@ -209,7 +207,7 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, Y))               robot.intake.setDesiredPixelCount(2);
             if (keyPressed(1, X))               robot.intake.setDesiredPixelCount(1);
             if (keyPressed(1, A))               robot.intake.toggle();
-            if (keyPressed(1, B))               robot.deposit.lift.climb();
+            if (keyPressed(1, B))               robot.endgame();
 
         }
 
