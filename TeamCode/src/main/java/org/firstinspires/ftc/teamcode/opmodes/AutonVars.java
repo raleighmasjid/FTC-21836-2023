@@ -34,7 +34,7 @@ public class AutonVars {
 
     static ParkingLocation parking = INNER;
 
-    public static double
+    static double
             SIZE_WINDOW = 720,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
@@ -64,7 +64,7 @@ public class AutonVars {
             WIDTH_PIXEL = 3,
             ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1;
 
-    public static EditablePose
+    static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
             centerSpikeBackdrop = new EditablePose(19, -22.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
