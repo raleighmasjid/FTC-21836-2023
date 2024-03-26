@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.INNER;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.CORNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
@@ -12,9 +12,9 @@ import com.acmerobotics.dashboard.config.Config;
 public class AutonVars {
 
     enum ParkingLocation {
-        INNER,
-        CENTER,
-        OUTER;
+        CORNER,
+        BACKDROP,
+        MIDFIELD;
 
         public static final ParkingLocation[] locations = values();
 
@@ -32,7 +32,7 @@ public class AutonVars {
 
     static final int[] ourPlacements = {1, 3, 6};
 
-    static ParkingLocation parking = INNER;
+    static ParkingLocation parking = CORNER;
 
     static double
             SIZE_WINDOW = 720,
@@ -72,10 +72,10 @@ public class AutonVars {
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
             innerSpikeAudience = new EditablePose(-36, -30, LEFT),
             outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
-            parkingInner = new EditablePose(X_BACKDROP, -60, LEFT),
-            parkedInner = new EditablePose(60, parkingInner.y, LEFT),
-            parkingOuter = new EditablePose(X_BACKDROP, -12, LEFT),
-            parkedOuter = new EditablePose(60, parkingOuter.y, LEFT),
+            parkingCorner = new EditablePose(X_BACKDROP, -60, LEFT),
+            parkedCorner = new EditablePose(60, parkingCorner.y, LEFT),
+            parkingMidfield = new EditablePose(X_BACKDROP, -12, LEFT),
+            parkedMidfield = new EditablePose(60, parkingMidfield.y, LEFT),
             enteringBackstage = new EditablePose(22, -11, LEFT),
             offsetAudienceInner = new EditablePose(0, 0, 0),
             offsetAudienceOuter = new EditablePose(0, 0, 0),

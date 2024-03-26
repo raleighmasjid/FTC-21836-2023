@@ -11,8 +11,8 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.INNER;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.OUTER;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.CORNER;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.MIDFIELD;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE;
@@ -21,11 +21,11 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isBackdropSide;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedOuter;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedCorner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedMidfield;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingOuter;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingCorner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingMidfield;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
@@ -285,10 +285,10 @@ public final class MainAuton extends LinearOpMode {
 //                }
             }
 
-            if (parking == INNER || parking == OUTER) {
+            if (parking == CORNER || parking == MIDFIELD) {
 
-                EditablePose movingToPark =  parking == INNER ? parkingInner : parkingOuter;
-                EditablePose parked =        parking == INNER ? parkedInner  : parkedOuter;
+                EditablePose movingToPark =  parking == CORNER ? parkingCorner : parkingMidfield;
+                EditablePose parked =        parking == CORNER ? parkedCorner : parkedMidfield;
 
                 sequence
                         .lineTo(movingToPark.byAlliance().toPose2d().vec())
