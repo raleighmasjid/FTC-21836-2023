@@ -131,7 +131,6 @@ public final class MainAuton extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
-        robot.initRun();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
