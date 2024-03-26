@@ -153,7 +153,11 @@ public final class MainTeleOp extends LinearOpMode {
 
         if (lockSlowMode) robot.drivetrain.lockSlowMode();
 
-        if (isAutomated) robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
+        if (isAutomated) {
+            robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
+            robot.autoScoringManager.backdropScanner.isRed = isRed;
+            robot.autoScoringManager.isRed = isRed;
+        }
 
         if (autonEndPose == null) autonEndPose = AutonVars.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(autonEndPose);

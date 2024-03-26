@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementa
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,6 +36,7 @@ public final class AutoScoringManager {
     private final Pixel.Color[] colorsNeeded = {EMPTY, EMPTY};
     private volatile TrajectorySequence scoringTrajectory = null;
     private volatile boolean trajectoryReady = false;
+    public volatile boolean isRed = true;
 
     private final Robot robot;
     private volatile boolean beginTrajectoryGeneration = false, clearingScan = false, runThread = true;
