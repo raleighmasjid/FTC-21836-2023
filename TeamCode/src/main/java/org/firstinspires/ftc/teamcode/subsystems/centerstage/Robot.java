@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems.centerstage;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.PURPLE;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.YELLOW;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.OFF;
-import static org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator.State.RED;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -16,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutoSc
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.AutoTurnDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrains.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystems.utilities.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @Config
@@ -36,7 +32,7 @@ public final class Robot {
     public final SimpleServoPivot drone, spike;
 
     private final BulkReader bulkReader;
-    private final LEDIndicator[] indicators;
+//    private final LEDIndicator[] indicators;
 
     public AutoScoringManager autoScoringManager = null;
 
@@ -58,10 +54,10 @@ public final class Robot {
                 getGoBildaServo(hardwareMap, "floor pixel")
         );
 
-        indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led left green", "led left red"),
-                new LEDIndicator(hardwareMap, "led right green", "led right red")
-        };
+//        indicators = new LEDIndicator[]{
+//                new LEDIndicator(hardwareMap, "led left green", "led left red"),
+//                new LEDIndicator(hardwareMap, "led right green", "led right red")
+//        };
     }
 
     public void preload(boolean backdropSide) {
@@ -113,12 +109,12 @@ public final class Robot {
         drone.run();
         spike.run();
 
-        LEDIndicator.State ledColor =
-                drivetrain.isBusy() ? RED :
-                autoScoringManager != null && autoScoringManager.trajectoryReady() ? GREEN :
-                OFF;
-
-        for (LEDIndicator indicator : indicators) indicator.setState(ledColor);
+//        LEDIndicator.State ledColor =
+//                drivetrain.isBusy() ? RED :
+//                autoScoringManager != null && autoScoringManager.trajectoryReady() ? GREEN :
+//                OFF;
+//
+//        for (LEDIndicator indicator : indicators) indicator.setState(ledColor);
     }
 
     public void printTelemetry() {
