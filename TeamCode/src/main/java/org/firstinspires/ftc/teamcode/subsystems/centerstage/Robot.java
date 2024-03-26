@@ -25,7 +25,7 @@ public final class Robot {
     public static double
             maxVoltage = 13,
             TIME_TRAJECTORY_GEN = 0,
-            ANGLE_DRONE_INITIAL = 50,
+            ANGLE_DRONE_LOADED = 50,
             ANGLE_DRONE_LAUNCHED = 0,
             ANGLE_SPIKE_LOCKED = 90,
             ANGLE_SPIKE_RELEASED = 0;
@@ -48,7 +48,7 @@ public final class Robot {
         intake = new Intake(hardwareMap);
         deposit = new Deposit(hardwareMap);
         drone = new SimpleServoPivot(
-                ANGLE_DRONE_INITIAL,
+                ANGLE_DRONE_LOADED,
                 ANGLE_DRONE_LAUNCHED,
                 getGoBildaServo(hardwareMap, "drone")
         );
@@ -96,7 +96,7 @@ public final class Robot {
     }
 
     public void run() {
-        drone.updateAngles(ANGLE_DRONE_INITIAL, ANGLE_DRONE_LAUNCHED);
+        drone.updateAngles(ANGLE_DRONE_LOADED, ANGLE_DRONE_LAUNCHED);
         spike.updateAngles(ANGLE_SPIKE_RELEASED, ANGLE_SPIKE_LOCKED);
 
         if (intake.pixelsTransferred()) {
