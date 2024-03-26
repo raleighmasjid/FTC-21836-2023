@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
@@ -100,12 +99,13 @@ public final class Deposit {
         public static double
                 kG = 0.15,
                 INCHES_PER_TICK = 0.0088581424,
-                HEIGHT_PIXEL = 2.59945,
-                ROW_CLIMBING = 6.25,
-                ROW_CLIMBED = 0.5,
                 ROW_RETRACTED = -1,
                 ROW_FLOOR_SCORING = -0.5,
-                HEIGHT_MIN = 0.5,
+                ROW_CLIMBED = 0.5,
+                ROW_CLIMBING = 6.25,
+                HEIGHT_RETRACTED = 0.5,
+                HEIGHT_ROW_0 = 2.5,
+                HEIGHT_PIXEL = 2.59945,
                 PERCENT_OVERSHOOT = 0,
                 SPEED_RETRACTION = -0.05,
                 POS_1 = 0,
@@ -148,7 +148,7 @@ public final class Deposit {
         }
 
         public boolean isExtended() {
-            return currentState.x > HEIGHT_MIN;
+            return currentState.x > HEIGHT_RETRACTED;
         }
 
         public void climb() {
@@ -163,7 +163,7 @@ public final class Deposit {
 
         private static double rowToInches(double row) {
             if (row == ROW_RETRACTED) return 0;
-            return row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT;
+            return row * HEIGHT_PIXEL + HEIGHT_ROW_0;
         }
 
         public void changeRow(int deltaRow) {
@@ -186,7 +186,7 @@ public final class Deposit {
             State setpoint = intakeClear ? targetState : new State(0);
             controller.setTarget(setpoint);
 
-            boolean withinRetractionTolerance = currentState.x <= HEIGHT_MIN;
+            boolean withinRetractionTolerance = currentState.x <= HEIGHT_RETRACTED;
             boolean tryingToRetract = withinRetractionTolerance && setpoint.x == 0;
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();

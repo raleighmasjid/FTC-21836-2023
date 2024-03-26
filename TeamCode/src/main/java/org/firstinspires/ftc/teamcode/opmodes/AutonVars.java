@@ -58,7 +58,6 @@ public class AutonVars {
             X_SHIFT_INTAKING = 2,
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
-            BOTTOM_ROW_HEIGHT = 2.5,
             X_BACKDROP = 51,
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -29,
