@@ -292,7 +292,7 @@ public final class Intake {
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
-        boolean doneIntaking = state.ordinal() > HAS_1_PIXEL.ordinal();
+        boolean doneIntaking = state.ordinal() >= WAITING_FOR_DEPOSIT.ordinal();
         boolean donePivoting = state.ordinal() > PIVOTING.ordinal();
 
         double ANGLE_PIVOT_DOWN =
