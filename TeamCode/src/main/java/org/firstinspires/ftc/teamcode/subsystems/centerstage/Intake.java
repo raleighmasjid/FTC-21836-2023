@@ -295,6 +295,8 @@ public final class Intake {
         boolean doneIntaking = state.ordinal() >= WAITING_FOR_DEPOSIT.ordinal();
         boolean donePivoting = state.ordinal() > PIVOTING.ordinal();
 
+        if (donePivoting || state == PIXEL_1_SETTLING) setMotorPower(0);
+
         double ANGLE_PIVOT_DOWN =
                 doneIntaking ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
@@ -307,8 +309,6 @@ public final class Intake {
         );
 
         double ANGLE_LATCH_UNLOCKED = doneIntaking ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
-
-        if (donePivoting || state == PIXEL_1_SETTLING) setMotorPower(0);
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
