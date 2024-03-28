@@ -308,7 +308,7 @@ public final class Intake {
 
         double ANGLE_LATCH_UNLOCKED = doneIntaking ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
 
-        if (donePivoting) setMotorPower(0);
+        if (state == PIXEL_1_SETTLING || donePivoting) setMotorPower(0);
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
