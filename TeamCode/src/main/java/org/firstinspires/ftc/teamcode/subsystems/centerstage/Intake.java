@@ -292,8 +292,11 @@ public final class Intake {
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
+        boolean doneIntaking = state.ordinal() > HAS_1_PIXEL.ordinal();
+        boolean donePivoting = state.ordinal() > PIVOTING.ordinal();
+
         double ANGLE_PIVOT_DOWN =
-                state.ordinal() >= WAITING_FOR_DEPOSIT.ordinal() ? ANGLE_PIVOT_VERTICAL :
+                doneIntaking ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
@@ -303,17 +306,9 @@ public final class Intake {
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
-        double ANGLE_LATCH_UNLOCKED;
-        switch (state) {
-            case PIXELS_FALLING:
-            case PIXELS_SETTLING:
-            case RETRACTED:
-                setMotorPower(0);
-            case PIVOTING:
-                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_TRANSFERRING; break;
-            default:
-                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_INTAKING;
-        }
+        double ANGLE_LATCH_UNLOCKED = doneIntaking ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
+
+        if (donePivoting) setMotorPower(0);
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
