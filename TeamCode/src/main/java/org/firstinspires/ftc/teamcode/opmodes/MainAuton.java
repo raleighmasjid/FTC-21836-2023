@@ -181,6 +181,7 @@ public final class MainAuton extends LinearOpMode {
         robot.initRun();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        detector.pipeline.isRed = isRed;
 
         Pose2d startPose = AutonVars.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
