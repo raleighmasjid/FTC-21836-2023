@@ -18,7 +18,7 @@ public final class AutonPixelSupplier {
      * Calculates the optimal placements for autonomous scoring based on a randomization
      * @param ourPlacement The scoring X that will be considered for the yellow pixel placement and avoidance thereof
      * @param partnerWillDoRandomization Whether or not the alliance partner will place a yellow pixel on the backdrop
-     * @return An {@link ArrayList< Pixel >} of optimal placements for autonomous
+     * @return An {@link ArrayList<Pixel>} of optimal placements for autonomous
      */
     public static ArrayList<Pixel> getPlacements(boolean partnerWillDoRandomization, int ourPlacement) {
         int[] yellowPixelXs = partnerWillDoRandomization ?
