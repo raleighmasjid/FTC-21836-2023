@@ -19,7 +19,6 @@ public class BackdropScanner {
 
     public final BackdropPipeline pipeline;
 
-    public volatile boolean isRed = true;
     private volatile boolean isOpen = false;
 
     /**

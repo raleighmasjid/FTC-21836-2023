@@ -107,7 +107,6 @@ public final class MainTeleOp extends LinearOpMode {
         // Initialize robot:
         robot = new Robot(opMode.hardwareMap);
         robot.initRun();
-        if (isAutomated) robot.startAlgorithm(opMode.hardwareMap);
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
@@ -151,12 +150,6 @@ public final class MainTeleOp extends LinearOpMode {
         }
 
         if (lockSlowMode) robot.drivetrain.lockSlowMode();
-
-        if (isAutomated) {
-            robot.autoScoringManager.backdropScanner.pipeline.isRed = isRed;
-            robot.autoScoringManager.backdropScanner.isRed = isRed;
-            robot.autoScoringManager.isRed = isRed;
-        }
 
         if (autonEndPose == null) autonEndPose = AutonVars.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(autonEndPose);
