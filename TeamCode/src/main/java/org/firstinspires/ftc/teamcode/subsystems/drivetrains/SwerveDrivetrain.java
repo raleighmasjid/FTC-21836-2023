@@ -1,28 +1,34 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrains;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USE_VELO_PID;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.LOGO_FACING_DIR;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.USB_FACING_DIR;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.roadrunner.DriveConstants.kV;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVoltage;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.BL;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.BR;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.FL;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrains.SwerveModule.SwerveModuleID.FR;
 import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
+import static java.lang.Math.hypot;
+import static java.lang.Math.max;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 import static java.util.Arrays.asList;
-import static java.util.Collections.max;
-
-import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -31,17 +37,14 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.control.filters.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.opmodes.EditablePose;
 import org.firstinspires.ftc.teamcode.roadrunner.DriveConstants;
-import org.firstinspires.ftc.teamcode.roadrunner.ThreeWheelTrackingLocalizer;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
@@ -51,11 +54,8 @@ import org.firstinspires.ftc.teamcode.subsystems.utilities.sensors.HeadingIMU;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Simple mecanum drive hardware implementation for REV hardware.
- */
 @Config
-public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
+public final class SwerveDrivetrain implements Drivetrain {
     public static PIDCoefficients
             TRANSLATIONAL_PID = new PIDCoefficients(
                 8,
@@ -68,29 +68,29 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
                     1
             );
 
-    public static double
-            LATERAL_MULTIPLIER = 1.48,
-            VX_WEIGHT = 1,
-            VY_WEIGHT = 1,
-            OMEGA_WEIGHT = 1;
+
+    private final SwerveModule[] modules;
 
     public static EditablePose admissibleError = new EditablePose(0.01, 0.01, 0.001);
 
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
+//    private final ThreeWheelTrackingLocalizer localizer;
+
     private final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
     private final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(DriveConstants.MAX_ACCEL);
 
-    private final DcMotorEx leftFront, leftBack, rightBack, rightFront;
-    private final List<DcMotorEx> motors;
+    private final VoltageSensor batteryVoltageSensor;
 
-    protected final VoltageSensor batteryVoltageSensor;
+    public SwerveDrivetrain(HardwareMap hardwareMap) {
 
-    private final List<Integer> lastEncPositions = new ArrayList<>();
-    private final List<Integer> lastEncVels = new ArrayList<>();
+        modules = new SwerveModule[]{
+                new SwerveModule(hardwareMap, BR),
+                new SwerveModule(hardwareMap, BL),
+                new SwerveModule(hardwareMap, FR),
+                new SwerveModule(hardwareMap, FL),
+        };
 
-    public MecanumDrivetrain(HardwareMap hardwareMap) {
-        super(DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic, DriveConstants.TRACK_WIDTH, DriveConstants.TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         TrajectoryFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 admissibleError.toPose2d(), 0.5);
@@ -101,44 +101,17 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
 
         // TODO: adjust the names of the following hardware devices to match your configuration
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "left front");
-        leftBack = hardwareMap.get(DcMotorEx.class, "left back");
-        rightBack = hardwareMap.get(DcMotorEx.class, "right back");
-        rightFront = hardwareMap.get(DcMotorEx.class, "right front");
-
-        motors = asList(leftFront, leftBack, rightBack, rightFront);
-
-        for (DcMotorEx motor : motors) {
-            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
-            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
-            motor.setMotorType(motorConfigurationType);
-        }
-
-        setMode(USE_VELO_PID ? RUN_USING_ENCODER : RUN_WITHOUT_ENCODER);
-
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        if (USE_VELO_PID && MOTOR_VELO_PID != null) {
-            setPIDFCoefficients(RUN_USING_ENCODER, MOTOR_VELO_PID);
-        }
-
-        // TODO: reverse any motors using DcMotor.setDirection()
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        List<Integer> lastTrackingEncPositions = new ArrayList<>();
-        List<Integer> lastTrackingEncVels = new ArrayList<>();
+        setZeroPowerBehavior(BRAKE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+//        localizer = new ThreeWheelTrackingLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
 
-        imu = null;
-//                new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
+        imu = new HeadingIMU(hardwareMap, "imu", new RevHubOrientationOnRobot(LOGO_FACING_DIR, USB_FACING_DIR));
         setCurrentHeading(0);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
-                lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
         );
     }
 
@@ -202,9 +175,86 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
     }
 
     public void update() {
-        updatePoseEstimate();
-        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
-        if (signal != null) setDriveSignal(signal);
+        rawHeading = imu.getHeading();
+
+        modules[BR.o].readSensors();
+        modules[BL.o].readSensors();
+        modules[FR.o].readSensors();
+        modules[FL.o].readSensors();
+
+//        DriveSignal signal = trajectorySequenceRunner.update(localizer.getPoseEstimate(), localizer.getPoseVelocity());
+//        if (signal != null) setDriveSignal(signal);
+    }
+
+    private void setDriveSignal(DriveSignal signal) {
+        SwerveModule.State[] velocities = SwerveKinematics.robotToPodStates(signal.getVel());
+        SwerveModule.State[] accelerations = SwerveKinematics.robotToPodStates(signal.getAccel());
+
+        List<Double> vels = asList(
+                velocities[BR.o].velo,
+                velocities[BL.o].velo,
+                velocities[FR.o].velo,
+                velocities[FL.o].velo
+        );
+
+        List<Double> accels = asList(
+                accelerations[BR.o].velo,
+                accelerations[BL.o].velo,
+                accelerations[FR.o].velo,
+                accelerations[FL.o].velo
+        );
+
+        List<Double> powers = Kinematics.calculateMotorFeedforward(vels, accels, kV, kA, kStatic);
+
+        setModules(
+                new SwerveModule.State(powers.get(BR.o), velocities[BR.o].theta),
+                new SwerveModule.State(powers.get(BL.o), velocities[BL.o].theta),
+                new SwerveModule.State(powers.get(FR.o), velocities[FR.o].theta),
+                new SwerveModule.State(powers.get(FL.o), velocities[FL.o].theta)
+        );
+    }
+
+    private void setModules(SwerveModule.State... states) {
+
+        double vBR = states[BR.o].velo;
+        double vBL = states[BL.o].velo;
+        double vFR = states[FR.o].velo;
+        double vFL = states[FL.o].velo;
+
+        // Get max of all motor power commands
+        double max = max(1.0, max(
+                max(abs(vBR), abs(vBL)),
+                max(abs(vFR), abs(vFL))
+        ));
+
+        // Normalize motor powers to [-1, 1]
+        vBR /= max;
+        vBL /= max;
+        vFR /= max;
+        vFL /= max;
+
+        modules[BR.o].setVelo(vBR);
+        modules[BL.o].setVelo(vBL);
+        modules[FR.o].setVelo(vFR);
+        modules[FL.o].setVelo(vFL);
+
+        double veloSum =
+                        vBR +
+                        vBL +
+                        vFR +
+                        vFL ;
+
+        if (veloSum != 0) {
+            modules[BR.o].setTheta(states[BR.o].theta);
+            modules[BL.o].setTheta(states[BL.o].theta);
+            modules[FR.o].setTheta(states[FR.o].theta);
+            modules[FL.o].setTheta(states[FL.o].theta);
+        }
+
+        modules[BR.o].run();
+        modules[BL.o].run();
+        modules[FR.o].run();
+        modules[FL.o].run();
     }
 
     public void waitForIdle() {
@@ -216,87 +266,8 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
         return trajectorySequenceRunner.isBusy();
     }
 
-    public void setMode(DcMotor.RunMode runMode) {
-        for (DcMotorEx motor : motors) {
-            motor.setMode(runMode);
-        }
-    }
-
-    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
-        for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(zeroPowerBehavior);
-        }
-    }
-
-    public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
-        PIDFCoefficients compensatedCoefficients = new PIDFCoefficients(
-                coefficients.p, coefficients.i, coefficients.d,
-                coefficients.f * maxVoltage / batteryVoltageSensor.getVoltage()
-        );
-
-        for (DcMotorEx motor : motors) {
-            motor.setPIDFCoefficients(runMode, compensatedCoefficients);
-        }
-    }
-
-    public void setWeightedDrivePower(Pose2d drivePower) {
-        Pose2d vel = drivePower;
-
-        if (abs(drivePower.getX()) + abs(drivePower.getY())
-                + abs(drivePower.getHeading()) > 1) {
-            // re-normalize the powers according to the weights
-            double denom = VX_WEIGHT * abs(drivePower.getX())
-                    + VY_WEIGHT * abs(drivePower.getY())
-                    + OMEGA_WEIGHT * abs(drivePower.getHeading());
-
-            vel = new Pose2d(
-                    VX_WEIGHT * drivePower.getX(),
-                    VY_WEIGHT * drivePower.getY(),
-                    OMEGA_WEIGHT * drivePower.getHeading()
-            ).div(denom);
-        }
-
-        setDrivePower(vel);
-    }
-
-    @NonNull
-    @Override
-    public List<Double> getWheelPositions() {
-        lastEncPositions.clear();
-
-        List<Double> wheelPositions = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int position = motor.getCurrentPosition();
-            lastEncPositions.add(position);
-            wheelPositions.add(DriveConstants.encoderTicksToInches(position));
-        }
-        return wheelPositions;
-    }
-
-    @Override
-    public List<Double> getWheelVelocities() {
-        lastEncVels.clear();
-
-        List<Double> wheelVelocities = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
-            int vel = (int) motor.getVelocity();
-            lastEncVels.add(vel);
-            wheelVelocities.add(DriveConstants.encoderTicksToInches(vel));
-        }
-        return wheelVelocities;
-    }
-
-    public boolean normalizeMotorPowers = true;
-
-    @Override
-    public void setMotorPowers(double v, double v1, double v2, double v3) {
-
-        double max = normalizeMotorPowers ? max(asList(abs(v), abs(v1), abs(v2), abs(v3), 1.0)) : 1;
-
-        leftFront.setPower(v / max);
-        leftBack.setPower(v1 / max);
-        rightBack.setPower(v2 / max);
-        rightFront.setPower(v3 / max);
+    public void setZeroPowerBehavior(Motor.ZeroPowerBehavior behavior) {
+        for (SwerveModule module : modules) module.setZeroPowerBehavior(behavior);
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
@@ -314,21 +285,23 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
         trajectorySequenceRunner.breakFollowing();
     }
 
-    @Override
     public double getRawExternalHeading() {
         return 0;
     }
 
-    @Override
     public Double getExternalHeadingVelocity() {
         return 0.0;
     }
 
     public final HeadingIMU imu;
 
-    private double headingOffset;
-    public static double SLOW_FACTOR = 0.3;
+    private double headingOffset, rawHeading;
+    public static double SLOW_FACTOR = 0.3, ACCEL_LIMIT = 10000;
     private boolean slowModeLocked = false;
+
+    private final SlewRateLimiter
+            xRateLimiter = new SlewRateLimiter(ACCEL_LIMIT),
+            yRateLimiter = new SlewRateLimiter(ACCEL_LIMIT);
 
     /**
      * Set internal heading of the robot to correct field-centric direction
@@ -344,7 +317,7 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
     }
 
     private double getRawHeading() {
-        return getPoseEstimate().getHeading();
+        return rawHeading;
     }
 
     /**
@@ -355,6 +328,12 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
      * @param turnCommand turning input
      */
     public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
+
+        xRateLimiter.setLimit(ACCEL_LIMIT);
+        yRateLimiter.setLimit(ACCEL_LIMIT);
+
+        xCommand = xRateLimiter.calculate(xCommand);
+        yCommand = yRateLimiter.calculate(yCommand);
 
         // counter-rotate translation vector by current heading
         double
@@ -381,11 +360,12 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
         turnCommand *= voltageScalar;
 
         // run motors
-        setDrivePower(new Pose2d(
+        Pose2d drive = new Pose2d(
                 yCommand,
                 -xCommand,
                 -turnCommand
-        ));
+        );
+        setModules(SwerveKinematics.robotToPodStates(drive));
     }
 
     public void lockSlowMode() {
@@ -395,5 +375,60 @@ public class MecanumDrivetrain extends MecanumDrive implements Drivetrain {
     public void printNumericalTelemetry() {
         mTelemetry.addData("Current heading (radians)", getHeading());
         mTelemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
+    }
+
+    @Override
+    public void setPoseEstimate(Pose2d pose) {
+    }
+
+    @Override
+    public Pose2d getPoseEstimate() {
+        return null;
+    }
+
+    @Config
+    public static final class SwerveKinematics {
+
+        public static double
+                WIDTH = 10,
+                LENGTH = 10;
+
+        public static SwerveModule.State[] robotToPodStates(Pose2d drive) {
+
+            double
+
+            iY = drive.getY(),
+            iX = drive.getX(),
+            t = drive.getHeading() / hypot(WIDTH, LENGTH),
+
+            // Calculate rotation component vectors
+            tY = t * LENGTH,
+            tX = t * WIDTH,
+
+            // Combine component vectors into total x and y vectors (per pod)
+            a = iY - tY,
+            b = iY + tY,
+            c = iX - tX,
+            d = iX + tX,
+
+            // Get velocity vector (hypotenuse) of total x and y vectors (per pod)
+            vBR = hypot(a, d),
+            vBL = hypot(a, c),
+            vFR = hypot(b, d),
+            vFL = hypot(b, c),
+
+            // Calculate pod angles with total x and y vectors (per pod)
+            aBR = atan2(a, d),
+            aBL = atan2(a, c),
+            aFR = atan2(b, d),
+            aFL = atan2(b, c);
+
+            return new SwerveModule.State[]{
+                new SwerveModule.State(vBR, aBR),
+                new SwerveModule.State(vBL, aBL),
+                new SwerveModule.State(vFR, aFR),
+                new SwerveModule.State(vFL, aFL),
+            };
+        }
     }
 }
