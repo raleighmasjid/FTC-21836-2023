@@ -360,11 +360,14 @@ public final class SwerveDrivetrain implements Drivetrain {
         turnCommand *= voltageScalar;
 
         // run motors
-        Pose2d drive = new Pose2d(
+        setDrivePower(new Pose2d(
                 yCommand,
                 -xCommand,
                 -turnCommand
-        );
+        ));
+    }
+
+    public void setDrivePower(Pose2d drive) {
         setModules(SwerveKinematics.robotToPodStates(drive));
     }
 

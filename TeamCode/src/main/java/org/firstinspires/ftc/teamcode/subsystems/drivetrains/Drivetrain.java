@@ -24,4 +24,6 @@ public interface Drivetrain {
     void setPoseEstimate(Pose2d pose);
 
     Pose2d getPoseEstimate();
+
+    void setDrivePower(Pose2d drive);
 }

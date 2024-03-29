@@ -122,6 +122,11 @@ public class AutoTurnDrivetrain implements Drivetrain {
         return drivetrain.getPoseEstimate();
     }
 
+    @Override
+    public void setDrivePower(Pose2d drive) {
+        drivetrain.setDrivePower(drive);
+    }
+
     public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
         return drivetrain.trajectorySequenceBuilder(startPose);
     }
