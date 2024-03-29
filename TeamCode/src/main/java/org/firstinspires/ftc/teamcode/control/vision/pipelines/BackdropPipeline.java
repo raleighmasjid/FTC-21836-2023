@@ -75,6 +75,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             showCircleDet = false,
             logicEnhancements = true;
 
+    public int futureSteps = 1;
+
     private static final double
             SCALING_FACTOR = 1 / 8.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
@@ -348,6 +350,15 @@ public class BackdropPipeline extends OpenCvPipeline {
         Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
 
         for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
+
+        if (futureSteps > 1) for (int i = 1; i < futureSteps; i++) {
+            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop.add(p));
+
+            if (optimalPlacements.isEmpty()) return;
+
+            p = optimalPlacements.get(0);
+            Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
+        }
     }
 
     private void drawSamplingMarkers(Mat input) {
