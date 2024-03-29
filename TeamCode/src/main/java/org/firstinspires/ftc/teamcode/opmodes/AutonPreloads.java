@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 
 import java.util.ArrayList;
 
-class AutonPreloads {
+final class AutonPreloads {
 
     static void backdropPreloads(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
         if (inner) {

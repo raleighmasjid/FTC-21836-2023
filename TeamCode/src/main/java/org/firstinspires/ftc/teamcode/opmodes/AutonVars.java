@@ -9,7 +9,7 @@ import static java.lang.Math.PI;
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
-public class AutonVars {
+public final class AutonVars {
 
     enum ParkingLocation {
         CORNER,

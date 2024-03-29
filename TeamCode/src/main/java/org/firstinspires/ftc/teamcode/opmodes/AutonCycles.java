@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 
 import java.util.ArrayList;
 
-class AutonCycles {
+final class AutonCycles {
 
     static Pose2d stackPos(int stack) {
         return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();

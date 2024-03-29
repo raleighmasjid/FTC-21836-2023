@@ -6,7 +6,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
-public class EditablePose {
+public final class EditablePose {
 
     public double x, y, heading;
 
