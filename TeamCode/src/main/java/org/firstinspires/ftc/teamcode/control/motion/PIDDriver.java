@@ -51,11 +51,13 @@ public final class PIDDriver {
         double targetY = target.getY();
         double targetHeading = target.getHeading();
 
+        double xError = targetX - currentX;
+        double yError = targetY - currentY;
         double headingError = normalizeRadians(targetHeading - currentHeading);
 
         if (
-                abs(targetX - currentX) <= admissibleError.x &&
-                abs(targetY - currentY) <= admissibleError.y &&
+                abs(xError) <= admissibleError.x &&
+                abs(yError) <= admissibleError.y &&
                 abs(headingError) <= admissibleError.heading
         ) return true;
 
