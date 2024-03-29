@@ -13,6 +13,8 @@ import java.util.Scanner;
 final class AlgorithmTesting {
     public static void main(String[] args) {
 
+        PlacementCalculator calculator = new PlacementCalculator();
+
         Scanner input = new Scanner(System.in);
         Backdrop backdrop = new Backdrop();
         boolean alwaysPlaceColored = true;
@@ -41,7 +43,7 @@ final class AlgorithmTesting {
                 backdrop.add(new Pixel(x, 10 - y, Pixel.Color.fromString(rowList[x])));
             }
         }
-        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = calculator.getOptimalPlacements(backdrop);
         backdrop.print();
         printLine();
         for (Pixel pixel : optimalPlacements) pixel.print();
@@ -61,7 +63,7 @@ final class AlgorithmTesting {
                 Pixel placement = optimalPlacements.get(0);
                 backdrop.add(alwaysPlaceColored && placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
             }
-            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+            optimalPlacements = calculator.getOptimalPlacements(backdrop);
             if (!solve || printPerIteration) {
                 printLine();
                 printLine();

@@ -138,6 +138,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat(), circles = new Mat();
 
     public final Backdrop backdrop;
+    private final PlacementCalculator calculator = new PlacementCalculator();
     private final Telemetry telemetry;
 
     private final Point[][] centerPoints = new Point[11][7];
@@ -337,7 +338,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             drawPixelIcon(input, y, x);
         }
 
-        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = calculator.getOptimalPlacements(backdrop);
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
             Pixel pixel = backdrop.get(x, y);
@@ -352,7 +353,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
 
         if (futureSteps > 1) for (int i = 1; i < futureSteps; i++) {
-            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop.add(p));
+            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(p));
 
             if (optimalPlacements.isEmpty()) return;
 

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public final class AutonPixelSupplier {
 
+    private static final PlacementCalculator calculator = new PlacementCalculator(true);
+
     public static int getOtherPlacement(int i) {
         return i + (i % 2 == 0 ? -1 : 1);
     }
@@ -23,8 +25,6 @@ public final class AutonPixelSupplier {
                 new int[]{getOtherPlacement(ourPlacement), ourPlacement} :
                 new int[]{ourPlacement};
 
-        PlacementCalculator.auton = true;
-
         ArrayList<Pixel> placements = new ArrayList<>();
 
         Backdrop backdrop = new Backdrop();
@@ -34,7 +34,7 @@ public final class AutonPixelSupplier {
             placements.add(yellowEnforced);
         }
 
-        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = calculator.getOptimalPlacements(backdrop);
         while (backdrop.notFull()) {
             Pixel optimalPlacement = null;
             for (Pixel placement : optimalPlacements) {
@@ -43,11 +43,9 @@ public final class AutonPixelSupplier {
                 break;
             }
             if (optimalPlacement == null) break;
-            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop.add(optimalPlacement));
+            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(optimalPlacement));
             placements.add(optimalPlacement);
         }
-
-        PlacementCalculator.auton = false;
 
         return placements;
     }
