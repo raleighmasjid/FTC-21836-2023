@@ -90,6 +90,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
             HEX_RADIUS = 80 * SCALING_FACTOR,
             HEX_SIDE_LENGTH = HEX_RADIUS / sqrt(3),
+            PLACEMENT_MARKER_RADIUS = 30 * SCALING_FACTOR,
             X_DIST_GRID = 97.825 * SCALING_FACTOR,
             Y_DIST_GRID = -85.0 * SCALING_FACTOR,
             CIRCLE_DET_BLUR = 16 * SCALING_FACTOR,
@@ -344,7 +345,7 @@ public class BackdropPipeline extends OpenCvPipeline {
         if (optimalPlacements.isEmpty()) return;
 
         Pixel p = optimalPlacements.get(0);
-        Imgproc.circle(input, centerPoints[p.y][p.x], (int) HEX_SIDE_LENGTH, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
+        Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
 
         for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
     }
