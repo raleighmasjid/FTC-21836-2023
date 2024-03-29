@@ -99,7 +99,6 @@ public final class MainTeleOp extends LinearOpMode {
     }
 
     static void teleOpInit(LinearOpMode opMode) {
-        boolean isAutomated = opMode instanceof AutomatedTeleOp;
 
         // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
