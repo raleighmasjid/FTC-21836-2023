@@ -21,7 +21,6 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.aqua;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -343,11 +342,11 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
 
         if (optimalPlacements.isEmpty()) return;
+
         Pixel p = optimalPlacements.get(0);
-        Imgproc.circle(input, centerPoints[p.y][p.x], (int) HEX_SIDE_LENGTH, aqua);
-        for (Pixel a : optimalPlacements) {
-            telemetry.addLine(a.toString());
-        }
+        Imgproc.circle(input, centerPoints[p.y][p.x], (int) HEX_SIDE_LENGTH, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
+
+        for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
     }
 
     private void drawSamplingMarkers(Mat input) {
