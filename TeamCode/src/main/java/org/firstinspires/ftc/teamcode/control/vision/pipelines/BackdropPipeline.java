@@ -484,6 +484,8 @@ public class BackdropPipeline extends OpenCvPipeline {
         );
         telemetry.addLine("Valid affine warp: " + valid);
 
+        if (!valid) return;
+
         Point[] source = {
                 findCenter(target[0]),
                 coordToPoint(target[1]),
