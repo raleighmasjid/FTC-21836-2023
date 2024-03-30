@@ -76,16 +76,18 @@ public final class AutomatedTeleOp extends LinearOpMode {
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            if (keyPressed(1, X)) {
+            if (
+                    gamepadEx1.getLeftX() != 0 ||
+                    gamepadEx1.getLeftY() != 0 ||
+                    gamepadEx1.getRightY() != 0
+            ) {
+                opState = MANUAL;
+            } else if (keyPressed(1, X)) {
 
                 if (robot.deposit.paintbrush.pixelsLocked == 2) opState = SET_FOR_1;
                 else if (robot.deposit.paintbrush.pixelsLocked == 1) opState = SET_FOR_2;
 
-            } else if (
-                    gamepadEx1.getLeftX() != 0 ||
-                    gamepadEx1.getLeftY() != 0 ||
-                    gamepadEx1.getRightY() != 0
-            ) opState = MANUAL;
+            }
 
             autoScoringStateMachine();
 
