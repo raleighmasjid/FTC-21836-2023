@@ -55,12 +55,6 @@ public final class PIDDriver {
         double yError = targetY - currentY;
         double headingError = normalizeRadians(targetHeading - currentHeading);
 
-        if (
-                abs(xError) <= admissibleError.x &&
-                abs(yError) <= admissibleError.y &&
-                abs(headingError) <= admissibleError.heading
-        ) return true;
-
         xController.setGains(xyGains);
         yController.setGains(xyGains);
         rotController.setGains(rotGains);
@@ -85,6 +79,8 @@ public final class PIDDriver {
                 rot
         ));
 
-        return false;
+        return  abs(xError) <= admissibleError.x &&
+                abs(yError) <= admissibleError.y &&
+                abs(headingError) <= admissibleError.heading;
     }
 }

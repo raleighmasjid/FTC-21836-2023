@@ -123,6 +123,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
             case SCORING_1:
 
+                driver.driveTo(robot.drivetrain, toPose2d(placements[0]));
+
                 if (timer.seconds() <= TIME_DROP_FIRST) break;
 
                 opState = MOVING_TO_2;
@@ -141,6 +143,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 opState = SCORING_2;
 
             case SCORING_2:
+
+                driver.driveTo(robot.drivetrain, toPose2d(placements[1]));
 
                 if (timer.seconds() <= TIME_DROP_SECOND) break;
 
