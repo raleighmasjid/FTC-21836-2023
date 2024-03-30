@@ -84,7 +84,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
             Y_TOP_LEFT = 1053.9285714285713 * SCALING_FACTOR,
             TARGET_SIZE = 65 * SCALING_FACTOR,
-            X_FIRST_PIXEL = 80 * SCALING_FACTOR,
+            X_FIRST_PIXEL = 128.9125 * SCALING_FACTOR,
             Y_FIRST_PIXEL = 966.875 * SCALING_FACTOR,
             X_SHIFT_PIXEL_POINTS_L = -28.321428571428573 * SCALING_FACTOR,
             X_SHIFT_PIXEL_POINTS_R = 28.321428571428573 * SCALING_FACTOR,
@@ -674,7 +674,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (x == 0 && evenRow) continue;
 
             centerPoints[y][x] = new Point(
-                    clipX(X_FIRST_PIXEL + (x * X_DIST_GRID) - (evenRow ? 0.5 * X_DIST_GRID : 0)),
+                    clipX(X_FIRST_PIXEL + ((x - 1) * X_DIST_GRID) + (!evenRow ? 0.5 * X_DIST_GRID : 0)),
                     clipY(Y_FIRST_PIXEL + (y * Y_DIST_GRID))
             );
         }
