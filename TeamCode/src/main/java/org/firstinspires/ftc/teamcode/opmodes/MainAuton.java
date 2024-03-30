@@ -89,8 +89,7 @@ public final class MainAuton extends LinearOpMode {
                 X_BACKDROP,
                 (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE)
                         - ((pixel.x - 1) * WIDTH_PIXEL)
-                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0
-                ),
+                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0),
                 PI
         );
     }
