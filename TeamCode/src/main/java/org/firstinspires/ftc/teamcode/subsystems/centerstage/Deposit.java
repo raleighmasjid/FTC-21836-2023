@@ -241,7 +241,7 @@ public final class Deposit {
         private final ElapsedTime timer = new ElapsedTime(), retractionTimer = new ElapsedTime();
         private boolean droppedPixel = true, floor = false;
         public int pixelsLocked = 0;
-        private final Pixel.Color[] colors = {EMPTY, EMPTY};
+        public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(
