@@ -7,8 +7,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.MOV
 import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.MOVING_TO_2;
 import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.SCORING_1;
 import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.SCORING_2;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.SET_FOR_1;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.SET_FOR_2;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx2;
@@ -39,10 +37,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
     enum OpState {
         MANUAL,
-        SET_FOR_1,
         MOVING_TO_1,
         SCORING_1,
-        SET_FOR_2,
         MOVING_TO_2,
         SCORING_2;
 
@@ -84,8 +80,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 opState = MANUAL;
             } else if (keyPressed(1, X)) {
 
-                if (robot.deposit.paintbrush.pixelsLocked == 2) opState = SET_FOR_1;
-                else if (robot.deposit.paintbrush.pixelsLocked == 1) opState = SET_FOR_2;
+                if (robot.deposit.paintbrush.pixelsLocked == 2) opState = MOVING_TO_1;
+                else if (robot.deposit.paintbrush.pixelsLocked == 1) opState = MOVING_TO_2;
 
             }
 
@@ -113,12 +109,9 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 teleOpControls();
                 break;
 
-            case SET_FOR_1:
+            case MOVING_TO_1:
 
                 robot.deposit.lift.setTargetRow(placements[0].y);
-                opState = MOVING_TO_1;
-
-            case MOVING_TO_1:
 
                 Pose2d first = toPose2d(placements[0]);
                 boolean reached1 = driver.driveTo(robot.drivetrain, first);
@@ -134,14 +127,11 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 if (timer.seconds() <= TIME_DROP_FIRST) break;
 
-                opState = SET_FOR_2;
-
-            case SET_FOR_2:
-
-                robot.deposit.lift.setTargetRow(placements[1].y);
                 opState = MOVING_TO_2;
 
             case MOVING_TO_2:
+
+                robot.deposit.lift.setTargetRow(placements[1].y);
 
                 Pose2d second = toPose2d(placements[1]);
                 boolean reached2 = driver.driveTo(robot.drivetrain, second);
