@@ -394,9 +394,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
             Pixel pixel = new Pixel(x, y, c);
-            if (logicEnhancements && c != EMPTY && !backdrop.isSupported(pixel)) {
-                pixel = new Pixel(pixel, EMPTY);
-            }
+            if (logicEnhancements && c != EMPTY && !backdrop.isSupported(pixel)) continue;
             backdrop.add(pixel);
         }
     }
