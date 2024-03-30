@@ -274,6 +274,7 @@ public final class Intake {
                 if (pixelsTransferred) {
                     state = RETRACTED;
                     isIntaking = false;
+                    setDesiredPixelCount(2);
                 } else break;
 
             case RETRACTED:
