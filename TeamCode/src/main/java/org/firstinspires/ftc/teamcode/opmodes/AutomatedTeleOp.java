@@ -22,7 +22,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Pain
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -113,8 +112,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 robot.deposit.lift.setTargetRow(placements[0].y);
 
-                Pose2d first = toPose2d(placements[0]);
-                boolean reached1 = driver.driveTo(robot.drivetrain, first);
+                boolean reached1 = driver.driveTo(robot.drivetrain, toPose2d(placements[0]));
 
                 if (!reached1) break;
 
@@ -133,8 +131,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 robot.deposit.lift.setTargetRow(placements[1].y);
 
-                Pose2d second = toPose2d(placements[1]);
-                boolean reached2 = driver.driveTo(robot.drivetrain, second);
+                boolean reached2 = driver.driveTo(robot.drivetrain, toPose2d(placements[1]));
 
                 if (!reached2) break;
 
