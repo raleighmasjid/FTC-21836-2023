@@ -598,34 +598,55 @@ public class BackdropPipeline extends OpenCvPipeline {
     private double[] getColorOfPixel(Mat input, int y, int x) {
         double hueSum = 0, satSum = 0, valSum = 0;
 
+        double sampleCount = samplePoints[y][x].length;
+
         for (int i = 0; i < samplePoints[y][x].length; i++) {
             Point samplePoint = samplePoints[y][x][i];
             sampleHSVs[y][x][i] = input.get((int) samplePoint.y, (int) samplePoint.x);
+
+            if (voidHSV(sampleHSVs[y][x][i])) {
+                sampleCount--;
+                continue;
+            }
+
             hueSum += sampleHSVs[y][x][i][0];
             satSum += sampleHSVs[y][x][i][1];
             valSum += sampleHSVs[y][x][i][2];
         }
 
-        double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
-        double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
-        double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
+        if (sampleCount == 0) {
 
-        averageHSVs[y][x][0] = avgHue;
-        averageHSVs[y][x][1] = round(avgSat * 1000) / 1000.0;
-        averageHSVs[y][x][2] = round(avgVal * 1000) / 1000.0;
+            averageHSVs[y][x][0] = 0;
+            averageHSVs[y][x][1] = 0;
+            averageHSVs[y][x][2] = 0;
+
+        } else {
+
+            double avgHue = hueSum / sampleCount * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+            double avgSat = satSum / sampleCount / 255.0;
+            double avgVal = valSum / sampleCount / 255.0;
+
+            averageHSVs[y][x][0] = avgHue;
+            averageHSVs[y][x][1] = round(avgSat * 1000) / 1000.0;
+            averageHSVs[y][x][2] = round(avgVal * 1000) / 1000.0;
+        }
 
         return averageHSVs[y][x];
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
         return
-                (hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0) ? INVALID :
+                voidHSV(hsv) ? INVALID :
                 inRange(hsv, minPurple, maxPurple) ? PURPLE :
                 inRange(hsv, minYellow, maxYellow) ? YELLOW :
                 inRange(hsv, minGreen, maxGreen)   ? GREEN :
                 inRange(hsv, minWhite, maxWhite)   ? WHITE :
                 EMPTY
         ;
+    }
+
+    private static boolean voidHSV(double[] hsv) {
+        return hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0;
     }
 
     private static Scalar colorToScalar(Pixel.Color color) {
