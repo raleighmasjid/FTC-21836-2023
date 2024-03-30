@@ -142,10 +142,12 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Telemetry telemetry;
 
     private final Point[][] centerPoints = new Point[11][7];
-    private final Point[][][] samplePoints = new Point[11][7][4];
-    private final Point[][][] hexCorners = new Point[11][7][6];
-    private final double[][][][] sampleHSVs = new double[11][7][4][3];
     private final double[][][] averageHSVs = new double[11][7][3];
+
+    private final Point[][][] samplePoints = new Point[11][7][4];
+    private final double[][][][] sampleHSVs = new double[11][7][4][3];
+
+    private final Point[][][] hexCorners = new Point[11][7][6];
 
     private final Size CIRCLE_DET_SIZE = new Size(CIRCLE_DET_BLUR, CIRCLE_DET_BLUR);
 
