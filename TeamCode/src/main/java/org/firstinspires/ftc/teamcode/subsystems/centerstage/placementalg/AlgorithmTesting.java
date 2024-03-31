@@ -26,7 +26,7 @@ final class AlgorithmTesting {
                 "_ _ _ _ _ _ _",
                 " _ _ _ _ _ _",
                 "_ _ _ _ _ _ _",
-                " W W _ _ _ _",
+                " _ W _ _ _ _",
                 "W W G _ _ _ _",
                 " p W W _ _ _",
                 "g y W g _ _ _",
