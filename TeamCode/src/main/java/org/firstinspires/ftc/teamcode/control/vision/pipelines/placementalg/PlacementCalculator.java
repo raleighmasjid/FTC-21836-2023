@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANYCOLOR;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
@@ -23,8 +22,7 @@ public final class PlacementCalculator {
 
     private final ArrayList<Pixel>
             optimalPlacements = new ArrayList<>(),
-            colorsToGetSPixels = new ArrayList<>(),
-            whites = new ArrayList<>();
+            colorsToGetSPixels = new ArrayList<>();
 
     private ArrayList<Pixel> setLineSPixels;
     private boolean auton, specifyColors = true;
@@ -297,9 +295,9 @@ public final class PlacementCalculator {
     }
 
     private void removeUnsupportedPixels(ArrayList<Pixel> pixels) {
-        ArrayList<Pixel> pixelsToPlaceCopy = new ArrayList<>(pixels);
+        ArrayList<Pixel> pixelsCopy = new ArrayList<>(pixels);
         pixels.clear();
-        for (Pixel pixel : pixelsToPlaceCopy) if (backdrop.isSupported(pixel)) pixels.add(pixel);
+        for (Pixel pixel : pixelsCopy) if (backdrop.isSupported(pixel)) pixels.add(pixel);
     }
 
     private void removeDuplicates(ArrayList<Pixel> pixels) {
@@ -398,7 +396,6 @@ public final class PlacementCalculator {
                     specifyColors ? getFirstColor() :
                     Pixel.Color.ANY
         );
-        if (p1.color == ANY) whites.add(p1.clone());
         return p1;
     }
 
@@ -455,24 +452,17 @@ public final class PlacementCalculator {
 
         optimalPlacements.clear();
         colorsToGetSPixels.clear();
-        whites.clear();
 
         countColorsLeft();
         scanForMosaics();
         scanForSetLinePixels();
         scanForEmptySpot();
 
-        removeDuplicates(whites);
-        removeOverridingPixels(whites);
-        removeUnsupportedPixels(whites);
-
         removeDuplicates(optimalPlacements);
         removeOverridingPixels(optimalPlacements);
         removeUnsupportedPixels(optimalPlacements);
 
         sortPixelsToPlace();
-
-        optimalPlacements.addAll(whites);
 
         return new ArrayList<>(optimalPlacements);
     }
