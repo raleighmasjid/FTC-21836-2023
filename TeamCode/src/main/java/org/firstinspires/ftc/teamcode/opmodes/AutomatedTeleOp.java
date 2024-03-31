@@ -109,10 +109,10 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
             case CALCULATE:
 
-                int pixelsLocked = robot.deposit.paintbrush.pixelsLocked;
-                Pixel.Color[] colors = robot.deposit.paintbrush.colors;
-
-                Pixel.Color color = colors[pixelsLocked < 2 ? 1 : 0];
+                Pixel.Color color =
+                        robot.deposit.paintbrush.colors[0] != EMPTY ?
+                                robot.deposit.paintbrush.colors[0] :
+                                robot.deposit.paintbrush.colors[1];
 
                 placement = color.getCounterpartIn(
                         calculator.getOptimalPlacements(backdrop),
@@ -140,9 +140,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 if (timer.seconds() <= TIME_DROP_FIRST) break;
 
-                pixelsLocked = robot.deposit.paintbrush.pixelsLocked;
-
-                opState = pixelsLocked > 0 ? CALCULATE : MANUAL;
+                opState = robot.deposit.paintbrush.colors[1] != EMPTY ? CALCULATE : MANUAL;
         }
     }
 }
