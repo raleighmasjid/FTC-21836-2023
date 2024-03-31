@@ -237,7 +237,7 @@ public final class PlacementCalculator {
 
         for (Pixel p : colorsToGetSPixels) optimalPlacements.addAll(getSupportPixels(p));
         removeDuplicates(optimalPlacements);
-        removeUnsupportedOptimalPlacements();
+        removeUnsupportedPixels(optimalPlacements);
         removeOverridingPixels(optimalPlacements);
     }
 
@@ -292,10 +292,10 @@ public final class PlacementCalculator {
         return false;
     }
 
-    private void removeUnsupportedOptimalPlacements() {
-        ArrayList<Pixel> pixelsToPlaceCopy = new ArrayList<>(optimalPlacements);
-        optimalPlacements.clear();
-        for (Pixel pixel : pixelsToPlaceCopy) if (backdrop.isSupported(pixel)) optimalPlacements.add(pixel);
+    private void removeUnsupportedPixels(ArrayList<Pixel> pixels) {
+        ArrayList<Pixel> pixelsToPlaceCopy = new ArrayList<>(pixels);
+        pixels.clear();
+        for (Pixel pixel : pixelsToPlaceCopy) if (backdrop.isSupported(pixel)) pixels.add(pixel);
     }
 
     private void removeDuplicates(ArrayList<Pixel> pixels) {
@@ -371,7 +371,7 @@ public final class PlacementCalculator {
         Pixel setLineGoal = getSetLineGoal();
         setLineSPixels = getSupportPixels(setLineGoal);
         if (setLineGoal.y <= 8) optimalPlacements.addAll(setLineSPixels);
-        removeUnsupportedOptimalPlacements();
+        removeUnsupportedPixels(optimalPlacements);
     }
 
     private void scanForEmptySpot() {
@@ -457,13 +457,18 @@ public final class PlacementCalculator {
         scanForSetLinePixels();
         scanForEmptySpot();
 
-        optimalPlacements.addAll(whites);
+        removeDuplicates(whites);
+        removeOverridingPixels(whites);
+        removeUnsupportedPixels(whites);
 
         removeDuplicates(optimalPlacements);
         removeOverridingPixels(optimalPlacements);
-        removeUnsupportedOptimalPlacements();
+        removeUnsupportedPixels(optimalPlacements);
 
         sortPixelsToPlace();
+
+        optimalPlacements.addAll(whites);
+
         return new ArrayList<>(optimalPlacements);
     }
 }
