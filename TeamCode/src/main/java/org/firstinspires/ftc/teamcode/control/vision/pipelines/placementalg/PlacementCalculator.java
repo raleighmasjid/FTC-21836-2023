@@ -398,7 +398,7 @@ public final class PlacementCalculator {
                     specifyColors ? getFirstColor() :
                     Pixel.Color.ANY
         );
-        if (p1.color == ANY) whites.add(new Pixel(p1, WHITE));
+        if (p1.color == ANY) whites.add(p1.clone());
         return p1;
     }
 
