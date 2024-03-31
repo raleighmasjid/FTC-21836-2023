@@ -58,7 +58,7 @@ public final class PlacementCalculator {
         };
         for (Pixel p : shouldBeWhite) if (!(p.color == EMPTY || p.color == Pixel.Color.WHITE)) return false;
 
-        return true;
+        return isMosaicPossible();
     }
 
     /**
@@ -396,6 +396,7 @@ public final class PlacementCalculator {
                     specifyColors ? getFirstColor() :
                     Pixel.Color.ANY
         );
+        if (p1.color.isColored()) p1.scoreValue += 10 / 3.0;
         return p1;
     }
 
@@ -438,7 +439,7 @@ public final class PlacementCalculator {
                     pixel.mHelper = true;
                 }
             }
-            if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x) / 3.0;
+//            if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x) / 3.0;
 
             if (pixel.isIn(setLineSPixels)) pixel.scoreValue += 10 / (double) setLineSPixels.size();
         }
