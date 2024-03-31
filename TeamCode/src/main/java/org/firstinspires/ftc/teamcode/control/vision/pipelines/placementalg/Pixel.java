@@ -13,8 +13,12 @@ public final class Pixel implements Comparable<Pixel> {
      * @return The difference in {@link #scoreValue} between this {@link Pixel} and the provided {@link Pixel}
      */
     public int compareTo(Pixel other) {
-        double diff = other.scoreValue - scoreValue;
-        if (diff == 0) diff = y - other.y;
+        double diff = other.scoreValue - this.scoreValue;
+        if (diff == 0) diff = this.y - other.y;
+        if (diff == 0) {
+            if (other.mHelper) diff++;
+            if (this.mHelper) diff--;
+        }
         return (int) (diff * 1000000000);
     }
 
@@ -23,6 +27,7 @@ public final class Pixel implements Comparable<Pixel> {
     public final Color color;
     double scoreValue = 0;
     public Pixel mosaic = null;
+    boolean mHelper = false;
 
     public Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
@@ -36,6 +41,7 @@ public final class Pixel implements Comparable<Pixel> {
     public Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
+        this.mHelper = p.mHelper;
     }
 
     /**

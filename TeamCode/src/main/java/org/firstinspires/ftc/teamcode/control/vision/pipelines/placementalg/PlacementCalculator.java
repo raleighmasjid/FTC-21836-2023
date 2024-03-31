@@ -164,8 +164,11 @@ public final class PlacementCalculator {
                         Pixel p1 = new Pixel(pMosaic[1], ANYCOLOR);
                         Pixel p2 = new Pixel(pMosaic[2], ANYCOLOR);
 
-                        p1.scoreValue += 11 * .5;
-                        p2.scoreValue += 11 * .5;
+                        p1.scoreValue += 10 * .5;
+                        p2.scoreValue += 10 * .5;
+
+                        p1.mHelper = true;
+                        p2.mHelper = true;
 
                         optimalPlacements.add(p1);
                         optimalPlacements.add(p2);
@@ -252,7 +255,8 @@ public final class PlacementCalculator {
 
     private void oneRemainingCase(Pixel pixel, Pixel p1, Pixel p2) {
         Pixel p3 = new Pixel(p1, getRemainingColor(pixel.color, p2.color));
-        p3.scoreValue += 11;
+        p3.scoreValue += 10;
+        p3.mHelper = true;
         optimalPlacements.add(p3);
         colorsToGetSPixels.add(new Pixel(p3, EMPTY));
     }
@@ -431,6 +435,7 @@ public final class PlacementCalculator {
                 ArrayList<Pixel> mosaicSPixels = getSupportPixels(mosaicPixel);
                 if (pixel.isIn(mosaicSPixels)) {
                     pixel.scoreValue += mosaicPixel.scoreValue / (double) mosaicSPixels.size();
+                    pixel.mHelper = true;
                 }
             }
             if (pixel.color.matches(ANYCOLOR)) pixel.scoreValue += abs(3 - pixel.x) / 3.0;
