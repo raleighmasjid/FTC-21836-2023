@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANYCOLOR;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.WHITE;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
@@ -21,7 +23,8 @@ public final class PlacementCalculator {
 
     private final ArrayList<Pixel>
             optimalPlacements = new ArrayList<>(),
-            colorsToGetSPixels = new ArrayList<>();
+            colorsToGetSPixels = new ArrayList<>(),
+            whites = new ArrayList<>();
 
     private ArrayList<Pixel> setLineSPixels;
     private boolean auton, specifyColors = true;
@@ -386,7 +389,13 @@ public final class PlacementCalculator {
     }
 
     private Pixel getSafePixel(Pixel pixel) {
-        return new Pixel(pixel, touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) || auton ? Pixel.Color.WHITE : specifyColors ? getFirstColor() : Pixel.Color.ANY);
+        Pixel p1 = new Pixel(pixel,
+                touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) || auton ? Pixel.Color.WHITE :
+                    specifyColors ? getFirstColor() :
+                    Pixel.Color.ANY
+        );
+        if (p1.color == ANY) whites.add(new Pixel(p1, WHITE));
+        return p1;
     }
 
     private Pixel.Color getFirstColor() {
@@ -431,30 +440,24 @@ public final class PlacementCalculator {
         Collections.sort(optimalPlacements);
     }
 
-    public ArrayList<Pixel> getOptimalPlacementsWithExtraWhites(Backdrop backdrop) {
-        ArrayList<Pixel> specificPlacements = getOptimalPlacements(backdrop);
-        specifyColors = false;
-        ArrayList<Pixel> vaguePlacements = getOptimalPlacements(backdrop);
-        specifyColors = true;
-        for (Pixel placement : vaguePlacements) if (placement.color == Pixel.Color.ANY) {
-            specificPlacements.add(new Pixel(placement, Pixel.Color.WHITE));
-        }
-        return specificPlacements;
-    }
-
     public ArrayList<Pixel> getOptimalPlacements(Backdrop backdrop) {
         this.backdrop = backdrop;
         backdrop.mosaicCount = 0;
+
         colorsLeft[0] = initialColors[0];
         colorsLeft[1] = initialColors[1];
         colorsLeft[2] = initialColors[2];
+
         optimalPlacements.clear();
         colorsToGetSPixels.clear();
+        whites.clear();
 
         countColorsLeft();
         scanForMosaics();
         scanForSetLinePixels();
         scanForEmptySpot();
+
+        optimalPlacements.addAll(whites);
 
         removeDuplicates(optimalPlacements);
         removeOverridingPixels(optimalPlacements);
