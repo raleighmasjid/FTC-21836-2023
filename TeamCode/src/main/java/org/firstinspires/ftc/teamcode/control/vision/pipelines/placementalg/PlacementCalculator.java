@@ -400,13 +400,16 @@ public final class PlacementCalculator {
     }
 
     private Pixel.Color getFirstColor() {
-        int p = colorsLeft[0], y = colorsLeft[1], g = colorsLeft[2];
-        boolean mosaicPossible = p >= 3 || y >= 3 || g >= 3 || (p >= 1 && y >= 1 && g >= 1);
-        if (!mosaicPossible) return Pixel.Color.WHITE;
-        int max = max(max(p, y), g);
+        if (!isMosaicPossible()) return Pixel.Color.WHITE;
+        int max = max(max(colorsLeft[0], colorsLeft[1]), colorsLeft[2]);
         int index = 0;
         for (int i = 0; i < colorsLeft.length; i++) if (colorsLeft[i] == max) index = i;
         return Pixel.Color.get(index);
+    }
+
+    private boolean isMosaicPossible() {
+        int p = colorsLeft[0], y = colorsLeft[1], g = colorsLeft[2];
+        return p >= 3 || y >= 3 || g >= 3 || (p >= 1 && y >= 1 && g >= 1);
     }
 
     private boolean noSpaceForMosaics(Pixel pixel) {
