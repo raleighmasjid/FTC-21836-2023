@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author Arshad Anas
  */
 public final class PlacementCalculator {
-    public static final int[] initialColors = {5, 5, 5};
+    public static final int[] initialColors = {6, 6, 6};
 
     private Backdrop backdrop;
     public final int[] colorsLeft = {5, 5, 5};
@@ -189,6 +189,7 @@ public final class PlacementCalculator {
             }
         }
         removeDuplicates(colorsToGetSPixels);
+        removeDuplicates(optimalPlacements);
 
         // remove specifically colored placements from colorsLeft[]
         for (Pixel pixel : optimalPlacements) if (pixel.color.isColored()) {
@@ -200,12 +201,16 @@ public final class PlacementCalculator {
 
             ArrayList<Pixel> placementsToRemove = new ArrayList<>();
             ArrayList<Pixel> placementsToAdd = new ArrayList<>();
+            ArrayList<Pixel> neighborsHit = new ArrayList<>();
 
+            coloredPlacements:
             for (Pixel pixel : optimalPlacements) if (pixel.color == ANYCOLOR) {
                 int c1 = 0;
                 for (Pixel neighbor : backdrop.getNeighbors(pixel))
                     if (neighbor.color.isColored()) {
                         c1 = neighbor.color.ordinal();
+                        if (neighbor.isIn(neighborsHit)) continue coloredPlacements;
+                        neighborsHit.add(neighbor);
                         break;
                     }
                 int c2 = (c1 + 1) % 3;
@@ -257,6 +262,13 @@ public final class PlacementCalculator {
         p3.mHelper = true;
         optimalPlacements.add(p3);
         colorsToGetSPixels.add(new Pixel(p3, EMPTY));
+    }
+
+    private boolean touchingAdjacentColor(Pixel pixel) {
+        for (Pixel neighbor : backdrop.getNeighbors(pixel)) if (neighbor.color.isColored()) {
+                return true;
+        }
+        return false;
     }
 
     private boolean touchingAdjacentMosaic(Pixel pixel, boolean includeEmpties) {
@@ -392,7 +404,7 @@ public final class PlacementCalculator {
 
     private Pixel getSafePixel(Pixel pixel) {
         Pixel p1 = new Pixel(pixel,
-                touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) || auton ? Pixel.Color.WHITE :
+                touchingAdjacentColor(pixel) || touchingAdjacentMosaic(pixel, true) || noSpaceForMosaics(pixel) || auton ? Pixel.Color.WHITE :
                     specifyColors ? getFirstColor() :
                     Pixel.Color.ANY
         );
@@ -467,6 +479,10 @@ public final class PlacementCalculator {
         removeUnsupportedPixels(optimalPlacements);
 
         sortPixelsToPlace();
+
+        System.out.println(colorsLeft[0]);
+        System.out.println(colorsLeft[1]);
+        System.out.println(colorsLeft[2]);
 
         return new ArrayList<>(optimalPlacements);
     }
