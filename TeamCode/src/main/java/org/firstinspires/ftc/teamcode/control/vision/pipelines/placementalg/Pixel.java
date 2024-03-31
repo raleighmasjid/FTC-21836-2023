@@ -213,5 +213,14 @@ public final class Pixel implements Comparable<Pixel> {
         boolean isColored() {
             return ordinal() <= 2;
         }
+
+        /**
+         * @return The first {@link Pixel} with identical {@link #x} and {@link #y} present in the provided {@link Iterable} <br>
+         * Returns null if no such {@link Pixel} is found
+         */
+        public Pixel getCounterpartIn(Iterable<Pixel> array, boolean isRed) {
+            for (Pixel pixel : array) if (this == pixel.color) return pixel;
+            return new Pixel((isRed ? -2 : 9), 0, EMPTY);
+        }
     }
 }

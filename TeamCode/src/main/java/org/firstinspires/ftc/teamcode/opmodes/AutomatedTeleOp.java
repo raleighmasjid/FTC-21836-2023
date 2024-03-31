@@ -30,8 +30,6 @@ import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Back
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
 
-import java.util.ArrayList;
-
 @TeleOp
 @Config
 public final class AutomatedTeleOp extends LinearOpMode {
@@ -56,7 +54,6 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
     private final Backdrop backdrop = autonBackdrop;
     private final PlacementCalculator calculator = new PlacementCalculator();
-    private ArrayList<Pixel> placements = new ArrayList<>();
     private Pixel placement = new Pixel(0, 0, EMPTY);
     private final Pixel.Color[] wingColors = {EMPTY, EMPTY};
 
@@ -115,15 +112,12 @@ public final class AutomatedTeleOp extends LinearOpMode {
                 int pixelsLocked = robot.deposit.paintbrush.pixelsLocked;
                 Pixel.Color[] colors = robot.deposit.paintbrush.colors;
 
-                Pixel.Color have = colors[pixelsLocked < 2 ? 1 : 0];
+                Pixel.Color color = colors[pixelsLocked < 2 ? 1 : 0];
 
-                placement = new Pixel((isRed ? -2 : 9), 0, EMPTY);
-                placements = calculator.getOptimalPlacements(backdrop);
-
-                for (Pixel p : placements) if (p.color == have) {
-                    placement = p;
-                    break;
-                }
+                placement = color.getCounterpartIn(
+                        calculator.getOptimalPlacements(backdrop),
+                        isRed
+                );
 
                 opState = MOVING;
 
