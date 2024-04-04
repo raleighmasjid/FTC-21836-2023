@@ -215,8 +215,8 @@ public final class Pixel implements Comparable<Pixel> {
         }
 
         /**
-         * @return The first {@link Pixel} with identical {@link #x} and {@link #y} present in the provided {@link Iterable} <br>
-         * Returns null if no such {@link Pixel} is found
+         * @return The first {@link Pixel} with identical {@link #color} present in the provided {@link Iterable} <br>
+         * Returns a {@link Pixel} with out-of-bounds coordinates if no matching {@link #color}ed {@link Pixel} is found
          */
         public Pixel getCounterpartIn(Iterable<Pixel> array, boolean isRed) {
             for (Pixel pixel : array) if (this == pixel.color) return pixel;
