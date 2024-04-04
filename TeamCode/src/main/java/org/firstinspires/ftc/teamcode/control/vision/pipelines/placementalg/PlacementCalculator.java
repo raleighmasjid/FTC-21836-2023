@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANYCOLOR;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.colors;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
@@ -174,7 +175,7 @@ public final class PlacementCalculator {
                         colorsToGetSPixels.add(new Pixel(p1, EMPTY));
                         colorsToGetSPixels.add(new Pixel(p2, EMPTY));
 
-                        countExpendedPixels(pixel);
+                        countExpendedPixels(pixel, p1, p2);
                     }
                     if (pMosaic[1].color == EMPTY || pMosaic[2].color == EMPTY) {
                         invalidateMosaic(pixel);
@@ -199,23 +200,20 @@ public final class PlacementCalculator {
         removeOverridingPixels(optimalPlacements);
     }
 
-    private void countExpendedPixels(Pixel pixel) {
-        int c1 = pixel.color.ordinal();
+    private void countExpendedPixels(Pixel p1, Pixel p2, Pixel p3) {
+        int c1 = p1.color.ordinal();
         int c2 = (c1 + 1) % 3;
         int c3 = (c1 + 2) % 3;
-
-        Pixel other = null;
-        for (Pixel p1 : optimalPlacements) {
-            if (backdrop.touching(pixel, p1) && p1.color == ANYCOLOR) {
-                other = p1;
-                break;
-            }
-        }
 
         if (colorsLeft[c2] >= 1 && colorsLeft[c3] >= 1) {
             colorsLeft[c2]--;
             colorsLeft[c3]--;
-        } else if (colorsLeft[c1] >= 2) colorsLeft[c1] -= 2;
+            p2.recommended = colors[c2];
+            p3.recommended = colors[c3];
+        } else if (colorsLeft[c1] >= 2) {
+            colorsLeft[c1] -= 2;
+            p2.recommended = p3.recommended = colors[c1];
+        }
     }
 
     private Pixel.Color getRemainingColor(Pixel.Color c1, Pixel.Color c2) {
@@ -228,7 +226,9 @@ public final class PlacementCalculator {
     }
 
     private void oneRemainingCase(Pixel p1, Pixel fillLoc, Pixel p2) {
-        Pixel p3 = new Pixel(fillLoc, getRemainingColor(p1.color, p2.color));
+        Pixel.Color remainingColor = getRemainingColor(p1.color, p2.color);
+        Pixel p3 = new Pixel(fillLoc, remainingColor);
+        p3.recommended = remainingColor;
         p3.scoreValue += 10;
         p3.mHelper = true;
         optimalPlacements.add(p3);
@@ -390,7 +390,7 @@ public final class PlacementCalculator {
         int max = max(max(colorsLeft[0], colorsLeft[1]), colorsLeft[2]);
         int index = 0;
         for (int i = 0; i < colorsLeft.length; i++) if (colorsLeft[i] == max) index = i;
-        return Pixel.Color.colors[index];
+        return colors[index];
     }
 
     private boolean isMosaicPossible() {

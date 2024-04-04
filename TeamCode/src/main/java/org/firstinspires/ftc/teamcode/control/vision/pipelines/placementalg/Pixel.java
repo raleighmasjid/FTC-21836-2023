@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.INVALID;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ public final class Pixel implements Comparable<Pixel> {
     public final int x;
     public final int y;
     public final Color color;
+    Color recommended = EMPTY;
     double scoreValue = 0;
     public Pixel mosaic = null;
     boolean mHelper = false;
@@ -91,14 +93,14 @@ public final class Pixel implements Comparable<Pixel> {
     @NonNull
     public String toString() {
         double decPlaces = 100000;
-        return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
+        return "(" + x + ", " + y + "), " + recommended.name() + " or " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
     }
 
     /**
      * Prints this scoring location to telemetry in an easily user-readable form
      */
     public String userFriendlyString() {
-        return userFriendlyX() + ", " + color.name();
+        return userFriendlyX() + ", " + recommended.name() + " or " + color.name();
     }
 
     private String userFriendlyX() {
