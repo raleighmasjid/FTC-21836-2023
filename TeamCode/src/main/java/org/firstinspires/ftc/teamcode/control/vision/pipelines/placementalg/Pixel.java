@@ -44,6 +44,7 @@ public final class Pixel implements Comparable<Pixel> {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
         this.mHelper = p.mHelper;
+        this.recommended = p.recommended;
     }
 
     /**

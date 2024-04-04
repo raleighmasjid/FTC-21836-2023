@@ -73,7 +73,9 @@ public final class Backdrop {
             default:
                 int x = pixel.x;
                 int y = pixel.y;
-                if (coordsInRange(x, y) && !(y % 2 == 0 && x == 0)) slots[y][x] = pixel;
+                if (coordsInRange(x, y) && !(y % 2 == 0 && x == 0)) {
+                    slots[y][x] = pixel.recommended != EMPTY && random() >= 0.5 ? new Pixel(pixel, pixel.recommended) : pixel;
+                }
         }
         return this;
     }

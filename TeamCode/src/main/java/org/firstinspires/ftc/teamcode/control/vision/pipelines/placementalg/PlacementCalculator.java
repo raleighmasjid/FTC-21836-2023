@@ -382,7 +382,10 @@ public final class PlacementCalculator {
                     specifyColors ? getFirstColor() :
                     Pixel.Color.ANY
         );
-        if (p1.color == ANY) p1.scoreValue += 10 / 3.0;
+        if (p1.color == ANY) {
+            p1.recommended = getFirstColor();
+            p1.scoreValue += 10 / 3.0;
+        }
         return p1;
     }
 
@@ -453,9 +456,9 @@ public final class PlacementCalculator {
 
         sortPixelsToPlace();
 
-        System.out.println(colorsLeft[0]);
-        System.out.println(colorsLeft[1]);
-        System.out.println(colorsLeft[2]);
+//        System.out.println(colorsLeft[0]);
+//        System.out.println(colorsLeft[1]);
+//        System.out.println(colorsLeft[2]);
 
         return new ArrayList<>(optimalPlacements);
     }
