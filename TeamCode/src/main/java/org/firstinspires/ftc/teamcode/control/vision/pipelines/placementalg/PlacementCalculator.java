@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author Arshad Anas
  */
 public final class PlacementCalculator {
-    public static final int[] initialColors = {5, 5, 5};
+    public static final int[] initialColors = {7, 5, 5};
 
     private Backdrop backdrop;
     public final int[] colorsLeft = {5, 5, 5};
