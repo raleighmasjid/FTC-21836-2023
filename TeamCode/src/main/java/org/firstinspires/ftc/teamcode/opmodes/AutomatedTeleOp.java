@@ -109,15 +109,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
             case CALCULATE:
 
-                Pixel.Color color =
-                        robot.deposit.paintbrush.colors[0] != EMPTY ?
-                                robot.deposit.paintbrush.colors[0] :
-                                robot.deposit.paintbrush.colors[1];
-
-                placement = color.getCounterpartIn(
-                        calculator.getOptimalPlacements(backdrop),
-                        isRed
-                );
+                updatePlacement();
 
                 opState = MOVING;
 
@@ -142,5 +134,17 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 opState = robot.deposit.paintbrush.colors[1] != EMPTY ? CALCULATE : MANUAL;
         }
+    }
+
+    private void updatePlacement() {
+
+        placement = (
+                robot.deposit.paintbrush.colors[0] == EMPTY ?
+                        robot.deposit.paintbrush.colors[1] :
+                        robot.deposit.paintbrush.colors[0]
+        ).getCounterpartIn(
+                calculator.getOptimalPlacements(backdrop),
+                isRed
+        );
     }
 }
