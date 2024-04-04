@@ -219,7 +219,7 @@ public final class Pixel implements Comparable<Pixel> {
          * Returns a {@link Pixel} with out-of-bounds coordinates if no matching {@link #color}ed {@link Pixel} is found
          */
         public Pixel getCounterpartIn(Iterable<Pixel> array, boolean isRed) {
-            for (Pixel pixel : array) if (this == pixel.color) return pixel;
+            for (Pixel pixel : array) if (this.matches(pixel.color)) return pixel;
             return new Pixel((isRed ? -2 : 9), 0, EMPTY);
         }
     }
