@@ -119,7 +119,7 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
 
     private boolean pixelsTransferred = false, isIntaking = false;
-    private int desiredPixelCount = 2;
+    private int intakingAmount = 2;
     private double motorPower;
 
     enum State {
@@ -237,7 +237,7 @@ public final class Intake {
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
-                if (topFull || !isIntaking || desiredPixelCount < 2) {
+                if (topFull || !isIntaking || intakingAmount < 2) {
                     if (isIntaking) latch.setActivated(true);
                     state = WAITING_FOR_DEPOSIT;
                 } else break;
@@ -274,7 +274,7 @@ public final class Intake {
                 if (pixelsTransferred) {
                     state = RETRACTED;
                     isIntaking = false;
-                    setDesiredPixelCount(2);
+                    setIntakingAmount(2);
                 } else break;
 
             case RETRACTED:
@@ -336,8 +336,8 @@ public final class Intake {
         this.motorPower = motorPower;
     }
 
-    public void setDesiredPixelCount(int pixelCount) {
-        this.desiredPixelCount = clip(pixelCount, 1, 2);
+    public void setIntakingAmount(int pixelCount) {
+        this.intakingAmount = clip(pixelCount, 1, 2);
     }
 
     public void setExtended(boolean isIntaking) {
@@ -353,6 +353,8 @@ public final class Intake {
     }
 
     void printTelemetry() {
+        mTelemetry.addLine("Intaking " + intakingAmount + " pixels");
+        mTelemetry.addLine();
         mTelemetry.addData("Top color", reads[1].name());
         mTelemetry.addData("Bottom color", reads[0].name());
     }

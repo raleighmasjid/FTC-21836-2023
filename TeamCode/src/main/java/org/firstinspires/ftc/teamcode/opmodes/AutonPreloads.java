@@ -162,7 +162,7 @@ final class AutonPreloads {
                     robot.deposit.paintbrush.toggleFloor();
                     robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
                     robot.intake.setHeight(FIVE_STACK);
-                    robot.intake.setDesiredPixelCount(1);
+                    robot.intake.setIntakingAmount(1);
                 })
 
                 .lineToSplineHeading(stack)
@@ -175,7 +175,7 @@ final class AutonPreloads {
                 .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
                     robot.intake.setHeight(FOUR_STACK);
-                    robot.intake.setDesiredPixelCount(2);
+                    robot.intake.setIntakingAmount(2);
                 })
         ;
 
