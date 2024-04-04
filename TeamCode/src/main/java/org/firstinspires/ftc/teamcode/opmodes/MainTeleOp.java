@@ -196,7 +196,7 @@ public final class MainTeleOp extends LinearOpMode {
             else if (keyPressed(1, DPAD_LEFT))  robot.deposit.paintbrush.dropPixel();
             else if (keyPressed(1, DPAD_RIGHT)) robot.deposit.paintbrush.lockPixels(WHITE);
 
-            if (keyPressed(1, Y))               robot.intake.setIntakingAmount(1);
+            if (keyPressed(1, Y))               robot.intake.toggleIntakeAmount();
             if (keyPressed(1, A))               robot.intake.toggle();
             if (keyPressed(1, B))               robot.endgame();
 

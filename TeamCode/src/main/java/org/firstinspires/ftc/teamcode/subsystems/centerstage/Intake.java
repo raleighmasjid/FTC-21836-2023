@@ -340,6 +340,10 @@ public final class Intake {
         this.intakingAmount = clip(pixelCount, 1, 2);
     }
 
+    public void toggleIntakeAmount() {
+        setIntakingAmount(intakingAmount == 2 ? 1 : 2);
+    }
+
     public void setExtended(boolean isIntaking) {
         this.isIntaking = isIntaking;
     }
