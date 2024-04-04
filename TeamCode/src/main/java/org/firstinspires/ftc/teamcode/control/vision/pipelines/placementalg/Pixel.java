@@ -138,10 +138,7 @@ public final class Pixel implements Comparable<Pixel> {
         INVALID;
 
         private static final String RESET = "\u001B[0m";
-        private static final Color[] values = values();
-        public static Color get(int ordinal) {
-            return values[ordinal];
-        }
+        public static final Color[] colors = values();
 
         /**
          * @return A single-letter {@link String} representation of this {@link Color} <br>
