@@ -50,7 +50,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    static boolean doAutoSlow = true;
+    static boolean doAutoSlow = true, wasTranslating;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -166,10 +166,22 @@ public final class MainTeleOp extends LinearOpMode {
         );
 
         double x = gamepadEx1.getRightX();
+        boolean overrideMode = gamepadEx1.isDown(LEFT_BUMPER);
 
-        if (gamepadEx1.isDown(LEFT_BUMPER)) {
+        if (wasTranslating || !overrideMode) wasTranslating = isTranslating();
+        else {
 
             robot.deposit.lift.setLiftPower(gamepadEx1.getLeftY());
+            if (keyPressed(1, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
+
+            // SET HEADING:
+            double y = gamepadEx1.getRightY();
+            if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(-atan2(y, x) - FORWARD);
+            x = 0;
+
+        }
+
+        if (overrideMode) {
 
             if (keyPressed(1, DPAD_UP))         robot.drivetrain.setTargetHeading(0);
             else if (keyPressed(1, DPAD_LEFT))  robot.drivetrain.setTargetHeading(PI * 0.5);
@@ -181,13 +193,6 @@ public final class MainTeleOp extends LinearOpMode {
             if (keyPressed(1, B))               robot.intake.setHeight(THREE_STACK);
             if (keyPressed(1, A))               robot.intake.setHeight(TWO_STACK);
             if (keyPressed(1, RIGHT_BUMPER))    robot.intake.setHeight(FLOOR);
-
-            if (keyPressed(1, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
-
-            // SET HEADING:
-            double y = gamepadEx1.getRightY();
-            if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(-atan2(y, x) - FORWARD);
-            x = 0;
 
         } else {
 
