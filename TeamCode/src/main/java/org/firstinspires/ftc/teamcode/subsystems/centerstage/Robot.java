@@ -64,7 +64,7 @@ public final class Robot {
     }
 
     public void endgame() {
-        if (!drone.isActivated()) drone.toggle();
+        if (!drone.isActivated()) drone.setActivated(true);
         else deposit.lift.climb();
     }
 
