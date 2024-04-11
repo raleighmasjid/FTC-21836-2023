@@ -218,4 +218,8 @@ public final class MainTeleOp extends LinearOpMode {
                 driveSlow
         );
     }
+
+    static boolean isTranslating() {
+        return gamepadEx1.getLeftX() != 0 || gamepadEx1.getLeftY() != 0 || gamepadEx1.getRightX() != 0;
+    }
 }

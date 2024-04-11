@@ -16,6 +16,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.toPose2d;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.doAutoSlow;
+import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.isTranslating;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpControls;
 import static org.firstinspires.ftc.teamcode.opmodes.MainTeleOp.teleOpInit;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
@@ -71,13 +72,8 @@ public final class AutomatedTeleOp extends LinearOpMode {
             gamepadEx1.readButtons();
             gamepadEx2.readButtons();
 
-            if (
-                    gamepadEx1.getLeftX() != 0 ||
-                    gamepadEx1.getLeftY() != 0 ||
-                    gamepadEx1.getRightY() != 0
-            ) {
-                opState = MANUAL;
-            } else if (keyPressed(1, X) && robot.deposit.paintbrush.pixelsLocked > 0) {
+            if (isTranslating()) opState = MANUAL;
+            else if (keyPressed(1, X) && robot.deposit.paintbrush.pixelsLocked > 0) {
                 opState = CALCULATE;
             }
 
