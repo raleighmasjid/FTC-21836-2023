@@ -238,13 +238,13 @@ public final class SwerveDrivetrain implements Drivetrain {
         modules[FR.o].setVelo(vFR);
         modules[FL.o].setVelo(vFL);
 
-        double veloSum =
-                        vBR +
-                        vBL +
-                        vFR +
-                        vFL ;
+        boolean moving =
+                        vBR != 0 ||
+                        vBL != 0 ||
+                        vFR != 0 ||
+                        vFL != 0;
 
-        if (veloSum != 0) {
+        if (moving) {
             modules[BR.o].setTheta(states[BR.o].theta);
             modules[BL.o].setTheta(states[BL.o].theta);
             modules[FR.o].setTheta(states[FR.o].theta);
