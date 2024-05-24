@@ -1,25 +1,40 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.CORNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.loopMod;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
-public class AutonVars {
+public final class AutonVars {
 
-    public static boolean
+    enum ParkingLocation {
+        CORNER,
+        BACKDROP,
+        MIDFIELD;
+
+        public static final ParkingLocation[] locations = values();
+
+        public ParkingLocation plus(int i) {
+            return locations[loopMod(ordinal() + i, locations.length)];
+        }
+    }
+
+
+    static boolean
             isRed = true,
-            backdropSide = true,
+            isBackdropSide = true,
             cycle = false,
-            park = true,
-            parkInner = true,
             partnerWillDoRand = false;
 
     static final int[] ourPlacements = {1, 3, 6};
 
-    public static double
+    static ParkingLocation parking = CORNER;
+
+    static double
             SIZE_WINDOW = 720,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,
@@ -28,7 +43,6 @@ public class AutonVars {
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
-            X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE = -14,
             X_INTAKING = -52,
             Y_INTAKING_1 = -10,
             Y_INTAKING_2 = -23.625,
@@ -44,15 +58,13 @@ public class AutonVars {
             X_SHIFT_INTAKING = 2,
             SPEED_INTAKING = 1,
             SPEED_INTAKE_STACK_APPROACH = 0.1,
-            BOTTOM_ROW_HEIGHT = 2.5,
             X_BACKDROP = 51,
             Y_BACKDROP_0_BLUE = 43,
             Y_BACKDROP_0_RED = -29,
             WIDTH_PIXEL = 3,
-            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1,
-            HEIGHT_SPIKE_AUDIENCE = -0.5;
+            ANGLE_INNER_SPIKE_AUDIENCE_APPROACH = 1;
 
-    public static EditablePose
+    static EditablePose
             startPose = new EditablePose(X_START_RIGHT, Y_START, FORWARD),
             centerSpikeBackdrop = new EditablePose(19, -22.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
@@ -60,11 +72,10 @@ public class AutonVars {
             centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
             innerSpikeAudience = new EditablePose(-36, -30, LEFT),
             outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
-            postOuterAudience = new EditablePose(-36, -SIZE_TILE * .5, LEFT),
-            parkingInner = new EditablePose(X_BACKDROP, -60, LEFT),
-            parkedInner = new EditablePose(60, parkingInner.y, LEFT),
-            parkingOuter = new EditablePose(X_BACKDROP, -12, LEFT),
-            parkedOuter = new EditablePose(60, parkingOuter.y, LEFT),
+            parkingCorner = new EditablePose(X_BACKDROP, -60, LEFT),
+            parkedCorner = new EditablePose(60, parkingCorner.y, LEFT),
+            parkingMidfield = new EditablePose(X_BACKDROP, -12, LEFT),
+            parkedMidfield = new EditablePose(60, parkingMidfield.y, LEFT),
             enteringBackstage = new EditablePose(22, -11, LEFT),
             offsetAudienceInner = new EditablePose(0, 0, 0),
             offsetAudienceOuter = new EditablePose(0, 0, 0),

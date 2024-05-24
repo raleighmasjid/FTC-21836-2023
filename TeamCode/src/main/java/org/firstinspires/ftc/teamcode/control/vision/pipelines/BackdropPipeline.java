@@ -21,7 +21,6 @@
 
 package org.firstinspires.ftc.teamcode.control.vision.pipelines;
 
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.aqua;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.black;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.blue;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.AprilTagDetectionPipeline.draw3dCubeMarker;
@@ -76,6 +75,8 @@ public class BackdropPipeline extends OpenCvPipeline {
             showCircleDet = false,
             logicEnhancements = true;
 
+    public int futureSteps = 1;
+
     private static final double
             SCALING_FACTOR = 1 / 8.0,
             SCREEN_HEIGHT = 1280 * SCALING_FACTOR,
@@ -83,7 +84,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             X_TOP_LEFT_R_TAG = 536.25 * SCALING_FACTOR,
             Y_TOP_LEFT = 1053.9285714285713 * SCALING_FACTOR,
             TARGET_SIZE = 65 * SCALING_FACTOR,
-            X_FIRST_PIXEL = 80 * SCALING_FACTOR,
+            X_FIRST_PIXEL = 128.9125 * SCALING_FACTOR,
             Y_FIRST_PIXEL = 966.875 * SCALING_FACTOR,
             X_SHIFT_PIXEL_POINTS_L = -28.321428571428573 * SCALING_FACTOR,
             X_SHIFT_PIXEL_POINTS_R = 28.321428571428573 * SCALING_FACTOR,
@@ -91,6 +92,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             Y_SHIFT_PIXEL_POINTS_B = 24.142857142857142 * SCALING_FACTOR,
             HEX_RADIUS = 80 * SCALING_FACTOR,
             HEX_SIDE_LENGTH = HEX_RADIUS / sqrt(3),
+            PLACEMENT_MARKER_RADIUS = 30 * SCALING_FACTOR,
             X_DIST_GRID = 97.825 * SCALING_FACTOR,
             Y_DIST_GRID = -85.0 * SCALING_FACTOR,
             CIRCLE_DET_BLUR = 16 * SCALING_FACTOR,
@@ -136,13 +138,16 @@ public class BackdropPipeline extends OpenCvPipeline {
     private final Mat grey = new Mat(), cameraMatrix, warpedGray = new Mat(), circles = new Mat();
 
     public final Backdrop backdrop;
+    private final PlacementCalculator calculator = new PlacementCalculator();
     private final Telemetry telemetry;
 
     private final Point[][] centerPoints = new Point[11][7];
-    private final Point[][][] samplePoints = new Point[11][7][4];
-    private final Point[][][] hexCorners = new Point[11][7][6];
-    private final double[][][][] sampleHSVs = new double[11][7][4][3];
     private final double[][][] averageHSVs = new double[11][7][3];
+
+    private final Point[][][] samplePoints = new Point[11][7][4];
+    private final double[][][][] sampleHSVs = new double[11][7][4][3];
+
+    private final Point[][][] hexCorners = new Point[11][7][6];
 
     private final Size CIRCLE_DET_SIZE = new Size(CIRCLE_DET_BLUR, CIRCLE_DET_BLUR);
 
@@ -335,7 +340,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             drawPixelIcon(input, y, x);
         }
 
-        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = calculator.getOptimalPlacements(backdrop);
         for (int y = 0; y < centerPoints.length; y++) for (int x = 0; x < centerPoints[y].length; x++) {
             if (x == 0 && y % 2 == 0) continue;
             Pixel pixel = backdrop.get(x, y);
@@ -343,10 +348,19 @@ public class BackdropPipeline extends OpenCvPipeline {
         }
 
         if (optimalPlacements.isEmpty()) return;
+
         Pixel p = optimalPlacements.get(0);
-        Imgproc.circle(input, centerPoints[p.y][p.x], (int) HEX_SIDE_LENGTH, aqua);
-        for (Pixel a : optimalPlacements) {
-            telemetry.addLine(a.toString());
+        Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
+
+        for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
+
+        if (futureSteps > 1) for (int i = 1; i < futureSteps; i++) {
+            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(p));
+
+            if (optimalPlacements.isEmpty()) return;
+
+            p = optimalPlacements.get(0);
+            Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
         }
     }
 
@@ -380,9 +394,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             telemetry.addLine("(" + x + ", " + y + "), " + c.name() + ": " + color[0] + ", " + color[1] + ", " + color[2]);
             if (c == INVALID || c == backdrop.get(x, y).color) continue;
             Pixel pixel = new Pixel(x, y, c);
-            if (logicEnhancements && c != EMPTY && !backdrop.isSupported(pixel)) {
-                pixel = new Pixel(pixel, EMPTY);
-            }
+            if (logicEnhancements && c != EMPTY && !backdrop.isSupported(pixel)) continue;
             backdrop.add(pixel);
         }
     }
@@ -471,6 +483,8 @@ public class BackdropPipeline extends OpenCvPipeline {
                 target[0].equals(target[2])
         );
         telemetry.addLine("Valid affine warp: " + valid);
+
+        if (!valid) return;
 
         Point[] source = {
                 findCenter(target[0]),
@@ -586,34 +600,55 @@ public class BackdropPipeline extends OpenCvPipeline {
     private double[] getColorOfPixel(Mat input, int y, int x) {
         double hueSum = 0, satSum = 0, valSum = 0;
 
+        double sampleCount = samplePoints[y][x].length;
+
         for (int i = 0; i < samplePoints[y][x].length; i++) {
             Point samplePoint = samplePoints[y][x][i];
             sampleHSVs[y][x][i] = input.get((int) samplePoint.y, (int) samplePoint.x);
+
+            if (voidHSV(sampleHSVs[y][x][i])) {
+                sampleCount--;
+                continue;
+            }
+
             hueSum += sampleHSVs[y][x][i][0];
             satSum += sampleHSVs[y][x][i][1];
             valSum += sampleHSVs[y][x][i][2];
         }
 
-        double avgHue = hueSum / ((double) samplePoints[y][x].length) * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
-        double avgSat = satSum / ((double) samplePoints[y][x].length) / 255.0;
-        double avgVal = valSum / ((double) samplePoints[y][x].length) / 255.0;
+        if (sampleCount == 0) {
 
-        averageHSVs[y][x][0] = avgHue;
-        averageHSVs[y][x][1] = round(avgSat * 1000) / 1000.0;
-        averageHSVs[y][x][2] = round(avgVal * 1000) / 1000.0;
+            averageHSVs[y][x][0] = 0;
+            averageHSVs[y][x][1] = 0;
+            averageHSVs[y][x][2] = 0;
+
+        } else {
+
+            double avgHue = hueSum / sampleCount * 2.0; // HUE IS MULTIPLIED BY 2 FOR RANGE [0, 360]
+            double avgSat = satSum / sampleCount / 255.0;
+            double avgVal = valSum / sampleCount / 255.0;
+
+            averageHSVs[y][x][0] = avgHue;
+            averageHSVs[y][x][1] = round(avgSat * 1000) / 1000.0;
+            averageHSVs[y][x][2] = round(avgVal * 1000) / 1000.0;
+        }
 
         return averageHSVs[y][x];
     }
 
     private static Pixel.Color hsvToColor(double[] hsv) {
         return
-                (hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0) ? INVALID :
+                voidHSV(hsv) ? INVALID :
                 inRange(hsv, minPurple, maxPurple) ? PURPLE :
                 inRange(hsv, minYellow, maxYellow) ? YELLOW :
                 inRange(hsv, minGreen, maxGreen)   ? GREEN :
                 inRange(hsv, minWhite, maxWhite)   ? WHITE :
                 EMPTY
         ;
+    }
+
+    private static boolean voidHSV(double[] hsv) {
+        return hsv[0] == 0 && hsv[1] == 0 && hsv[2] == 0;
     }
 
     private static Scalar colorToScalar(Pixel.Color color) {
@@ -641,7 +676,7 @@ public class BackdropPipeline extends OpenCvPipeline {
             if (x == 0 && evenRow) continue;
 
             centerPoints[y][x] = new Point(
-                    clipX(X_FIRST_PIXEL + (x * X_DIST_GRID) - (evenRow ? 0.5 * X_DIST_GRID : 0)),
+                    clipX(X_FIRST_PIXEL + ((x - 1) * X_DIST_GRID) + (!evenRow ? 0.5 * X_DIST_GRID : 0)),
                     clipY(Y_FIRST_PIXEL + (y * Y_DIST_GRID))
             );
         }

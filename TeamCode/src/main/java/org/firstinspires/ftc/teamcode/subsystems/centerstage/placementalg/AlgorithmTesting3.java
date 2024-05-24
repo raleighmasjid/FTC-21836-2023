@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg;
 
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANY;
-import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.ANYCOLOR;
-
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Backdrop;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.PlacementCalculator;
@@ -10,7 +7,7 @@ import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Plac
 import java.util.ArrayList;
 import java.util.Scanner;
 
-final class AlgorithmTesting {
+final class AlgorithmTesting3 {
     public static void main(String[] args) {
 
         PlacementCalculator calculator = new PlacementCalculator();
@@ -26,13 +23,13 @@ final class AlgorithmTesting {
                 "_ _ _ _ _ _ _",
                 " _ _ _ _ _ _",
                 "_ _ _ _ _ _ _",
-                " _ W _ _ _ _",
-                "W W G _ _ _ _",
-                " p W W _ _ _",
-                "g y W g _ _ _",
-                " W W y p _ _",
-                "g p W W W _ _",
-                " y W P Y W _",
+                " _ _ _ _ _ _",
+                "_ _ _ _ _ _ _",
+                " _ _ _ _ _ _",
+                "_ _ _ _ _ _ _",
+                " _ _ _ _ _ _",
+                "_ _ _ _ _ _ _",
+                " _ _ _ _ _ _",
         };
 
         for (int y = 0; y < colors.length; y++) {
@@ -61,7 +58,7 @@ final class AlgorithmTesting {
             }
             if (solve) {
                 Pixel placement = optimalPlacements.get(0);
-                backdrop.add(alwaysPlaceColored && placement.color == ANY ? new Pixel(placement, ANYCOLOR) : placement);
+                backdrop.add(alwaysPlaceColored && placement.color == Pixel.Color.ANY ? new Pixel(placement, Pixel.Color.ANYCOLOR) : placement);
             }
             optimalPlacements = calculator.getOptimalPlacements(backdrop);
             if (!solve || printPerIteration) {

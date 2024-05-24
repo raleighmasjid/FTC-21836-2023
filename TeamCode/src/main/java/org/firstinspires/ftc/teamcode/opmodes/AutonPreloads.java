@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.stackPos;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ANGLE_INNER_SPIKE_AUDIENCE_APPROACH;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.HEIGHT_SPIKE_AUDIENCE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKE_STACK_APPROACH;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.TIME_INTAKING;
@@ -30,6 +29,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.RIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.toPose2d;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_FLOOR_SCORING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 
 import java.util.ArrayList;
 
-class AutonPreloads {
+final class AutonPreloads {
 
     static void backdropPreloads(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
         if (inner) {
@@ -94,7 +94,7 @@ class AutonPreloads {
 
         sequence
                 .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
-                    robot.deposit.lift.setTargetRow(HEIGHT_SPIKE_AUDIENCE);
+                    robot.deposit.lift.setTargetRow(ROW_FLOOR_SCORING);
                 })
                 .addTemporalMarker(() -> {
                     robot.intake.toggle();
@@ -162,7 +162,7 @@ class AutonPreloads {
                     robot.deposit.paintbrush.toggleFloor();
                     robot.intake.setMotorPower(SPEED_INTAKE_STACK_APPROACH);
                     robot.intake.setHeight(FIVE_STACK);
-                    robot.intake.setDesiredPixelCount(1);
+                    robot.intake.setIntakingAmount(1);
                 })
 
                 .lineToSplineHeading(stack)
@@ -175,7 +175,7 @@ class AutonPreloads {
                 .addTemporalMarker( () -> {
                     robot.intake.setMotorPower(0);
                     robot.intake.setHeight(FOUR_STACK);
-                    robot.intake.setDesiredPixelCount(2);
+                    robot.intake.setIntakingAmount(2);
                 })
         ;
 

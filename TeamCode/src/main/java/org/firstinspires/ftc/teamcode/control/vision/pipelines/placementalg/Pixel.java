@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg;
 
+import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.INVALID;
 
 import androidx.annotation.NonNull;
@@ -13,16 +14,22 @@ public final class Pixel implements Comparable<Pixel> {
      * @return The difference in {@link #scoreValue} between this {@link Pixel} and the provided {@link Pixel}
      */
     public int compareTo(Pixel other) {
-        double diff = other.scoreValue - scoreValue;
-        if (diff == 0) diff = y - other.y;
+        double diff = other.scoreValue - this.scoreValue;
+        if (diff == 0) diff = this.y - other.y;
+        if (diff == 0) {
+            if (other.mHelper) diff++;
+            if (this.mHelper) diff--;
+        }
         return (int) (diff * 1000000000);
     }
 
     public final int x;
     public final int y;
     public final Color color;
+    Color recommended = EMPTY;
     double scoreValue = 0;
     public Pixel mosaic = null;
+    boolean mHelper = false;
 
     public Pixel(int x, int y, Pixel.Color color) {
         this.x = x;
@@ -36,6 +43,8 @@ public final class Pixel implements Comparable<Pixel> {
     public Pixel(Pixel p, Pixel.Color color) {
         this(p.x, p.y, color);
         this.scoreValue = p.scoreValue;
+        this.mHelper = p.mHelper;
+        this.recommended = p.recommended;
     }
 
     /**
@@ -85,14 +94,14 @@ public final class Pixel implements Comparable<Pixel> {
     @NonNull
     public String toString() {
         double decPlaces = 100000;
-        return "(" + x + ", " + y + "), " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
+        return "(" + x + ", " + y + "), " + recommended.name() + " or " + color.name() + ", " + (int) (scoreValue * decPlaces) / decPlaces;
     }
 
     /**
      * Prints this scoring location to telemetry in an easily user-readable form
      */
     public String userFriendlyString() {
-        return userFriendlyX() + ", " + color.name();
+        return userFriendlyX() + ", " + recommended.name() + " or " + color.name();
     }
 
     private String userFriendlyX() {
@@ -132,10 +141,7 @@ public final class Pixel implements Comparable<Pixel> {
         INVALID;
 
         private static final String RESET = "\u001B[0m";
-        private static final Color[] values = values();
-        public static Color get(int ordinal) {
-            return values[ordinal];
-        }
+        public static final Color[] colors = values();
 
         /**
          * @return A single-letter {@link String} representation of this {@link Color} <br>
@@ -206,6 +212,15 @@ public final class Pixel implements Comparable<Pixel> {
          */
         boolean isColored() {
             return ordinal() <= 2;
+        }
+
+        /**
+         * @return The first {@link Pixel} with identical {@link #color} present in the provided {@link Iterable} <br>
+         * Returns a {@link Pixel} with out-of-bounds coordinates if no matching {@link #color}ed {@link Pixel} is found
+         */
+        public Pixel getCounterpartIn(Iterable<Pixel> array, boolean isRed) {
+            for (Pixel pixel : array) if (this.matches(pixel.color)) return pixel;
+            return new Pixel((isRed ? -2 : 9), 0, EMPTY);
         }
     }
 }

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.vision.detectors;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.openftc.easyopencv.OpenCvCameraRotation.UPRIGHT;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -28,7 +27,6 @@ public class TeamPropDetector {
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
         );
         pipeline = new PropDetectPipeline(mTelemetry);
-        pipeline.isRed = isRed;
         camera.setPipeline(pipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.mechanismtests;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.roadrunner.util.Encoder.Direction.REVERSE;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.INCHES_PER_TICK;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -13,30 +13,31 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.BulkReader;
 
 @TeleOp(group = "Single mechanism test")
-public final class TestOdoPodEncoders extends LinearOpMode {
+public final class TestLiftEncoder extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        BulkReader bulkReader = new BulkReader(hardwareMap);
+        // Initialize multiple telemetry outputs:
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right front"));
-        Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left front"));
-        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "left back"));
-        leftEncoder.setDirection(REVERSE);
+        BulkReader bulkReader = new BulkReader(hardwareMap);
 
+        // Motors and variables to manage their readings:
+        Encoder encoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right back"));
+        double offset = encoder.getCurrentPosition();
+        
         waitForStart();
 
         // Control loop:
         while (opModeIsActive()) {
             bulkReader.bulkRead();
 
+            double x = INCHES_PER_TICK * (encoder.getCurrentPosition() - offset);
 
-            mTelemetry.addData("Right", rightEncoder.getCurrentPosition());
-            mTelemetry.addData("Left", leftEncoder.getCurrentPosition());
-            mTelemetry.addData("Lateral", frontEncoder.getCurrentPosition());
+            mTelemetry.addData("Current position (in)", x);
             mTelemetry.update();
         }
     }
+
 }

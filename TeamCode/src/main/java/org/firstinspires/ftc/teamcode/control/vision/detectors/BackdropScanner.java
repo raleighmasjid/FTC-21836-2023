@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.control.vision.detectors;
 
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.openftc.easyopencv.OpenCvCameraRotation.SIDEWAYS_RIGHT;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -31,8 +30,6 @@ public class BackdropScanner {
                 hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName())
         );
         pipeline = new BackdropPipeline(mTelemetry, autonBackdrop);
-
-        pipeline.isRed = isRed;
         pipeline.showGraphics = false;
 
         camera.setPipeline(pipeline);

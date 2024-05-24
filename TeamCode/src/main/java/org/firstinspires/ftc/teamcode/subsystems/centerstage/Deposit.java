@@ -4,9 +4,10 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_1150;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.BOTTOM_ROW_HEIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.HEIGHT_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBED;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_CLIMBING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Lift.ROW_RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_SECOND;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_FLOOR_RETRACTION;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_SCORING_RETRACTION;
@@ -14,17 +15,16 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot.maxVol
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getReversedServo;
-
 import static java.lang.Math.round;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.control.controllers.PIDController;
-import org.firstinspires.ftc.teamcode.control.filters.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.FeedforwardGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.LowPassGains;
@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrices.PIDGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrices.ProfileConstraints;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel;
+import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot;
 
 @Config
@@ -49,20 +50,18 @@ public final class Deposit {
 
         if (!paintbrush.droppedPixel && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
-            lift.setTargetRow(-1);
+            lift.setTargetRow(ROW_RETRACTED);
         }
 
         lift.run(intakeClear);
-        paintbrush.pivot.setActivated(paintbrushExtended() && intakeClear);
+
+        boolean extendPaintbrush = intakeClear && lift.targetRow != ROW_CLIMBING && lift.targetRow != ROW_CLIMBED && lift.isScoring();
+        paintbrush.pivot.setActivated(extendPaintbrush);
         paintbrush.run();
     }
 
     boolean isExtended() {
         return lift.isExtended() || paintbrush.retractionTimer.seconds() <= (paintbrush.floor ? TIME_FLOOR_RETRACTION : TIME_SCORING_RETRACTION);
-    }
-
-    private boolean paintbrushExtended() {
-        return lift.isScoring() && lift.targetRow != HEIGHT_CLIMBING;
     }
 
     @Config
@@ -100,20 +99,25 @@ public final class Deposit {
         public static double
                 kG = 0.15,
                 INCHES_PER_TICK = 0.0088581424,
+                ROW_RETRACTED = -1,
+                ROW_FLOOR_SCORING = -0.5,
+                ROW_CLIMBED = 0.5,
+                ROW_CLIMBING = 6.25,
+                HEIGHT_RETRACTED = 0.5,
+                HEIGHT_ROW_0 = 2.5,
                 HEIGHT_PIXEL = 2.59945,
-                HEIGHT_CLIMBING = 6.25,
-                HEIGHT_MIN = 0.5,
                 PERCENT_OVERSHOOT = 0,
+                SPEED_RETRACTION = -0.05,
                 POS_1 = 0,
                 POS_2 = 25;
 
         // Motors and variables to manage their readings:
         private final MotorEx[] motors;
+        private final Encoder encoder;
         private State currentState, targetState;
-        private final KalmanFilter kDFilter = new KalmanFilter(kalmanGains);
-        private final PIDController controller = new PIDController(kDFilter);
+        private final PIDController controller = new PIDController();
 
-        private double manualLiftPower, targetRow;
+        private double manualLiftPower, targetRow, offset;
 
         // Battery voltage sensor and variable to track its readings:
         private final VoltageSensor batteryVoltageSensor;
@@ -126,31 +130,40 @@ public final class Deposit {
             };
             motors[1].setInverted(true);
             for (MotorEx motor : motors) motor.setZeroPowerBehavior(FLOAT);
+
+            encoder = new Encoder(hardwareMap.get(DcMotorEx.class, "right back"));
+
             reset();
         }
 
         public void reset() {
-            targetRow = -1;
+            targetRow = ROW_RETRACTED;
             controller.reset();
-            for (MotorEx motor : motors) motor.encoder.reset();
+            offset = encoder.getCurrentPosition();
             targetState = currentState = new State();
         }
 
         public boolean isScoring() {
-            return targetRow > -1;
+            return targetRow != ROW_RETRACTED;
         }
 
         public boolean isExtended() {
-            return currentState.x > HEIGHT_MIN;
+            return currentState.x > HEIGHT_RETRACTED;
+        }
+
+        public void climb() {
+            setTargetRow(targetRow == ROW_CLIMBING ? ROW_CLIMBED : ROW_CLIMBING);
         }
 
         public void setTargetRow(double targetRow) {
-            this.targetRow = clip(targetRow, -1, 10);
-            targetState = new State(rowToInches(this.targetRow));
+            this.targetRow = clip(targetRow, ROW_RETRACTED, 10);
+            double inches = rowToInches(this.targetRow);
+            targetState = new State(inches);
         }
 
         private static double rowToInches(double row) {
-            return row == -1 ? 0 : (row * HEIGHT_PIXEL + BOTTOM_ROW_HEIGHT);
+            if (row == ROW_RETRACTED) return 0;
+            return row * HEIGHT_PIXEL + HEIGHT_ROW_0;
         }
 
         public void changeRow(int deltaRow) {
@@ -162,9 +175,7 @@ public final class Deposit {
         }
 
         public void readSensors() {
-            currentState = new State(INCHES_PER_TICK * 0.5 * (motors[0].encoder.getPosition() + motors[1].encoder.getPosition()));
-
-            kDFilter.setGains(kalmanGains);
+            currentState = new State(INCHES_PER_TICK * (encoder.getCurrentPosition() - offset));
             controller.setGains(pidGains);
         }
 
@@ -172,23 +183,31 @@ public final class Deposit {
 
             if (manualLiftPower != 0) targetState = currentState;
 
-            controller.setTarget(intakeClear ? targetState : new State(0));
+            State setpoint = intakeClear ? targetState : new State(0);
+            controller.setTarget(setpoint);
+
+            boolean retracted = !isExtended();
 
             double voltageScalar = maxVoltage / batteryVoltageSensor.getVoltage();
-            double output = (
-                    manualLiftPower != 0 ?
-                            manualLiftPower * voltageScalar :
-                            controller.calculate(currentState)
-            ) + (
-                    currentState.x > 0.15 ?
-                            kG * voltageScalar :
-                            0
-            );
+            double output =
+                    (
+                            retracted ? 0 : kG * voltageScalar
+                    ) + (
+                        manualLiftPower != 0 ?          manualLiftPower * voltageScalar :
+                        retracted && setpoint.x == 0 ?  SPEED_RETRACTION * voltageScalar :
+                        controller.calculate(currentState)
+                    )
+            ;
             for (MotorEx motor : motors) motor.set(output);
         }
 
         void printTelemetry() {
-            mTelemetry.addData("Named target position", targetRow < 0 ? "Retracted" : "Row " + targetRow);
+            String namedPos =
+                    targetRow == ROW_RETRACTED ? "Retracted" :
+                    targetRow == ROW_CLIMBING ? "Climbing" :
+                    targetRow == ROW_CLIMBED? "Climbed" :
+                    "Row " + targetRow;
+            mTelemetry.addData("Named target position", namedPos);
         }
 
         void printNumericalTelemetry() {
@@ -221,8 +240,8 @@ public final class Deposit {
 
         private final ElapsedTime timer = new ElapsedTime(), retractionTimer = new ElapsedTime();
         private boolean droppedPixel = true, floor = false;
-        private int pixelsLocked = 0;
-        final Pixel.Color[] colors = {EMPTY, EMPTY};
+        public int pixelsLocked = 0;
+        public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
             pivot = new SimpleServoPivot(

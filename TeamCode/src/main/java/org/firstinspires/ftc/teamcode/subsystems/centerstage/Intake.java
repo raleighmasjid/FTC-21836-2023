@@ -16,7 +16,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_FALLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXELS_SETTLING;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_1_SETTLING;
-import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.PIXEL_2_SETTLING;
+import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.WAITING_FOR_DEPOSIT;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.State.RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getAxonServo;
 import static org.firstinspires.ftc.teamcode.subsystems.utilities.SimpleServoPivot.getGoBildaServo;
@@ -104,7 +104,7 @@ public final class Intake {
 
     private final MotorEx motor;
 
-    final ColorSensor[] sensors;
+    private final ColorSensor[] sensors;
     private final HSV[] HSVs = {new HSV(), new HSV()};
     private final Pixel.Color[] reads = {EMPTY, EMPTY};
     public final Pixel.Color[] colors = {EMPTY, EMPTY};
@@ -119,14 +119,14 @@ public final class Intake {
     private final ElapsedTime timer = new ElapsedTime(), timeSinceRetracted = new ElapsedTime();
 
     private boolean pixelsTransferred = false, isIntaking = false;
-    private int desiredPixelCount = 2;
+    private int intakingAmount = 2;
     private double motorPower;
 
     enum State {
         HAS_0_PIXELS,
         PIXEL_1_SETTLING,
         HAS_1_PIXEL,
-        PIXEL_2_SETTLING,
+        WAITING_FOR_DEPOSIT,
         PIVOTING,
         PIXELS_FALLING,
         PIXELS_SETTLING,
@@ -205,39 +205,50 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        reads[0] = fromHSV(HSVs[0] = sensors[0].getHSV());
-        reads[1] = fromHSV(HSVs[1] = sensors[1].getHSV());
+        if (state == PIXELS_FALLING || state == HAS_0_PIXELS) {
+            sensors[0].update();
+            HSVs[0] = sensors[0].getHSV();
+            reads[0] = fromHSV(HSVs[0]);
+        }
+
+        if (state == PIXELS_FALLING || state == HAS_1_PIXEL) {
+            sensors[1].update();
+            HSVs[1] = sensors[1].getHSV();
+            reads[1] = fromHSV(HSVs[1]);
+        }
 
         switch (state) {
             case HAS_0_PIXELS:
 
                 boolean bottomFull = (colors[0] = reads[0]) != EMPTY;
                 if (bottomFull || !isIntaking) {
-//                    if (bottomFull) setHeight(height.minus(1));
                     state = PIXEL_1_SETTLING;
                     timer.reset();
+                    latch.setActivated(true);
                 } else break;
 
             case PIXEL_1_SETTLING:
 
-                if (!isIntaking || timer.seconds() >= TIME_PIXEL_1_SETTLING) state = HAS_1_PIXEL;
-                else break;
+                if (!isIntaking || timer.seconds() >= TIME_PIXEL_1_SETTLING) {
+                    state = HAS_1_PIXEL;
+                    latch.setActivated(false);
+                } else break;
 
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
-                if (topFull || !isIntaking || desiredPixelCount < 2) {
-//                    if (topFull) setHeight(height.minus(1));
-                    if (reads[0] != EMPTY) latch.setActivated(true);
-                    state = PIXEL_2_SETTLING;
+                if (topFull || !isIntaking || intakingAmount < 2) {
+                    if (isIntaking) latch.setActivated(true);
+                    state = WAITING_FOR_DEPOSIT;
                 } else break;
 
-            case PIXEL_2_SETTLING:
+            case WAITING_FOR_DEPOSIT:
 
-                if (!depositIsExtended && (!isIntaking || (reads[1] == EMPTY ? 0 : 1) + (reads[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
+                if (!depositIsExtended && (!isIntaking || (colors[1] == EMPTY ? 0 : 1) + (colors[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
+                    setHeight(FLOOR);
                 } else break;
 
             case PIVOTING:
@@ -263,6 +274,7 @@ public final class Intake {
                 if (pixelsTransferred) {
                     state = RETRACTED;
                     isIntaking = false;
+                    setIntakingAmount(2);
                 } else break;
 
             case RETRACTED:
@@ -275,34 +287,29 @@ public final class Intake {
         }
 
 
-        boolean liftIsRunning = liftIsScoring || depositIsExtended;
+        boolean depositIsRunning = liftIsScoring || depositIsExtended;
 
-        if (state == RETRACTED) pivot.setActivated(!liftIsRunning);
+        if (state == RETRACTED) pivot.setActivated(!depositIsRunning);
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
-        double ANGLE_PIVOT_INTAKING =
-                state == RETRACTED && liftIsRunning ? ANGLE_PIVOT_VERTICAL :
+        boolean doneIntaking = state.ordinal() >= WAITING_FOR_DEPOSIT.ordinal();
+        boolean donePivoting = state.ordinal() > PIVOTING.ordinal();
+
+        if (donePivoting || state == PIXEL_1_SETTLING) setMotorPower(0);
+
+        double ANGLE_PIVOT_DOWN =
+                doneIntaking ? ANGLE_PIVOT_VERTICAL :
                 height != FLOOR ? height.getAngle() :
                 motorPower > 0 ? 0 :
                 ANGLE_PIVOT_FLOOR_CLEARANCE;
 
         pivot.updateAngles(
-                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_INTAKING,
+                ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_DOWN,
                 ANGLE_PIVOT_OFFSET + ANGLE_PIVOT_TRANSFERRING
         );
 
-        double ANGLE_LATCH_UNLOCKED;
-        switch (state) {
-            case PIXELS_FALLING:
-            case PIXELS_SETTLING:
-            case RETRACTED:
-                setMotorPower(0);
-            case PIVOTING:
-                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_TRANSFERRING; break;
-            default:
-                ANGLE_LATCH_UNLOCKED = ANGLE_LATCH_INTAKING;
-        }
+        double ANGLE_LATCH_UNLOCKED = doneIntaking ? ANGLE_LATCH_TRANSFERRING : ANGLE_LATCH_INTAKING;
 
         latch.updateAngles(ANGLE_LATCH_UNLOCKED, ANGLE_LATCH_LOCKED);
 
@@ -329,15 +336,29 @@ public final class Intake {
         this.motorPower = motorPower;
     }
 
-    public void setDesiredPixelCount(int pixelCount) {
-        this.desiredPixelCount = clip(pixelCount, 1, 2);
+    public void setIntakingAmount(int pixelCount) {
+        this.intakingAmount = clip(pixelCount, 1, 2);
+    }
+
+    public void toggleIntakeAmount() {
+        setIntakingAmount(intakingAmount == 2 ? 1 : 2);
+    }
+
+    public void setExtended(boolean isIntaking) {
+        this.isIntaking = isIntaking;
     }
 
     public void toggle() {
-        isIntaking = !isIntaking;
+        setExtended(!isIntaking);
+    }
+
+    public boolean isExtended() {
+        return state.ordinal() <= HAS_1_PIXEL.ordinal();
     }
 
     void printTelemetry() {
+        mTelemetry.addLine("Intaking " + intakingAmount + " pixels");
+        mTelemetry.addLine();
         mTelemetry.addData("Top color", reads[1].name());
         mTelemetry.addData("Bottom color", reads[0].name());
     }

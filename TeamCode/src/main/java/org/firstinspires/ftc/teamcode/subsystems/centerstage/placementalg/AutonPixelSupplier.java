@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public final class AutonPixelSupplier {
 
+    private static final PlacementCalculator calculator = new PlacementCalculator(true);
+
     public static int getOtherPlacement(int i) {
         return i + (i % 2 == 0 ? -1 : 1);
     }
@@ -16,14 +18,12 @@ public final class AutonPixelSupplier {
      * Calculates the optimal placements for autonomous scoring based on a randomization
      * @param ourPlacement The scoring X that will be considered for the yellow pixel placement and avoidance thereof
      * @param partnerWillDoRandomization Whether or not the alliance partner will place a yellow pixel on the backdrop
-     * @return An {@link ArrayList< Pixel >} of optimal placements for autonomous
+     * @return An {@link ArrayList<Pixel>} of optimal placements for autonomous
      */
     public static ArrayList<Pixel> getPlacements(boolean partnerWillDoRandomization, int ourPlacement) {
         int[] yellowPixelXs = partnerWillDoRandomization ?
                 new int[]{getOtherPlacement(ourPlacement), ourPlacement} :
                 new int[]{ourPlacement};
-
-        PlacementCalculator.auton = true;
 
         ArrayList<Pixel> placements = new ArrayList<>();
 
@@ -34,7 +34,7 @@ public final class AutonPixelSupplier {
             placements.add(yellowEnforced);
         }
 
-        ArrayList<Pixel> optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop);
+        ArrayList<Pixel> optimalPlacements = calculator.getOptimalPlacements(backdrop);
         while (backdrop.notFull()) {
             Pixel optimalPlacement = null;
             for (Pixel placement : optimalPlacements) {
@@ -43,11 +43,9 @@ public final class AutonPixelSupplier {
                 break;
             }
             if (optimalPlacement == null) break;
-            optimalPlacements = PlacementCalculator.getOptimalPlacements(backdrop.add(optimalPlacement));
+            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(optimalPlacement));
             placements.add(optimalPlacement);
         }
-
-        PlacementCalculator.auton = false;
 
         return placements;
     }

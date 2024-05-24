@@ -3,13 +3,10 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.TIME_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_INTAKING;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_SHIFT_INTAKING;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_START_LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_INTAKING_1;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_INTAKING_2;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_INTAKING_3;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.postOuterAudience;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.RIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
@@ -28,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake;
 
 import java.util.ArrayList;
 
-class AutonCycles {
+final class AutonCycles {
 
     static Pose2d stackPos(int stack) {
         return new EditablePose(X_INTAKING, stack == 3 ? Y_INTAKING_3 : stack == 2 ? Y_INTAKING_2 : Y_INTAKING_1, LEFT).byAlliance().toPose2d();
@@ -36,27 +33,13 @@ class AutonCycles {
 
     static void driveToStack1(TrajectorySequenceBuilder sequence, Intake.Height height) {
         sequence
-                .addTemporalMarker(() -> {
-                    robot.intake.setHeight(height);
-                    robot.intake.toggle();
-                })
                 .setTangent(LEFT)
                 .splineTo(AutonVars.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                .splineTo(stackPos(1).vec(), LEFT)
-        ;
-    }
-
-    static void driveToStack2(TrajectorySequenceBuilder sequence, Intake.Height height) {
-        Pose2d turnToStack1 = new EditablePose(X_START_LEFT + X_SHIFT_CENTER_AUDIENCE_STACK_CLEARANCE, Y_INTAKING_1, LEFT).byAlliance().toPose2d();
-        sequence
                 .addTemporalMarker(() -> {
                     robot.intake.setHeight(height);
+                    robot.intake.setExtended(true);
                 })
-                .setTangent(LEFT)
-                .splineToConstantHeading(AutonVars.enteringBackstage.byAlliance().toPose2d().vec(), LEFT)
-                .splineTo(turnToStack1.vec(), LEFT)
-                .lineTo(postOuterAudience.byAlliance().toPose2d().vec())
-                .lineTo(stackPos(2).vec())
+                .splineTo(stackPos(1).vec(), LEFT)
         ;
     }
 
@@ -107,6 +90,10 @@ class AutonCycles {
         mTelemetry.addLine();
 
         sequence
+                .addTemporalMarker( () -> {
+                    robot.intake.setMotorPower(0);
+                    robot.intake.setExtended(false);
+                })
                 .setTangent(RIGHT)
                 .splineToSplineHeading(backstage, RIGHT)
 

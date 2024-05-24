@@ -11,16 +11,21 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.CORNER;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.MIDFIELD;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_BLUE;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_BACKDROP_0_RED;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.cycle;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isBackdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ourPlacements;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.park;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.backdropSide;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedCorner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkedMidfield;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parking;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingCorner;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.parkingMidfield;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.partnerWillDoRand;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_CYCLE;
@@ -30,7 +35,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITI
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.placementalg.AutonPixelSupplier.getOtherPlacement;
 import static java.lang.Math.PI;
 import static java.util.Collections.swap;
@@ -85,8 +89,7 @@ public final class MainAuton extends LinearOpMode {
                 X_BACKDROP,
                 (isRed ? Y_BACKDROP_0_RED : Y_BACKDROP_0_BLUE)
                         - ((pixel.x - 1) * WIDTH_PIXEL)
-                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0
-                ),
+                        - (pixel.y % 2 != 0 ? 0.5 * WIDTH_PIXEL : 0),
                 PI
         );
     }
@@ -127,7 +130,6 @@ public final class MainAuton extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(hardwareMap);
-        robot.initRun();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(gamepad1);
@@ -153,10 +155,10 @@ public final class MainAuton extends LinearOpMode {
                     isRed = !isRed;
                     break;
                 case EDITING_SIDE:
-                    backdropSide = !backdropSide;
+                    isBackdropSide = !isBackdropSide;
                     break;
                 case EDITING_PARK:
-                    park = !park;
+                    parking = parking.plus(1);
                     break;
                 case EDITING_CYCLE:
                     cycle = !cycle;
@@ -174,10 +176,11 @@ public final class MainAuton extends LinearOpMode {
 
             mTelemetry.update();
         }
-        robot.preload();
+        robot.preload(isBackdropSide);
         robot.initRun();
 
         TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        detector.pipeline.isRed = isRed;
 
         Pose2d startPose = AutonVars.startPose.byBoth().toPose2d();
         robot.drivetrain.setPoseEstimate(startPose);
@@ -213,9 +216,9 @@ public final class MainAuton extends LinearOpMode {
     private void printConfig(AutonConfig selection) {
         mTelemetry.addLine((isRed ? "RED " : "BLUE ") + selection.markIf(EDITING_ALLIANCE));
         mTelemetry.addLine();
-        mTelemetry.addLine((backdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
+        mTelemetry.addLine((isBackdropSide ? "BACKDROP " : "AUDIENCE ") + "side" + selection.markIf(EDITING_SIDE));
         mTelemetry.addLine();
-        mTelemetry.addLine("WILL " + (park ? "PARK" : "NOT PARK") + selection.markIf(EDITING_PARK));
+        mTelemetry.addLine(parking.name() + " PARKING" + selection.markIf(EDITING_PARK));
         mTelemetry.addLine();
         mTelemetry.addLine("WILL " + (cycle ? "CYCLE" : "NOT CYCLE") + selection.markIf(EDITING_CYCLE));
         mTelemetry.addLine();
@@ -241,15 +244,15 @@ public final class MainAuton extends LinearOpMode {
                 autonBackdrop.add(placements.get(0));
                 placements.remove(0);
             }
-            if (!backdropSide) swap(placements, 0, 1);
+            if (!isBackdropSide) swap(placements, 0, 1);
 
             boolean outer, inner;
             switch (rand) {
                 case LEFT:
-                    outer = !(inner = (backdropSide == isRed));
+                    outer = !(inner = (isBackdropSide == isRed));
                     break;
                 case RIGHT:
-                    inner = !(outer = (backdropSide == isRed));
+                    inner = !(outer = (isBackdropSide == isRed));
                     break;
                 default:
                     outer = inner = false;
@@ -261,13 +264,13 @@ public final class MainAuton extends LinearOpMode {
                     .setTangent(startPose.getHeading())
                     ;
 
-            if (backdropSide) backdropPreloads(sequence, placements, a, outer, inner);
+            if (isBackdropSide) backdropPreloads(sequence, placements, a, outer, inner);
             else audiencePreloadsAndWhite(sequence, placements, a, outer, inner);
 
             if (cycle) {
 
-                Intake.Height height = backdropSide ? FIVE_STACK : FOUR_STACK;
-                int placement = backdropSide ? 1 : 2;
+                Intake.Height height = isBackdropSide ? FIVE_STACK : FOUR_STACK;
+                int placement = isBackdropSide ? 1 : 2;
 
                 // CYCLE 1
                 driveToStack1(sequence, height);
@@ -282,10 +285,14 @@ public final class MainAuton extends LinearOpMode {
 //                }
             }
 
-            if (park) {
+            if (parking == CORNER || parking == MIDFIELD) {
+
+                EditablePose movingToPark =  parking == CORNER ? parkingCorner : parkingMidfield;
+                EditablePose parked =        parking == CORNER ? parkedCorner : parkedMidfield;
+
                 sequence
-                        .lineTo(parkingInner.byAlliance().toPose2d().vec())
-                        .lineTo(parkedInner.byAlliance().toPose2d().vec())
+                        .lineTo(movingToPark.byAlliance().toPose2d().vec())
+                        .lineTo(parked.byAlliance().toPose2d().vec())
                 ;
             }
 

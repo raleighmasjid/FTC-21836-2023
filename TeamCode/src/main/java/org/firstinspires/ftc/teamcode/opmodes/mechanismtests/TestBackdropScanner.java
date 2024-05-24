@@ -27,7 +27,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.keyPressed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -49,12 +48,11 @@ public final class TestBackdropScanner extends LinearOpMode {
         // Get gamepad 1 button input and save alliance and side for autonomous configuration:
         while (opModeInInit()) {
             gamepadEx1.readButtons();
-            if (keyPressed(1, B)) isRed = true;
-            if (keyPressed(1, X)) isRed = false;
-            mTelemetry.addLine("Selected " + (isRed ? "RED " : "BLUE "));
+            if (keyPressed(1, B)) backdropScanner.pipeline.isRed = true;
+            if (keyPressed(1, X)) backdropScanner.pipeline.isRed = false;
+            mTelemetry.addLine("Selected " + (backdropScanner.pipeline.isRed ? "RED " : "BLUE "));
             mTelemetry.update();
         }
-        backdropScanner.pipeline.isRed = isRed;
 
         while (opModeIsActive()) {
 
