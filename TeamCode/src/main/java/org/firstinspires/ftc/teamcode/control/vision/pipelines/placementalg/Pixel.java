@@ -104,6 +104,10 @@ public final class Pixel implements Comparable<Pixel> {
         return userFriendlyX() + ", " + recommended.name() + " or " + color.name();
     }
 
+    public Color getColor() {
+        return recommended != EMPTY ? recommended : color;
+    }
+
     private String userFriendlyX() {
         switch (x) {
             case 0: return "FAR LEFT";

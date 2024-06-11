@@ -355,12 +355,12 @@ public class BackdropPipeline extends OpenCvPipeline {
         for (Pixel a : optimalPlacements) telemetry.addLine(a.toString());
 
         if (futureSteps > 1) for (int i = 1; i < futureSteps; i++) {
-            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(p));
+            optimalPlacements = calculator.getOptimalPlacements(backdrop.add(new Pixel(p, p.getColor())));
 
             if (optimalPlacements.isEmpty()) return;
 
             p = optimalPlacements.get(0);
-            Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.color), (int) (8 * SCALING_FACTOR));
+            Imgproc.circle(input, centerPoints[p.y][p.x], (int) PLACEMENT_MARKER_RADIUS, colorToScalar(p.getColor()), (int) (8 * SCALING_FACTOR));
         }
     }
 
@@ -573,7 +573,7 @@ public class BackdropPipeline extends OpenCvPipeline {
     }
 
     private void drawPixelIcon(Mat input, int y, int x) {
-        Scalar color = colorToScalar(backdrop.get(x, y).color);
+        Scalar color = colorToScalar(backdrop.get(x, y).getColor());
 
         for (int i = 0; i < hexCorners[y][x].length; i++) {
             int i2 = loopClip(i + 1, hexCorners[y][x].length);
