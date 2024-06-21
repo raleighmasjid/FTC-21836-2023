@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Pixel.Color.EMPTY;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.CALCULATE;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.MANUAL;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.MOVING;
-import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.OpState.SCORING;
+import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.TeleOpState.CALCULATE;
+import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.TeleOpState.MANUAL;
+import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.TeleOpState.MOVING;
+import static org.firstinspires.ftc.teamcode.opmodes.AutomatedTeleOp.TeleOpState.SCORING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.isRed;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.gamepadEx1;
@@ -37,20 +37,20 @@ import org.firstinspires.ftc.teamcode.control.vision.pipelines.placementalg.Plac
 @Disabled
 public final class AutomatedTeleOp extends LinearOpMode {
 
-    enum OpState {
+    enum TeleOpState {
         MANUAL,
         CALCULATE,
         MOVING,
         SCORING;
 
-        public static final OpState[] states = values();
+        public static final TeleOpState[] states = values();
 
-        public OpState plus(int i) {
+        public TeleOpState plus(int i) {
             return states[loopMod(ordinal() + i, states.length)];
         }
     }
 
-    private OpState opState = MANUAL;
+    private TeleOpState opState = MANUAL;
 
     private final PIDDriver driver = new PIDDriver();
     private final ElapsedTime timer = new ElapsedTime();
