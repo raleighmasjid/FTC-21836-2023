@@ -240,7 +240,7 @@ public final class Deposit {
 
         private final ElapsedTime timer = new ElapsedTime(), retractionTimer = new ElapsedTime();
         private boolean droppedPixel = true, floor = false;
-        public int pixelsLocked = 0;
+        int numOfPixels = 0;
         public final Pixel.Color[] colors = {EMPTY, EMPTY};
 
         private Paintbrush(HardwareMap hardwareMap) {
@@ -264,23 +264,19 @@ public final class Deposit {
             );
         }
 
-        int getPixelsLocked() {
-            return pixelsLocked;
-        }
-
         public void lockPixels(Pixel.Color... colors) {
             int pixelsInIntake = 0;
             for (Pixel.Color color : colors) if (color != EMPTY) pixelsInIntake++;
 
             if (pixelsInIntake == 1) {
-                if (pixelsLocked == 0) this.colors[1] = colors[0];
-                if (pixelsLocked == 1) this.colors[0] = colors[0];
+                if (numOfPixels == 0) this.colors[1] = colors[0];
+                if (numOfPixels == 1) this.colors[0] = colors[0];
             } else if (pixelsInIntake == 2) {
                 this.colors[1] = colors[1];
                 this.colors[0] = colors[0];
             }
 
-            pixelsLocked = clip(pixelsLocked + pixelsInIntake, 0, 2);
+            numOfPixels = clip(numOfPixels + pixelsInIntake, 0, 2);
         }
 
         public void toggleFloor() {
@@ -288,9 +284,9 @@ public final class Deposit {
         }
 
         public void dropPixel() {
-            pixelsLocked = clip(pixelsLocked - 1, 0, 2);
-            if (pixelsLocked <= 1) colors[0] = EMPTY;
-            if (pixelsLocked == 0) {
+            numOfPixels = clip(numOfPixels - 1, 0, 2);
+            if (numOfPixels <= 1) colors[0] = EMPTY;
+            if (numOfPixels == 0) {
                 colors[1] = EMPTY;
                 if (pivot.isActivated()) {
                     droppedPixel = false;
@@ -307,8 +303,8 @@ public final class Deposit {
             claw.updateAngles(ANGLE_CLAW_OPEN, ANGLE_CLAW_CLOSED);
             hook.updateAngles(ANGLE_HOOK_OPEN, ANGLE_HOOK_CLOSED);
 
-            claw.setActivated(pixelsLocked >= 1);
-            hook.setActivated(pixelsLocked == 2);
+            claw.setActivated(numOfPixels >= 1);
+            hook.setActivated(numOfPixels == 2);
 
             pivot.run();
             claw.run();

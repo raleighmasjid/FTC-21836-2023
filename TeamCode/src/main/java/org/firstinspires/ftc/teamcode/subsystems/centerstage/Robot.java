@@ -68,6 +68,14 @@ public final class Robot {
         else deposit.lift.climb();
     }
 
+    public boolean hasAPixel() {
+        return deposit.paintbrush.numOfPixels > 0;
+    }
+
+    public boolean has2Pixels() {
+        return deposit.paintbrush.numOfPixels == 2;
+    }
+
     public void readSensors() {
         bulkReader.bulkRead();
         drivetrain.update();
@@ -78,12 +86,10 @@ public final class Robot {
         drone.updateAngles(ANGLE_DRONE_LOADED, ANGLE_DRONE_LAUNCHED);
         spike.updateAngles(ANGLE_SPIKE_RELEASED, ANGLE_SPIKE_LOCKED);
 
-        if (intake.pixelsTransferred()) {
-            deposit.paintbrush.lockPixels(intake.colors);
-        }
+        if (intake.pixelsTransferred()) deposit.paintbrush.lockPixels(intake.colors);
 
         intake.run(
-                deposit.paintbrush.getPixelsLocked(),
+                deposit.paintbrush.numOfPixels,
                 deposit.isExtended(),
                 deposit.lift.isScoring()
         );
