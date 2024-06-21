@@ -42,12 +42,6 @@ public final class AutomatedTeleOp extends LinearOpMode {
         CALCULATE,
         MOVING,
         SCORING;
-
-        public static final TeleOpState[] states = values();
-
-        public TeleOpState plus(int i) {
-            return states[loopMod(ordinal() + i, states.length)];
-        }
     }
 
     private TeleOpState opState = MANUAL;
