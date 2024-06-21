@@ -119,8 +119,10 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 if (!reached1) break;
 
+                backdrop.add(new Pixel(placement, robot.deposit.paintbrush.colors[
+                        robot.deposit.paintbrush.pixelsLocked == 2 ? 0 : 1
+                ]));
                 robot.deposit.paintbrush.dropPixel();
-                backdrop.add(placement);
                 timer.reset();
                 opState = SCORING;
 
@@ -130,7 +132,7 @@ public final class AutomatedTeleOp extends LinearOpMode {
 
                 if (timer.seconds() <= TIME_DROP_FIRST) break;
 
-                opState = robot.deposit.paintbrush.colors[1] != EMPTY ? CALCULATE : MANUAL;
+                opState = robot.deposit.paintbrush.pixelsLocked == 0 ? MANUAL : CALCULATE;
         }
     }
 
