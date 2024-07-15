@@ -205,13 +205,15 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        if (state == PIXELS_FALLING || state == HAS_0_PIXELS) {
+        boolean pixelsFalling = state == PIXELS_FALLING;
+
+        if (pixelsFalling || state == HAS_0_PIXELS) {
             sensors[0].update();
             HSVs[0] = sensors[0].getHSV();
             reads[0] = fromHSV(HSVs[0]);
         }
 
-        if (state == PIXELS_FALLING || state == HAS_1_PIXEL) {
+        if (pixelsFalling || state == HAS_1_PIXEL) {
             sensors[1].update();
             HSVs[1] = sensors[1].getHSV();
             reads[1] = fromHSV(HSVs[1]);
