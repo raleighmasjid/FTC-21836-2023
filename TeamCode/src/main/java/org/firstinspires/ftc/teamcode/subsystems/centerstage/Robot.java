@@ -64,8 +64,8 @@ public final class Robot {
     }
 
     public void endgame() {
-        if (!drone.isActivated()) drone.setActivated(true);
-        else deposit.lift.climb();
+        drone.toggle();
+        if (drone.isActivated()) deposit.lift.climb();
     }
 
     public boolean hasAPixel() {
