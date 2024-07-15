@@ -351,10 +351,6 @@ public final class Intake {
         setExtended(!isIntaking);
     }
 
-    public boolean isExtended() {
-        return state.ordinal() <= HAS_1_PIXEL.ordinal();
-    }
-
     void printTelemetry() {
         mTelemetry.addLine("Intaking " + intakingAmount + " pixels");
         mTelemetry.addLine();
