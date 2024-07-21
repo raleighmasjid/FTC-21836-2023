@@ -63,9 +63,12 @@ public final class Robot {
         spike.run();
     }
 
+    private boolean droneLaunched;
+
     public void endgame() {
+        if (droneLaunched) deposit.lift.climb();
+        else droneLaunched = true;
         drone.toggle();
-        if (drone.isActivated()) deposit.lift.climb();
     }
 
     public boolean hasAPixel() {
