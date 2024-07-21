@@ -168,8 +168,7 @@ public final class MainTeleOp extends LinearOpMode {
         double x = gamepadEx1.getRightX();
         boolean overrideMode = gamepadEx1.isDown(LEFT_BUMPER);
 
-        if (wasTranslating || !overrideMode) wasTranslating = isTranslating();
-        else {
+        if (overrideMode) {
 
             robot.deposit.lift.setLiftPower(gamepadEx1.getLeftY());
             if (keyPressed(1, LEFT_STICK_BUTTON))   robot.deposit.lift.reset();
@@ -178,10 +177,6 @@ public final class MainTeleOp extends LinearOpMode {
             double y = gamepadEx1.getRightY();
             if (hypot(x, y) >= 0.8) robot.drivetrain.setCurrentHeading(-atan2(y, x) - FORWARD);
             x = 0;
-
-        }
-
-        if (overrideMode) {
 
             if (keyPressed(1, DPAD_UP))         robot.drivetrain.setTargetHeading(0);
             else if (keyPressed(1, DPAD_LEFT))  robot.drivetrain.setTargetHeading(PI * 0.5);
@@ -217,8 +212,8 @@ public final class MainTeleOp extends LinearOpMode {
 
         robot.run();
         robot.drivetrain.run(
-                gamepadEx1.getLeftX(),
-                gamepadEx1.getLeftY(),
+                overrideMode ? 0 : gamepadEx1.getLeftX(),
+                overrideMode ? 0 : gamepadEx1.getLeftY(),
                 x,
                 driveSlow
         );
