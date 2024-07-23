@@ -107,7 +107,7 @@ public final class Deposit {
                 HEIGHT_ROW_0 = 2.5,
                 HEIGHT_PIXEL = 2.59945,
                 PERCENT_OVERSHOOT = 0,
-                SPEED_RETRACTION = -0.05,
+                SPEED_RETRACTION = -0.1,
                 POS_1 = 0,
                 POS_2 = 25;
 
@@ -194,7 +194,7 @@ public final class Deposit {
                             retracted ? 0 : kG * voltageScalar
                     ) + (
                         manualLiftPower != 0 ?          manualLiftPower * voltageScalar :
-                        retracted && setpoint.x == 0 ?  SPEED_RETRACTION * voltageScalar :
+                        (retracted && setpoint.x == 0 ?  SPEED_RETRACTION * voltageScalar : 0) +
                         controller.calculate(currentState)
                     )
             ;
