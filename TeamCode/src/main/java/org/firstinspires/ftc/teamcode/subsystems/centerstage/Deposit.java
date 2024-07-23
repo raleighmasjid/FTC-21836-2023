@@ -101,7 +101,7 @@ public final class Deposit {
                 INCHES_PER_TICK = 0.0088581424,
                 ROW_RETRACTED = -1,
                 ROW_FLOOR_SCORING = -0.5,
-                ROW_CLIMBED = 0.5,
+                ROW_CLIMBED = -0.75,
                 ROW_CLIMBING = 6.25,
                 HEIGHT_RETRACTED = 0.5,
                 HEIGHT_ROW_0 = 2.5,
