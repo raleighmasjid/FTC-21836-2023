@@ -272,11 +272,8 @@ public final class Intake {
             case PIXELS_SETTLING:
 
                 pixelsTransferred = timer.seconds() >= TIME_SETTLING;
-                if (pixelsTransferred) {
-                    state = RETRACTED;
-                    isIntaking = false;
-                    setIntakingAmount(2);
-                } else break;
+                if (pixelsTransferred) retract();
+                else break;
 
             case RETRACTED:
 
@@ -317,6 +314,12 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    private void retract() {
+        state = RETRACTED;
+        isIntaking = false;
+        setIntakingAmount(2);
     }
 
     boolean clearOfDeposit() {
