@@ -245,7 +245,8 @@ public final class Intake {
 
             case WAITING_FOR_DEPOSIT:
 
-                int pixelsInIntake = (colors[1] == EMPTY ? 0 : 1) + (colors[0] == EMPTY ? 0 : 1);
+                boolean bottomEmpty = colors[0] == EMPTY;
+                int pixelsInIntake = (colors[1] == EMPTY ? 0 : 1) + (bottomEmpty ? 0 : 1);
 
                 if (!depositIsExtended && (!isIntaking || pixelsInIntake + pixelsInDeposit <= 2)) {
                     state = PIVOTING;
