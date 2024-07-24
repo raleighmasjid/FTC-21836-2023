@@ -238,7 +238,7 @@ public final class Intake {
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
-                if (topFull || !isIntaking || intakingAmount < 2) {
+                if (topFull || !isIntaking || intakingAmount == 1) {
                     if (isIntaking) latch.setActivated(true);
                     state = WAITING_FOR_DEPOSIT;
                 } else break;
