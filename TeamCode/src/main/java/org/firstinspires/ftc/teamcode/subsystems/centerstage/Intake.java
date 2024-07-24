@@ -239,7 +239,7 @@ public final class Intake {
 
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
                 if (topFull || !isIntaking || intakingAmount == 1) {
-                    if (isIntaking) latch.setActivated(true);
+                    if (colors[0] != EMPTY) latch.setActivated(true);
                     state = WAITING_FOR_DEPOSIT;
                 } else break;
 
