@@ -248,7 +248,10 @@ public final class Intake {
                 boolean bottomEmpty = colors[0] == EMPTY;
                 int pixelsInIntake = (colors[1] == EMPTY ? 0 : 1) + (bottomEmpty ? 0 : 1);
 
-                if (!depositIsExtended && (!isIntaking || pixelsInIntake + pixelsInDeposit <= 2)) {
+                if (bottomEmpty) {
+                    retract();
+                    break;
+                } else if (!depositIsExtended && pixelsInIntake + pixelsInDeposit <= 2) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
