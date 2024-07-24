@@ -219,6 +219,8 @@ public final class Intake {
             reads[1] = fromHSV(HSVs[1]);
         }
 
+        boolean depositIsRunning = liftIsScoring || depositIsExtended;
+
         switch (state) {
             case HAS_0_PIXELS:
 
@@ -281,14 +283,13 @@ public final class Intake {
                 if (isIntaking) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                } else break;
+                } else {
+                    pivot.setActivated(!depositIsRunning);
+                    break;
+                }
 
         }
 
-
-        boolean depositIsRunning = liftIsScoring || depositIsExtended;
-
-        if (state == RETRACTED) pivot.setActivated(!depositIsRunning);
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
