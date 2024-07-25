@@ -50,7 +50,7 @@ import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    static boolean doAutoSlow = true, wasTranslating;
+    static boolean doAutoSlow = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
