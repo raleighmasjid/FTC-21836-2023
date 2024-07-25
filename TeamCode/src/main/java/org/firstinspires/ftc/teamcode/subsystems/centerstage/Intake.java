@@ -205,26 +205,12 @@ public final class Intake {
 
         if (pixelsTransferred) pixelsTransferred = false;
 
-        boolean pixelsFalling = state == PIXELS_FALLING;
-
-        if (pixelsFalling || state == HAS_0_PIXELS) {
-            sensors[0].update();
-            HSVs[0] = sensors[0].getHSV();
-            reads[0] = fromHSV(HSVs[0]);
-        }
-
-        if (pixelsFalling || state == HAS_1_PIXEL) {
-            sensors[1].update();
-            HSVs[1] = sensors[1].getHSV();
-            reads[1] = fromHSV(HSVs[1]);
-        }
-
         boolean depositIsRunning = liftIsScoring || depositIsExtended;
 
         switch (state) {
             case HAS_0_PIXELS:
 
-                boolean bottomFull = (colors[0] = reads[0]) != EMPTY;
+                boolean bottomFull = (colors[0] = readColorSensor(0)) != EMPTY;
                 if (bottomFull || !isIntaking) {
                     state = PIXEL_1_SETTLING;
                     timer.reset();
@@ -237,7 +223,7 @@ public final class Intake {
 
             case HAS_1_PIXEL:
 
-                boolean topFull = (colors[1] = reads[1]) != EMPTY;
+                boolean topFull = (colors[1] = readColorSensor(1)) != EMPTY;
                 if (topFull || !isIntaking || intakingAmount == 1) {
                     if (colors[0] != EMPTY) latch.setActivated(true);
                     state = WAITING_FOR_DEPOSIT;
@@ -270,7 +256,7 @@ public final class Intake {
 
             case PIXELS_FALLING:
 
-                if (reads[1] == EMPTY && reads[0] == EMPTY) {
+                if (readColorSensor(1) == EMPTY && readColorSensor(0) == EMPTY) {
                     state = PIXELS_SETTLING;
                     timer.reset();
                 } else break;
@@ -320,6 +306,11 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    private Pixel.Color readColorSensor(int i) {
+        sensors[i].update();
+        return reads[i] = fromHSV(HSVs[i] = sensors[i].getHSV());
     }
 
     private void retract() {
