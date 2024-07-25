@@ -219,6 +219,8 @@ public final class Intake {
             reads[1] = fromHSV(HSVs[1]);
         }
 
+        boolean depositIsRunning = liftIsScoring || depositIsExtended;
+
         switch (state) {
             case HAS_0_PIXELS:
 
@@ -236,14 +238,20 @@ public final class Intake {
             case HAS_1_PIXEL:
 
                 boolean topFull = (colors[1] = reads[1]) != EMPTY;
-                if (topFull || !isIntaking || intakingAmount < 2) {
-                    if (isIntaking) latch.setActivated(true);
+                if (topFull || !isIntaking || intakingAmount == 1) {
+                    if (colors[0] != EMPTY) latch.setActivated(true);
                     state = WAITING_FOR_DEPOSIT;
                 } else break;
 
             case WAITING_FOR_DEPOSIT:
 
-                if (!depositIsExtended && (!isIntaking || (colors[1] == EMPTY ? 0 : 1) + (colors[0] == EMPTY ? 0 : 1) + pixelsInDeposit <= 2)) {
+                boolean bottomEmpty = colors[0] == EMPTY;
+                int pixelsInIntake = (colors[1] == EMPTY ? 0 : 1) + (bottomEmpty ? 0 : 1);
+
+                if (bottomEmpty) {
+                    retract();
+                    break;
+                } else if (!depositIsExtended && pixelsInIntake + pixelsInDeposit <= 2) {
                     state = PIVOTING;
                     pivot.setActivated(true);
                     timer.reset();
@@ -270,25 +278,21 @@ public final class Intake {
             case PIXELS_SETTLING:
 
                 pixelsTransferred = timer.seconds() >= TIME_SETTLING;
-                if (pixelsTransferred) {
-                    state = RETRACTED;
-                    isIntaking = false;
-                    setIntakingAmount(2);
-                } else break;
+                if (pixelsTransferred) retract();
+                else break;
 
             case RETRACTED:
 
                 if (isIntaking) {
                     state = HAS_0_PIXELS;
                     pivot.setActivated(false);
-                } else break;
+                } else {
+                    pivot.setActivated(!depositIsRunning);
+                    break;
+                }
 
         }
 
-
-        boolean depositIsRunning = liftIsScoring || depositIsExtended;
-
-        if (state == RETRACTED) pivot.setActivated(!depositIsRunning);
 
         if (pivot.isActivated()) timeSinceRetracted.reset();
 
@@ -316,6 +320,12 @@ public final class Intake {
         latch.run();
 
         motor.set(motorPower);
+    }
+
+    private void retract() {
+        state = RETRACTED;
+        isIntaking = false;
+        setIntakingAmount(2);
     }
 
     boolean clearOfDeposit() {

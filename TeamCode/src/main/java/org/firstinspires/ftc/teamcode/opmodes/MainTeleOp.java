@@ -43,19 +43,16 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.centerstage.Robot;
 
 @TeleOp
 public final class MainTeleOp extends LinearOpMode {
 
-    static boolean doAutoSlow = true, wasTranslating;
+    static boolean doAutoSlow = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
-
-        ElapsedTime loopTimer = new ElapsedTime();
 
         teleOpInit(this);
 
@@ -69,11 +66,6 @@ public final class MainTeleOp extends LinearOpMode {
             teleOpControls();
 
             robot.run();
-
-            mTelemetry.addData("Loop time", loopTimer.seconds());
-            loopTimer.reset();
-            mTelemetry.addLine();
-            mTelemetry.addLine();
 
             mTelemetry.addData("Auto slow is", doAutoSlow ? "enabled" : "disabled");
             mTelemetry.addLine();
@@ -157,9 +149,9 @@ public final class MainTeleOp extends LinearOpMode {
 
     static void teleOpControls() {
 
-        if (keyPressed(2, Y))   robot.spike.toggle();
-        if (keyPressed(2, X))   doAutoSlow = !doAutoSlow;
-        if (keyPressed(2, A))   robot.deposit.paintbrush.toggleFloor();
+        if (keyPressed(2, DPAD_RIGHT))   robot.spike.toggle();
+        if (keyPressed(2, LEFT_BUMPER))   doAutoSlow = !doAutoSlow;
+        if (keyPressed(2, DPAD_LEFT))   robot.deposit.paintbrush.toggleFloor();
 
         robot.intake.setMotorPower(
                 gamepadEx1.getTrigger(RIGHT_TRIGGER) - gamepadEx1.getTrigger(LEFT_TRIGGER)
@@ -197,7 +189,7 @@ public final class MainTeleOp extends LinearOpMode {
             else if (keyPressed(1, DPAD_RIGHT)) robot.deposit.paintbrush.lockPixels(WHITE);
 
             if (keyPressed(1, Y))               robot.intake.toggleIntakeAmount();
-            if (keyPressed(1, A))               robot.intake.toggle();
+            if (keyPressed(1, X))               robot.intake.toggle();
             if (keyPressed(1, B))               robot.endgame();
 
         }
