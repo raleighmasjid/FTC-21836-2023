@@ -70,10 +70,10 @@ public final class MainTeleOp extends LinearOpMode {
 
             robot.run();
 
-            mTelemetry.addData("Loop time", loopTimer.seconds());
-            loopTimer.reset();
-            mTelemetry.addLine();
-            mTelemetry.addLine();
+//            mTelemetry.addData("Loop time", loopTimer.seconds());
+//            loopTimer.reset();
+//            mTelemetry.addLine();
+//            mTelemetry.addLine();
 
             mTelemetry.addData("Auto slow is", doAutoSlow ? "enabled" : "disabled");
             mTelemetry.addLine();
