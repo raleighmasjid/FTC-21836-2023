@@ -35,6 +35,7 @@ public final class AutonVars {
     static ParkingLocation parking = CORNER;
 
     static double
+            PARTNER_WAIT = 1,
             SIZE_WINDOW = 720,
             LENGTH_ROBOT = 17.3984665354,
             WIDTH_ROBOT = 16.4220472441,

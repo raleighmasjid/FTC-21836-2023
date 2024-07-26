@@ -1,16 +1,19 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.control.vision.pipelines.PropDetectPipeline.Randomization.randomizations;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.driveToStack1;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.intake2Pixels;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonCycles.score;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.audiencePreloadsAndWhite;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonPreloads.backdropPreloads;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.PARTNER_WAIT;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.CORNER;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.ParkingLocation.MIDFIELD;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.WIDTH_PIXEL;
@@ -32,6 +35,7 @@ import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITI
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARK;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_PARTNER;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.EDITING_WAIT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.AutonConfig.selections;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FIVE_STACK;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Intake.Height.FOUR_STACK;
@@ -102,7 +106,8 @@ public final class MainAuton extends LinearOpMode {
         EDITING_SIDE,
         EDITING_PARK,
         EDITING_CYCLE,
-        EDITING_PARTNER;
+        EDITING_PARTNER,
+        EDITING_WAIT;
 
         public static final AutonConfig[] selections = values();
 
@@ -169,6 +174,11 @@ public final class MainAuton extends LinearOpMode {
                     break;
             }
 
+            if (selection == EDITING_WAIT) {
+                if (keyPressed(1, Y)) PARTNER_WAIT += 0.5;
+                if (keyPressed(1, A)) PARTNER_WAIT -= 0.5;
+            }
+
             printConfig(selection);
             mTelemetry.addLine();
             mTelemetry.addLine();
@@ -223,6 +233,8 @@ public final class MainAuton extends LinearOpMode {
         mTelemetry.addLine("WILL " + (cycle ? "CYCLE" : "NOT CYCLE") + selection.markIf(EDITING_CYCLE));
         mTelemetry.addLine();
         mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
+        mTelemetry.addLine();
+        mTelemetry.addLine("Pause after spike: " + PARTNER_WAIT);
         mTelemetry.addLine();
         mTelemetry.addLine("Randomizations:");
         for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(
