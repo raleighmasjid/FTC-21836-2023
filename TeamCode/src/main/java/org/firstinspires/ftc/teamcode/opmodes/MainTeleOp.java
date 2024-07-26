@@ -199,7 +199,8 @@ public final class MainTeleOp extends LinearOpMode {
                 gamepadEx1.isDown(RIGHT_BUMPER) ||
                 (doAutoSlow && (
                         (robot.deposit.lift.isScoring() && robot.deposit.lift.isExtended()) ||
-                        gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0
+//                        gamepadEx1.getTrigger(RIGHT_TRIGGER) > 0 ||
+                        robot.intake.isExtended()
                 ));
 
         robot.run();
