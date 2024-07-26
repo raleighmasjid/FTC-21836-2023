@@ -183,8 +183,8 @@ public final class MainTeleOp extends LinearOpMode {
 
         } else {
 
-            if (keyPressed(1, DPAD_DOWN))       robot.deposit.lift.changeRow(-1);
-            else if (keyPressed(1, DPAD_UP))    robot.deposit.lift.changeRow(1);
+            if (keyPressed(1, DPAD_DOWN))       robot.deposit.lift.changeRowBy(-1);
+            else if (keyPressed(1, DPAD_UP))    robot.deposit.lift.changeRowBy(1);
             else if (keyPressed(1, DPAD_LEFT))  robot.deposit.paintbrush.dropPixel();
             else if (keyPressed(1, DPAD_RIGHT)) robot.deposit.paintbrush.lockPixels(WHITE);
 

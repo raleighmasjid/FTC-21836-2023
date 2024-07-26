@@ -166,7 +166,7 @@ public final class Deposit {
             return row * HEIGHT_PIXEL + HEIGHT_ROW_0;
         }
 
-        public void changeRow(int deltaRow) {
+        public void changeRowBy(int deltaRow) {
             setTargetRow(round(targetRow + deltaRow));
         }
 
