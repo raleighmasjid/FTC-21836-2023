@@ -10,7 +10,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_INTAKING_3;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.LEFT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.RIGHT;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.autonBackdrop;
-import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.robot;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.toPose2d;
 import static org.firstinspires.ftc.teamcode.subsystems.centerstage.Deposit.Paintbrush.TIME_DROP_FIRST;
@@ -77,17 +76,17 @@ final class AutonCycles {
 
         Pose2d firstPose = toPose2d(first);
         Pose2d secondPose = toPose2d(second);
-        Vector2d firstVec = firstPose.vec();
+//        Vector2d firstVec = firstPose.vec();
         Vector2d secondVec = secondPose.vec();
 
-        mTelemetry.addLine(backstage.toString());
-        mTelemetry.addLine(first.toString());
-        mTelemetry.addLine(firstPose.toString());
-        mTelemetry.addLine(firstVec.toString());
-        mTelemetry.addLine(second.toString());
-        mTelemetry.addLine(secondPose.toString());
-        mTelemetry.addLine(secondVec.toString());
-        mTelemetry.addLine();
+//        mTelemetry.addLine(backstage.toString());
+//        mTelemetry.addLine(first.toString());
+//        mTelemetry.addLine(firstPose.toString());
+//        mTelemetry.addLine(firstVec.toString());
+//        mTelemetry.addLine(second.toString());
+//        mTelemetry.addLine(secondPose.toString());
+//        mTelemetry.addLine(secondVec.toString());
+//        mTelemetry.addLine();
 
         sequence
                 .addTemporalMarker( () -> {
