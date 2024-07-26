@@ -41,7 +41,7 @@ public final class Deposit {
     public final Paintbrush paintbrush;
     public final Lift lift;
 
-    private double lastRow = ROW_RETRACTED;
+    private double lastRow = 1;
 
     Deposit(HardwareMap hardwareMap) {
         lift = new Lift(hardwareMap);
