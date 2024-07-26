@@ -41,15 +41,22 @@ public final class Deposit {
     public final Paintbrush paintbrush;
     public final Lift lift;
 
+    private double lastRow = ROW_RETRACTED;
+
     Deposit(HardwareMap hardwareMap) {
         lift = new Lift(hardwareMap);
         paintbrush = new Paintbrush(hardwareMap);
+    }
+
+    public void goToLastRow() {
+        lift.setTargetRow(lastRow);
     }
 
     void run(boolean intakeClear) {
 
         if (!paintbrush.droppedPixel && (paintbrush.timer.seconds() >= TIME_DROP_SECOND)) {
             paintbrush.droppedPixel = true;
+            lastRow = lift.targetRow;
             lift.setTargetRow(ROW_RETRACTED);
         }
 
