@@ -87,17 +87,17 @@ final class AutonPreloads {
     static void audiencePreloadsAndWhite(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
 
         Pose2d offset = (
-                inner ? offsetAudienceInner :
+                        inner ? offsetAudienceInner :
                         outer ? offsetAudienceOuter :
                                 offsetAudienceCenter
         ).byAlliance().toPose2d();
 
         sequence
-                .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
-                    robot.deposit.lift.setTargetRow(ROW_FLOOR_SCORING);
-                })
                 .addTemporalMarker(() -> {
                     robot.intake.setExtended(true);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(TIME_PRE_SPIKE_AUDIENCE_PAINTBRUSH, () -> {
+                    robot.deposit.lift.setTargetRow(ROW_FLOOR_SCORING);
                 })
         ;
 

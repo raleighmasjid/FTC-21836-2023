@@ -97,7 +97,7 @@ public final class MainTeleOp extends LinearOpMode {
 
         // Initialize robot:
         robot = new Robot(opMode.hardwareMap);
-        robot.initRun();
+        robot.run();
 
         // Initialize gamepads:
         gamepadEx1 = new GamepadEx(opMode.gamepad1);
