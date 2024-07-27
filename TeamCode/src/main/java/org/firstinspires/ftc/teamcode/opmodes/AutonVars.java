@@ -44,7 +44,7 @@ public final class AutonVars {
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
-            X_INTAKING = -54,
+            X_INTAKING = -53.75,
             Y_INTAKING_1 = -10,
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
