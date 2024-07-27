@@ -44,7 +44,7 @@ public final class AutonVars {
             X_START_LEFT = SIZE_TILE * -1.5,
             X_START_RIGHT = SIZE_TILE * 0.5,
             Y_START = -SIZE_HALF_FIELD + LENGTH_ROBOT * 0.5,
-            X_INTAKING = -52,
+            X_INTAKING = -54,
             Y_INTAKING_1 = -10,
             Y_INTAKING_2 = -23.625,
             Y_INTAKING_3 = -35.4375,
@@ -70,15 +70,12 @@ public final class AutonVars {
             centerSpikeBackdrop = new EditablePose(19, -22.5, LEFT),
             innerSpikeBackdrop = new EditablePose(5.4, -35, LEFT),
             outerSpikeBackdrop = new EditablePose(30, -32, LEFT),
-            centerSpikeAudience = new EditablePose(-47, -12, 3 * PI / 4.0),
+            centerSpikeAudience = new EditablePose(-47, -14, 3 * PI / 4.0),
             innerSpikeAudience = new EditablePose(-36, -30, LEFT),
             outerSpikeAudience = new EditablePose(-47, -12, FORWARD),
             parkingCorner = new EditablePose(X_BACKDROP, -60, LEFT),
             parkedCorner = new EditablePose(60, parkingCorner.y, LEFT),
             parkingMidfield = new EditablePose(X_BACKDROP, -12, LEFT),
             parkedMidfield = new EditablePose(60, parkingMidfield.y, LEFT),
-            enteringBackstage = new EditablePose(22, -11, LEFT),
-            offsetAudienceInner = new EditablePose(0, 0, 0),
-            offsetAudienceOuter = new EditablePose(0, 0, 0),
-            offsetAudienceCenter = new EditablePose(0, 0, 0);
+            enteringBackstage = new EditablePose(22, -10, LEFT);
 }

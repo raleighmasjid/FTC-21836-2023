@@ -66,10 +66,7 @@ final class AutonCycles {
         ;
     }
 
-    static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
-        score(sequence, placements, index, new Pose2d());
-    }
-    static void score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index, Pose2d offset) {
+    static void  score(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, int index) {
         Pixel first = placements.get(index);
         Pixel second = placements.get(index + 1);
         Pose2d backstage = AutonVars.enteringBackstage.byAlliance().toPose2d();

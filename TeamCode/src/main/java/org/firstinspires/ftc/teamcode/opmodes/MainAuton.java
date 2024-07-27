@@ -176,7 +176,7 @@ public final class MainAuton extends LinearOpMode {
 
             if (selection == EDITING_WAIT) {
                 if (keyPressed(1, Y)) PARTNER_WAIT += 0.5;
-                if (keyPressed(1, A)) PARTNER_WAIT -= 0.5;
+                if (keyPressed(1, A) && PARTNER_WAIT > 0) PARTNER_WAIT -= 0.5;
             }
 
             printConfig(selection);
@@ -234,7 +234,7 @@ public final class MainAuton extends LinearOpMode {
         mTelemetry.addLine();
         mTelemetry.addLine("PARTNER " + (partnerWillDoRand ? "PLACES" : "DOESN'T PLACE") + " YELLOW" + selection.markIf(EDITING_PARTNER));
         mTelemetry.addLine();
-        mTelemetry.addLine("Pause after spike: " + PARTNER_WAIT);
+        mTelemetry.addLine("Pause after spike: " + PARTNER_WAIT + selection.markIf(EDITING_WAIT));
         mTelemetry.addLine();
         mTelemetry.addLine("Randomizations:");
         for (int i = 0; i < ourPlacements.length; i++) mTelemetry.addLine(

@@ -18,9 +18,6 @@ import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.centerSpikeAudien
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.centerSpikeBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.innerSpikeAudience;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.innerSpikeBackdrop;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.offsetAudienceCenter;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.offsetAudienceInner;
-import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.offsetAudienceOuter;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.outerSpikeAudience;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.outerSpikeBackdrop;
 import static org.firstinspires.ftc.teamcode.opmodes.MainAuton.FORWARD;
@@ -86,12 +83,6 @@ final class AutonPreloads {
 
     static void audiencePreloadsAndWhite(TrajectorySequenceBuilder sequence, ArrayList<Pixel> placements, double a, boolean outer, boolean inner) {
 
-        Pose2d offset = (
-                        inner ? offsetAudienceInner :
-                        outer ? offsetAudienceOuter :
-                                offsetAudienceCenter
-        ).byAlliance().toPose2d();
-
         sequence
                 .addTemporalMarker(() -> {
                     robot.intake.setExtended(true);
@@ -111,7 +102,7 @@ final class AutonPreloads {
             sequence
                     .setTangent(a * (REVERSE - ANGLE_INNER_SPIKE_AUDIENCE_APPROACH))
                     .splineToSplineHeading(spike, a * ANGLE_INNER_SPIKE_AUDIENCE_APPROACH)
-                    .strafeLeft(a * 2)
+//                    .strafeLeft(a * 2)
                     .addTemporalMarker(() -> {
                         robot.deposit.paintbrush.dropPixel();
                     })
@@ -179,6 +170,6 @@ final class AutonPreloads {
 
         if (PARTNER_WAIT > 0) sequence.waitSeconds(PARTNER_WAIT);
 
-        score(sequence, placements, 0, offset);
+        score(sequence, placements, 0);
     }
 }
