@@ -49,12 +49,13 @@ public final class Intake {
             ANGLE_STACK_3 = 10.5,
             ANGLE_STACK_4 = 15.5,
             ANGLE_STACK_5 = 19.61,
-            TIME_PIXEL_1_SETTLING = 0.25,
+            TIME_PIXEL_1_SETTLING = 0.35,
             TIME_PIVOTING = 0,
             TIME_SETTLING = 0.2,
             TIME_INTAKE_FLIP_TO_LIFT = 0.2,
             TIME_REVERSING = 0.175,
             SPEED_SLOW_REVERSING = -0.2,
+            SPEED_REVERSING = -0.6,
             COLOR_SENSOR_GAIN = 1;
 
     /**
@@ -250,7 +251,7 @@ public final class Intake {
                     state = PIXELS_FALLING;
                     latch.setActivated(false);
                 } else {
-                    setMotorPower(timer.seconds() <= TIME_REVERSING ? -1 : SPEED_SLOW_REVERSING);
+                    setMotorPower(timer.seconds() <= TIME_REVERSING ? SPEED_REVERSING : SPEED_SLOW_REVERSING);
                     break;
                 }
 
