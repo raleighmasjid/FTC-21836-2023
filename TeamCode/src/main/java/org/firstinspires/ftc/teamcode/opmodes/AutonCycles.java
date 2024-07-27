@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.SPEED_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.TIME_INTAKING;
+import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_BACKDROP;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.X_SHIFT_INTAKING;
 import static org.firstinspires.ftc.teamcode.opmodes.AutonVars.Y_INTAKING_1;
@@ -97,7 +98,8 @@ final class AutonCycles {
 //                    offsetLocalization(backstage, offset);
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .splineToSplineHeading(firstPose, RIGHT)
+                .lineToSplineHeading(new Pose2d(X_BACKDROP, backstage.getY(), RIGHT))
+                .lineToSplineHeading(firstPose)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
                     autonBackdrop.add(first);
