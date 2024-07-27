@@ -14,7 +14,7 @@ public final class AutonPlacementVisualizer {
                 ArrayList<Pixel> optimalPlacements = AutonPixelSupplier.getPlacements(partnerWillDoRandomization, i);
                 Backdrop backdrop = new Backdrop();
 
-                for (int j = 0; j < 15; j++) {
+                for (int j = 0; j < 2; j++) {
                     backdrop.add(optimalPlacements.get(j));
                 }
                 backdrop.print();
