@@ -98,7 +98,7 @@ final class AutonCycles {
 //                    offsetLocalization(backstage, offset);
                     robot.deposit.lift.setTargetRow(first.y);
                 })
-                .lineToSplineHeading(new Pose2d(X_BACKDROP, backstage.getY(), RIGHT))
+                .lineToSplineHeading(new Pose2d(X_BACKDROP, backstage.getY(), LEFT))
                 .lineToSplineHeading(firstPose)
                 .addTemporalMarker(() -> {
                     robot.deposit.paintbrush.dropPixel();
